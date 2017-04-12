@@ -1,0 +1,6 @@
+# data
+data/
+
+# python files
+__pycache__/
+env/
