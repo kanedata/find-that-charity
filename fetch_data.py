@@ -58,5 +58,7 @@ def main():
 
     # @TODO get charity commission register of mergers
 
+    # @TODO scrape Northern Ireland register of charities
+
 if __name__ == '__main__':
     main()
