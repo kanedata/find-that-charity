@@ -1,18 +1,130 @@
 import csv
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
+from elasticsearch.exceptions import NotFoundError
+import validators
+from urllib.parse import urlparse
 
 INDEX_NAME = "charitysearch"
+
+def parse_postcode(postcode):
+    """
+    standardises a postcode into the correct format
+    """
+
+    if postcode is None:
+        return None
+
+    # check for blank/empty
+    postcode = postcode.strip()
+    if postcode=='':
+        return None
+
+    # check for nonstandard codes
+    if len(postcode.replace(" ", ""))>7:
+        return postcode
+
+    first_part = postcode[:-3].strip()
+    last_part = postcode[-3:].strip()
+
+    # check for incorrect characters
+    first_part = list(first_part)
+    last_part = list(last_part)
+    if last_part[0]=="O":
+        last_part[0] = "0"
+
+    return "%s %s" % ("".join(first_part), "".join(last_part) )
+
+def fetch_postcode(postcode, es):
+    if postcode is None:
+        return None
+
+    areas = ["hro","wz11","bua11","pct","lsoa11","nuts","msoa11","laua",
+             "oa11","ccg","ward","teclec","gor","ttwa","pfa","pcon","lep1",
+             "cty","eer","ctry","park","lep2","hlthau","buasd11"]
+    try:
+        res = es.get(index="postcode", doc_type='postcode', id=postcode, ignore=[404])
+        if res['found']:
+            return (res['_source'].get("location"),
+                    {k:res['_source'].get(k) for k in res['_source'] if k in areas})
+    except (NotFoundError, ValueError):
+        return None
+
+def parse_company_number(coyno):
+    coyno = coyno.strip()
+    if coyno=="":
+        return None
+
+    if coyno.isdigit():
+        return coyno.rjust(8, "0")
+
+    return coyno
+
+def parse_url(url):
+    if url is None:
+        return None
+
+    url = url.strip()
+
+    if validators.url(url):
+        return url
+
+    if validators.url("http://%s" % url):
+        return "http://%s" % url
+
+    if url in ["n.a", 'non.e', '.0', '-.-', '.none', '.nil', 'N/A', 'TBC', 'under construction', '.n/a', '0.0', '.P', b'', 'no.website']:
+        return None
+
+    for i in ['http;//', 'http//', 'http.//', 'http:\\\\', 'http://http://', 'www://', 'www.http://']:
+        url = url.replace(i, 'http://')
+    url = url.replace('http:/www', 'http://www')
+
+    for i in ['www,', ':www', 'www:', 'www/', 'www\\\\', '.www']:
+        url = url.replace(i, 'www.')
+
+    url = url.replace(',', '.')
+    url = url.replace('..', '.')
+
+    if validators.url(url):
+        return url
+
+    if validators.url("http://%s" % url):
+        return "http://%s" % url
+
+def get_domain(url=None, email=None):
+    if url==None:
+        return None
+    u = urlparse(url)
+    domain = u.netloc
+    if domain.startswith('www.'):
+        domain = domain[4:]
+    return domain
+
+def clean_row(row):
+    if isinstance(row, dict):
+        row = {k: row[k].strip() for k in row}
+        for k in row:
+            if row[k]=="":
+                row[k] = None
+    elif isinstance(row, list):
+        row = [v.strip() for v in row]
+        for k, v in enumerate(row):
+            if v=="":
+                row[k] = None
+
+    return row
 
 def main():
 
     chars = {}
+    es = Elasticsearch()
 
     with open( "data/ccew/extract_charity.csv", "r", encoding="latin1" ) as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
         ccount = 0
         for row in csvreader:
             if len(row)>1 and row[1]=="0":
+                row = clean_row(row)
                 char_json = {
                     "_index": INDEX_NAME,
                     "_type": "charity",
@@ -21,12 +133,12 @@ def main():
                     "ccew_number": row[0],
                     "oscr_number": None,
                     "active": row[3]=="R",
-                    "names": [{"name": row[2].strip(), "type": "registered name", "source": "ccew"}],
-                    "known_as": row[2].strip(),
+                    "names": [{"name": row[2], "type": "registered name", "source": "ccew"}],
+                    "known_as": row[2],
                     "geo": {
                         "areas": [],
-                        "postcode": row[15].strip(),
-                        "latlng": [None, None]
+                        "postcode": parse_postcode(row[15]),
+                        "location": None
                     },
                     "url": None,
                     "domain": None,
@@ -34,43 +146,50 @@ def main():
                     "company_number": [],
                     "parent": None
                 }
+
                 chars[row[0]] = char_json
 
                 ccount += 1
                 if ccount % 10000 == 0:
-                    print("[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount)
+                    print('\r' , "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount, end=' ')
+        print('\r' , "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount)
 
         ccount = 0
         a.seek(0)
         for row in csvreader:
             if len(row)>1 and row[1]!="0":
-                chars[row[0]]["names"].append({"name": row[2].strip(), "type": "subsidiary name", "source": "ccew"})
+                row = clean_row(row)
+                chars[row[0]]["names"].append({"name": row[2], "type": "subsidiary name", "source": "ccew"})
                 ccount += 1
                 if ccount % 10000 == 0:
-                    print("[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount)
+                    print('\r' , "[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount, end=' ')
+        print('\r' , "[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount)
 
     with open( "data/ccew/extract_main_charity.csv", encoding="latin1") as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
         ccount = 0
         for row in csvreader:
             if len(row)>1:
-                if row[1].strip()!="":
-                    chars[row[0]]["company_number"].append({"number": row[1], "source": "ccew"})
-                if row[9].strip()!="":
+                row = clean_row(row)
+                if row[1]:
+                    chars[row[0]]["company_number"].append({"number": parse_company_number(row[1]), "source": "ccew"})
+                if row[9]:
                     chars[row[0]]["url"] = row[9]
-                if row[6].strip()!="":
+                if row[6]:
                     chars[row[0]]["latest_income"] = int(row[6])
                 ccount += 1
                 if ccount % 10000 == 0:
-                    print("[CCEW] %s charities read from extract_main_charity.csv" % ccount)
+                    print('\r' , "[CCEW] %s charities read from extract_main_charity.csv" % ccount, end=' ')
+        print('\r' , "[CCEW] %s charities read from extract_main_charity.csv" % ccount)
 
     with open( "data/ccew/extract_name.csv", encoding="latin1") as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
         ccount = 0
         for row in csvreader:
             if len(row)>1:
+                row = clean_row(row)
                 char_names = [i["name"] for i in chars[row[0]]["names"]]
-                name = row[3].strip()
+                name = row[3]
                 if name not in char_names:
                     name_type = "other name"
                     if row[1]!="0":
@@ -82,7 +201,8 @@ def main():
                     })
                 ccount += 1
                 if ccount % 10000 == 0:
-                    print("[CCEW] %s names read from extract_name.csv" % ccount)
+                    print('\r' , "[CCEW] %s names read from extract_name.csv" % ccount, end=' ')
+        print('\r' , "[CCEW] %s names read from extract_name.csv" % ccount)
 
     # store dual registration details
     dual = {}
@@ -100,25 +220,28 @@ def main():
         cadded = 0
         cupdated = 0
         for row in csvreader:
+            row = clean_row(row)
 
             # check if they're dual registered
-            if row["Charity Number"].strip() in dual:
-                for c in dual[row["Charity Number"].strip()]:
+            if row["Charity Number"] in dual:
+                for c in dual[row["Charity Number"]]:
                     if c in chars:
                         chars[c]["oscr_number"] = row["Charity Number"]
                         char_names = [i["name"] for i in chars[c]["names"]]
                         if row["Charity Name"] not in char_names:
-                            chars[c]["names"].append({"name": row["Charity Name"].strip(), "type": "registered name", "source": "oscr"})
-                        if row["Most recent year income"].strip()!="" and chars[c]["latest_income"] is None:
+                            chars[c]["names"].append({"name": row["Charity Name"], "type": "registered name", "source": "oscr"})
+                        if row["Most recent year income"] and chars[c]["latest_income"] is None:
                             chars[c]["latest_income"] = int(row["Most recent year income"])
-                        if row["Website"].strip()!="" and chars[c]["url"] is None:
-                            chars[c]["url"] = row["Website"].strip()
-                        if row["Known As"].strip()!="" and row["Known As"] not in char_names:
-                            chars[c]["names"].append({"name": row["Known As"].strip(), "type": "known as", "source": "oscr"})
-                        if row["Parent charity number"].strip()!="" \
+                        if row["Website"] and chars[c]["url"] is None:
+                            chars[c]["url"] = row["Website"]
+                        if row["Known As"] and row["Known As"] not in char_names:
+                            chars[c]["names"].append({"name": row["Known As"], "type": "known as", "source": "oscr"})
+                        if chars[c]["geo"]["postcode"] is None and row["Postcode"]:
+                            chars[c]["geo"]["postcode"] = parse_postcode( row["Postcode"] )
+                        if row["Parent charity number"] \
                             and chars[c]["parent"] is None\
                             and row["Parent charity number"]!=c:
-                            chars[c]["parent"] = row["Parent charity number"].strip()
+                            chars[c]["parent"] = row["Parent charity number"]
                         cupdated += 1
 
 
@@ -132,12 +255,12 @@ def main():
                     "ccew_number": None,
                     "oscr_number": row["Charity Number"],
                     "active": True,
-                    "names": [{"name": row["Charity Name"].strip(), "type": "registered name", "source": "oscr"}],
-                    "known_as": row["Charity Name"].strip(),
+                    "names": [{"name": row["Charity Name"], "type": "registered name", "source": "oscr"}],
+                    "known_as": row["Charity Name"],
                     "geo": {
                         "areas": [],
-                        "postcode": row["Postcode"].strip(),
-                        "latlng": [None, None]
+                        "postcode": row["Postcode"],
+                        "location": None
                     },
                     "url": None,
                     "domain": None,
@@ -145,35 +268,46 @@ def main():
                     "company_number": [],
                     "parent": None
                 }
-                if row["Most recent year income"].strip()!="":
+                if row["Most recent year income"]:
                     char_json["latest_income"] = int(row["Most recent year income"])
-                if row["Website"].strip()!="":
-                    char_json["url"] = row["Website"].strip()
-                if row["Known As"].strip()!="":
-                    char_json["names"].append({"name": row["Known As"].strip(), "type": "known as", "source": "oscr"})
-                    char_json["known_as"] = row["Known As"].strip()
-                if row["Parent charity number"].strip()!="":
-                    char_json["parent"] = row["Parent charity number"].strip()
+                if row["Website"]:
+                    char_json["url"] = row["Website"]
+                if row["Known As"]:
+                    char_json["names"].append({"name": row["Known As"], "type": "known as", "source": "oscr"})
+                    char_json["known_as"] = row["Known As"]
+                if row["Parent charity number"]:
+                    char_json["parent"] = row["Parent charity number"]
 
                 chars[row["Charity Number"]] = char_json
                 cadded +=1
             ccount += 1
             if ccount % 10000 == 0:
-                print("[OSCR] %s charites added or updated from oscr.csv" % ccount)
-    print("[OSCR] %s charites added from oscr.csv" % cadded)
-    print("[OSCR] %s charites updated using oscr.csv" % cupdated)
+                print('\r' , "[OSCR] %s charites added or updated from oscr.csv" % ccount, end=' ')
+        print('\r' , "[OSCR] %s charites added or updated from oscr.csv" % ccount)
+        print("[OSCR] %s charites added from oscr.csv" % cadded)
+        print("[OSCR] %s charites updated using oscr.csv" % cupdated)
 
     # @TODO include charity commission register of mergers
 
+    ccount = 0
+    print("[Geo] %s charites added location details" % ccount)
+    for c in chars:
+        geo_data = fetch_postcode(chars[c]["geo"]["postcode"], es)
+        if geo_data:
+            chars[c]["geo"]["location"] = geo_data[0]
+            chars[c]["geo"]["areas"] = geo_data[1]
+
+        chars[c]["url"] = parse_url(chars[c]["url"])
+        chars[c]["domain"] = get_domain(chars[c]["url"])
+
+        ccount += 1
+        if ccount % 10000 == 0:
+            print('\r' , "[Geo] %s charites added location details" % ccount, end=' ')
+    print('\r' , "[Geo] %s charites added location details" % ccount)
+
+    # @TODO capitalisation of names
+
     print("[elasticsearch] %s charities to save" % len(chars))
-    es = Elasticsearch()
-    if es.indices.exists(INDEX_NAME):
-        print("[elasticsearch] deleting '%s' index..." % (INDEX_NAME))
-        res = es.indices.delete(index = INDEX_NAME)
-        print("[elasticsearch] response: '%s'" % (res))
-    # since we are running locally, use one shard and no replicas
-    print("[elasticsearch] creating '%s' index..." % (INDEX_NAME))
-    res = es.indices.create(index = INDEX_NAME)
     print("[elasticsearch] saving %s charities to %s index" % (len(chars), INDEX_NAME))
     results = bulk(es, list(chars.values()))
     print("[elasticsearch] saved %s charities to %s index" % (results[0], INDEX_NAME))
