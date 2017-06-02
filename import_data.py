@@ -6,8 +6,6 @@ from elasticsearch.exceptions import NotFoundError
 import validators
 from urllib.parse import urlparse
 
-INDEX_NAME = "charitysearch"
-
 def parse_postcode(postcode):
     """
     standardises a postcode into the correct format
@@ -43,7 +41,7 @@ def parse_postcode(postcode):
 
     return "%s %s" % ("".join(first_part), "".join(last_part) )
 
-def fetch_postcode(postcode, es):
+def fetch_postcode(postcode, es, es_index="postcode", es_type="postcode"):
     if postcode is None:
         return None
 
@@ -51,7 +49,7 @@ def fetch_postcode(postcode, es):
              "oa11","ccg","ward","teclec","gor","ttwa","pfa","pcon","lep1",
              "cty","eer","ctry","park","lep2","hlthau","buasd11"]
     try:
-        res = es.get(index="postcode", doc_type='postcode', id=postcode, ignore=[404])
+        res = es.get(index=es_index, doc_type=es_type, id=postcode, ignore=[404])
         if res['found']:
             return (res['_source'].get("location"),
                     {k:res['_source'].get(k) for k in res['_source'] if k in areas})
@@ -124,8 +122,34 @@ def clean_row(row):
 
 def main():
 
+    parser = argparse.ArgumentParser(description='Import charity data into elasticsearch')
+    parser.add_argument('--reset', action='store_true',
+                        help='If set, any existing indexes will be deleted and recreated.')
+
+    # elasticsearch options
+    parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
+    parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
+    parser.add_argument('--es-url-prefix', default='', help='Elasticsearch url prefix')
+    parser.add_argument('--es-use-ssl', action='store_true', help='Use ssl to connect to elasticsearch')
+    parser.add_argument('--es-index', default='charitysearch', help='index used to store charity data')
+    parser.add_argument('--es-type', default='charity', help='type used to store charity data')
+
+    # elasticsearch postcode options
+    parser.add_argument('--es-pc-host', default=None, help='host for the postcode elasticsearch instance')
+    parser.add_argument('--es-pc-port', default=9200, help='port for the postcode elasticsearch instance')
+    parser.add_argument('--es-pc-url-prefix', default='', help='Postcode elasticsearch url prefix')
+    parser.add_argument('--es-pc-use-ssl', action='store_true', help='Use ssl to connect to postcode elasticsearch')
+    parser.add_argument('--es-pc-index', default='postcode', help='index used to store postcode data')
+    parser.add_argument('--es-pc-type', default='postcode', help='type used to store postcode data')
+
+    args = parser.parse_args()
+
+    es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
+    pc_es = None # Elasticsearch postcode instance
+    if args.es_pc_host:
+        pc_es = Elasticsearch(host=args.es_pc_host, port=args.es_pc_port, url_prefix=args.es_pc_url_prefix, use_ssl=args.es_pc_use_ssl)
+
     chars = {}
-    es = Elasticsearch()
 
     with open( "data/ccew/extract_charity.csv", "r", encoding="latin1" ) as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
@@ -134,8 +158,8 @@ def main():
             if len(row)>1 and row[1]=="0":
                 row = clean_row(row)
                 char_json = {
-                    "_index": INDEX_NAME,
-                    "_type": "charity",
+                    "_index": args.es_index,
+                    "_type": args.es_type,
                     "_op_type": "index",
                     "_id": row[0],
                     "ccew_number": row[0],
@@ -256,8 +280,8 @@ def main():
             # if not dual registered then add as their own record
             else:
                 char_json = {
-                    "_index": INDEX_NAME,
-                    "_type": "charity",
+                    "_index": args.es_index,
+                    "_type": args.es_type,
                     "_op_type": "index",
                     "_id": row["Charity Number"],
                     "ccew_number": None,
@@ -299,10 +323,11 @@ def main():
 
     ccount = 0
     for c in chars:
-        geo_data = fetch_postcode(chars[c]["geo"]["postcode"], es)
-        if geo_data:
-            chars[c]["geo"]["location"] = geo_data[0]
-            chars[c]["geo"]["areas"] = geo_data[1]
+        if pc_es:
+            geo_data = fetch_postcode(chars[c]["geo"]["postcode"], pc_es, args.es_pc_index, args.es_pc_type)
+            if geo_data:
+                chars[c]["geo"]["location"] = geo_data[0]
+                chars[c]["geo"]["areas"] = geo_data[1]
 
         chars[c]["url"] = parse_url(chars[c]["url"])
         chars[c]["domain"] = get_domain(chars[c]["url"])
@@ -317,9 +342,9 @@ def main():
     # @TODO capitalisation of names
 
     print("[elasticsearch] %s charities to save" % len(chars))
-    print("[elasticsearch] saving %s charities to %s index" % (len(chars), INDEX_NAME))
+    print("[elasticsearch] saving %s charities to %s index" % (len(chars), args.es_index))
     results = bulk(es, list(chars.values()))
-    print("[elasticsearch] saved %s charities to %s index" % (results[0], INDEX_NAME))
+    print("[elasticsearch] saved %s charities to %s index" % (results[0], args.es_index))
     print("[elasticsearch] %s errors reported" % len(results[1]) )
 
 if __name__ == '__main__':
