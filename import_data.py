@@ -1,4 +1,5 @@
 import csv
+import re
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 from elasticsearch.exceptions import NotFoundError
@@ -16,12 +17,19 @@ def parse_postcode(postcode):
         return None
 
     # check for blank/empty
-    postcode = postcode.strip()
+    # put in all caps
+    postcode = postcode.strip().upper()
+    if postcode=='':
+        return None
+
+    # replace any non alphanumeric characters
+    postcode = re.sub('[^0-9a-zA-Z]+', '', postcode)
+
     if postcode=='':
         return None
 
     # check for nonstandard codes
-    if len(postcode.replace(" ", ""))>7:
+    if len(postcode)>7:
         return postcode
 
     first_part = postcode[:-3].strip()
@@ -30,7 +38,7 @@ def parse_postcode(postcode):
     # check for incorrect characters
     first_part = list(first_part)
     last_part = list(last_part)
-    if last_part[0]=="O":
+    if len(last_part)>0 and last_part[0]=="O":
         last_part[0] = "0"
 
     return "%s %s" % ("".join(first_part), "".join(last_part) )
@@ -151,7 +159,7 @@ def main():
 
                 ccount += 1
                 if ccount % 10000 == 0:
-                    print('\r' , "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount, end=' ')
+                    print('\r' , "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount, end='')
         print('\r' , "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount)
 
         ccount = 0
@@ -162,7 +170,7 @@ def main():
                 chars[row[0]]["names"].append({"name": row[2], "type": "subsidiary name", "source": "ccew"})
                 ccount += 1
                 if ccount % 10000 == 0:
-                    print('\r' , "[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount, end=' ')
+                    print('\r' , "[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount, end='')
         print('\r' , "[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount)
 
     with open( "data/ccew/extract_main_charity.csv", encoding="latin1") as a:
@@ -179,7 +187,7 @@ def main():
                     chars[row[0]]["latest_income"] = int(row[6])
                 ccount += 1
                 if ccount % 10000 == 0:
-                    print('\r' , "[CCEW] %s charities read from extract_main_charity.csv" % ccount, end=' ')
+                    print('\r' , "[CCEW] %s charities read from extract_main_charity.csv" % ccount, end='')
         print('\r' , "[CCEW] %s charities read from extract_main_charity.csv" % ccount)
 
     with open( "data/ccew/extract_name.csv", encoding="latin1") as a:
@@ -201,7 +209,7 @@ def main():
                     })
                 ccount += 1
                 if ccount % 10000 == 0:
-                    print('\r' , "[CCEW] %s names read from extract_name.csv" % ccount, end=' ')
+                    print('\r' , "[CCEW] %s names read from extract_name.csv" % ccount, end='')
         print('\r' , "[CCEW] %s names read from extract_name.csv" % ccount)
 
     # store dual registration details
@@ -229,13 +237,13 @@ def main():
                         chars[c]["oscr_number"] = row["Charity Number"]
                         char_names = [i["name"] for i in chars[c]["names"]]
                         if row["Charity Name"] not in char_names:
-                            chars[c]["names"].append({"name": row["Charity Name"], "type": "registered name", "source": "oscr"})
+                            chars[c]["names"].append({"name": row["Charity Name"].replace("`","'"), "type": "registered name", "source": "oscr"})
                         if row["Most recent year income"] and chars[c]["latest_income"] is None:
                             chars[c]["latest_income"] = int(row["Most recent year income"])
                         if row["Website"] and chars[c]["url"] is None:
                             chars[c]["url"] = row["Website"]
                         if row["Known As"] and row["Known As"] not in char_names:
-                            chars[c]["names"].append({"name": row["Known As"], "type": "known as", "source": "oscr"})
+                            chars[c]["names"].append({"name": row["Known As"].replace("`","'"), "type": "known as", "source": "oscr"})
                         if chars[c]["geo"]["postcode"] is None and row["Postcode"]:
                             chars[c]["geo"]["postcode"] = parse_postcode( row["Postcode"] )
                         if row["Parent charity number"] \
@@ -255,8 +263,8 @@ def main():
                     "ccew_number": None,
                     "oscr_number": row["Charity Number"],
                     "active": True,
-                    "names": [{"name": row["Charity Name"], "type": "registered name", "source": "oscr"}],
-                    "known_as": row["Charity Name"],
+                    "names": [{"name": row["Charity Name"].replace("`","'"), "type": "registered name", "source": "oscr"}],
+                    "known_as": row["Charity Name"].replace("`","'"),
                     "geo": {
                         "areas": [],
                         "postcode": row["Postcode"],
@@ -273,8 +281,8 @@ def main():
                 if row["Website"]:
                     char_json["url"] = row["Website"]
                 if row["Known As"]:
-                    char_json["names"].append({"name": row["Known As"], "type": "known as", "source": "oscr"})
-                    char_json["known_as"] = row["Known As"]
+                    char_json["names"].append({"name": row["Known As"].replace("`","'"), "type": "known as", "source": "oscr"})
+                    char_json["known_as"] = row["Known As"].replace("`","'")
                 if row["Parent charity number"]:
                     char_json["parent"] = row["Parent charity number"]
 
@@ -282,7 +290,7 @@ def main():
                 cadded +=1
             ccount += 1
             if ccount % 10000 == 0:
-                print('\r' , "[OSCR] %s charites added or updated from oscr.csv" % ccount, end=' ')
+                print('\r' , "[OSCR] %s charites added or updated from oscr.csv" % ccount, end='')
         print('\r' , "[OSCR] %s charites added or updated from oscr.csv" % ccount)
         print("[OSCR] %s charites added from oscr.csv" % cadded)
         print("[OSCR] %s charites updated using oscr.csv" % cupdated)
@@ -290,7 +298,6 @@ def main():
     # @TODO include charity commission register of mergers
 
     ccount = 0
-    print("[Geo] %s charites added location details" % ccount)
     for c in chars:
         geo_data = fetch_postcode(chars[c]["geo"]["postcode"], es)
         if geo_data:
@@ -300,9 +307,11 @@ def main():
         chars[c]["url"] = parse_url(chars[c]["url"])
         chars[c]["domain"] = get_domain(chars[c]["url"])
 
+        chars[c]["alt_names"] = [n["name"] for n in chars[c]["names"] if n["name"]!=chars[c]["known_as"]]
+
         ccount += 1
         if ccount % 10000 == 0:
-            print('\r' , "[Geo] %s charites added location details" % ccount, end=' ')
+            print('\r' , "[Geo] %s charites added location details" % ccount, end='')
     print('\r' , "[Geo] %s charites added location details" % ccount)
 
     # @TODO capitalisation of names
