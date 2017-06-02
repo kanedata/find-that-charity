@@ -3,8 +3,30 @@ from elasticsearch import Elasticsearch
 
 
 INDEXES = [
-    {"name": "postcode", "mapping": ("postcode", {"properties": {"location": {"type": "geo_point"}}}) },
-    {"name": "charitysearch", "mapping": ("charity", {"properties": {"geo": {"properties": {"location": {"type": "geo_point"}}}}}) }
+    {
+        "name": "charitysearch",
+        "mapping": (
+            "charity", {
+                "properties": {
+                    "geo": {
+                        "properties": {
+                            "location": {
+                                "type": "geo_point"
+                            }
+                        }
+                    },
+                    "names": {
+                        "type": "nested",
+                        "properties": {
+                            "type": {"type": "string"},
+                            "source": {"type": "string"},
+                            "name": {"type": "string"}
+                        }
+                    }
+                }
+            }
+        )
+    }
 ]
 
 def main():
@@ -21,8 +43,9 @@ def main():
             print("[elasticsearch] deleting '%s' index..." % ( i["name"]  ))
             res = es.indices.delete(index =  i["name"]  )
             print("[elasticsearch] response: '%s'" % (res))
-        print("[elasticsearch] creating '%s' index..." % ( i["name"]  ))
-        res = es.indices.create(index =  i["name"]  )
+        if not es.indices.exists( i["name"]  ):
+            print("[elasticsearch] creating '%s' index..." % ( i["name"]  ))
+            res = es.indices.create(index =  i["name"]  )
 
         if "mapping" in i:
             res = es.indices.put_mapping(i["mapping"][0], i["mapping"][1], index= i["name"]   )
