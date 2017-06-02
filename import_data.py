@@ -123,8 +123,6 @@ def clean_row(row):
 def main():
 
     parser = argparse.ArgumentParser(description='Import charity data into elasticsearch')
-    parser.add_argument('--reset', action='store_true',
-                        help='If set, any existing indexes will be deleted and recreated.')
 
     # elasticsearch options
     parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
