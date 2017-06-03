@@ -77,6 +77,14 @@ def reconcile():
     res = app.config["es"].search_template(index=app.config["es_index"], doc_type=app.config["es_type"], body=query, ignore=[404])
     return res
 
+@app.route('/charity/<regno>')
+@app.route('/charity/<regno>.<filetype>')
+def charity(regno, filetype='json'):
+    res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
+    if "_source" in res:
+        return res["_source"]
+
+
 def main():
 
     parser = argparse.ArgumentParser(description='') # @TODO fill in
