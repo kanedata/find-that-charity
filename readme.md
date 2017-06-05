@@ -14,7 +14,7 @@ Elasticsearch-powered search engine for looking for charities. Allows for:
 Installation
 ------------
 
-1. Clone repository
+1. [Clone repository](https://github.com/TechforgoodCAST/find-that-charity)
 2. Create virtual environment (`python -m venv env`)
 3. Activate virtual environment (`env/bin/activate` or `env/Scripts\activate`)
 4. Install requirements (`pip install -r requirements.txt`)
