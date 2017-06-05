@@ -1,0 +1,93 @@
+% rebase('base.html', title=charity["known_as"], subtitle="Charity number: {}".format(charity_id) )
+<div class="columns">
+  <div class="column">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">Alternative names</p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <table class="table">
+            <tbody>
+              % for name in charity["names"]:
+              <tr>
+                <td>{{ name["name"] }} ({{name["type"]}})</td>
+              </tr>
+              % end
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">Company details</p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <table class="table">
+            <tbody>
+              % for co in charity["company_number"]:
+              <tr>
+                <td>{{ co["number"] }} ({{co["source"]}})</td>
+              </tr>
+              % end
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">Registration details</p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <table class="table">
+            <tbody>
+              <tr><th>CCEW Charity number</th><td>{{ charity["ccew_number"] }}</td></tr>
+              <tr><th>OSCR Charity number</th><td>{{ charity["oscr_number"] }}</td></tr>
+              <tr><th>Active</th><td>{{ charity["active"] }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">Other details</p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <table class="table">
+            <tbody>
+              <tr><th>Website</th><td><a href="{{ charity["url"] }}">{{ charity["url"] }}</a></td></tr>
+              <tr><th>Domain</th><td><code>{{ charity["domain"] }}</code></td></tr>
+              <tr><th>Latest income</th><td>&pound;{{ "{:,.0f}".format(charity["latest_income"])}}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">Location</p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <table class="table">
+            <tbody>
+              <tr><th>Latitude/longitude</th><td><a href="{{ charity["url"] }}">{{ charity["geo"]["location"]["lat"] }}, {{ charity["geo"]["location"]["lon"] }}</a></td></tr>
+              <tr><th>Local Authority</th><td>{{ charity["geo"]["areas"]["laua"] }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

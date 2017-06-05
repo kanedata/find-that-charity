@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title or 'No title' }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.min.css" integrity="sha256-5MiG346KC5bVXrbDQQU0cjus8r2Yxh07eorYOPNUcmw=" crossorigin="anonymous" />
+  </head>
+  <body>
+    <section class="hero is-dark">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">
+            {{ get("heading") or title }}
+          </h1>
+          <h2 class="subtitle">
+            {{ !get("subtitle", "") }}
+          </h2>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        {{!base}}
+      </div>
+    </section>
+    <footer class="footer">
+      <div class="container">
+        <div class="content has-text-centered">
+          <p>
+            <strong>Find that Charity</strong> by <a href="">David Kane</a>.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

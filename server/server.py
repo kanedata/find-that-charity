@@ -79,10 +79,13 @@ def reconcile():
 
 @app.route('/charity/<regno>')
 @app.route('/charity/<regno>.<filetype>')
-def charity(regno, filetype='json'):
+def charity(regno, filetype='html'):
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
-        return res["_source"]
+        if filetype=="html":
+            return bottle.template('charity', charity=res["_source"], charity_id=res["_id"])
+        else:
+            return res["_source"]
 
 
 def main():
