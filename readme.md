@@ -120,3 +120,21 @@ The server offers the following API endpoints:
   conforming to the OpenRefine reconciliation API specification.
 
 - `/charity/12345`: Look up information about a particular charity
+
+Todo
+----
+
+Current status is a proof-of-concept, needs a bit of work to get up and running.
+
+Priorities:
+
+- tests for ensuring data is correctly imported
+- server tests
+- use results of `server/recon_test.py` to produce the best reconciliation
+  search query for use in the server (`recon_test_7` seems the best at the moment)
+- threshold for when to use the result vs discard
+
+Future development:
+
+- upload a CSV file and reconcile each row with a charity
+- allow updating a charity with additional possible names
