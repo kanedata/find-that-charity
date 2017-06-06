@@ -20,7 +20,7 @@ Installation
 4. Install requirements (`pip install -r requirements.txt`)
 5. [Install elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html)
 6. Start elasticsearch
-7. Create elasticsearch index (`python import/create_elasticsearch.py`)
+7. Create elasticsearch index (`python data_import/create_elasticsearch.py`)
 
 Fetching data
 -------------
@@ -28,13 +28,13 @@ Fetching data
 This step fetches data on charities in England, Wales and Scotland. The command
 is run using the following command:
 
-`python import/fetch_data.py --oscr <path/to/oscr/zip/file.zip>`
+`python data_import/fetch_data.py --oscr <path/to/oscr/zip/file.zip>`
 
 ### Office of the Scottish Charity Regulator (OSCR)
 
 OSCR data needs to be manually downloaded from the [OSCR website](http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download)
 in order to accept the terms and conditions. Once downloaded the path needs to
-be passed to `import/fetch_data.py` using the `--oscr` flag.
+be passed to `data_import/fetch_data.py` using the `--oscr` flag.
 
 ### Charity Commission for England and Wales
 
@@ -71,10 +71,10 @@ Importing data
 --------------
 
 Once the data has been fetched the needed files are stored `data/` directory.
-You can then run the `python import/import_data.py` script to import it.
+You can then run the `python data_import/import_data.py` script to import it.
 
 By default the script will look for an elasticsearch instance at <localhost:9200>,
-use `python import/import_data.py --help` to see the available options. To use the
+use `python data_import/import_data.py --help` to see the available options. To use the
 postcode elasticsearch index you need to pass `--es-pc-host localhost`.
 
 ### Data model
