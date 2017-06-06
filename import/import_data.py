@@ -5,6 +5,7 @@ from elasticsearch.helpers import bulk
 from elasticsearch.exceptions import NotFoundError
 import validators
 from urllib.parse import urlparse
+import argparse
 
 def parse_postcode(postcode):
     """
