@@ -121,44 +121,20 @@ def clean_row(row):
 
     return row
 
-def main():
+def import_extract_charity(chars = {},
+                           datafile="data/ccew/extract_charity.csv",
+                           es_index="charitysearch",
+                           es_type="charity"):
 
-    parser = argparse.ArgumentParser(description='Import charity data into elasticsearch')
-
-    # elasticsearch options
-    parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
-    parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
-    parser.add_argument('--es-url-prefix', default='', help='Elasticsearch url prefix')
-    parser.add_argument('--es-use-ssl', action='store_true', help='Use ssl to connect to elasticsearch')
-    parser.add_argument('--es-index', default='charitysearch', help='index used to store charity data')
-    parser.add_argument('--es-type', default='charity', help='type used to store charity data')
-
-    # elasticsearch postcode options
-    parser.add_argument('--es-pc-host', default=None, help='host for the postcode elasticsearch instance')
-    parser.add_argument('--es-pc-port', default=9200, help='port for the postcode elasticsearch instance')
-    parser.add_argument('--es-pc-url-prefix', default='', help='Postcode elasticsearch url prefix')
-    parser.add_argument('--es-pc-use-ssl', action='store_true', help='Use ssl to connect to postcode elasticsearch')
-    parser.add_argument('--es-pc-index', default='postcode', help='index used to store postcode data')
-    parser.add_argument('--es-pc-type', default='postcode', help='type used to store postcode data')
-
-    args = parser.parse_args()
-
-    es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
-    pc_es = None # Elasticsearch postcode instance
-    if args.es_pc_host:
-        pc_es = Elasticsearch(host=args.es_pc_host, port=args.es_pc_port, url_prefix=args.es_pc_url_prefix, use_ssl=args.es_pc_use_ssl)
-
-    chars = {}
-
-    with open( "data/ccew/extract_charity.csv", "r", encoding="latin1" ) as a:
+    with open( datafile, "r", encoding="latin1" ) as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
         ccount = 0
         for row in csvreader:
             if len(row)>1 and row[1]=="0":
                 row = clean_row(row)
                 char_json = {
-                    "_index": args.es_index,
-                    "_type": args.es_type,
+                    "_index": es_index,
+                    "_type": es_type,
                     "_op_type": "index",
                     "_id": row[0],
                     "ccew_number": row[0],
@@ -196,7 +172,11 @@ def main():
                     print('\r' , "[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount, end='')
         print('\r' , "[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount)
 
-    with open( "data/ccew/extract_main_charity.csv", encoding="latin1") as a:
+    return chars
+
+def import_extract_main(chars = {}, datafile="data/ccew/extract_main_charity.csv"):
+
+    with open( datafile, encoding="latin1") as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
         ccount = 0
         for row in csvreader:
@@ -213,7 +193,11 @@ def main():
                     print('\r' , "[CCEW] %s charities read from extract_main_charity.csv" % ccount, end='')
         print('\r' , "[CCEW] %s charities read from extract_main_charity.csv" % ccount)
 
-    with open( "data/ccew/extract_name.csv", encoding="latin1") as a:
+    return chars
+
+def import_extract_name(chars = {}, datafile="data/ccew/extract_name.csv"):
+
+    with open( datafile, encoding="latin1") as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
         ccount = 0
         for row in csvreader:
@@ -235,17 +219,29 @@ def main():
                     print('\r' , "[CCEW] %s names read from extract_name.csv" % ccount, end='')
         print('\r' , "[CCEW] %s names read from extract_name.csv" % ccount)
 
+    return chars
+
+def import_dual_reg(datafile="data/dual-registered-uk-charities.csv"):
+
     # store dual registration details
     dual = {}
-    with open( "data/dual-registered-uk-charities.csv" ) as a:
+    with open( datafile ) as a:
         csvreader = csv.DictReader(a)
         for row in csvreader:
             if row["Scottish Charity Number"] not in dual:
                 dual[row["Scottish Charity Number"]] = []
             dual[row["Scottish Charity Number"]].append(row["E&W Charity Number"])
 
+    return dual
+
+def import_oscr(chars = {},
+                dual = {},
+                datafile="data/oscr.csv",
+                es_index="charitysearch",
+                es_type="charity"):
+
     # go through the Scottish charities
-    with open( "data/oscr.csv", encoding="latin1" ) as a:
+    with open( datafile, encoding="latin1" ) as a:
         csvreader = csv.DictReader(a)
         ccount = 0
         cadded = 0
@@ -279,8 +275,8 @@ def main():
             # if not dual registered then add as their own record
             else:
                 char_json = {
-                    "_index": args.es_index,
-                    "_type": args.es_type,
+                    "_index": es_index,
+                    "_type": es_type,
                     "_op_type": "index",
                     "_id": row["Charity Number"],
                     "ccew_number": None,
@@ -318,12 +314,14 @@ def main():
         print("[OSCR] %s charites added from oscr.csv" % cadded)
         print("[OSCR] %s charites updated using oscr.csv" % cupdated)
 
-    # @TODO include charity commission register of mergers
+    return chars
+
+def clean_chars(chars={}, pc_es = None, es_pc_index="postcode", es_pc_type="postcode"):
 
     ccount = 0
     for c in chars:
         if pc_es:
-            geo_data = fetch_postcode(chars[c]["geo"]["postcode"], pc_es, args.es_pc_index, args.es_pc_type)
+            geo_data = fetch_postcode(chars[c]["geo"]["postcode"], pc_es, es_pc_index, es_pc_type)
             if geo_data:
                 chars[c]["geo"]["location"] = geo_data[0]
                 chars[c]["geo"]["areas"] = geo_data[1]
@@ -333,18 +331,66 @@ def main():
 
         chars[c]["alt_names"] = [n["name"] for n in chars[c]["names"] if n["name"]!=chars[c]["known_as"]]
 
+        # @TODO capitalisation of names
+
         ccount += 1
         if ccount % 10000 == 0:
             print('\r' , "[Geo] %s charites added location details" % ccount, end='')
     print('\r' , "[Geo] %s charites added location details" % ccount)
 
-    # @TODO capitalisation of names
+    return chars
+
+def save_to_elasticsearch(chars, es, es_index):
 
     print("[elasticsearch] %s charities to save" % len(chars))
-    print("[elasticsearch] saving %s charities to %s index" % (len(chars), args.es_index))
+    print("[elasticsearch] saving %s charities to %s index" % (len(chars), es_index))
     results = bulk(es, list(chars.values()))
-    print("[elasticsearch] saved %s charities to %s index" % (results[0], args.es_index))
+    print("[elasticsearch] saved %s charities to %s index" % (results[0], es_index))
     print("[elasticsearch] %s errors reported" % len(results[1]) )
+
+def main():
+
+    parser = argparse.ArgumentParser(description='Import charity data into elasticsearch')
+
+    # elasticsearch options
+    parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
+    parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
+    parser.add_argument('--es-url-prefix', default='', help='Elasticsearch url prefix')
+    parser.add_argument('--es-use-ssl', action='store_true', help='Use ssl to connect to elasticsearch')
+    parser.add_argument('--es-index', default='charitysearch', help='index used to store charity data')
+    parser.add_argument('--es-type', default='charity', help='type used to store charity data')
+
+    # elasticsearch postcode options
+    parser.add_argument('--es-pc-host', default=None, help='host for the postcode elasticsearch instance')
+    parser.add_argument('--es-pc-port', default=9200, help='port for the postcode elasticsearch instance')
+    parser.add_argument('--es-pc-url-prefix', default='', help='Postcode elasticsearch url prefix')
+    parser.add_argument('--es-pc-use-ssl', action='store_true', help='Use ssl to connect to postcode elasticsearch')
+    parser.add_argument('--es-pc-index', default='postcode', help='index used to store postcode data')
+    parser.add_argument('--es-pc-type', default='postcode', help='type used to store postcode data')
+
+    args = parser.parse_args()
+
+    es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
+    pc_es = None # Elasticsearch postcode instance
+    if args.es_pc_host:
+        pc_es = Elasticsearch(host=args.es_pc_host, port=args.es_pc_port, url_prefix=args.es_pc_url_prefix, use_ssl=args.es_pc_use_ssl)
+
+    data_files = {
+        "extract_charity": "data/ccew/extract_charity.csv",
+        "extract_main": "data/ccew/extract_main_charity.csv",
+        "extract_names": "data/ccew/extract_name.csv",
+        "dual_registration": "data/dual-registered-uk-charities.csv",
+        "oscr": "data/oscr.csv",
+    }
+
+    chars = import_extract_charity({}, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type)
+    chars = import_extract_main(chars, datafile=data_files["extract_main"])
+    chars = import_extract_name(chars, datafile=data_files["extract_names"])
+    dual = import_dual_reg(data_files["dual_registration"])
+    chars = import_oscr(chars, dual=dual, datafile=data_files["oscr"], es_index=args.es_index, es_type=args.es_type)
+    # @TODO include charity commission register of mergers
+    chars = clean_chars(chars, pc_es, args.es_pc_index, args.es_pc_type)
+    save_to_elasticsearch(chars, es, args.es_index)
 
 if __name__ == '__main__':
     main()
