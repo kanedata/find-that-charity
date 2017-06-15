@@ -81,7 +81,12 @@
       </header>
       <div class="card-content">
         <div class="content">
-
+          <table class="table">
+            <tbody>
+              <tr><th>Latitude/longitude</th><td><a href="{{ charity["url"] }}">{{ charity["geo"]["location"]["lat"] }}, {{ charity["geo"]["location"]["lon"] }}</a></td></tr>
+              <tr><th>Local Authority</th><td>{{ charity["geo"]["areas"]["laua"] }}</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
