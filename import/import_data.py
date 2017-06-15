@@ -67,6 +67,22 @@ def parse_company_number(coyno):
 
     return coyno
 
+def parse_ni_company_number(coyno):
+    coyno = coyno.strip()
+    if coyno=="" or int(coyno)==0 or int(coyno)==999999:
+        return None
+
+    if coyno.isdigit():
+        return "NI" + coyno.rjust(6, "0")
+
+    return coyno
+
+def parse_ni_charity_number(charno):
+    charno = charno.strip()
+    if charno.isdigit():
+        return "NIC" + charno
+    return charno
+
 def parse_url(url):
     if url is None:
         return None
@@ -163,6 +179,7 @@ def main():
                     "_id": row[0],
                     "ccew_number": row[0],
                     "oscr_number": None,
+                    "ccni_number": None,
                     "active": row[3]=="R",
                     "names": [{"name": row[2], "type": "registered name", "source": "ccew"}],
                     "known_as": row[2],
@@ -175,7 +192,10 @@ def main():
                     "domain": None,
                     "latest_income": None,
                     "company_number": [],
-                    "parent": None
+                    "parent": None,
+                    "ccew_link": "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber=" + row[0] + "&SubsidiaryNumber=0",
+                    "oscr_link": "",
+                    "ccni_link": ""
                 }
 
                 chars[row[0]] = char_json
@@ -203,7 +223,7 @@ def main():
             if len(row)>1:
                 row = clean_row(row)
                 if row[1]:
-                    chars[row[0]]["company_number"].append({"number": parse_company_number(row[1]), "source": "ccew"})
+                    chars[row[0]]["company_number"].append({"number": parse_company_number(row[1]), "url": "http://beta.companieshouse.gov.uk/company/" + parse_company_number(row[1]),  "source": "ccew"})
                 if row[9]:
                     chars[row[0]]["url"] = row[9]
                 if row[6]:
@@ -285,6 +305,7 @@ def main():
                     "_id": row["Charity Number"],
                     "ccew_number": None,
                     "oscr_number": row["Charity Number"],
+                    "ccni_number": None,
                     "active": True,
                     "names": [{"name": row["Charity Name"].replace("`","'"), "type": "registered name", "source": "oscr"}],
                     "known_as": row["Charity Name"].replace("`","'"),
@@ -297,7 +318,10 @@ def main():
                     "domain": None,
                     "latest_income": None,
                     "company_number": [],
-                    "parent": None
+                    "parent": None,
+                    "ccew_link": "",
+                    "oscr_link": "http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-details?number=" + row["Charity Number"],
+                    "ccni_link": ""
                 }
                 if row["Most recent year income"]:
                     char_json["latest_income"] = int(row["Most recent year income"])
@@ -313,10 +337,91 @@ def main():
                 cadded +=1
             ccount += 1
             if ccount % 10000 == 0:
-                print('\r' , "[OSCR] %s charites added or updated from oscr.csv" % ccount, end='')
-        print('\r' , "[OSCR] %s charites added or updated from oscr.csv" % ccount)
-        print("[OSCR] %s charites added from oscr.csv" % cadded)
-        print("[OSCR] %s charites updated using oscr.csv" % cupdated)
+                print('\r' , "[OSCR] %s charities added or updated from oscr.csv" % ccount, end='')
+        print('\r' , "[OSCR] %s charities added or updated from oscr.csv" % ccount)
+        print('\r' , "[OSCR] %s charities added from oscr.csv" % cadded)
+        print('\r' , "[OSCR] %s charities updated using oscr.csv" % cupdated)
+
+    # go through the Northern Irish charities
+    with open( "data/ccni.csv", encoding="latin1" ) as a:
+        csvreader = csv.DictReader(a)
+        ccount = 0
+        cadded = 0
+        cupdated = 0
+        for row in csvreader:
+            row = clean_row(row)
+
+            # check if they're dual registered
+            if row["Reg charity number"] in dual:
+                break
+            #     for c in dual[row["Reg charity number"]]:
+            #         if c in chars:
+            #             chars[c]["ccni_number"] = row["Reg charity number"]
+            #             char_names = [i["name"] for i in chars[c]["names"]]
+            #             if row["Charity name"] not in char_names:
+            #                 chars[c]["names"].append({"name": row["Charity name"].replace("`","'"), "type": "registered name", "source": "ccni"})
+            #             if row["Total income"] and chars[c]["latest_income"] is None:
+            #                 chars[c]["latest_income"] = int(row["Total income"])
+            #             if row["Website"] and chars[c]["url"] is None:
+            #                 chars[c]["url"] = row["Website"]
+            #             # if row["Known As"] and row["Known As"] not in char_names:
+            #             #     chars[c]["names"].append({"name": row["Known As"].replace("`","'"), "type": "known as", "source": "oscr"})
+            #             # if chars[c]["geo"]["postcode"] is None and row["Postcode"]:
+            #             #     chars[c]["geo"]["postcode"] = parse_postcode( row["Postcode"] )
+            #             # if row["Parent charity number"] \
+            #             #     and chars[c]["parent"] is None\
+            #             #     and row["Parent charity number"]!=c:
+            #             #     chars[c]["parent"] = row["Parent charity number"]
+            #             cupdated += 1
+
+
+            # if not dual registered then add as their own record
+            else:
+                char_json = {
+                    "_index": args.es_index,
+                    "_type": args.es_type,
+                    "_op_type": "index",
+                    "_id": row["Reg charity number"],
+                    "ccew_number": None,
+                    "oscr_number": None,
+                    "ccni_number": parse_ni_charity_number(row["Reg charity number"]),
+                    "active": True,
+                    "names": [{"name": row["Charity name"].replace("`","'"), "type": "registered name", "source": "ccni"}],
+                    "known_as": row["Charity name"].replace("`","'"),
+                    "geo": {
+                        "areas": [],
+                        "postcode": re.sub(".*,\s", "", row["Public address"]),
+                        "location": None
+                    },
+                    "url": None,
+                    "domain": None,
+                    "latest_income": None,
+                    "company_number": [],
+                    "parent": None,
+                    "ccew_link": "",
+                    "oscr_link": "",
+                    "ccni_link": "http://www.charitycommissionni.org.uk/charity-details/?regid=" + row["Reg charity number"] + "&subid=" + row["Sub charity number"]
+                }
+                if row["Total income"]:
+                    char_json["latest_income"] = int(row["Total income"])
+                if row["Website"]:
+                    char_json["url"] = row["Website"]
+                if row["Company number"] is not None and parse_ni_company_number(row["Company number"]) is not None:
+                    char_json["company_number"].append({"number": parse_ni_company_number(row["Company number"]), "url": "http://beta.companieshouse.gov.uk/company/" + parse_ni_company_number(row["Company number"]), "source": "ccni"})
+                # if row["Known As"]:
+                #     char_json["names"].append({"name": row["Known As"].replace("`","'"), "type": "known as", "source": "oscr"})
+                #     char_json["known_as"] = row["Known As"].replace("`","'")
+                # if row["Parent charity number"]:
+                #     char_json["parent"] = row["Parent charity number"]
+
+                chars[row["Reg charity number"]] = char_json
+                cadded +=1
+            ccount += 1
+            if ccount % 10000 == 0:
+                print('\r' , "[CCNI] %s charities added or updated from ccni.csv" % ccount, end='')
+        print('\r' , "[CCNI] %s charities added or updated from ccni.csv" % ccount)
+        print('\r' , "[CCNI] %s charities added from ccni.csv" % cadded)
+        print('\r' , "[CCNI] %s charities updated using ccni.csv" % cupdated)
 
     # @TODO include charity commission register of mergers
 
@@ -340,11 +445,11 @@ def main():
 
     # @TODO capitalisation of names
 
-    print("[elasticsearch] %s charities to save" % len(chars))
-    print("[elasticsearch] saving %s charities to %s index" % (len(chars), args.es_index))
+    print('\r' , "[elasticsearch] %s charities to save" % len(chars))
+    print('\r' , "[elasticsearch] saving %s charities to %s index" % (len(chars), args.es_index))
     results = bulk(es, list(chars.values()))
-    print("[elasticsearch] saved %s charities to %s index" % (results[0], args.es_index))
-    print("[elasticsearch] %s errors reported" % len(results[1]) )
+    print('\r' , "[elasticsearch] saved %s charities to %s index" % (results[0], args.es_index))
+    print('\r' , "[elasticsearch] %s errors reported" % len(results[1]) )
 
 if __name__ == '__main__':
     main()

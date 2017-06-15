@@ -3,7 +3,7 @@ Find that charity
 
 Elasticsearch-powered search engine for looking for charities. Allows for:
 
-- importing data from England and Wales, and Scotland, ensuring that duplicates
+- importing data from England and Wales, Scotland, and Northern Ireland, ensuring that duplicates
   are matched to one record.
 - An elasticsearch index that can be queried.
 - Reconciliation API for searching charity, based on an optimised search query.
@@ -43,6 +43,13 @@ If a different URL is needed then use the `--ccew` flag.
 
 The latest .ZIP file will be downloaded and unzipped, and the data contained
 will be converted from `.bcp` files to `.csv`.
+
+### Charity Commission for Northern Ireland
+
+Data on charities in Northern Ireland will be fetched from <http://www.charitycommissionni.org.uk/charity-search/> (Open Government Licence)
+If a different URL is needed then pass it to the `--ccni` flag when running `import/fetch_data.py`
+
+The latest .CSV file (updated daily) will be downloaded to /data.
 
 ### Dual registered charities
 

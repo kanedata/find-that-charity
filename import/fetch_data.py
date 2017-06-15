@@ -6,6 +6,9 @@ import re
 import bcp
 import os
 
+if not os.path.exists("data"):
+    os.makedirs("data")
+
 def main():
     parser = argparse.ArgumentParser(description='Fetch needed data sources.')
     parser.add_argument('--dual', type=str,
@@ -15,6 +18,8 @@ def main():
                         default=None, help="ZIP file containing Scottish charity data")
     parser.add_argument('--ccew', type=str,
                         default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
+    parser.add_argument('--ccni', type=str,
+                        default="http://www.charitycommissionni.org.uk/charity-search/?&exportCSV=1", help="CSV of Northern Ireland Charity Commission data")
     args = parser.parse_args()
 
     # retrieve dual registered charities
@@ -58,7 +63,11 @@ def main():
 
     # @TODO get charity commission register of mergers
 
-    # @TODO scrape Northern Ireland register of charities
+    # download Northern Ireland register of charities
+    if args.ccni:
+        print("[CCNI] Using url: %s" % args.ccni)
+        urllib.request.urlretrieve('http://www.charitycommissionni.org.uk/charity-search/?&exportCSV=1', 'data\ccni.csv')
+        print("[CCNI] CSV downloaded")
 
 if __name__ == '__main__':
     main()
