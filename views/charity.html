@@ -75,6 +75,7 @@
       </div>
     </div>
     <br>
+    % if charity["geo"]["location"] is not None:
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">Location</p>
@@ -90,5 +91,6 @@
         </div>
       </div>
     </div>
+    % end
   </div>
 </div>
