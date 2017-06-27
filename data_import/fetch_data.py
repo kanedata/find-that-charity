@@ -9,6 +9,7 @@ import os
 if not os.path.exists("data"):
     os.makedirs("data")
 
+
 def main():
     parser = argparse.ArgumentParser(description='Fetch needed data sources.')
     parser.add_argument('--dual', type=str,
@@ -37,7 +38,7 @@ def main():
     if args.oscr:
         with zipfile.ZipFile(args.oscr) as oscrzip:
             files = oscrzip.infolist()
-            if len(files)!=1:
+            if len(files) != 1:
                 raise ValueError("More than one file in OSCR zip")
             with open("data/oscr.csv", "wb") as oscrcsv:
                 oscrcsv.write(oscrzip.read(files[0]))
@@ -47,7 +48,7 @@ def main():
     ccew_html = urllib.request.urlopen(args.ccew)
     ccew_out = "data\ccew.zip"
     ccew_folder = "data\ccew"
-    if ccew_html.status!=200:
+    if ccew_html.status != 200:
         raise ValueError("[CCEW] Could not find Charity Commission data page. Status %s %s" % (ccew_data.status, ccew_data.reason))
     ccew_html = ccew_html.read()
     ccew_soup = BeautifulSoup(ccew_html, 'html.parser')
@@ -64,7 +65,7 @@ def main():
             bcp_content = ccew_zip.read(f)
             csv_content = bcp.convert(bcp_content.decode("latin1"))
             csv_filename = f.filename.replace(".bcp", ".csv")
-            with open( os.path.join(ccew_folder, csv_filename), "w", encoding="latin1" ) as a:
+            with open(os.path.join(ccew_folder, csv_filename), "w", encoding="latin1") as a:
                 a.write(csv_content.replace('\x00', ''))
                 print("[CCEW] write %s" % csv_filename)
 

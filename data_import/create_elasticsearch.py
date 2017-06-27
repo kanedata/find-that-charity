@@ -29,6 +29,7 @@ INDEXES = [
     }
 ]
 
+
 def main():
 
     parser = argparse.ArgumentParser(description='Setup elasticsearch indexes.')
@@ -51,17 +52,17 @@ def main():
     INDEXES[0]["mapping"][0] = args.es_type
 
     for i in INDEXES:
-        if es.indices.exists( i["name"]  ) and args.reset:
-            print("[elasticsearch] deleting '%s' index..." % ( i["name"]  ))
-            res = es.indices.delete(index =  i["name"]  )
+        if es.indices.exists(i["name"]) and args.reset:
+            print("[elasticsearch] deleting '%s' index..." % (i["name"]))
+            res = es.indices.delete(index=i["name"])
             print("[elasticsearch] response: '%s'" % (res))
-        if not es.indices.exists( i["name"]  ):
-            print("[elasticsearch] creating '%s' index..." % ( i["name"]  ))
-            res = es.indices.create(index =  i["name"]  )
+        if not es.indices.exists(i["name"]):
+            print("[elasticsearch] creating '%s' index..." % (i["name"]))
+            res = es.indices.create(index=i["name"])
 
         if "mapping" in i:
-            res = es.indices.put_mapping(i["mapping"][0], i["mapping"][1], index= i["name"]   )
-            print("[elasticsearch] set mapping on %s index" % ( i["name"]  ))
+            res = es.indices.put_mapping(i["mapping"][0], i["mapping"][1], index=i["name"])
+            print("[elasticsearch] set mapping on %s index" % (i["name"]))
 
 if __name__ == '__main__':
     main()

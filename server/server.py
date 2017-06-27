@@ -8,6 +8,7 @@ from collections import OrderedDict
 
 app = bottle.default_app()
 
+
 def search_query(name, domain_name=None):
     return {
         "inline": {
@@ -17,11 +18,11 @@ def search_query(name, domain_name=None):
                         "dis_max": {
                             "queries": [
                                 {
-    	                            "multi_match": {
-    	                                "query": "{{name}}",
-    	                                "fields": [ "known_as^3", "alt_names" ]
-    	                            }
-	                            }, {
+                                    "multi_match": {
+                                        "query": "{{name}}",
+                                        "fields": ["known_as^3", "alt_names"]
+                                    }
+                                }, {
                                     "match_phrase": {
                                         "known_as": "{{name}}"
                                     }
@@ -41,7 +42,7 @@ def search_query(name, domain_name=None):
                             "filter": {
                                 "multi_match": {
                                     "query": "{{name}}",
-                                    "fields": [ "known_as^3", "alt_names" ],
+                                    "fields": ["known_as^3", "alt_names"],
                                     "operator": "and"
                                 }
                             },
@@ -50,9 +51,9 @@ def search_query(name, domain_name=None):
                         #     "filter": {"match_phrase_prefix": {"alt_names": "{{name}}"}},
                         #     "weight": 100
                         # }, {
-    	                # 	"filter": {"term": {"domain": "{{domain_name}}"}},
-    	                # 	"weight": 50
-    		            #}, {
+                        # 	"filter": {"term": {"domain": "{{domain_name}}"}},
+                        # 	"weight": 50
+                        # }, {
                             "filter": {"term": {"active": False}},
                             "weight": 0.9
                         }, {
@@ -71,6 +72,7 @@ def search_query(name, domain_name=None):
             "domain_name": domain_name
         }
     }
+
 
 def esdoc_orresponse(query):
     """Decorate the elasticsearch document to the OpenRefine response API
@@ -93,6 +95,7 @@ def esdoc_orresponse(query):
             i["match"] = False
     return res["hits"]
 
+
 def service_spec():
         """Return the default service specification
 
@@ -107,16 +110,17 @@ def service_spec():
             "view": {
                 "url": service_url + "charity/{{id}}"
             },
-            "preview" : {
+            "preview": {
                 "url": service_url + "preview/charity/{{id}}",
                 "width": 430,
                 "height": 300
             },
-            "defaultTypes" : [{
+            "defaultTypes": [{
                 "id": "/" + app.config["es_type"],
                 "name": app.config["es_type"]
             }]
         }
+
 
 @app.route('/reconcile')
 @app.post('/reconcile')
@@ -149,22 +153,24 @@ def reconcile():
             q = "q" + str(counter)
             # print(queries_json[q], queries_json[q]["query"])
             result = esdoc_orresponse(search_query(queries_json[q]["query"]))["result"]
-            results.update({q:{"result": result}})
+            results.update({q: {"result": result}})
             counter += 1
         return results
 
     # otherwise just return the service specification
     return service_spec()
 
+
 @app.route('/charity/<regno>')
 @app.route('/charity/<regno>.<filetype>')
 def charity(regno, filetype='html'):
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
-        if filetype=="html":
+        if filetype == "html":
             return bottle.template('charity', charity=res["_source"], charity_id=res["_id"])
         else:
             return res["_source"]
+
 
 @app.route('/preview/charity/<regno>')
 @app.route('/preview/charity/<regno>.html')
@@ -176,9 +182,10 @@ def charity(regno):
     else:
         return res["_source"]
 
+
 def main():
 
-    parser = argparse.ArgumentParser(description='') # @TODO fill in
+    parser = argparse.ArgumentParser(description='')  # @TODO fill in
 
     # server options
     parser.add_argument('-host', '--host', default="localhost", help='host for the server')
