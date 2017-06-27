@@ -382,18 +382,28 @@ def import_oscr(chars={},
         print('\r', "[OSCR] %s charities added from oscr.csv" % cadded)
         print('\r', "[OSCR] %s charities updated using oscr.csv" % cupdated)
 
+    return chars
+
+
+def import_ccni(chars={},
+                dual={},
+                datafile="data/ccni.csv",
+                extra_names="data/ccni_extra_names.csv",
+                es_index="charitysearch",
+                es_type="charity"):
+
     # store dual registration details
     ccni_extra = {}
-    with open("data/ccni_extra_names.csv", encoding="utf-8") as a:
+    with open(extra_names, encoding="utf-8") as a:
         csvreader = csv.DictReader(a)
         for row in csvreader:
             if row["Charity_number"] not in ccni_extra:
                 ccni_extra[row["Charity_number"]] = []
-            for n in row["Other_names"].split(";").strip():
-                ccni_extra[row["Charity_number"]].append(n)
+            for n in row["Other_names"].split(";"):
+                ccni_extra[row["Charity_number"]].append(n.strip())
 
     # go through the Northern Irish charities
-    with open("data/ccni.csv", encoding="utf-8") as a:
+    with open(datafile, encoding="utf-8") as a:
         csvreader = csv.DictReader(a)
         ccount = 0
         cadded = 0
@@ -427,8 +437,8 @@ def import_oscr(chars={},
             # if not dual registered then add as their own record
             else:
                 char_json = {
-                    "_index": args.es_index,
-                    "_type": args.es_type,
+                    "_index": es_index,
+                    "_type": es_type,
                     "_op_type": "index",
                     "_id": row["Reg charity number"],
                     "ccew_number": None,
@@ -516,9 +526,9 @@ def clean_chars(chars={}, pc_es=None, es_pc_index="postcode", es_pc_type="postco
 def save_to_elasticsearch(chars, es, es_index):
 
     print('\r', "[elasticsearch] %s charities to save" % len(chars))
-    print('\r', "[elasticsearch] saving %s charities to %s index" % (len(chars), args.es_index))
+    print('\r', "[elasticsearch] saving %s charities to %s index" % (len(chars), es_index))
     results = bulk(es, list(chars.values()))
-    print('\r', "[elasticsearch] saved %s charities to %s index" % (results[0], args.es_index))
+    print('\r', "[elasticsearch] saved %s charities to %s index" % (results[0], es_index))
     print('\r', "[elasticsearch] %s errors reported" % len(results[1]))
 
 
@@ -555,6 +565,8 @@ def main():
         "extract_names": "data/ccew/extract_name.csv",
         "dual_registration": "data/dual-registered-uk-charities.csv",
         "oscr": "data/oscr.csv",
+        "ccni": "data/ccni.csv",
+        "ccni_extra_names": "data/ccni_extra_names.csv",
     }
 
     chars = import_extract_charity({}, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type)
@@ -562,6 +574,7 @@ def main():
     chars = import_extract_name(chars, datafile=data_files["extract_names"])
     dual = import_dual_reg(data_files["dual_registration"])
     chars = import_oscr(chars, dual=dual, datafile=data_files["oscr"], es_index=args.es_index, es_type=args.es_type)
+    chars = import_ccni(chars, dual=dual, datafile=data_files["ccni"], extra_names=data_files["ccni_extra_names"], es_index=args.es_index, es_type=args.es_type)
     # @TODO include charity commission register of mergers
     chars = clean_chars(chars, pc_es, args.es_pc_index, args.es_pc_type)
     save_to_elasticsearch(chars, es, args.es_index)
