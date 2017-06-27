@@ -24,6 +24,8 @@ def main():
     parser.add_argument('--ccni_extra', type=str,
                         default="https://gist.githubusercontent.com/BobHarper1/2687545c562b47bc755aef2e9e0de537/raw/ac052c33fd14a08dd4c2a0604b54c50bc1ecc0db/ccni_extra",
                         help='CSV for NI charities with other names')
+    parser.add_argument('--skip-ccew', action='store_true',
+                        help='Don\'t fetch data from Charity Commission for England and Wales.')
     args = parser.parse_args()
 
     # retrieve dual registered charities
@@ -45,36 +47,37 @@ def main():
             print("[OSCR] data extracted")
 
     # get charity commission data
-    ccew_html = urllib.request.urlopen(args.ccew)
-    ccew_out = "data\ccew.zip"
-    ccew_folder = "data\ccew"
-    if ccew_html.status != 200:
-        raise ValueError("[CCEW] Could not find Charity Commission data page. Status %s %s" % (ccew_data.status, ccew_data.reason))
-    ccew_html = ccew_html.read()
-    ccew_soup = BeautifulSoup(ccew_html, 'html.parser')
-    zip_regex = re.compile("http://apps.charitycommission.gov.uk/data/.*?/RegPlusExtract.*?\.zip")
-    ccew_data_url = ccew_soup.find("a", href=zip_regex)["href"]
-    print("[CCEW] Using url: %s" % ccew_data_url)
-    urllib.request.urlretrieve(ccew_data_url, ccew_out)
-    print("[CCEW] ZIP downloaded")
+    if not args.skip_ccew:
+        ccew_html = urllib.request.urlopen(args.ccew)
+        ccew_out = "data\ccew.zip"
+        ccew_folder = "data\ccew"
+        if ccew_html.status != 200:
+            raise ValueError("[CCEW] Could not find Charity Commission data page. Status %s %s" % (ccew_data.status, ccew_data.reason))
+        ccew_html = ccew_html.read()
+        ccew_soup = BeautifulSoup(ccew_html, 'html.parser')
+        zip_regex = re.compile("http://apps.charitycommission.gov.uk/data/.*?/RegPlusExtract.*?\.zip")
+        ccew_data_url = ccew_soup.find("a", href=zip_regex)["href"]
+        print("[CCEW] Using url: %s" % ccew_data_url)
+        urllib.request.urlretrieve(ccew_data_url, ccew_out)
+        print("[CCEW] ZIP downloaded")
 
-    with zipfile.ZipFile(ccew_out) as ccew_zip:
-        if not os.path.isdir(ccew_folder):
-            os.makedirs(ccew_folder)
-        for f in ccew_zip.infolist():
-            bcp_content = ccew_zip.read(f)
-            csv_content = bcp.convert(bcp_content.decode("latin1"))
-            csv_filename = f.filename.replace(".bcp", ".csv")
-            with open(os.path.join(ccew_folder, csv_filename), "w", encoding="latin1") as a:
-                a.write(csv_content.replace('\x00', ''))
-                print("[CCEW] write %s" % csv_filename)
+        with zipfile.ZipFile(ccew_out) as ccew_zip:
+            if not os.path.isdir(ccew_folder):
+                os.makedirs(ccew_folder)
+            for f in ccew_zip.infolist():
+                bcp_content = ccew_zip.read(f)
+                csv_content = bcp.convert(bcp_content.decode("latin1"))
+                csv_filename = f.filename.replace(".bcp", ".csv")
+                with open(os.path.join(ccew_folder, csv_filename), "w", encoding="latin1") as a:
+                    a.write(csv_content.replace('\x00', ''))
+                    print("[CCEW] write %s" % csv_filename)
 
     # @TODO get charity commission register of mergers
 
     # download Northern Ireland register of charities
     if args.ccni:
         print("[CCNI] Using url: %s" % args.ccni)
-        urllib.request.urlretrieve('http://www.charitycommissionni.org.uk/charity-search/?&exportCSV=1', 'data\ccni.csv')
+        urllib.request.urlretrieve(args.ccni, 'data\ccni.csv')
         print("[CCNI] CSV downloaded")
 
 if __name__ == '__main__':
