@@ -179,10 +179,7 @@ def charity(regno, filetype='html'):
 def charity(regno):
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
-        if filetype == "html":
-            return bottle.template('preview', charity=res["_source"], charity_id=res["_id"])
-        else:
-            return res["_source"]
+        return bottle.template('preview', charity=res["_source"], charity_id=res["_id"])
     else:
         bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
 
