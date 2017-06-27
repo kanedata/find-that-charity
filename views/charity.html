@@ -56,8 +56,9 @@
         <div class="content">
           <table class="table">
             <tbody>
-              <tr><th>CCEW Charity number</th><td>{{ charity["ccew_number"] }}</td></tr>
-              <tr><th>OSCR Charity number</th><td>{{ charity["oscr_number"] }}</td></tr>
+              <tr><th>CCEW Charity number</th><td><a href={{ charity["ccew_link"]}}>{{ charity["ccew_number"] }}</a></td></tr>
+              <tr><th>OSCR Charity number</th><td><a href={{ charity["oscr_link"]}}>{{ charity["oscr_number"] }}</a></td></tr>
+              <tr><th>CCNI Charity number</th><td><a href={{ charity["ccni_link"]}}>{{ charity["ccni_number"] }}</a></td></tr>
               <tr><th>Active</th><td>{{ charity["active"] }}</td></tr>
             </tbody>
           </table>
@@ -82,6 +83,7 @@
       </div>
     </div>
     <br>
+    % if charity["geo"]["location"] is not None:
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">Location</p>
@@ -108,5 +110,6 @@
         </div>
       </div>
     </div>
+    % end
   </div>
 </div>

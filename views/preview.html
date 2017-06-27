@@ -1,0 +1,32 @@
+<h1>
+  {{ charity["known_as"] }}
+</h1>
+<h3><strong>Active:</strong>
+  {{ charity["active"] }}
+</h3>
+<h3><strong>Charity No(s):</strong><br/>
+  % if charity["ccew_number"]:
+    CCEW: {{charity["ccew_number"]}}<br/>
+  % end
+  % if charity["ccew_number"]:
+    OSCR: {{charity["oscr_number"]}}<br/>
+  % end
+  % if charity["ccew_number"]:
+    CCNI: {{charity["ccni_number"]}}
+  % end
+</h3>
+<h3><strong>Company No(s):</strong>
+  % if charity["company_number"]:
+    % for co in charity["company_number"]:
+      {{ co["number"] }} ({{co["source"]}})
+    % end
+  % end
+</h3>
+<h3><strong>Postcode:</strong>
+  {{ charity["geo"]["postcode"] }}
+</h3>
+<h3><strong>Other Names:</strong>
+  % for name in charity["names"]:
+    {{ name["name"] }} ({{name["type"]}}, {{name["source"]}})
+  % end
+</h3>

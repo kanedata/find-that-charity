@@ -2,7 +2,9 @@ from __future__ import print_function
 
 import argparse
 import bottle
+import json
 from elasticsearch import Elasticsearch
+from collections import OrderedDict
 
 app = bottle.default_app()
 
@@ -70,12 +72,89 @@ def search_query(name, domain_name=None):
         }
     }
 
-@app.route('/reconcile')
-def reconcile():
-    q = bottle.request.query.query
-    query = search_query(q)
+def esdoc_orresponse(query):
+    """Decorate the elasticsearch document to the OpenRefine response API
+
+    Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
+    """
     res = app.config["es"].search_template(index=app.config["es_index"], doc_type=app.config["es_type"], body=query, ignore=[404])
-    return res
+    print(res)
+    res["hits"]["result"] = res["hits"].pop("hits")
+    for i in res["hits"]["result"]:
+        i["id"] = i.pop("_id")
+        i["type"] = [i.pop("_type")]
+        i["score"] = i.pop("_score")
+        i["index"] = i.pop("_index")
+        i["source"] = i.pop("_source")
+        i["name"] = i["source"]["known_as"]
+        if i["name"] == query["params"]["name"] and i["score"] == res["hits"]["max_score"]:
+            i["match"] = True
+        else:
+            i["match"] = False
+    return res["hits"]
+
+def service_spec():
+        """Return the default service specification
+
+        Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
+        """
+        service_url = "http://localhost:8080/"
+
+        return {
+            "name": app.config["es_index"],
+            "identifierSpace": "http://rdf.freebase.com/ns/type.object.id",
+            "schemaSpace": "http://rdf.freebase.com/ns/type.object.id",
+            "view": {
+                "url": service_url + "charity/{{id}}"
+            },
+            "preview" : {
+                "url": service_url + "preview/charity/{{id}}",
+                "width": 430,
+                "height": 300
+            },
+            "defaultTypes" : [{
+                "id": "/" + app.config["es_type"],
+                "name": app.config["es_type"]
+            }]
+        }
+
+@app.route('/reconcile')
+@app.post('/reconcile')
+def reconcile():
+    """ Index of the server. If ?query or ?queries used then search,
+                otherwise return the default response as JSON
+    """
+    query = search_query(bottle.request.query.query) or None
+    queries = bottle.request.params.queries or None
+
+    # if we're doing a callback request then do that
+    if bottle.request.query.callback:
+        if bottle.request.query.query:
+            bottle.response.content_type = "application/javascript"
+            return "%s(%s)" % (bottle.request.query.callback, esdoc_orresponse(query))
+        else:
+            return "%s(%s)" % (bottle.request.query.callback, service_spec())
+
+    # try fetching the query as json data or a string
+    if bottle.request.query.query:
+        return esdoc_orresponse(query)
+
+    if queries:
+        queries_json = json.loads(queries)
+        queries_dict = json.loads(queries, object_pairs_hook=OrderedDict)
+        # print(queries)
+        results = {}
+        counter = 0
+        for query in queries_dict:
+            q = "q" + str(counter)
+            # print(queries_json[q], queries_json[q]["query"])
+            result = esdoc_orresponse(search_query(queries_json[q]["query"]))["result"]
+            results.update({q:{"result": result}})
+            counter += 1
+        return results
+
+    # otherwise just return the service specification
+    return service_spec()
 
 @app.route('/charity/<regno>')
 @app.route('/charity/<regno>.<filetype>')
@@ -87,6 +166,15 @@ def charity(regno, filetype='html'):
         else:
             return res["_source"]
 
+@app.route('/preview/charity/<regno>')
+@app.route('/preview/charity/<regno>.html')
+def charity(regno):
+    res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
+    if "_source" in res:
+        print('giving you the page')
+        return bottle.template('preview', charity=res["_source"], charity_id=res["_id"])
+    else:
+        return res["_source"]
 
 def main():
 

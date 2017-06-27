@@ -6,6 +6,9 @@ import re
 import bcp
 import os
 
+if not os.path.exists("data"):
+    os.makedirs("data")
+
 def main():
     parser = argparse.ArgumentParser(description='Fetch needed data sources.')
     parser.add_argument('--dual', type=str,
@@ -15,11 +18,20 @@ def main():
                         default=None, help="ZIP file containing Scottish charity data")
     parser.add_argument('--ccew', type=str,
                         default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
+    parser.add_argument('--ccni', type=str,
+                        default="http://www.charitycommissionni.org.uk/charity-search/?&exportCSV=1", help="CSV of Northern Ireland Charity Commission data")
+    parser.add_argument('--ccni_extra', type=str,
+                        default="https://gist.githubusercontent.com/BobHarper1/2687545c562b47bc755aef2e9e0de537/raw/ac052c33fd14a08dd4c2a0604b54c50bc1ecc0db/ccni_extra",
+                        help='CSV for NI charities with other names')
     args = parser.parse_args()
 
     # retrieve dual registered charities
     urllib.request.urlretrieve(args.dual, "data/dual-registered-uk-charities.csv")
     print("[Dual] Dual registered charities fetched")
+
+    # retrieve ni charity extra names
+    urllib.request.urlretrieve(args.ccni_extra, "data/ccni_extra_names.csv")
+    print("[CCNI Extra] Extra Northern Ireland charity names fetched")
 
     # get oscr data
     if args.oscr:
@@ -58,7 +70,11 @@ def main():
 
     # @TODO get charity commission register of mergers
 
-    # @TODO scrape Northern Ireland register of charities
+    # download Northern Ireland register of charities
+    if args.ccni:
+        print("[CCNI] Using url: %s" % args.ccni)
+        urllib.request.urlretrieve('http://www.charitycommissionni.org.uk/charity-search/?&exportCSV=1', 'data\ccni.csv')
+        print("[CCNI] CSV downloaded")
 
 if __name__ == '__main__':
     main()
