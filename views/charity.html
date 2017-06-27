@@ -1,5 +1,5 @@
 % rebase('base.html', title=charity["known_as"], subtitle="Charity number: {}".format(charity_id) )
-% sources = {"ccew": "Charity Commission for England and Wales", "oscr": "Office of Scottish Charity Regulator"}
+% sources = {"ccew": "Charity Commission for England and Wales", "oscr": "Office of Scottish Charity Regulator", "ccni": "Charity Commission for Northern Ireland"}
 <div class="columns">
   <div class="column">
     <div class="card">
@@ -38,7 +38,12 @@
             <tbody>
               % for co in charity["company_number"]:
               <tr>
-                <td>{{ co["number"] }} <i>(Source: {{ sources.get(co["source"], co["source"])}})</i></td>
+                <td>
+                  <a href="https://beta.companieshouse.gov.uk/company/{{ co["number"] }}" target="_blank">
+                    {{ co["number"] }}
+                  </a>
+                  <i>(Source: {{ sources.get(co["source"], co["source"])}})</i>
+                </td>
               </tr>
               % end
             </tbody>
@@ -56,8 +61,36 @@
         <div class="content">
           <table class="table">
             <tbody>
-              <tr><th>CCEW Charity number</th><td>{{ charity["ccew_number"] }}</td></tr>
-              <tr><th>OSCR Charity number</th><td>{{ charity["oscr_number"] }}</td></tr>
+              <tr>
+                <th>CCEW Charity number</th>
+                <td>
+                  % if charity["ccew_number"]:
+                  <a href={{ charity["ccew_link"]}}>{{ charity["ccew_number"] }}</a>
+                  % else:
+                  None
+                  % end
+                </td>
+              </tr>
+              <tr>
+                <th>OSCR Charity number</th>
+                <td>
+                  % if charity["oscr_number"]:
+                  <a href={{ charity["oscr_link"]}}>{{ charity["oscr_number"] }}</a>
+                  % else:
+                  None
+                  % end
+                </td>
+              </tr>
+              <tr>
+                <th>CCNI Charity number</th>
+                <td>
+                  % if charity["ccni_number"]:
+                  <a href={{ charity["ccni_number"]}}>{{ charity["ccni_number"] }}</a>
+                  % else:
+                  None
+                  % end
+                </td>
+              </tr>
               <tr><th>Active</th><td>{{ charity["active"] }}</td></tr>
             </tbody>
           </table>
@@ -82,6 +115,7 @@
       </div>
     </div>
     <br>
+    % if charity["geo"]["location"] is not None:
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">Location</p>
@@ -94,7 +128,7 @@
               <tr>
                 <th>Latitude/longitude</th>
                 <td>
-                  <a href="{{ charity.get("url") }}">
+                  <a href="#">
                      {{ charity.get("geo", {}).get("location",{}).get("lat") }},
                      {{ charity.get("geo", {}).get("location",{}).get("lon") }}
                   </a>
@@ -108,5 +142,6 @@
         </div>
       </div>
     </div>
+    % end
   </div>
 </div>
