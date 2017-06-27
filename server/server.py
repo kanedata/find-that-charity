@@ -122,6 +122,11 @@ def service_spec():
         }
 
 
+@app.route('/')
+def home():
+    return bottle.template('index')
+
+
 @app.route('/reconcile')
 @app.post('/reconcile')
 def reconcile():
