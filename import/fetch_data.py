@@ -20,11 +20,18 @@ def main():
                         default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
     parser.add_argument('--ccni', type=str,
                         default="http://www.charitycommissionni.org.uk/charity-search/?&exportCSV=1", help="CSV of Northern Ireland Charity Commission data")
+    parser.add_argument('--ccni_extra', type=str,
+                        default="https://gist.githubusercontent.com/BobHarper1/2687545c562b47bc755aef2e9e0de537/raw/ac052c33fd14a08dd4c2a0604b54c50bc1ecc0db/ccni_extra",
+                        help='CSV for NI charities with other names')
     args = parser.parse_args()
 
     # retrieve dual registered charities
     urllib.request.urlretrieve(args.dual, "data/dual-registered-uk-charities.csv")
     print("[Dual] Dual registered charities fetched")
+
+    # retrieve ni charity extra names
+    urllib.request.urlretrieve(args.ccni_extra, "data/ccni_extra_names.csv")
+    print("[CCNI Extra] Extra Northern Ireland charity names fetched")
 
     # get oscr data
     if args.oscr:

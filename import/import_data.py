@@ -342,8 +342,18 @@ def main():
         print('\r' , "[OSCR] %s charities added from oscr.csv" % cadded)
         print('\r' , "[OSCR] %s charities updated using oscr.csv" % cupdated)
 
+    # store dual registration details
+    ccni_extra = {}
+    with open( "data/ccni_extra_names.csv", encoding="utf-8" ) as a:
+        csvreader = csv.DictReader(a)
+        for row in csvreader:
+            if row["Charity_number"] not in ccni_extra:
+                ccni_extra[row["Charity_number"]] = []
+            for n in row["Other_names"].split(";").strip():
+                ccni_extra[row["Charity_number"]].append(n)
+
     # go through the Northern Irish charities
-    with open( "data/ccni.csv", encoding="latin1" ) as a:
+    with open( "data/ccni.csv", encoding="utf-8" ) as a:
         csvreader = csv.DictReader(a)
         ccount = 0
         cadded = 0
@@ -408,9 +418,10 @@ def main():
                     char_json["url"] = row["Website"]
                 if row["Company number"] is not None and parse_ni_company_number(row["Company number"]) is not None:
                     char_json["company_number"].append({"number": parse_ni_company_number(row["Company number"]), "url": "http://beta.companieshouse.gov.uk/company/" + parse_ni_company_number(row["Company number"]), "source": "ccni"})
-                # if row["Known As"]:
-                #     char_json["names"].append({"name": row["Known As"].replace("`","'"), "type": "known as", "source": "oscr"})
-                #     char_json["known_as"] = row["Known As"].replace("`","'")
+
+                if row["Reg charity number"] in ccni_extra:
+                    for name in ccni_extra[row["Reg charity number"]]:
+                        char_json["names"].append({"name": name.replace("`","'"), "type": "known as", "source": "ccni"})
                 # if row["Parent charity number"]:
                 #     char_json["parent"] = row["Parent charity number"]
 
