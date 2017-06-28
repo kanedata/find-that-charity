@@ -1,0 +1,23 @@
+<div class="card">
+  <header class="card-header">
+    <p class="card-header-title">Search results: {{res["total"]}} found</p>
+  </header>
+  <div class="card-content">
+    <div class="content">
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Name</th>
+            <th>Charity Number</th>
+          </tr>
+          % for result in res["hits"]:
+          <tr>
+            <td><a href={{result[ "_link"]}}>{{result["_source"]["known_as"]}}</a></td>
+            <td>{{result["_id"]}}</td>
+          </tr>
+          % end
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

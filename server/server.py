@@ -121,11 +121,22 @@ def service_spec():
             }]
         }
 
+def search_return(query):
+    res = app.config["es"].search_template(index=app.config["es_index"], doc_type=app.config["es_type"], body=query, ignore=[404])
+    res = res["hits"]
+    for result in res["hits"]:
+        result["_link"] = "/charity/" + result["_id"]
+    return bottle.template('index', res=res)
 
 @app.route('/')
 def home():
-    return bottle.template('index')
+    return bottle.template('index', search_results='')
 
+@app.post('/')
+def handle_search():
+    query = bottle.request.forms.get('query')
+    query = search_query(query)
+    return search_return(query)
 
 @app.route('/reconcile')
 @app.post('/reconcile')

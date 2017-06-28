@@ -4,18 +4,21 @@
     <div class="content is-large">
       <p>A search engine for UK charities.</p>
     </div>
-    <form style="padding-top: 30px; padding-bottom: 160px;">
+    <form method="post" action="/" style="padding-top: 30px; padding-bottom: 160px;">
       <div class="field has-addons has-addons-centered">
         <p class="control is-expanded">
-          <input class="input is-large" type="text" placeholder="Charity search">
+          <input name="query" class="input is-large" type="text" placeholder="Charity search">
         </p>
         <p class="control">
-          <a class="button is-info is-large">
-            Search
-          </a>
+          <input type="submit" value="Search" class="button is-info is-large">
         </p>
       </div>
     </form>
+    
+    % if defined('res'):
+      % include('search_results.html', res=res)
+    % end
+
     <div class="content is-medium">
       <p>Other ways to use:</pr>
       <ul>
