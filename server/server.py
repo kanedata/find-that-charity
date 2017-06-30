@@ -9,11 +9,11 @@ from collections import OrderedDict
 app = bottle.default_app()
 
 
-def search_query(name, domain_name=None):
+def search_query(term):
     with open ('./es_config.yml', 'r') as yaml_file:
         json_q = yaml.load(yaml_file)
-        json_q["params"]["name"] = name
-        json_q["params"]["domain_name"] = domain_name
+        for p in json_q["params"]:
+            json_q["params"][p] = term
         return json.dumps(json_q)
 
 def esdoc_orresponse(query):
