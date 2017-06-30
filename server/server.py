@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import argparse
 import bottle
-import json
+import json, yaml
 from elasticsearch import Elasticsearch
 from collections import OrderedDict
 
@@ -10,69 +10,11 @@ app = bottle.default_app()
 
 
 def search_query(name, domain_name=None):
-    return {
-        "inline": {
-            "query": {
-                "function_score": {
-                    "query": {
-                        "dis_max": {
-                            "queries": [
-                                {
-                                    "multi_match": {
-                                        "query": "{{name}}",
-                                        "fields": ["known_as^3", "alt_names"]
-                                    }
-                                }, {
-                                    "match_phrase": {
-                                        "known_as": "{{name}}"
-                                    }
-                                # }, {
-                                #     "match": {
-                                #         "domain": "{{domain_name}}"
-                                #     }
-                                }
-                            ]
-                        }
-                    },
-                    "functions": [
-                        {
-                            "filter": {"match_phrase_prefix": {"known_as": "{{name}}"}},
-                            "weight": 200
-                        }, {
-                            "filter": {
-                                "multi_match": {
-                                    "query": "{{name}}",
-                                    "fields": ["known_as^3", "alt_names"],
-                                    "operator": "and"
-                                }
-                            },
-                            "weight": 10
-                        }, {
-                        #     "filter": {"match_phrase_prefix": {"alt_names": "{{name}}"}},
-                        #     "weight": 100
-                        # }, {
-                        # 	"filter": {"term": {"domain": "{{domain_name}}"}},
-                        # 	"weight": 50
-                        # }, {
-                            "filter": {"term": {"active": False}},
-                            "weight": 0.9
-                        }, {
-                            "field_value_factor": {
-                                "field": "latest_income",
-                                "modifier": "log2p",
-                                "missing": 1
-                            }
-                        }
-                    ]
-                }
-            }
-        },
-        "params": {
-            "name": name,
-            "domain_name": domain_name
-        }
-    }
-
+    with open ('./es_config.yml', 'r') as yaml_file:
+        json_q = yaml.load(yaml_file)
+        json_q["params"]["name"] = name
+        json_q["params"]["domain_name"] = domain_name
+        return json.dumps(json_q)
 
 def esdoc_orresponse(query):
     """Decorate the elasticsearch document to the OpenRefine response API
