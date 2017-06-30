@@ -10,7 +10,14 @@ app = bottle.default_app()
 
 
 def search_query(term):
-    with open ('./es_config.yml', 'r') as yaml_file:
+    with open ('./es_config.yml', 'rb') as yaml_file:
+        json_q = yaml.load(yaml_file)
+        for p in json_q["params"]:
+            json_q["params"][p] = term
+        return json.dumps(json_q)
+
+def recon_query(term):
+    with open ('./recon_config.yml', 'rb') as yaml_file:
         json_q = yaml.load(yaml_file)
         for p in json_q["params"]:
             json_q["params"][p] = term
@@ -31,12 +38,11 @@ def esdoc_orresponse(query):
         i["index"] = i.pop("_index")
         i["source"] = i.pop("_source")
         i["name"] = i["source"]["known_as"]
-        if i["name"] == query["params"]["name"] and i["score"] == res["hits"]["max_score"]:
+        if i["name"] == json.loads(query)["params"]["name"] and i["score"] == res["hits"]["max_score"]:
             i["match"] = True
         else:
             i["match"] = False
     return res["hits"]
-
 
 def service_spec():
         """Return the default service specification
@@ -86,7 +92,7 @@ def reconcile():
     """ Index of the server. If ?query or ?queries used then search,
                 otherwise return the default response as JSON
     """
-    query = search_query(bottle.request.query.query) or None
+    query = recon_query(bottle.request.query.query) or None
     queries = bottle.request.params.queries or None
 
     # if we're doing a callback request then do that
@@ -110,7 +116,7 @@ def reconcile():
         for query in queries_dict:
             q = "q" + str(counter)
             # print(queries_json[q], queries_json[q]["query"])
-            result = esdoc_orresponse(search_query(queries_json[q]["query"]))["result"]
+            result = esdoc_orresponse(recon_query(queries_json[q]["query"]))["result"]
             results.update({q: {"result": result}})
             counter += 1
         return results
