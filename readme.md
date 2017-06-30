@@ -51,6 +51,8 @@ If a different URL is needed then pass it to the `--ccni` flag when running `imp
 
 The latest .CSV file (updated daily) will be downloaded to /data.
 
+"Other names" for Northern Ireland charities are not contained in the downloadable CSV, but are in the information presented on the CCNI website. The other names are maintained [in this list](https://gist.github.com/BobHarper1/2687545c562b47bc755aef2e9e0de537) which will be downloaded. To use another file, pass url to `--ccni_extra`.
+
 ### Dual registered charities
 
 A list of [dual registered charities](https://gist.github.com/drkane/22d62e07346084fafdcc7d9f5e1cd661/raw/bec666d1bc5c6efb8503a90f76ac0c6236ebc183/dual-registered-uk-charities.csv)
