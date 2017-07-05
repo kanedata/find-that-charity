@@ -5,7 +5,7 @@ from elasticsearch import Elasticsearch
 INDEXES = [
     {
         "name": "charitysearch",
-        "mapping": (
+        "mapping": [
             "charity", {
                 "properties": {
                     "geo": {
@@ -25,7 +25,7 @@ INDEXES = [
                     }
                 }
             }
-        )
+        ]
     }
 ]
 
