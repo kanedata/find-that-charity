@@ -95,6 +95,7 @@ The data is imported into elasticsearch in the following format:
   "charity_number": "12355",
   "ccew_number": "12355",
   "oscr_number": "SC1235",
+  "ccni_number": "NI100012",
   "active": true,
   "names": [
     {"name": "Charity Name", "type": "registered name", "source": "ccew"}
@@ -111,7 +112,10 @@ The data is imported into elasticsearch in the following format:
   "company_number": [
     {"number": "00121212", "source": "ccew"}
   ],
-  "parent": "124566"
+  "parent": "124566",
+  "ccew_link": "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber=12355&SubsidiaryNumber=0",
+  "oscr_link": "http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-details?number=SC1235",
+  "ccni_link": "http://www.charitycommissionni.org.uk/charity-details/?regid=100012&subid=0"
 }
 ```
 
