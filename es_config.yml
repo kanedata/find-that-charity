@@ -18,6 +18,8 @@ inline:
               - ccni_number
               - ccew_number
               - oscr_number
+              - company_number.number
+              - id
       functions:
       - filter:
           match_phrase_prefix:
