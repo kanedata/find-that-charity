@@ -444,7 +444,7 @@ def import_ccni(chars={},
                     "ccew_number": None,
                     "oscr_number": None,
                     "ccni_number": row["Reg charity number"],
-                    "active": True,
+                    "active": row["Status"] != "Removed",
                     "names": [{
                         "name": row["Charity name"].replace("`", "'"),
                         "type": "registered name",
