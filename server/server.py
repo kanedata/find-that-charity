@@ -74,7 +74,7 @@ def search_return(query):
     res = res["hits"]
     for result in res["hits"]:
         result["_link"] = "/charity/" + result["_id"]
-    return bottle.template('index', res=res)
+    return bottle.template('index', res=res, term=json.loads(query)["params"]["name"])
 
 @app.route('/')
 def home():

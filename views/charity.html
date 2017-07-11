@@ -1,4 +1,4 @@
-% rebase('base.html', title=charity["known_as"], subtitle="Charity number: {}".format(charity_id) )
+% rebase('base.html', title=charity["known_as"], subtitle="Charity number: {}".format(charity_id), status=charity["active"] )
 % sources = {"ccew": "Charity Commission for England and Wales", "oscr": "Office of Scottish Charity Regulator", "ccni": "Charity Commission for Northern Ireland"}
 <div class="columns">
   <div class="column">
@@ -108,7 +108,15 @@
             <tbody>
               <tr><th>Website</th><td><a href="{{ charity["url"] }}">{{ charity["url"] }}</a></td></tr>
               <tr><th>Domain</th><td><code>{{ charity["domain"] }}</code></td></tr>
-              <tr><th>Latest income</th><td>&pound;{{ "{:,.0f}".format(charity["latest_income"])}}</td></tr>
+              <tr><th>Latest income</th>
+                <td>
+                % if charity["latest_income"]:
+                  &pound;{{ "{:,.0f}".format(charity["latest_income"])}}
+                % else:
+                  <code>None</code>
+                % end
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>

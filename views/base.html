@@ -13,6 +13,13 @@
           </h1>
           <h2 class="subtitle">
             {{ !get("subtitle", "") }}
+            % if defined("status"):
+              % if get("status"):
+              | Active
+              % else:
+              | Inactive
+              % end
+            % end
           </h2>
         </div>
       </div>
