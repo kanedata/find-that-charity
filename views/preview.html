@@ -1,32 +1,57 @@
-<h1>
-  {{ charity["known_as"] }}
-</h1>
-<h3><strong>Active:</strong>
-  {{ charity["active"] }}
-</h3>
-<h3><strong>Charity No(s):</strong><br/>
-  % if charity["ccew_number"]:
-    CCEW: {{charity["ccew_number"]}}<br/>
-  % end
-  % if charity["ccew_number"]:
-    OSCR: {{charity["oscr_number"]}}<br/>
-  % end
-  % if charity["ccew_number"]:
-    CCNI: {{charity["ccni_number"]}}
-  % end
-</h3>
-<h3><strong>Company No(s):</strong>
-  % if charity["company_number"]:
-    % for co in charity["company_number"]:
-      {{ co["number"] }} ({{co["source"]}})
-    % end
-  % end
-</h3>
-<h3><strong>Postcode:</strong>
-  {{ charity["geo"]["postcode"] }}
-</h3>
-<h3><strong>Other Names:</strong>
-  % for name in charity["names"]:
-    {{ name["name"] }} ({{name["type"]}}, {{name["source"]}})
-  % end
-</h3>
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.3/css/bulma.min.css" integrity="sha256-VC9bpAao257nf22leBRLU7AqKGwS9/Ylz8hfpHmOob4=" crossorigin="anonymous" />
+  </head>
+  <body>
+    <div class="container is-fluid">
+      <div class="box">
+        <div class="content is-small">
+          <h1>
+            {{ charity["known_as"] }}
+          </h1>
+          <table class="table">
+            <tr>
+              <th colspan="2">Active</th>
+              <td>{{ charity["active"] }}</td>
+            </tr>
+            <tr>
+              <th rowspan="3">Charity no(s)</th>
+              <th>CCEW</th>
+              <td>{{charity["ccew_number"]}}</td>
+            </tr>
+            <tr>
+              <th>OSCR</th>
+              <td>{{charity["oscr_number"]}}</td>
+            </tr>
+            <tr>
+              <th>CCNI</th>
+              <td>{{charity["ccni_number"]}}</td>
+            </tr>
+            % if charity["company_number"]:
+            <tr>
+              <th colspan="2">Company No(s)</th>
+              <td>
+              % for co in charity["company_number"]:
+                {{ co["number"] }} ({{co["source"]}})<br>
+              % end
+              </td>
+            </tr>
+            <tr>
+              <th colspan="2">Postcode</th>
+              <td>{{ charity["geo"]["postcode"] }}</td>
+            </tr>
+            <tr>
+              <th>Other Names</th>
+              <td colspan="2">
+              % for name in charity["names"]:
+                {{ name["name"] }} ({{name["type"]}}, {{name["source"]}})<br>
+              % end
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
