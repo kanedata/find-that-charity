@@ -161,6 +161,7 @@ def main():
     parser.add_argument('-host', '--host', default="localhost", help='host for the server')
     parser.add_argument('-p', '--port', default=8080, help='port for the server')
     parser.add_argument('--debug', action='store_true', dest="debug", help='Debug mode (autoreloads the server)')
+    parser.add_argument('--server', default="auto", help='Server backend to use (see http://bottlepy.org/docs/dev/deployment.html#switching-the-server-backend)')
 
     # elasticsearch options
     parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
@@ -172,13 +173,18 @@ def main():
 
     args = parser.parse_args()
 
-    app.config["es"] = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
+    app.config["es"] = Elasticsearch(
+        host=args.es_host,
+        port=args.es_port,
+        url_prefix=args.es_url_prefix,
+        use_ssl=args.es_use_ssl
+    )
     app.config["es_index"] = args.es_index
     app.config["es_type"] = args.es_type
 
     bottle.debug(args.debug)
 
-    bottle.run(app, host=args.host, port=args.port, reloader=args.debug)
+    bottle.run(app, server=args.server, host=args.host, port=args.port, reloader=args.debug)
 
 if __name__ == '__main__':
     main()
