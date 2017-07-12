@@ -173,12 +173,23 @@ def main():
 
     args = parser.parse_args()
 
-    app.config["es"] = Elasticsearch(
-        host=args.es_host,
-        port=args.es_port,
-        url_prefix=args.es_url_prefix,
-        use_ssl=args.es_use_ssl
-    )
+    if os.environ.get("BONSAI_URL"):
+        bonsai = os.environ['BONSAI_URL']
+        auth = re.search('https\:\/\/(.*)\@', bonsai).group(1).split(':')
+        host = bonsai.replace('https://%s:%s@' % (auth[0], auth[1]), '')
+        app.config["es"] = Elasticsearch(
+            host=host,
+            port=443,
+            use_ssl=True,
+            http_auth=(auth[0], auth[1])
+        )
+    else:
+        app.config["es"] = Elasticsearch(
+            host=args.es_host,
+            port=args.es_port,
+            url_prefix=args.es_url_prefix,
+            use_ssl=args.es_use_ssl
+        )
     app.config["es_index"] = args.es_index
     app.config["es_type"] = args.es_type
 
