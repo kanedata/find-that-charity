@@ -31,8 +31,12 @@ def esdoc_orresponse(query):
 
     Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
     """
-    res = app.config["es"].search_template(index=app.config["es_index"], doc_type=app.config["es_type"], body=query, ignore=[404])
-    print(res)
+    res = app.config["es"].search_template(
+        index=app.config["es_index"],
+        doc_type=app.config["es_type"],
+        body=query,
+        ignore=[404]
+    )
     res["hits"]["result"] = res["hits"].pop("hits")
     for i in res["hits"]["result"]:
         i["id"] = i.pop("_id")
@@ -53,17 +57,19 @@ def service_spec():
 
         Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
         """
-        service_url = "http://localhost:8080/"
-
+        service_url = "{}://{}".format(
+            bottle.request.urlparts.scheme,
+            bottle.request.urlparts.netloc,
+        )
         return {
             "name": app.config["es_index"],
             "identifierSpace": "http://rdf.freebase.com/ns/type.object.id",
             "schemaSpace": "http://rdf.freebase.com/ns/type.object.id",
             "view": {
-                "url": service_url + "charity/{{id}}"
+                "url": service_url + "/charity/{{id}}"
             },
             "preview": {
-                "url": service_url + "preview/charity/{{id}}",
+                "url": service_url + "/preview/charity/{{id}}",
                 "width": 430,
                 "height": 300
             },
