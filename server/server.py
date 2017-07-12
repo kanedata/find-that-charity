@@ -2,77 +2,26 @@ from __future__ import print_function
 
 import argparse
 import bottle
-import json
+import json, yaml
 from elasticsearch import Elasticsearch
 from collections import OrderedDict
 
 app = bottle.default_app()
 
 
-def search_query(name, domain_name=None):
-    return {
-        "inline": {
-            "query": {
-                "function_score": {
-                    "query": {
-                        "dis_max": {
-                            "queries": [
-                                {
-                                    "multi_match": {
-                                        "query": "{{name}}",
-                                        "fields": ["known_as^3", "alt_names"]
-                                    }
-                                }, {
-                                    "match_phrase": {
-                                        "known_as": "{{name}}"
-                                    }
-                                # }, {
-                                #     "match": {
-                                #         "domain": "{{domain_name}}"
-                                #     }
-                                }
-                            ]
-                        }
-                    },
-                    "functions": [
-                        {
-                            "filter": {"match_phrase_prefix": {"known_as": "{{name}}"}},
-                            "weight": 200
-                        }, {
-                            "filter": {
-                                "multi_match": {
-                                    "query": "{{name}}",
-                                    "fields": ["known_as^3", "alt_names"],
-                                    "operator": "and"
-                                }
-                            },
-                            "weight": 10
-                        }, {
-                        #     "filter": {"match_phrase_prefix": {"alt_names": "{{name}}"}},
-                        #     "weight": 100
-                        # }, {
-                        # 	"filter": {"term": {"domain": "{{domain_name}}"}},
-                        # 	"weight": 50
-                        # }, {
-                            "filter": {"term": {"active": False}},
-                            "weight": 0.9
-                        }, {
-                            "field_value_factor": {
-                                "field": "latest_income",
-                                "modifier": "log2p",
-                                "missing": 1
-                            }
-                        }
-                    ]
-                }
-            }
-        },
-        "params": {
-            "name": name,
-            "domain_name": domain_name
-        }
-    }
+def search_query(term):
+    with open ('./es_config.yml', 'rb') as yaml_file:
+        json_q = yaml.load(yaml_file)
+        for p in json_q["params"]:
+            json_q["params"][p] = term
+        return json.dumps(json_q)
 
+def recon_query(term):
+    with open ('./recon_config.yml', 'rb') as yaml_file:
+        json_q = yaml.load(yaml_file)
+        for p in json_q["params"]:
+            json_q["params"][p] = term
+        return json.dumps(json_q)
 
 def esdoc_orresponse(query):
     """Decorate the elasticsearch document to the OpenRefine response API
@@ -89,12 +38,11 @@ def esdoc_orresponse(query):
         i["index"] = i.pop("_index")
         i["source"] = i.pop("_source")
         i["name"] = i["source"]["known_as"]
-        if i["name"] == query["params"]["name"] and i["score"] == res["hits"]["max_score"]:
+        if i["name"] == json.loads(query)["params"]["name"] and i["score"] == res["hits"]["max_score"]:
             i["match"] = True
         else:
             i["match"] = False
     return res["hits"]
-
 
 def service_spec():
         """Return the default service specification
@@ -126,7 +74,7 @@ def search_return(query):
     res = res["hits"]
     for result in res["hits"]:
         result["_link"] = "/charity/" + result["_id"]
-    return bottle.template('index', res=res)
+    return bottle.template('index', res=res, term=json.loads(query)["params"]["name"])
 
 @app.route('/')
 def home():
@@ -144,7 +92,7 @@ def reconcile():
     """ Index of the server. If ?query or ?queries used then search,
                 otherwise return the default response as JSON
     """
-    query = search_query(bottle.request.query.query) or None
+    query = recon_query(bottle.request.query.query) or None
     queries = bottle.request.params.queries or None
 
     # if we're doing a callback request then do that
@@ -168,7 +116,7 @@ def reconcile():
         for query in queries_dict:
             q = "q" + str(counter)
             # print(queries_json[q], queries_json[q]["query"])
-            result = esdoc_orresponse(search_query(queries_json[q]["query"]))["result"]
+            result = esdoc_orresponse(recon_query(queries_json[q]["query"]))["result"]
             results.update({q: {"result": result}})
             counter += 1
         return results

@@ -20,7 +20,7 @@ def main():
     parser.add_argument('--ccew', type=str,
                         default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
     parser.add_argument('--ccni', type=str,
-                        default="http://www.charitycommissionni.org.uk/charity-search/?&exportCSV=1", help="CSV of Northern Ireland Charity Commission data")
+                        default="http://www.charitycommissionni.org.uk/charity-search/?q=&include=Linked&include=Removed&exportCSV=1", help="CSV of Northern Ireland Charity Commission data")
     parser.add_argument('--ccni_extra', type=str,
                         default="https://gist.githubusercontent.com/BobHarper1/2687545c562b47bc755aef2e9e0de537/raw/ac052c33fd14a08dd4c2a0604b54c50bc1ecc0db/ccni_extra",
                         help='CSV for NI charities with other names')

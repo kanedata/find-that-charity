@@ -1,0 +1,37 @@
+---
+inline:
+  query:
+    function_score:
+      query:
+        dis_max:
+          queries:
+          - multi_match:
+              query: "{{name}}"
+              fields:
+              - known_as^3
+              - alt_names
+          - match_phrase:
+              known_as: "{{name}}"
+      functions:
+      - filter:
+          match_phrase_prefix:
+            known_as: "{{name}}"
+        weight: 200
+      - filter:
+          multi_match:
+            query: "{{name}}"
+            fields:
+            - known_as^3
+            - alt_names
+            operator: and
+        weight: 10
+      - filter:
+          term:
+            active: false
+        weight: 0.9
+      - field_value_factor:
+          field: latest_income
+          modifier: log2p
+          missing: 1
+params:
+  name: term
