@@ -79,19 +79,16 @@ def search_return(query):
     res = res["hits"]
     for result in res["hits"]:
         result["_link"] = "/charity/" + result["_id"]
-    return bottle.template('index', res=res, term=json.loads(query)["params"]["name"])
+    return bottle.template('search', res=res, term=json.loads(query)["params"]["name"])
 
 
 @app.route('/')
 def home():
-    return bottle.template('index', search_results='')
-
-
-@app.post('/')
-def handle_search():
-    query = bottle.request.forms.get('query')
-    query = search_query(query)
-    return search_return(query)
+    query = bottle.request.query.get('q')
+    if query:
+        query = search_query(query)
+        return search_return(query)
+    return bottle.template('index', term='')
 
 
 @app.route('/reconcile')
