@@ -2,7 +2,8 @@ from __future__ import print_function
 
 import argparse
 import bottle
-import json, yaml
+import json
+import yaml
 from elasticsearch import Elasticsearch
 from collections import OrderedDict
 
@@ -10,18 +11,20 @@ app = bottle.default_app()
 
 
 def search_query(term):
-    with open ('./es_config.yml', 'rb') as yaml_file:
+    with open('./es_config.yml', 'rb') as yaml_file:
         json_q = yaml.load(yaml_file)
         for p in json_q["params"]:
             json_q["params"][p] = term
         return json.dumps(json_q)
 
+
 def recon_query(term):
-    with open ('./recon_config.yml', 'rb') as yaml_file:
+    with open('./recon_config.yml', 'rb') as yaml_file:
         json_q = yaml.load(yaml_file)
         for p in json_q["params"]:
             json_q["params"][p] = term
         return json.dumps(json_q)
+
 
 def esdoc_orresponse(query):
     """Decorate the elasticsearch document to the OpenRefine response API
@@ -43,6 +46,7 @@ def esdoc_orresponse(query):
         else:
             i["match"] = False
     return res["hits"]
+
 
 def service_spec():
         """Return the default service specification
@@ -69,6 +73,7 @@ def service_spec():
             }]
         }
 
+
 def search_return(query):
     res = app.config["es"].search_template(index=app.config["es_index"], doc_type=app.config["es_type"], body=query, ignore=[404])
     res = res["hits"]
@@ -76,15 +81,18 @@ def search_return(query):
         result["_link"] = "/charity/" + result["_id"]
     return bottle.template('index', res=res, term=json.loads(query)["params"]["name"])
 
+
 @app.route('/')
 def home():
     return bottle.template('index', search_results='')
+
 
 @app.post('/')
 def handle_search():
     query = bottle.request.forms.get('query')
     query = search_query(query)
     return search_return(query)
+
 
 @app.route('/reconcile')
 @app.post('/reconcile')
