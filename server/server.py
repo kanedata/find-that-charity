@@ -60,8 +60,8 @@ def service_spec():
             },
             "preview": {
                 "url": service_url + "preview/charity/{{id}}",
-                "width": 430,
-                "height": 300
+                "width": 500,
+                "height": 450
             },
             "defaultTypes": [{
                 "id": "/" + app.config["es_type"],
