@@ -29,11 +29,11 @@ def main():
     args = parser.parse_args()
 
     # retrieve dual registered charities
-    urllib.request.urlretrieve(args.dual, "data/dual-registered-uk-charities.csv")
+    urllib.request.urlretrieve(args.dual, os.path.join("data", "dual-registered-uk-charities.csv"))
     print("[Dual] Dual registered charities fetched")
 
     # retrieve ni charity extra names
-    urllib.request.urlretrieve(args.ccni_extra, "data/ccni_extra_names.csv")
+    urllib.request.urlretrieve(args.ccni_extra, os.path.join("data", "ccni_extra_names.csv"))
     print("[CCNI Extra] Extra Northern Ireland charity names fetched")
 
     # get oscr data
@@ -42,15 +42,15 @@ def main():
             files = oscrzip.infolist()
             if len(files) != 1:
                 raise ValueError("More than one file in OSCR zip")
-            with open("data/oscr.csv", "wb") as oscrcsv:
+            with open(os.path.join("data", "oscr.csv"), "wb") as oscrcsv:
                 oscrcsv.write(oscrzip.read(files[0]))
             print("[OSCR] data extracted")
 
     # get charity commission data
     if not args.skip_ccew:
         ccew_html = urllib.request.urlopen(args.ccew)
-        ccew_out = "data\ccew.zip"
-        ccew_folder = "data\ccew"
+        ccew_out = os.path.join("data", "ccew.zip")
+        ccew_folder = os.path.join("data", "ccew")
         if ccew_html.status != 200:
             raise ValueError("[CCEW] Could not find Charity Commission data page. Status %s %s" % (ccew_data.status, ccew_data.reason))
         ccew_html = ccew_html.read()
@@ -77,7 +77,7 @@ def main():
     # download Northern Ireland register of charities
     if args.ccni:
         print("[CCNI] Using url: %s" % args.ccni)
-        urllib.request.urlretrieve(args.ccni, 'data\ccni.csv')
+        urllib.request.urlretrieve(args.ccni, os.path.join('data', 'ccni.csv'))
         print("[CCNI] CSV downloaded")
 
 if __name__ == '__main__':
