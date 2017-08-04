@@ -6,7 +6,7 @@ from elasticsearch.exceptions import NotFoundError
 import validators
 from urllib.parse import urlparse
 import argparse
-
+import os
 
 def parse_postcode(postcode):
     """
@@ -151,7 +151,7 @@ def clean_row(row):
 
 
 def import_extract_charity(chars={},
-                           datafile="data/ccew/extract_charity.csv",
+                           datafile= os.path.join("data", "ccew", "extract_charity.csv"),
                            es_index="charitysearch",
                            es_type="charity"):
 
@@ -216,7 +216,7 @@ def import_extract_charity(chars={},
     return chars
 
 
-def import_extract_main(chars={}, datafile="data/ccew/extract_main_charity.csv"):
+def import_extract_main(chars={}, datafile=os.path.join("data", "ccew", "extract_main_charity.csv")):
 
     with open(datafile, encoding="latin1") as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
@@ -242,7 +242,7 @@ def import_extract_main(chars={}, datafile="data/ccew/extract_main_charity.csv")
     return chars
 
 
-def import_extract_name(chars={}, datafile="data/ccew/extract_name.csv"):
+def import_extract_name(chars={}, datafile=os.path.join("data", "ccew", "extract_name.csv")):
 
     with open(datafile, encoding="latin1") as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
@@ -269,7 +269,7 @@ def import_extract_name(chars={}, datafile="data/ccew/extract_name.csv"):
     return chars
 
 
-def import_dual_reg(datafile="data/dual-registered-uk-charities.csv"):
+def import_dual_reg(datafile= os.path.join("data", "dual-registered-uk-charities.csv")):
 
     # store dual registration details
     dual = {}
@@ -285,7 +285,7 @@ def import_dual_reg(datafile="data/dual-registered-uk-charities.csv"):
 
 def import_oscr(chars={},
                 dual={},
-                datafile="data/oscr.csv",
+                datafile=os.path.join("data", "oscr.csv"),
                 es_index="charitysearch",
                 es_type="charity"):
 
@@ -387,8 +387,8 @@ def import_oscr(chars={},
 
 def import_ccni(chars={},
                 dual={},
-                datafile="data/ccni.csv",
-                extra_names="data/ccni_extra_names.csv",
+                datafile=os.path.join("data", "ccni.csv"),
+                extra_names=os.path.join("data", "ccni_extra_names.csv"),
                 es_index="charitysearch",
                 es_type="charity"):
 
@@ -560,13 +560,13 @@ def main():
         pc_es = Elasticsearch(host=args.es_pc_host, port=args.es_pc_port, url_prefix=args.es_pc_url_prefix, use_ssl=args.es_pc_use_ssl)
 
     data_files = {
-        "extract_charity": "data/ccew/extract_charity.csv",
-        "extract_main": "data/ccew/extract_main_charity.csv",
-        "extract_names": "data/ccew/extract_name.csv",
-        "dual_registration": "data/dual-registered-uk-charities.csv",
-        "oscr": "data/oscr.csv",
-        "ccni": "data/ccni.csv",
-        "ccni_extra_names": "data/ccni_extra_names.csv",
+        "extract_charity": os.path.join("data", "ccew", "extract_charity.csv"),
+        "extract_main": os.path.join("data" , "ccew" , "extract_main_charity.csv"),
+        "extract_names": os.path.join("data" , "ccew", "extract_name.csv"),
+        "dual_registration": os.path.join("data", "dual-registered-uk-charities.csv"),
+        "oscr": os.path.join("data" , "oscr.csv"),
+        "ccni": os.path.join("data", "ccni.csv"),
+        "ccni_extra_names": os.path.join("data", "ccni_extra_names.csv"),
     }
 
     chars = import_extract_charity({}, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type)
