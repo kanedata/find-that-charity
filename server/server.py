@@ -1,8 +1,9 @@
 from __future__ import print_function
-
+import os
 import argparse
 import bottle
-import json, yaml
+import json
+import yaml
 from elasticsearch import Elasticsearch
 from collections import OrderedDict
 
@@ -10,26 +11,32 @@ app = bottle.default_app()
 
 
 def search_query(term):
-    with open ('./es_config.yml', 'rb') as yaml_file:
+    with open('./es_config.yml', 'rb') as yaml_file:
         json_q = yaml.load(yaml_file)
         for p in json_q["params"]:
             json_q["params"][p] = term
         return json.dumps(json_q)
 
+
 def recon_query(term):
-    with open ('./recon_config.yml', 'rb') as yaml_file:
+    with open('./recon_config.yml', 'rb') as yaml_file:
         json_q = yaml.load(yaml_file)
         for p in json_q["params"]:
             json_q["params"][p] = term
         return json.dumps(json_q)
+
 
 def esdoc_orresponse(query):
     """Decorate the elasticsearch document to the OpenRefine response API
 
     Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
     """
-    res = app.config["es"].search_template(index=app.config["es_index"], doc_type=app.config["es_type"], body=query, ignore=[404])
-    print(res)
+    res = app.config["es"].search_template(
+        index=app.config["es_index"],
+        doc_type=app.config["es_type"],
+        body=query,
+        ignore=[404]
+    )
     res["hits"]["result"] = res["hits"].pop("hits")
     for i in res["hits"]["result"]:
         i["id"] = i.pop("_id")
@@ -44,24 +51,27 @@ def esdoc_orresponse(query):
             i["match"] = False
     return res["hits"]
 
+
 def service_spec():
         """Return the default service specification
 
         Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
         """
-        service_url = "http://localhost:8080/"
-
+        service_url = "{}://{}".format(
+            bottle.request.urlparts.scheme,
+            bottle.request.urlparts.netloc,
+        )
         return {
             "name": app.config["es_index"],
             "identifierSpace": "http://rdf.freebase.com/ns/type.object.id",
             "schemaSpace": "http://rdf.freebase.com/ns/type.object.id",
             "view": {
-                "url": service_url + "charity/{{id}}"
+                "url": service_url + "/charity/{{id}}"
             },
             "preview": {
-                "url": service_url + "preview/charity/{{id}}",
-                "width": 500,
-                "height": 450
+                "url": service_url + "/preview/charity/{{id}}",
+                "width": 430,
+                "height": 300
             },
             "defaultTypes": [{
                 "id": "/" + app.config["es_type"],
@@ -69,22 +79,23 @@ def service_spec():
             }]
         }
 
+
 def search_return(query):
     res = app.config["es"].search_template(index=app.config["es_index"], doc_type=app.config["es_type"], body=query, ignore=[404])
     res = res["hits"]
     for result in res["hits"]:
         result["_link"] = "/charity/" + result["_id"]
-    return bottle.template('index', res=res, term=json.loads(query)["params"]["name"])
+    return bottle.template('search', res=res, term=json.loads(query)["params"]["name"])
+
 
 @app.route('/')
 def home():
-    return bottle.template('index', search_results='')
+    query = bottle.request.query.get('q')
+    if query:
+        query = search_query(query)
+        return search_return(query)
+    return bottle.template('index', term='')
 
-@app.post('/')
-def handle_search():
-    query = bottle.request.forms.get('query')
-    query = search_query(query)
-    return search_return(query)
 
 @app.route('/reconcile')
 @app.post('/reconcile')
@@ -156,6 +167,7 @@ def main():
     parser.add_argument('-host', '--host', default="localhost", help='host for the server')
     parser.add_argument('-p', '--port', default=8080, help='port for the server')
     parser.add_argument('--debug', action='store_true', dest="debug", help='Debug mode (autoreloads the server)')
+    parser.add_argument('--server', default="auto", help='Server backend to use (see http://bottlepy.org/docs/dev/deployment.html#switching-the-server-backend)')
 
     # elasticsearch options
     parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
@@ -167,13 +179,29 @@ def main():
 
     args = parser.parse_args()
 
-    app.config["es"] = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
+    if os.environ.get("BONSAI_URL"):
+        bonsai = os.environ['BONSAI_URL']
+        auth = re.search('https\:\/\/(.*)\@', bonsai).group(1).split(':')
+        host = bonsai.replace('https://%s:%s@' % (auth[0], auth[1]), '')
+        app.config["es"] = Elasticsearch(
+            host=host,
+            port=443,
+            use_ssl=True,
+            http_auth=(auth[0], auth[1])
+        )
+    else:
+        app.config["es"] = Elasticsearch(
+            host=args.es_host,
+            port=args.es_port,
+            url_prefix=args.es_url_prefix,
+            use_ssl=args.es_use_ssl
+        )
     app.config["es_index"] = args.es_index
     app.config["es_type"] = args.es_type
 
     bottle.debug(args.debug)
 
-    bottle.run(app, host=args.host, port=args.port, reloader=args.debug)
+    bottle.run(app, server=args.server, host=args.host, port=args.port, reloader=args.debug)
 
 if __name__ == '__main__':
     main()

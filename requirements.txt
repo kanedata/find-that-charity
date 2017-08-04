@@ -2,6 +2,7 @@ beautifulsoup4==4.5.3
 bottle==0.12.13
 decorator==4.0.11
 elasticsearch==5.3.0
+gunicorn==19.7.1
 six==1.10.0
 urllib3==1.20
 validators==0.11.3
