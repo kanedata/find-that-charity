@@ -6,6 +6,7 @@ import json
 import yaml
 from elasticsearch import Elasticsearch
 from collections import OrderedDict
+import re
 
 app = bottle.default_app()
 
@@ -53,31 +54,31 @@ def esdoc_orresponse(query):
 
 
 def service_spec():
-        """Return the default service specification
+    """Return the default service specification
 
-        Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
-        """
-        service_url = "{}://{}".format(
-            bottle.request.urlparts.scheme,
-            bottle.request.urlparts.netloc,
-        )
-        return {
-            "name": app.config["es_index"],
-            "identifierSpace": "http://rdf.freebase.com/ns/type.object.id",
-            "schemaSpace": "http://rdf.freebase.com/ns/type.object.id",
-            "view": {
-                "url": service_url + "/charity/{{id}}"
-            },
-            "preview": {
-                "url": service_url + "/preview/charity/{{id}}",
-                "width": 430,
-                "height": 300
-            },
-            "defaultTypes": [{
-                "id": "/" + app.config["es_type"],
-                "name": app.config["es_type"]
-            }]
-        }
+    Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
+    """
+    service_url = "{}://{}".format(
+        bottle.request.urlparts.scheme,
+        bottle.request.urlparts.netloc,
+    )
+    return {
+        "name": app.config["es_index"],
+        "identifierSpace": "http://rdf.freebase.com/ns/type.object.id",
+        "schemaSpace": "http://rdf.freebase.com/ns/type.object.id",
+        "view": {
+            "url": service_url + "/charity/{{id}}"
+        },
+        "preview": {
+            "url": service_url + "/preview/charity/{{id}}",
+            "width": 430,
+            "height": 300
+        },
+        "defaultTypes": [{
+            "id": "/" + app.config["es_type"],
+            "name": app.config["es_type"]
+        }]
+    }
 
 
 def search_return(query):

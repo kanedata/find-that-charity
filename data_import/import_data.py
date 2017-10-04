@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 import argparse
 import os
 
+
 def parse_postcode(postcode):
     """
     standardises a postcode into the correct format
@@ -151,7 +152,7 @@ def clean_row(row):
 
 
 def import_extract_charity(chars={},
-                           datafile= os.path.join("data", "ccew", "extract_charity.csv"),
+                           datafile=os.path.join("data", "ccew", "extract_charity.csv"),
                            es_index="charitysearch",
                            es_type="charity"):
 
@@ -269,7 +270,7 @@ def import_extract_name(chars={}, datafile=os.path.join("data", "ccew", "extract
     return chars
 
 
-def import_dual_reg(datafile= os.path.join("data", "dual-registered-uk-charities.csv")):
+def import_dual_reg(datafile=os.path.join("data", "dual-registered-uk-charities.csv")):
 
     # store dual registration details
     dual = {}
@@ -561,10 +562,10 @@ def main():
 
     data_files = {
         "extract_charity": os.path.join("data", "ccew", "extract_charity.csv"),
-        "extract_main": os.path.join("data" , "ccew" , "extract_main_charity.csv"),
-        "extract_names": os.path.join("data" , "ccew", "extract_name.csv"),
+        "extract_main": os.path.join("data", "ccew", "extract_main_charity.csv"),
+        "extract_names": os.path.join("data", "ccew", "extract_name.csv"),
         "dual_registration": os.path.join("data", "dual-registered-uk-charities.csv"),
-        "oscr": os.path.join("data" , "oscr.csv"),
+        "oscr": os.path.join("data", "oscr.csv"),
         "ccni": os.path.join("data", "ccni.csv"),
         "ccni_extra_names": os.path.join("data", "ccni_extra_names.csv"),
     }
