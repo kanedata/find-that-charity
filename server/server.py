@@ -10,16 +10,8 @@ import re
 
 app = bottle.default_app()
 
-if os.environ.get("BONSAI_URL"):
-    bonsai = os.environ['BONSAI_URL']
-    auth = re.search('https\:\/\/(.*)\@', bonsai).group(1).split(':')
-    host = bonsai.replace('https://%s:%s@' % (auth[0], auth[1]), '')
-    app.config["es"] = Elasticsearch(
-        host=host,
-        port=443,
-        use_ssl=True,
-        http_auth=(auth[0], auth[1])
-    )
+if os.environ.get("ES_URL", os.environ.get("BONSAI_URL")):
+    app.config["es"] = Elasticsearch(os.environ.get('ES_URL', os.environ.get("BONSAI_URL")))
     app.config["es_index"] = 'charitysearch'
     app.config["es_type"] = 'charity'
 

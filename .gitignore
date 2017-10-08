@@ -10,3 +10,5 @@ scratchpad/
 .cache
 
 *.lnk
+
+\.vscode/
