@@ -90,6 +90,18 @@ def parse_ni_charity_number(charno):
         return "NIC" + charno
     return charno
 
+def add_org_id_prefix(char_json):
+    prefixes = []
+    if char_json['company_number']:
+        for coh in char_json['company_number']:
+            prefixes.append('GB-COH-' + coh['number'])
+    if char_json['oscr_number']:
+        prefixes.append('GB-SC-' + char_json['oscr_number'])
+    if char_json['ccew_number']:
+        prefixes.append('GB-CHC-' + char_json['ccew_number'])
+    if char_json['ccni_number']:
+        prefixes.append('GB-NIC-' + char_json['ccni_number'])
+    return prefixes
 
 def parse_url(url):
     if url is None:
@@ -196,6 +208,9 @@ def import_extract_charity(chars={},
                 ccount += 1
                 if ccount % 10000 == 0:
                     print('\r', "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount, end='')
+
+        char_json['org-ids'] = add_org_id_prefix(char_json)
+
         print('\r', "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount)
 
         ccount = 0
@@ -378,6 +393,9 @@ def import_oscr(chars={},
             ccount += 1
             if ccount % 10000 == 0:
                 print('\r', "[OSCR] %s charities added or updated from oscr.csv" % ccount, end='')
+
+        char_json['org-ids'] = add_org_id_prefix(char_json)
+
         print('\r', "[OSCR] %s charities added or updated from oscr.csv" % ccount)
         print('\r', "[OSCR] %s charities added from oscr.csv" % cadded)
         print('\r', "[OSCR] %s charities updated using oscr.csv" % cupdated)
@@ -488,6 +506,9 @@ def import_ccni(chars={},
 
                 chars[row["Reg charity number"]] = char_json
                 cadded += 1
+
+            char_json['org-ids'] = add_org_id_prefix(char_json)
+
             ccount += 1
             if ccount % 10000 == 0:
                 print('\r', "[CCNI] %s charities added or updated from ccni.csv" % ccount, end='')
