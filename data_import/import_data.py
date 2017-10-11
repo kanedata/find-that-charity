@@ -209,8 +209,6 @@ def import_extract_charity(chars={},
                 if ccount % 10000 == 0:
                     print('\r', "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount, end='')
 
-        char_json['org-ids'] = add_org_id_prefix(char_json)
-
         print('\r', "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount)
 
         ccount = 0
@@ -245,6 +243,7 @@ def import_extract_main(chars={}, datafile=os.path.join("data", "ccew", "extract
                         "url": "http://beta.companieshouse.gov.uk/company/" + parse_company_number(row[1]),
                         "source": "ccew"
                     })
+                    chars[row[0]]['org-ids'] = add_org_id_prefix(chars[row[0]])
                 if row[9]:
                     chars[row[0]]["url"] = row[9]
                 if row[6]:
@@ -394,7 +393,7 @@ def import_oscr(chars={},
             if ccount % 10000 == 0:
                 print('\r', "[OSCR] %s charities added or updated from oscr.csv" % ccount, end='')
 
-        char_json['org-ids'] = add_org_id_prefix(char_json)
+            char_json['org-ids'] = add_org_id_prefix(char_json)
 
         print('\r', "[OSCR] %s charities added or updated from oscr.csv" % ccount)
         print('\r', "[OSCR] %s charities added from oscr.csv" % cadded)
