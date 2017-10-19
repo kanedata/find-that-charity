@@ -288,7 +288,7 @@ def import_extract_charity(chars={},
             if len(row) > 1 and row[1] != "0":
                 row = clean_row(row)
                 chars[row[0]]["names"].append({
-                    "name": row[2],
+                    "name": parse_name(row[2]),
                     "type": "subsidiary name",
                     "source": "ccew"
                 })
@@ -338,7 +338,7 @@ def import_extract_name(chars={}, datafile=os.path.join("data", "ccew", "extract
                 name = row[3]
                 if name not in char_names:
                     try:
-                        name = titlecase.titlecase(name, title_exceptions)
+                        name = parse_name(name)
                     except:
                         pass
                     name_type = "other name"
