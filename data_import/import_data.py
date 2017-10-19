@@ -646,9 +646,15 @@ def main():
     args = parser.parse_args()
 
     es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
+
+    if not es.ping():
+        raise ValueError("Elasticsearch connection failed")
+
     pc_es = None  # Elasticsearch postcode instance
     if args.es_pc_host:
         pc_es = Elasticsearch(host=args.es_pc_host, port=args.es_pc_port, url_prefix=args.es_pc_url_prefix, use_ssl=args.es_pc_use_ssl)
+        if not pc_es.ping():
+            raise ValueError("Connection failed - postcode elasticsearch")
 
     data_files = {
         "extract_charity": os.path.join("data", "ccew", "extract_charity.csv"),
