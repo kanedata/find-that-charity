@@ -6,6 +6,7 @@ Elasticsearch-powered search engine for looking for charities. Allows for:
 - importing data from England and Wales, Scotland, and Northern Ireland, ensuring that duplicates
   are matched to one record.
 - An elasticsearch index that can be queried.
+- [Org-ids](http://org-id.guide/about) are added to charities.
 - Reconciliation API for searching charity, based on an optimised search query.
 - Facility for uploading a CSV of charity names and adding the (best guess) at a
   charity number.
@@ -95,7 +96,7 @@ The data is imported into elasticsearch in the following format:
   "charity_number": "12355",
   "ccew_number": "12355",
   "oscr_number": "SC1235",
-  "ccni_number": "NI100012",
+  "ccni_number": "NIC100012",
   "active": true,
   "names": [
     {"name": "Charity Name", "type": "registered name", "source": "ccew"}
@@ -115,7 +116,8 @@ The data is imported into elasticsearch in the following format:
   "parent": "124566",
   "ccew_link": "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber=12355&SubsidiaryNumber=0",
   "oscr_link": "http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-details?number=SC1235",
-  "ccni_link": "http://www.charitycommissionni.org.uk/charity-details/?regid=100012&subid=0"
+  "ccni_link": "http://www.charitycommissionni.org.uk/charity-details/?regid=100012&subid=0",
+  "org-ids": ["GB-COH-00121212", "GB-CHC-12355", "GB-SC-SC1235", "GB-NIC-100012"]
 }
 ```
 
