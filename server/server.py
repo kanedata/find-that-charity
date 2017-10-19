@@ -7,6 +7,7 @@ import yaml
 from elasticsearch import Elasticsearch
 from collections import OrderedDict
 import re
+import time
 
 app = bottle.default_app()
 
@@ -101,6 +102,48 @@ def home():
         query = search_query(query)
         return search_return(query)
     return bottle.template('index', term='')
+
+
+@app.route('/random')
+@app.route('/random.<filetype>')
+def random(filetype="html"):
+    """ Get a random charity record 
+    """
+    query = {
+            "size": 1,
+            "query": {
+                "function_score": {
+                    "functions": [
+                        {
+                            "random_score": {
+                                "seed": str(time.time())
+                            }
+                        }
+                    ]
+                }
+            }
+    }
+
+    if "active" in bottle.request.query:
+        query["query"]["function_score"]["query"] = {"match": {"active": True}}
+
+    res = app.config["es"].search(
+        index=app.config["es_index"],
+        doc_type=app.config["es_type"],
+        body=query,
+        ignore=[404]
+    )
+    char = None
+    if "hits" in res:
+        if "hits" in res["hits"]:
+            char = res["hits"]["hits"][0]
+    
+    if char:
+        if filetype=="html":
+            bottle.redirect("/charity/{}".format(char["_id"]))
+        else:
+            return char["_source"]
+
 
 
 @app.route('/reconcile')

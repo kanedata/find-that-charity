@@ -156,7 +156,7 @@
               <tr>
                 <th>Org-ids<br /><a href="http://org-id.guide/about" target="_blank" class="has-text-weight-light">What is org-id?</a></th>
                 <td>
-                  % if charity["org-ids"]:
+                  % if charity.get("org-ids"):
                     % for orgid in charity["org-ids"]:
                         {{ orgid }}<br />
                     % end
