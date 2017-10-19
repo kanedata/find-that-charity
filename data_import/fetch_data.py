@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import bcp
 import os
+import mechanicalsoup
 
 if not os.path.exists("data"):
     os.makedirs("data")
@@ -16,7 +17,8 @@ def main():
                         default='https://gist.github.com/drkane/22d62e07346084fafdcc7d9f5e1cd661/raw/bec666d1bc5c6efb8503a90f76ac0c6236ebc183/dual-registered-uk-charities.csv',
                         help='CSV with dual registered charities in')
     parser.add_argument('--oscr', type=str,
-                        default=None, help="ZIP file containing Scottish charity data")
+                        default="https://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download", 
+                        help="URL of page containing Scottish charity data")
     parser.add_argument('--ccew', type=str,
                         default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
     parser.add_argument('--ccni', type=str,
@@ -24,6 +26,8 @@ def main():
     parser.add_argument('--ccni_extra', type=str,
                         default="https://gist.githubusercontent.com/BobHarper1/2687545c562b47bc755aef2e9e0de537/raw/ac052c33fd14a08dd4c2a0604b54c50bc1ecc0db/ccni_extra",
                         help='CSV for NI charities with other names')
+    parser.add_argument('--skip-oscr', action='store_true',
+                        help='Don\'t fetch data from Office of the Scottish Charity Regulator.')
     parser.add_argument('--skip-ccew', action='store_true',
                         help='Don\'t fetch data from Charity Commission for England and Wales.')
     args = parser.parse_args()
@@ -37,8 +41,31 @@ def main():
     print("[CCNI Extra] Extra Northern Ireland charity names fetched")
 
     # get oscr data
-    if args.oscr:
-        with zipfile.ZipFile(args.oscr) as oscrzip:
+    if not args.skip_oscr:
+
+        FORM_ID = "#uxSiteForm"
+        TERMS_AND_CONDITIONS_CHECKBOX = "ctl00$ctl00$ctl00$ContentPlaceHolderDefault$WebsiteContent$ctl05$CharityRegDownload_10$cbTermsConditions"
+
+        browser = mechanicalsoup.StatefulBrowser()
+        print("[OSCR] Using url: %s" % args.oscr)
+        browser.open(args.oscr)
+
+        browser.select_form(FORM_ID)
+        browser[TERMS_AND_CONDITIONS_CHECKBOX] = True
+        resp = browser.submit_selected()
+        print("[OSCR] Form submitted")
+        try:
+            resp.raise_for_status()
+        except:
+            raise ValueError("[OSCR] Could not download OSCR data. Status %s %s" % (
+                resp.status, resp.reason))
+
+        oscr_out = os.path.join("data", "oscr.zip")
+        with open(oscr_out, "wb") as oscrfile:
+            oscrfile.write(resp.content)
+        print("[OSCR] ZIP downloaded")
+
+        with zipfile.ZipFile(oscr_out) as oscrzip:
             files = oscrzip.infolist()
             if len(files) != 1:
                 raise ValueError("More than one file in OSCR zip")
