@@ -7,6 +7,76 @@ import validators
 from urllib.parse import urlparse
 import argparse
 import os
+import titlecase
+
+
+def title_exceptions(word, **kwargs):
+
+    word_test = word.strip("(){}<>.")
+
+    # lowercase words
+    if word_test.lower() in ['a', 'an', 'of', 'the', 'is', 'or']:
+        return word.lower()
+
+    # uppercase words
+    if word_test.upper() in ['UK', 'FM', 'YMCA', 'PTA', 'PTFA',
+                             'NHS', 'CIO', 'U3A', 'RAF', 'PFA', 'ADHD',
+                             'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI',
+                             'AFC', 'CE', 'CIC'
+                             ]:
+        return word.upper()
+
+    # words with only vowels that aren't all uppercase
+    if word_test.lower() in ['st', 'mr', 'mrs', 'ms', 'ltd', 'dr', 'cwm', 'clwb', 'drs']:
+        return None
+
+    # words with number ordinals
+    ord_numbers_re = re.compile("([0-9]+(?:st|nd|rd|th))")
+    if bool(ord_numbers_re.search(word_test.lower())):
+        return word.lower()
+
+    # words with dots/etc in the middle
+    for s in [".", "'", ")"]:
+        dots = word.split(s)
+        if(len(dots) > 1):
+            # check for possesive apostrophes
+            if s == "'" and dots[-1].upper() == "S":
+                return s.join([titlecase.titlecase(i, title_exceptions) for i in dots[:-1]] + [dots[-1].lower()])
+            # check for you're and other contractions
+            if word_test.upper() in ["YOU'RE", "DON'T", "HAVEN'T"]:
+                return s.join([titlecase.titlecase(i, title_exceptions) for i in dots[:-1]] + [dots[-1].lower()])
+            return s.join([titlecase.titlecase(i, title_exceptions) for i in dots])
+
+    # words with only vowels in (treat as acronyms)
+    vowels = re.compile("[AEIOUYaeiouy]")
+    if not bool(vowels.search(word_test)):
+        return word.upper()
+
+    return None
+
+
+def parse_name(name):
+    if type(name) != str:
+        return name
+
+    name = name.strip()
+
+    # if it contains any lowercase letters then return as is
+    for c in name:
+        if c.islower():
+            return name
+
+    # try titlecasing
+    try:
+        name = titlecase.titlecase(name, title_exceptions)
+    except:
+        pass
+
+    # Make sure first letter is capitalise
+    return name[0].upper() + name[1:]
+
+    
+
 
 
 def parse_postcode(postcode):
@@ -184,11 +254,11 @@ def import_extract_charity(chars={},
                     "ccni_number": None,
                     "active": row[3] == "R",
                     "names": [{
-                        "name": row[2],
+                        "name": parse_name(row[2]),
                         "type": "registered name",
                         "source": "ccew"
                     }],
-                    "known_as": row[2],
+                    "known_as": parse_name(row[2]),
                     "geo": {
                         "areas": [],
                         "postcode": parse_postcode(row[15]),
@@ -244,7 +314,6 @@ def import_extract_main(chars={}, datafile=os.path.join("data", "ccew", "extract
                         "url": "http://beta.companieshouse.gov.uk/company/" + parse_company_number(row[1]),
                         "source": "ccew"
                     })
-                    chars[row[0]]['org-ids'] = add_org_id_prefix(chars[row[0]])
                 if row[9]:
                     chars[row[0]]["url"] = row[9]
                 if row[6]:
@@ -268,6 +337,10 @@ def import_extract_name(chars={}, datafile=os.path.join("data", "ccew", "extract
                 char_names = [i["name"] for i in chars[row[0]]["names"]]
                 name = row[3]
                 if name not in char_names:
+                    try:
+                        name = titlecase.titlecase(name, title_exceptions)
+                    except:
+                        pass
                     name_type = "other name"
                     if row[1] != "0":
                         name_type = "other subsidiary name"
@@ -394,8 +467,6 @@ def import_oscr(chars={},
             if ccount % 10000 == 0:
                 print('\r', "[OSCR] %s charities added or updated from oscr.csv" % ccount, end='')
 
-            char_json['org-ids'] = add_org_id_prefix(char_json)
-
         print('\r', "[OSCR] %s charities added or updated from oscr.csv" % ccount)
         print('\r', "[OSCR] %s charities added from oscr.csv" % cadded)
         print('\r', "[OSCR] %s charities updated using oscr.csv" % cupdated)
@@ -507,8 +578,6 @@ def import_ccni(chars={},
                 chars[row["Reg charity number"]] = char_json
                 cadded += 1
 
-            char_json['org-ids'] = add_org_id_prefix(char_json)
-
             ccount += 1
             if ccount % 10000 == 0:
                 print('\r', "[CCNI] %s charities added or updated from ccni.csv" % ccount, end='')
@@ -531,6 +600,7 @@ def clean_chars(chars={}, pc_es=None, es_pc_index="postcode", es_pc_type="postco
 
         chars[c]["url"] = parse_url(chars[c]["url"])
         chars[c]["domain"] = get_domain(chars[c]["url"])
+        chars[c]['org-ids'] = add_org_id_prefix(chars[c])
 
         chars[c]["alt_names"] = [n["name"] for n in chars[c]["names"] if n["name"] != chars[c]["known_as"]]
 
