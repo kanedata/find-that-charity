@@ -30,12 +30,21 @@ Dokku Installation
 1. Set up elasticsearch
 
 ```bash
+# create app
 dokku apps:create find-that-charity
+dokku storage:mount find-that-charity /var/lib/dokku/data/storage/node-js-app:/data
+
+# elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
 export ELASTICSEARCH_IMAGE="elasticsearch"
 export ELASTICSEARCH_IMAGE_VERSION="2.4"
 dokku elasticsearch:create find-that-charity-es
 dokku elasticsearch:link find-that-charity-es find-that-charity
+
+# setup and run import
+dokku run find-that-charity python data_import/create_elasticsearch.py
+dokku run find-that-charity python data_import/fetch_data.py
+dokku run find-that-charity python data_import/import_data.py
 ```
 
 Fetching data
