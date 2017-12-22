@@ -27,7 +27,7 @@ def main():
                         help='Don\'t fetch data from Office of the Scottish Charity Regulator.')
     parser.add_argument('--skip-ccew', action='store_true',
                         help='Don\'t fetch data from Charity Commission for England and Wales.')
-    parser.add_argument('--folder', type='str', default='data',
+    parser.add_argument('--folder', type=str, default='data',
                         help='Root path of the data folder.')
     args = parser.parse_args()
 

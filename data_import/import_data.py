@@ -627,7 +627,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Import charity data into elasticsearch')
 
-    parser.add_argument('--folder', type='str', default='data',
+    parser.add_argument('--folder', type=str, default='data',
                         help='Root path of the data folder.')
 
     # elasticsearch options
