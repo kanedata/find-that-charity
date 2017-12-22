@@ -689,8 +689,11 @@ def main():
         chars = import_extract_charity(chars, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type)
         chars = import_extract_main(chars, datafile=data_files["extract_main"])
         chars = import_extract_name(chars, datafile=data_files["extract_names"])
-    if not args.skip_oscr:
+
+    dual = {}
+    if os.path.isfile(data_files["dual_registration"]):
         dual = import_dual_reg(data_files["dual_registration"])
+    if not args.skip_oscr:
         chars = import_oscr(chars, dual=dual, datafile=data_files["oscr"], es_index=args.es_index, es_type=args.es_type)
     chars = import_ccni(chars, dual=dual, datafile=data_files["ccni"], extra_names=data_files["ccni_extra_names"], es_index=args.es_index, es_type=args.es_type)
     # @TODO include charity commission register of mergers
