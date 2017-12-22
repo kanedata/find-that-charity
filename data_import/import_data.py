@@ -646,6 +646,11 @@ def main():
     parser.add_argument('--es-pc-index', default='postcode', help='index used to store postcode data')
     parser.add_argument('--es-pc-type', default='postcode', help='type used to store postcode data')
 
+    parser.add_argument('--skip-oscr', action='store_true',
+                        help='Don\'t fetch data from Office of the Scottish Charity Regulator.')
+    parser.add_argument('--skip-ccew', action='store_true',
+                        help='Don\'t fetch data from Charity Commission for England and Wales.')
+
     args = parser.parse_args()
 
     es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
@@ -679,11 +684,14 @@ def main():
         "ccni_extra_names": os.path.join(args.folder, "ccni_extra_names.csv"),
     }
 
-    chars = import_extract_charity({}, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type)
-    chars = import_extract_main(chars, datafile=data_files["extract_main"])
-    chars = import_extract_name(chars, datafile=data_files["extract_names"])
-    dual = import_dual_reg(data_files["dual_registration"])
-    chars = import_oscr(chars, dual=dual, datafile=data_files["oscr"], es_index=args.es_index, es_type=args.es_type)
+    chars = {}
+    if not args.skip_ccew:
+        chars = import_extract_charity(chars, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type)
+        chars = import_extract_main(chars, datafile=data_files["extract_main"])
+        chars = import_extract_name(chars, datafile=data_files["extract_names"])
+    if not args.skip_oscr:
+        dual = import_dual_reg(data_files["dual_registration"])
+        chars = import_oscr(chars, dual=dual, datafile=data_files["oscr"], es_index=args.es_index, es_type=args.es_type)
     chars = import_ccni(chars, dual=dual, datafile=data_files["ccni"], extra_names=data_files["ccni_extra_names"], es_index=args.es_index, es_type=args.es_type)
     # @TODO include charity commission register of mergers
     chars = clean_chars(chars, pc_es, args.es_pc_index, args.es_pc_type)
