@@ -11,10 +11,18 @@ import time
 
 app = bottle.default_app()
 
-if os.environ.get("ES_URL", os.environ.get("BONSAI_URL")):
-    app.config["es"] = Elasticsearch(os.environ.get('ES_URL', os.environ.get("BONSAI_URL")))
-    app.config["es_index"] = 'charitysearch'
-    app.config["es_type"] = 'charity'
+# everywhere gives a different env var for elasticsearch services...
+potential_env_vars = [
+    "ELASTICSEARCH_URL",
+    "ES_URL",
+    "BONSAI_URL"
+]
+for e_v in potential_env_vars:
+    if os.environ.get(e_v):
+        app.config["es"] = Elasticsearch(os.environ.get(e_v))
+        app.config["es_index"] = 'charitysearch'
+        app.config["es_type"] = 'charity'
+        break
 
 
 def search_query(term):

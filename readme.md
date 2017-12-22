@@ -23,6 +23,21 @@ Installation
 6. Start elasticsearch
 7. Create elasticsearch index (`python data_import/create_elasticsearch.py`)
 
+
+Dokku Installation
+------------------
+
+1. Set up elasticsearch
+
+```bash
+dokku apps:create find-that-charity
+sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
+export ELASTICSEARCH_IMAGE="elasticsearch"
+export ELASTICSEARCH_IMAGE_VERSION="2.4"
+dokku elasticsearch:create find-that-charity-es
+dokku elasticsearch:link find-that-charity-es find-that-charity
+```
+
 Fetching data
 -------------
 
