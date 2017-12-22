@@ -657,7 +657,7 @@ def main():
     ]
     for e_v in potential_env_vars:
         if os.environ.get(e_v):
-            es = Elasticsearch(e_v)
+            es = Elasticsearch(os.environ.get(e_v))
             break
 
     if not es.ping():
