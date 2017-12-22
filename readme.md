@@ -34,6 +34,8 @@ SSH into server and run:
 ```bash
 # create app
 dokku apps:create find-that-charity
+
+# add permanent data storage
 dokku storage:mount find-that-charity /var/lib/dokku/data/storage/find-that-charity:/data
 
 # elasticsearch
@@ -42,6 +44,12 @@ export ELASTICSEARCH_IMAGE="elasticsearch"
 export ELASTICSEARCH_IMAGE_VERSION="2.4"
 dokku elasticsearch:create find-that-charity-es
 dokku elasticsearch:link find-that-charity-es find-that-charity
+
+# SSL
+sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
+dokku config:set --no-restart find-that-charity DOKKU_LETSENCRYPT_EMAIL=your@email.tld
+dokku letsencrypt find-that-charity
+dokku letsencrypt:cron-job --add
 ```
 
 ### 2. Add as a git remote and push
@@ -63,6 +71,9 @@ dokku run find-that-charity python data_import/create_elasticsearch.py
 dokku run find-that-charity python data_import/fetch_data.py --folder '/data'
 dokku run find-that-charity python data_import/import_data.py --folder '/data'
 ```
+
+> @TODO: set up cron job to run the `fetch_data` and `import_data` tasks on a 
+regular basis.
 
 Fetching data
 -------------
