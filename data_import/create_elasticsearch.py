@@ -1,5 +1,6 @@
 import argparse
 from elasticsearch import Elasticsearch
+import os
 
 
 INDEXES = [
