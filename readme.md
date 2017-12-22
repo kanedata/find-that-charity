@@ -43,8 +43,8 @@ dokku elasticsearch:link find-that-charity-es find-that-charity
 
 # setup and run import
 dokku run find-that-charity python data_import/create_elasticsearch.py
-dokku run find-that-charity python data_import/fetch_data.py
-dokku run find-that-charity python data_import/import_data.py
+dokku run find-that-charity python data_import/fetch_data.py --folder '/data'
+dokku run find-that-charity python data_import/import_data.py --folder '/data'
 ```
 
 Fetching data

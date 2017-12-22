@@ -107,7 +107,7 @@ def main():
     # download Northern Ireland register of charities
     if args.ccni:
         print("[CCNI] Using url: %s" % args.ccni)
-        urllib.request.urlretrieve(args.ccni, os.path.join('data', 'ccni.csv'))
+        urllib.request.urlretrieve(args.ccni, os.path.join(args.folder, 'ccni.csv'))
         print("[CCNI] CSV downloaded")
 
 if __name__ == '__main__':
