@@ -7,9 +7,6 @@ import bcp
 import os
 import mechanicalsoup
 
-if not os.path.exists("data"):
-    os.makedirs("data")
-
 
 def main():
     parser = argparse.ArgumentParser(description='Fetch needed data sources.')
@@ -30,14 +27,20 @@ def main():
                         help='Don\'t fetch data from Office of the Scottish Charity Regulator.')
     parser.add_argument('--skip-ccew', action='store_true',
                         help='Don\'t fetch data from Charity Commission for England and Wales.')
+    parser.add_argument('--folder', type='str', default='data',
+                        help='Root path of the data folder.')
     args = parser.parse_args()
 
+    # make folder if it's not already there
+    if not os.path.exists(args.folder):
+        os.makedirs(args.folder)
+
     # retrieve dual registered charities
-    urllib.request.urlretrieve(args.dual, os.path.join("data", "dual-registered-uk-charities.csv"))
+    urllib.request.urlretrieve(args.dual, os.path.join(args.folder, "dual-registered-uk-charities.csv"))
     print("[Dual] Dual registered charities fetched")
 
     # retrieve ni charity extra names
-    urllib.request.urlretrieve(args.ccni_extra, os.path.join("data", "ccni_extra_names.csv"))
+    urllib.request.urlretrieve(args.ccni_extra, os.path.join(args.folder, "ccni_extra_names.csv"))
     print("[CCNI Extra] Extra Northern Ireland charity names fetched")
 
     # get oscr data
@@ -60,7 +63,7 @@ def main():
             raise ValueError("[OSCR] Could not download OSCR data. Status %s %s" % (
                 resp.status, resp.reason))
 
-        oscr_out = os.path.join("data", "oscr.zip")
+        oscr_out = os.path.join(args.folder, "oscr.zip")
         with open(oscr_out, "wb") as oscrfile:
             oscrfile.write(resp.content)
         print("[OSCR] ZIP downloaded")
@@ -69,15 +72,15 @@ def main():
             files = oscrzip.infolist()
             if len(files) != 1:
                 raise ValueError("More than one file in OSCR zip")
-            with open(os.path.join("data", "oscr.csv"), "wb") as oscrcsv:
+            with open(os.path.join(args.folder, "oscr.csv"), "wb") as oscrcsv:
                 oscrcsv.write(oscrzip.read(files[0]))
             print("[OSCR] data extracted")
 
     # get charity commission data
     if not args.skip_ccew:
         ccew_html = urllib.request.urlopen(args.ccew)
-        ccew_out = os.path.join("data", "ccew.zip")
-        ccew_folder = os.path.join("data", "ccew")
+        ccew_out = os.path.join(args.folder, "ccew.zip")
+        ccew_folder = os.path.join(args.folder, "ccew")
         if ccew_html.status != 200:
             raise ValueError("[CCEW] Could not find Charity Commission data page. Status %s %s" % (ccew_data.status, ccew_data.reason))
         ccew_html = ccew_html.read()

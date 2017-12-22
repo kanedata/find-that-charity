@@ -627,6 +627,9 @@ def main():
 
     parser = argparse.ArgumentParser(description='Import charity data into elasticsearch')
 
+    parser.add_argument('--folder', type='str', default='data',
+                        help='Root path of the data folder.')
+
     # elasticsearch options
     parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
     parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
@@ -667,13 +670,13 @@ def main():
             raise ValueError("Connection failed - postcode elasticsearch")
 
     data_files = {
-        "extract_charity": os.path.join("data", "ccew", "extract_charity.csv"),
-        "extract_main": os.path.join("data", "ccew", "extract_main_charity.csv"),
-        "extract_names": os.path.join("data", "ccew", "extract_name.csv"),
-        "dual_registration": os.path.join("data", "dual-registered-uk-charities.csv"),
-        "oscr": os.path.join("data", "oscr.csv"),
-        "ccni": os.path.join("data", "ccni.csv"),
-        "ccni_extra_names": os.path.join("data", "ccni_extra_names.csv"),
+        "extract_charity": os.path.join(args.folder, "ccew", "extract_charity.csv"),
+        "extract_main": os.path.join(args.folder, "ccew", "extract_main_charity.csv"),
+        "extract_names": os.path.join(args.folder, "ccew", "extract_name.csv"),
+        "dual_registration": os.path.join(args.folder, "dual-registered-uk-charities.csv"),
+        "oscr": os.path.join(args.folder, "oscr.csv"),
+        "ccni": os.path.join(args.folder, "ccni.csv"),
+        "ccni_extra_names": os.path.join(args.folder, "ccni_extra_names.csv"),
     }
 
     chars = import_extract_charity({}, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type)
