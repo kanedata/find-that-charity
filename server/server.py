@@ -8,6 +8,7 @@ from elasticsearch import Elasticsearch
 from collections import OrderedDict
 import re
 import time
+import datetime
 
 app = bottle.default_app()
 
@@ -214,6 +215,11 @@ def charity(regno):
         return bottle.template('preview', charity=res["_source"], charity_id=res["_id"])
     else:
         bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
+
+
+@app.route('/about')
+def about():
+    return bottle.template('about', this_year=datetime.datetime.now().year)
 
 
 def main():
