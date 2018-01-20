@@ -1,7 +1,20 @@
 % default_title = 'Find that charity'
+% import bottle
+% ga_tracking = bottle.default_app().config.get("ga_tracking_id")
 <!DOCTYPE html>
 <html>
   <head>
+    % if ga_tracking:
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      gtag('config', '{{ ga_tracking }}');
+    </script>
+    % end
     <title>{{ title or default_title }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css" integrity="sha256-v5YlJGWVLS5hQ+o48fBzCKHEP2vMNsku57x3CosYykc="
       crossorigin="anonymous" />
@@ -49,6 +62,7 @@
             <strong>{{ default_title }}</strong>
             | <a href="/about">About</a>
             | <a href="/about#data-sources">Data sources</a>
+            | <a href="/about#privacy">Privacy</a>
           </p>
           <p>
             <a href="https://github.com/drkane/find-that-charity">

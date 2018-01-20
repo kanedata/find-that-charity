@@ -25,6 +25,8 @@ for e_v in potential_env_vars:
         app.config["es_type"] = 'charity'
         break
 
+if os.environ.get("GA_TRACKING_ID"):
+    app.config["ga_tracking_id"] = os.environ.get("GA_TRACKING_ID")
 
 def search_query(term):
     with open('./es_config.yml', 'rb') as yaml_file:
@@ -240,6 +242,8 @@ def main():
     parser.add_argument('--es-index', default='charitysearch', help='index used to store charity data')
     parser.add_argument('--es-type', default='charity', help='type used to store charity data')
 
+    parser.add_argument('--ga-tracking-id', help='Google Analytics Tracking ID')
+
     args = parser.parse_args()
 
     app.config["es"] = Elasticsearch(
@@ -250,6 +254,7 @@ def main():
     )
     app.config["es_index"] = args.es_index
     app.config["es_type"] = args.es_type
+    app.config["ga_tracking_id"] = args.ga_tracking_id
 
     bottle.debug(args.debug)
 
