@@ -69,6 +69,7 @@
             <li><a href="http://opencharities.org/charities/{{charity["ccew_number"]}}" target="_blank">OpenCharities</a></li>
             <li><a href="http://www.guidestar.org.uk/summary.aspx?CCReg={{charity["ccew_number"]}}" target="_blank">GuideStar</a></li>
             <li><a href="http://www.charitychoice.co.uk/charities/search?t=qsearch&q={{charity["ccew_number"]}}" target="_blank">Charities Direct</a></li>
+            <li><a href="https://olib.uk/charity/html/{{charity["ccew_number"]}}" target="_blank">CharityData by Olly Benson</a></li>
             % end
             % if charity["ccni_number"]:
             <li><a href="http://www.charitycommissionni.org.uk/charity-details/?regid={{charity["ccni_number"].replace("NIC", "")}}&subid=0" target="_blank">Charity Commission Northern Ireland</a></li>
