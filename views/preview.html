@@ -3,11 +3,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.3/css/bulma.min.css" integrity="sha256-VC9bpAao257nf22leBRLU7AqKGwS9/Ylz8hfpHmOob4=" crossorigin="anonymous" />
 </head>
   <body>
-    <div class="content">
+    <div class="content" style="padding: 5px;">
       <h3>
         {{ charity["known_as"] }}
       </h3>
-      <a href='http://localhost:8080/charity/{{ charity_id }}' target="_blank">View full profile</a>
+      <a href='/charity/{{ charity_id }}' target="_blank">View full profile</a>
       <h5><strong>Active:</strong>
         {{ charity["active"] }}
       </h5>
@@ -57,9 +57,11 @@
         {{ charity["geo"]["postcode"] }}
       </h5>
       <h5><strong>Other Names:</strong>
+      <ul>
         % for name in charity["names"]:
-          {{ name["name"] }} ({{name["type"]}}, {{name["source"]}})
+          <li>{{ name["name"] }} <small>({{name["type"]}}, {{name["source"]}})</small></li>
         % end
+      </ul>
       </h5>
     </div>
   </body>
