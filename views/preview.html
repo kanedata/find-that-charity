@@ -1,55 +1,51 @@
 <html>
 <head>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.3/css/bulma.min.css" integrity="sha256-VC9bpAao257nf22leBRLU7AqKGwS9/Ylz8hfpHmOob4=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css" integrity="sha256-2k1KVsNPRXxZOsXQ8aqcZ9GOOwmJTMoOB5o5Qp1d6/s="
+    crossorigin="anonymous" />
 </head>
   <body>
-    <div class="content" style="padding: 5px;">
+    <div class="content is-small" style="padding: 5px;">
       <h3>
         {{ charity["known_as"] }}
       </h3>
-      <a href='/charity/{{ charity_id }}' target="_blank">View full profile</a>
-      <h5><strong>Active:</strong>
-        {{ charity["active"] }}
+      <h5>
+        % if charity["active"]:
+        <strong>Active</strong>
+        % else:
+        <strong>Inactive</strong>
+        % end
+         |
+        <a href='/charity/{{ charity_id }}' target="_blank">
+          View full profile</a>
       </h5>
-      <h5><strong>Charity Numbers</strong></h5>
-      <table class="table">
-        <tbody>
-          <tr>
-            <th>CCEW Charity number</th>
-            <td>
-              % if charity["ccew_number"]:
-              <a href={{ charity["ccew_link"]}}>{{ charity["ccew_number"] }}</a>
-              % else:
-              None
-              % end
-            </td>
-          </tr>
-          <tr>
-            <th>OSCR Charity number</th>
-            <td>
-              % if charity["oscr_number"]:
-              <a href={{ charity["oscr_link"]}}>{{ charity["oscr_number"] }}</a>
-              % else:
-              None
-              % end
-            </td>
-          </tr>
-          <tr>
-            <th>CCNI Charity number</th>
-            <td>
-              % if charity["ccni_number"]:
-              <a href={{ charity["ccni_link"]}}>{{ charity["ccni_number"] }}</a>
-              % else:
-              None
-              % end
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <h5><strong>Company No(s):</strong>
+      <h5><strong>Charity Number</strong></h5>
+      <ul>
+        % if charity["ccew_number"]:
+        <li>
+          <strong>England and Wales (CCEW):</strong>
+            <a href="{{ charity[ "ccew_link"]}}" target="_blank">{{ charity["ccew_number"] }}</a>
+        </li>
+        % end
+        % if charity["oscr_number"]:
+        <li>
+          <strong>Scotland (OSCR):</strong>
+            <a href="{{ charity[ "oscr_link"]}}" target="_blank">{{ charity["oscr_number"] }}</a>
+        </li>
+        % end
+        % if charity["ccni_number"]:
+        <li>
+          <strong>Northern Ireland (CCNI):</strong>
+            <a href="{{ charity["ccni_link"]}}" target="_blank">{{ charity["ccni_number"] }}</a>
+        </li>
+        % end
+      </ul>
+      <h5><strong>Company Number:</strong>
         % if charity["company_number"]:
           % for co in charity["company_number"]:
-            {{ co["number"] }} ({{co["source"]}})
+            <a href="https://beta.companieshouse.gov.uk/company/{{ co["number"] }}" target="_blank">
+              {{ co["number"] }}
+            </a>
+             ({{co["source"]}})
           % end
         % end
       </h5>
@@ -59,7 +55,7 @@
       <h5><strong>Other Names:</strong>
       <ul>
         % for name in charity["names"]:
-          <li>{{ name["name"] }} <small>({{name["type"]}}, {{name["source"]}})</small></li>
+          <li>{{ name["name"] }}<br><small class="has-text-grey">({{name["type"]}}, {{name["source"]}})</small></li>
         % end
       </ul>
       </h5>
