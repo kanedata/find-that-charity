@@ -61,8 +61,10 @@ def esdoc_orresponse(query):
         i["score"] = i.pop("_score")
         i["index"] = i.pop("_index")
         i["source"] = i.pop("_source")
-        i["name"] = i["source"]["known_as"]
-        if i["name"] == json.loads(query)["params"]["name"] and i["score"] == res["hits"]["max_score"]:
+        i["name"] = i["source"]["known_as"] + " (" + i["id"] + ")"
+        if not i["source"]["active"]:
+            i["name"] += " [INACTIVE]"
+        if i["name"].lower() == json.loads(query)["params"]["name"].lower() and i["score"] == res["hits"]["max_score"]:
             i["match"] = True
         else:
             i["match"] = False
