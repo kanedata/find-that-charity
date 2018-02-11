@@ -10,6 +10,7 @@ idna==2.6
 MechanicalSoup==0.8.0
 py==1.4.34
 pytest==3.1.2
+python-dateutil==2.6.1
 PyYAML==3.12
 requests==2.18.4
 six==1.10.0

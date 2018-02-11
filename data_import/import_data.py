@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 import argparse
 import os
 import titlecase
+import datetime
 
 
 def title_exceptions(word, **kwargs):
@@ -236,7 +237,8 @@ def clean_row(row):
 def import_extract_charity(chars={},
                            datafile=os.path.join("data", "ccew", "extract_charity.csv"),
                            es_index="charitysearch",
-                           es_type="charity"):
+                           es_type="charity",
+                           debug=False):
 
     with open(datafile, "r", encoding="latin1") as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
@@ -271,7 +273,9 @@ def import_extract_charity(chars={},
                     "parent": None,
                     "ccew_link": "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber=" + row[0] + "&SubsidiaryNumber=0",
                     "oscr_link": "",
-                    "ccni_link": ""
+                    "ccni_link": "",
+                    "date_registered": None,
+                    "date_removed": None,
                 }
 
                 chars[row[0]] = char_json
@@ -279,6 +283,8 @@ def import_extract_charity(chars={},
                 ccount += 1
                 if ccount % 10000 == 0:
                     print('\r', "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount, end='')
+            if debug and ccount > 10000:
+                break
 
         print('\r', "[CCEW] %s charities read from extract_charity.csv (main pass)" % ccount)
 
@@ -287,6 +293,8 @@ def import_extract_charity(chars={},
         for row in csvreader:
             if len(row) > 1 and row[1] != "0":
                 row = clean_row(row)
+                if row[0] not in chars:
+                    continue
                 chars[row[0]]["names"].append({
                     "name": parse_name(row[2]),
                     "type": "subsidiary name",
@@ -295,12 +303,15 @@ def import_extract_charity(chars={},
                 ccount += 1
                 if ccount % 10000 == 0:
                     print('\r', "[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount, end='')
+            if debug and ccount > 10000:
+                break
+
         print('\r', "[CCEW] %s subsidiaries read from extract_charity.csv (subsidiary pass)" % ccount)
 
     return chars
 
 
-def import_extract_main(chars={}, datafile=os.path.join("data", "ccew", "extract_main_charity.csv")):
+def import_extract_main(chars={}, datafile=os.path.join("data", "ccew", "extract_main_charity.csv"), debug=False):
 
     with open(datafile, encoding="latin1") as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
@@ -308,6 +319,8 @@ def import_extract_main(chars={}, datafile=os.path.join("data", "ccew", "extract
         for row in csvreader:
             if len(row) > 1:
                 row = clean_row(row)
+                if row[0] not in chars:
+                    continue
                 if row[1]:
                     chars[row[0]]["company_number"].append({
                         "number": parse_company_number(row[1]),
@@ -321,12 +334,15 @@ def import_extract_main(chars={}, datafile=os.path.join("data", "ccew", "extract
                 ccount += 1
                 if ccount % 10000 == 0:
                     print('\r', "[CCEW] %s charities read from extract_main_charity.csv" % ccount, end='')
+            if debug and ccount > 10000:
+                break
+
         print('\r', "[CCEW] %s charities read from extract_main_charity.csv" % ccount)
 
     return chars
 
 
-def import_extract_name(chars={}, datafile=os.path.join("data", "ccew", "extract_name.csv")):
+def import_extract_name(chars={}, datafile=os.path.join("data", "ccew", "extract_name.csv"), debug=False):
 
     with open(datafile, encoding="latin1") as a:
         csvreader = csv.reader(a, doublequote=False, escapechar='\\')
@@ -334,6 +350,9 @@ def import_extract_name(chars={}, datafile=os.path.join("data", "ccew", "extract
         for row in csvreader:
             if len(row) > 1:
                 row = clean_row(row)
+                if row[0] not in chars:
+                    continue
+
                 char_names = [i["name"] for i in chars[row[0]]["names"]]
                 name = row[3]
                 if name not in char_names:
@@ -352,8 +371,50 @@ def import_extract_name(chars={}, datafile=os.path.join("data", "ccew", "extract
                 ccount += 1
                 if ccount % 10000 == 0:
                     print('\r', "[CCEW] %s names read from extract_name.csv" % ccount, end='')
+            if debug and ccount > 10000:
+                break
+
         print('\r', "[CCEW] %s names read from extract_name.csv" % ccount)
 
+    return chars
+
+def import_extract_registration(chars={}, datafile=os.path.join("data", "ccew", "extract_registration.csv"), debug=False):
+
+    with open(datafile, encoding="latin1") as a:
+        csvreader = csv.reader(a, doublequote=False, escapechar='\\')
+        ccount = 0
+        for row in csvreader:
+            if len(row) > 1:
+                row = clean_row(row)
+                if row[0] not in chars:
+                    continue
+                if row[1] != "0":
+                    continue
+                regno = row[0]
+                new_reg_date = None
+                new_rem_date = None
+                try:
+                    new_reg_date = datetime.datetime.strptime( row[2], "%Y-%m-%d %H:%M:%S" )
+                except ValueError:
+                    pass
+                if row[3]:
+                    try:
+                        new_rem_date = datetime.datetime.strptime( row[3], "%Y-%m-%d %H:%M:%S" )
+                    except ValueError:
+                        pass
+                date_registered = chars[regno].get("date_registered")
+                date_removed = chars[regno].get("date_removed")
+                if not date_registered or date_registered > new_reg_date:
+                    chars[regno]["date_registered"] = new_reg_date
+                if not chars[regno]["active"] and (not date_removed or date_removed < new_rem_date):
+                    chars[regno]["date_removed"] = new_rem_date 
+                ccount += 1
+                if ccount % 10000 == 0:
+                    print('\r', "[CCEW] %s records read from extract_registration.csv" % ccount, end='')
+            if debug and ccount > 10000:
+                break
+
+        print('\r', "[CCEW] %s records read from extract_registration.csv" % ccount)
     return chars
 
 
@@ -375,7 +436,8 @@ def import_oscr(chars={},
                 dual={},
                 datafile=os.path.join("data", "oscr.csv"),
                 es_index="charitysearch",
-                es_type="charity"):
+                es_type="charity",
+                debug=False):
 
     # go through the Scottish charities
     with open(datafile, encoding="latin1") as a:
@@ -418,6 +480,10 @@ def import_oscr(chars={},
 
             # if not dual registered then add as their own record
             else:
+                try:
+                    date_registered = datetime.datetime.strptime(row["Registered Date"], "%d/%m/%Y %H:%M")
+                except ValueError:
+                    date_registered = None
                 char_json = {
                     "_index": es_index,
                     "_type": es_type,
@@ -445,7 +511,9 @@ def import_oscr(chars={},
                     "parent": None,
                     "ccew_link": "",
                     "oscr_link": "http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-details?number=" + row["Charity Number"],
-                    "ccni_link": ""
+                    "ccni_link": "",
+                    "date_registered": date_registered,
+                    "date_removed": None
                 }
                 if row["Most recent year income"]:
                     char_json["latest_income"] = int(row["Most recent year income"])
@@ -466,6 +534,8 @@ def import_oscr(chars={},
             ccount += 1
             if ccount % 10000 == 0:
                 print('\r', "[OSCR] %s charities added or updated from oscr.csv" % ccount, end='')
+            if debug and ccount > 1000:
+                break
 
         print('\r', "[OSCR] %s charities added or updated from oscr.csv" % ccount)
         print('\r', "[OSCR] %s charities added from oscr.csv" % cadded)
@@ -479,7 +549,8 @@ def import_ccni(chars={},
                 datafile=os.path.join("data", "ccni.csv"),
                 extra_names=os.path.join("data", "ccni_extra_names.csv"),
                 es_index="charitysearch",
-                es_type="charity"):
+                es_type="charity",
+                debug=False):
 
     # store dual registration details
     ccni_extra = {}
@@ -525,6 +596,10 @@ def import_ccni(chars={},
 
             # if not dual registered then add as their own record
             else:
+                try:
+                    date_registered = datetime.datetime.strptime(row["Date registered"], "%d/%m/%Y")
+                except ValueError:
+                    date_registered = None
                 char_json = {
                     "_index": es_index,
                     "_type": es_type,
@@ -552,7 +627,9 @@ def import_ccni(chars={},
                     "parent": None,
                     "ccew_link": "",
                     "oscr_link": "",
-                    "ccni_link": "http://www.charitycommissionni.org.uk/charity-details/?regid=" + row["Reg charity number"] + "&subid=" + row["Sub charity number"]
+                    "ccni_link": "http://www.charitycommissionni.org.uk/charity-details/?regid=" + row["Reg charity number"] + "&subid=" + row["Sub charity number"],
+                    "date_registered": date_registered,
+                    "date_removed": None
                 }
                 if row["Total income"]:
                     char_json["latest_income"] = int(row["Total income"])
@@ -581,6 +658,8 @@ def import_ccni(chars={},
             ccount += 1
             if ccount % 10000 == 0:
                 print('\r', "[CCNI] %s charities added or updated from ccni.csv" % ccount, end='')
+            if debug and ccount > 500:
+                break
         print('\r', "[CCNI] %s charities added or updated from ccni.csv" % ccount)
         print('\r', "[CCNI] %s charities added from ccni.csv" % cadded)
         print('\r', "[CCNI] %s charities updated using ccni.csv" % cupdated)
@@ -603,6 +682,7 @@ def clean_chars(chars={}, pc_es=None, es_pc_index="postcode", es_pc_type="postco
         chars[c]['org-ids'] = add_org_id_prefix(chars[c])
 
         chars[c]["alt_names"] = [n["name"] for n in chars[c]["names"] if n["name"] != chars[c]["known_as"]]
+        chars[c]["last_modified"] = datetime.datetime.now()
 
         # @TODO capitalisation of names
 
@@ -651,6 +731,8 @@ def main():
     parser.add_argument('--skip-ccew', action='store_true',
                         help='Don\'t fetch data from Charity Commission for England and Wales.')
 
+    parser.add_argument('--debug', action='store_true', help='Only load first 10000 rows for ccew')
+
     args = parser.parse_args()
 
     es = Elasticsearch(host=args.es_host, port=args.es_port, url_prefix=args.es_url_prefix, use_ssl=args.es_use_ssl)
@@ -678,6 +760,7 @@ def main():
         "extract_charity": os.path.join(args.folder, "ccew", "extract_charity.csv"),
         "extract_main": os.path.join(args.folder, "ccew", "extract_main_charity.csv"),
         "extract_names": os.path.join(args.folder, "ccew", "extract_name.csv"),
+        "extract_registration": os.path.join(args.folder, "ccew", "extract_registration.csv"),
         "dual_registration": os.path.join(args.folder, "dual-registered-uk-charities.csv"),
         "oscr": os.path.join(args.folder, "oscr.csv"),
         "ccni": os.path.join(args.folder, "ccni.csv"),
@@ -686,18 +769,27 @@ def main():
 
     chars = {}
     if not args.skip_ccew:
-        chars = import_extract_charity(chars, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type)
-        chars = import_extract_main(chars, datafile=data_files["extract_main"])
-        chars = import_extract_name(chars, datafile=data_files["extract_names"])
+        chars = import_extract_charity(chars, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type, debug=args.debug)
+        chars = import_extract_main(chars, datafile=data_files["extract_main"], debug=args.debug)
+        chars = import_extract_name(chars, datafile=data_files["extract_names"], debug=args.debug)
+        chars = import_extract_registration(chars, datafile=data_files["extract_registration"], debug=args.debug)
 
     dual = {}
     if os.path.isfile(data_files["dual_registration"]):
         dual = import_dual_reg(data_files["dual_registration"])
     if not args.skip_oscr:
-        chars = import_oscr(chars, dual=dual, datafile=data_files["oscr"], es_index=args.es_index, es_type=args.es_type)
-    chars = import_ccni(chars, dual=dual, datafile=data_files["ccni"], extra_names=data_files["ccni_extra_names"], es_index=args.es_index, es_type=args.es_type)
+        chars = import_oscr(chars, dual=dual, datafile=data_files["oscr"], es_index=args.es_index, es_type=args.es_type, debug=args.debug)
+    chars = import_ccni(chars, dual=dual, datafile=data_files["ccni"], extra_names=data_files["ccni_extra_names"], es_index=args.es_index, es_type=args.es_type, debug=args.debug)
     # @TODO include charity commission register of mergers
     chars = clean_chars(chars, pc_es, args.es_pc_index, args.es_pc_type)
+
+    if args.debug:
+        import random
+        import json
+        random_keys = random.choices(list(chars.keys()), k=10)
+        for r in random_keys:
+            print(r, chars[r])
+    
     save_to_elasticsearch(chars, es, args.es_index)
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ from elasticsearch import Elasticsearch
 from collections import OrderedDict
 import time
 import datetime
+from dateutil import parser
 
 app = bottle.default_app()
 
@@ -104,6 +105,7 @@ def search_return(query):
     res = res["hits"]
     for result in res["hits"]:
         result["_link"] = "/charity/" + result["_id"]
+        result["_source"] = sort_out_date(result["_source"])
     return bottle.template('search', res=res, term=json.loads(query)["params"]["name"])
 
 
@@ -203,7 +205,7 @@ def charity(regno, filetype='html'):
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
         if filetype == "html":
-            return bottle.template('charity', charity=res["_source"], charity_id=res["_id"])
+            return bottle.template('charity', charity=sort_out_date(res["_source"]), charity_id=res["_id"])
         else:
             return res["_source"]
     else:
@@ -215,7 +217,7 @@ def charity(regno, filetype='html'):
 def charity_preview(regno):
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
-        return bottle.template('preview', charity=res["_source"], charity_id=res["_id"])
+        return bottle.template('preview', charity=sort_out_date(res["_source"]), charity_id=res["_id"])
     else:
         bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
 
@@ -223,6 +225,17 @@ def charity_preview(regno):
 @app.route('/about')
 def about():
     return bottle.template('about', this_year=datetime.datetime.now().year)
+
+
+def sort_out_date(charity):
+    dates = ["date_registered", "date_removed", "last_modified"]
+    for d in dates:
+        if d in charity and charity[d]:
+            try:
+                charity[d] = parser.parse(charity[d])
+            except ValueError:
+                pass
+    return charity
 
 
 def main():

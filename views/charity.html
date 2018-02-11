@@ -122,6 +122,12 @@
                 </td>
               </tr>
               <tr><th>Active</th><td>{{ charity["active"] }}</td></tr>
+              % if charity.get("date_registered"):
+              <tr><th>Registered</th><td>{{ "{:%d %B %Y}".format(charity["date_registered"]) }}</td></tr>
+              % end
+              % if charity.get("date_removed"):
+              <tr><th>Removed</th><td>{{ "{:%d %B %Y}".format(charity["date_removed"]) }}</td></tr>
+              % end
             </tbody>
           </table>
         </div>
@@ -136,6 +142,10 @@
         <div class="content">
           <table class="table">
             <tbody>
+              <tr>
+                <th>Postcode</th>
+                <td>{{ charity.get("geo", {}).get("postcode") }}</td>
+              </tr>
               <tr>
                 <th>Website</th>
                 <td><a href="{{ charity["url"] }}">{{ charity["url"] }}</a></td>
@@ -166,6 +176,12 @@
                   % end
                 </td>
               </tr>
+              % if charity.get("last_modified"):
+              <tr>
+                <th>Last modified</th>
+                <td>{{ "{:%Y-%m-%d}".format(charity["last_modified"]) }}</td>
+              </tr>
+              % end
             </tbody>
           </table>
         </div>
