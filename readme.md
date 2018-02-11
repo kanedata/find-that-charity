@@ -23,7 +23,6 @@ Installation
 6. Start elasticsearch
 7. Create elasticsearch index (`python data_import/create_elasticsearch.py`)
 
-
 Dokku Installation
 ------------------
 
@@ -65,14 +64,14 @@ git push dokku master
 
 On Dokku server run:
 
-```
+```bash
 # setup and run import
 dokku run find-that-charity python data_import/create_elasticsearch.py
 dokku run find-that-charity python data_import/fetch_data.py --folder '/data'
 dokku run find-that-charity python data_import/import_data.py --folder '/data'
 ```
 
-> @TODO: set up cron job to run the `fetch_data` and `import_data` tasks on a 
+> @TODO: set up cron job to run the `fetch_data` and `import_data` tasks on a
 regular basis.
 
 Fetching data
