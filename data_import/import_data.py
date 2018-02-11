@@ -510,7 +510,7 @@ def import_oscr(chars={},
                     "company_number": [],
                     "parent": None,
                     "ccew_link": "",
-                    "oscr_link": "http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-details?number=" + row["Charity Number"],
+                    "oscr_link": "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number=" + row["Charity Number"],
                     "ccni_link": "",
                     "date_registered": date_registered,
                     "date_removed": None

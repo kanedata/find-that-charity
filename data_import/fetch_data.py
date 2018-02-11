@@ -14,7 +14,7 @@ def main():
                         default='https://gist.github.com/drkane/22d62e07346084fafdcc7d9f5e1cd661/raw/bec666d1bc5c6efb8503a90f76ac0c6236ebc183/dual-registered-uk-charities.csv',
                         help='CSV with dual registered charities in')
     parser.add_argument('--oscr', type=str,
-                        default="https://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download", 
+                        default="https://www.oscr.org.uk/about-charities/search-the-register/charity-register-download", 
                         help="URL of page containing Scottish charity data")
     parser.add_argument('--ccew', type=str,
                         default="http://data.charitycommission.gov.uk/", help="URL of page containing Charity Commission data")
@@ -53,15 +53,15 @@ def main():
         print("[OSCR] Using url: %s" % args.oscr)
         browser.open(args.oscr)
 
-        browser.select_form(FORM_ID)
-        browser[TERMS_AND_CONDITIONS_CHECKBOX] = True
+        f = browser.select_form(FORM_ID)
+        f.set_checkbox({TERMS_AND_CONDITIONS_CHECKBOX: True})
         resp = browser.submit_selected()
         print("[OSCR] Form submitted")
         try:
             resp.raise_for_status()
         except:
             raise ValueError("[OSCR] Could not download OSCR data. Status %s %s" % (
-                resp.status, resp.reason))
+                resp.status_code, resp.reason))
 
         oscr_out = os.path.join(args.folder, "oscr.zip")
         with open(oscr_out, "wb") as oscrfile:

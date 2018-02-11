@@ -84,7 +84,7 @@ is run using the following command:
 
 ### Office of the Scottish Charity Regulator (OSCR)
 
-OSCR data needs to be manually downloaded from the [OSCR website](http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-register-download)
+OSCR data needs to be manually downloaded from the [OSCR website](https://www.oscr.org.uk/about-charities/search-the-register/charity-register-download)
 in order to accept the terms and conditions. Once downloaded the path needs to
 be passed to `data_import/fetch_data.py` using the `--oscr` flag.
 
@@ -166,9 +166,12 @@ The data is imported into elasticsearch in the following format:
   ],
   "parent": "124566",
   "ccew_link": "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber=12355&SubsidiaryNumber=0",
-  "oscr_link": "http://www.oscr.org.uk/charities/search-scottish-charity-register/charity-details?number=SC1235",
+  "oscr_link": "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number=SC1235",
   "ccni_link": "http://www.charitycommissionni.org.uk/charity-details/?regid=100012&subid=0",
-  "org-ids": ["GB-COH-00121212", "GB-CHC-12355", "GB-SC-SC1235", "GB-NIC-100012"]
+  "org-ids": ["GB-COH-00121212", "GB-CHC-12355", "GB-SC-SC1235", "GB-NIC-100012"],
+  "date_registered": "2001-01-01T00:00:00",
+  "date_removed": null,
+  "last_modified": "2018-02-11T22:49:15"
 }
 ```
 
