@@ -71,8 +71,48 @@ dokku run find-that-charity python data_import/fetch_data.py --folder '/data'
 dokku run find-that-charity python data_import/import_data.py --folder '/data'
 ```
 
-> @TODO: set up cron job to run the `fetch_data` and `import_data` tasks on a
-regular basis.
+### 4. Set up scheduled task for running tasks on a regular basis
+
+On dokku server add a cron file at `/etc/cron.d/find-that-charity`
+
+```bash
+nano /etc/cron.d/find-that-charity
+```
+
+Then paste in the file contents, and press `CTRL+X` then `Y` to save.
+
+File contents:
+
+```bash
+# server cron jobs
+MAILTO="mail@example.com"
+PATH=/usr/local/bin:/usr/bin:/bin
+SHELL=/bin/bash
+
+# m   h   dom mon dow   username command
+# *   *   *   *   *     dokku    command to be executed
+# -   -   -   -   -
+# |   |   |   |   |
+# |   |   |   |   +----- day of week (0 - 6) (Sunday=0)
+# |   |   |   +------- month (1 - 12)
+# |   |   +--------- day of month (1 - 31)
+# |   +----------- hour (0 - 23)
+# +----------- min (0 - 59)
+
+### KEEP SORTED IN TIME ORDER
+
+### PLACE ALL CRON TASKS BELOW
+
+# fetch latest charity data from the regulators
+# run at 2am on the 13th of the month
+0 2 13 * * dokku dokku run find-that-charity python data_import/fetch_data.py --folder '/data'
+
+# import latest charity data
+# run at 4am on the 13th of the month
+0 4 13 * * dokku dokku run find-that-charity python data_import/import_data.py --folder '/data'
+
+### PLACE ALL CRON TASKS ABOVE, DO NOT REMOVE THE WHITESPACE AFTER THIS LINE
+```
 
 Fetching data
 -------------
