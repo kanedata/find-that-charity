@@ -406,7 +406,7 @@ def import_extract_registration(chars={}, datafile=os.path.join("data", "ccew", 
                 date_removed = chars[regno].get("date_removed")
                 if not date_registered or date_registered > new_reg_date:
                     chars[regno]["date_registered"] = new_reg_date
-                if not chars[regno]["active"] and (not date_removed or date_removed < new_rem_date):
+                if not chars[regno]["active"] and new_rem_date and (not date_removed or (date_removed < new_rem_date)):
                     chars[regno]["date_removed"] = new_rem_date 
                 ccount += 1
                 if ccount % 10000 == 0:
