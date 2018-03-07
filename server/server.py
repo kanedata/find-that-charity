@@ -254,6 +254,8 @@ def uploadcsv():
         "encoding": "utf-8",
         "reconcile_field": None,
         "uploaded": datetime.datetime.now(),
+        "size": upload.content_length,
+        "type": upload.content_type,
     }
     reader = csv.DictReader(io.TextIOWrapper(upload.file, encoding=filedata["encoding"]))
     for r in reader:

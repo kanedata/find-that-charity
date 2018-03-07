@@ -3,10 +3,13 @@
   <div class="column">
     <div class="content">
       <form method="post">
+        % if "reconcile_result" in file["data"][0]:
         <!--<pre>
           % import json
           {{ json.dumps(file["data"][0]["reconcile_result"], indent=4) }}
         </pre>-->
+        % end
+        <p>File size: {{file["size"]}}</p>
         <p>Options needed</p>
         <ul>
           <li>Autoclassify based on score</li>
