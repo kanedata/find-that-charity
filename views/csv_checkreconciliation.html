@@ -1,15 +1,21 @@
 % rebase('base.html', title="{} | Find that charity".format(file["name"]), heading=file["name"], subtitle="Reconciling on {}".format(file["reconcile_field"]) )
 <div class="columns">
   <div class="column">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li class="">
+          <a href="/adddata">Add data</a>
+        </li>
+        <li class="">
+          <a href="/adddata/{{fileid}}">Find charity name</a>
+        </li>
+        <li class="is-active">
+          <a href="/adddata/{{fileid}}/reconcile">Identify charities</a>
+        </li>
+      </ul>
+    </nav>
     <div class="content">
       <form method="post">
-        % if "reconcile_result" in file["data"][0]:
-        <!--<pre>
-          % import json
-          {{ json.dumps(file["data"][0]["reconcile_result"], indent=4) }}
-        </pre>-->
-        % end
-        <p>File size: {{file["size"]}}</p>
         <p>Options needed</p>
         <ul>
           <li>Autoclassify based on score</li>
@@ -19,41 +25,38 @@
           <li>Download results</li>
           <li>Change order (hardest ones first?)</li>
         </ul>
-        <table>
+        <p>
+          {{len(file["data"])}} rows in the file.
+        </p>
+        <table class="table is-striped is-narrow">
           <tr>
           % for h in file["fields"]:
             <th>
-              % if file["reconcile_field"]:
               {{h}}
-              % else:
-              <label>
-                <input type="radio" name="reconcile_field" value="{{h}}" /> 
-                {{h}}
-              </label>
-              % end
             </th>
-            % if "reconcile_result" in file["data"][0] and h == file["reconcile_field"]:
+            % if "reconcile_results" in file and h == file["reconcile_field"]:
             <th>
-              Reconciliation result
+              Select charity
             </th>
             % end
           % end
           </tr>
-        % for k, r in enumerate(file["data"][0:10]): 
+        % for k, r in enumerate(file["data"]): 
           <tr>
           % for c in file["fields"]:
             <td>{{r[c]}}</td>
-            % if "reconcile_result" in r and c == file["reconcile_field"]:
-            <td>
-              % for result in r["reconcile_result"]["result"]:
-                <label>
+            % if c == file["reconcile_field"]:
+            <td class="">
+              % for result in file["reconcile_results"][r[file["reconcile_field"]]]["result"]:
+                <label class="is-size-6">
                   <input type="radio" name="reconcile_choice_{{k}}" value="{{result["id"]}}">
                     % if not result["source"]["active"]:
-                    INACTIVE: 
-                    % end
+                    <span class="has-text-grey">INACTIVE: {{result["source"]["known_as"]}}</span>
+                    % else:
                     {{result["source"]["known_as"]}} 
+                    % end
                     (<a href="/charity/{{result["id"]}}" target="_blank">{{result["id"]}}</a>)
-                  [{{result["score"]}}]
+                  <span class="has-text-grey is-size-7">[{{result["score"]}}]</span>
                 </label>
                 <br>
               % end
@@ -63,7 +66,9 @@
           </tr>
         % end
         </table>
-        <input type="submit" value="Reconcile data" />
+        <div class="control">
+          <input type="submit" value="Add charity numbers to the data" class="button is-link" />
+        </div>
       </form>
     </div>
   </div>

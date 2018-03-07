@@ -30,6 +30,41 @@ for e_v in potential_env_vars:
 if os.environ.get("GA_TRACKING_ID"):
     app.config["ga_tracking_id"] = os.environ.get("GA_TRACKING_ID")
 
+
+app.config["csv_options"] = {
+    "file_encoding": ("File encoding", {
+        "utf8": "UTF-8",
+        "ascii": "ASCII",
+        "latin1": "latin1"
+    }),
+    "delimiter": ("CSV Field delimiter", {
+        ",": ", (comma)",
+        ";": "; (semi-colon)",
+        "\t": "Tab-delimited",
+        "|": "| (pipe)",
+        "^": "^ (caret)",
+    }),
+    "quotechar": ("Quote Character", {
+        "\"": '" (double quote)',
+        "'": "' (single quote)",
+        "~": "~ (tilde)",
+    }),
+    "escapechar": ("Escape Character", {
+        "": 'No escape character',
+        "\\": '\\ (backslash)',
+    }),
+    "doublequote": ("Double quoting", {
+        "1": 'Doubled quoting',
+        "0": 'No double quoting',
+    }),
+    "quoting": ("When quotes are used", {
+        csv.QUOTE_MINIMAL: "Only when special characters used",
+        csv.QUOTE_ALL: "All fields quoted",
+        csv.QUOTE_NONNUMERIC: "All non-numeric fields quoted",
+        csv.QUOTE_NONE: "No fields quoted",
+    })
+}
+
 def search_query(term):
     with open('./es_config.yml', 'rb') as yaml_file:
         json_q = yaml.load(yaml_file)
@@ -109,6 +144,10 @@ def search_return(query):
         result["_link"] = "/charity/" + result["_id"]
         result["_source"] = sort_out_date(result["_source"])
     return bottle.template('search', res=res, term=json.loads(query)["params"]["name"])
+
+
+def check_password(usr, passwd):
+    return True
 
 
 @app.route('/')
@@ -229,43 +268,81 @@ def about():
     return bottle.template('about', this_year=datetime.datetime.now().year)
 
 
-@app.get('/uploadcsv')
-def uploadcsv():
-    return bottle.template('uploadcsv', file=None)
+def get_csv_options():
+    # work out CSV options
+    csv_options = {}
+    for o, v in app.config["csv_options"].items():
+        values = [v for v in v[1]]
+        csv_options[o] = values[0]
+        if o in bottle.request.forms:
+            if bottle.request.forms[o] in values:
+                csv_options[o] = bottle.request.forms[o]
+
+    if csv_options["escapechar"] == "":
+        csv_options["escapechar"] = None
+    csv_options["doublequote"] = csv_options["doublequote"] == 1
+
+    return csv_options
 
 
-@app.post('/uploadcsv')
+@app.get('/adddata')
 def uploadcsv():
+    return bottle.template('csv_upload', error=None, 
+                           csv_max_rows=app.config["max_csv_rows"], 
+                           csv_options=app.config["csv_options"])
+
+@app.post('/adddata')
+def uploadcsv_post():
     upload     = bottle.request.files.get('uploadcsv')
-    name, ext = os.path.splitext(upload.filename)
-    if ext not in ('.csv'):
-        return 'File extension not allowed.'
 
-    # Limit on file size
-    # Select encoding
+    if not upload:
+        return bottle.template('csv_upload', error="No file attached.", 
+                            csv_max_rows=app.config["max_csv_rows"], 
+                            csv_options=app.config["csv_options"])
+
+    name, ext = os.path.splitext(upload.filename)
+    if ext not in ('.csv', '.tsv', '.txt'):
+        return bottle.template('csv_upload', error="File extension \"{}\" not allowed".format(ext), 
+                            csv_max_rows=app.config["max_csv_rows"], 
+                            csv_options=app.config["csv_options"])
+
+    # Select encoding and other CSV options
 
     # - store the CSV data somewhere (elasticsearch?)
-    # - redirect to page with unique ID for dataset
     filedata = {
         "data": [],
         "name": upload.filename,
         "ext": ext,
         "fields": [],
-        "encoding": "utf-8",
         "reconcile_field": None,
         "uploaded": datetime.datetime.now(),
         "size": upload.content_length,
         "type": upload.content_type,
     }
-    reader = csv.DictReader(io.TextIOWrapper(upload.file, encoding=filedata["encoding"]))
-    for r in reader:
+
+    # work out CSV options
+    csv_options = get_csv_options()
+
+    filedata["file_encoding"] = csv_options["file_encoding"]
+    del csv_options["file_encoding"]
+    filedata["csvoptions"] = csv_options
+
+    fileinput = io.TextIOWrapper(upload.file, encoding=filedata["file_encoding"])
+    reader = csv.DictReader(fileinput, **filedata["csvoptions"])
+    for k, r in enumerate(reader):
+        # Limit on file size
+        if k > app.config["max_csv_rows"]:
+            return bottle.template('csv_upload', error="File too big (more than {} rows)".format(app.config["max_csv_rows"]), 
+                            csv_max_rows=app.config["max_csv_rows"], 
+                            csv_options=app.config["csv_options"])
         filedata["data"].append(r)
     filedata["fields"] = reader.fieldnames
     res = app.config["es"].index(index=app.config["es_index"], doc_type="csv_data", body=filedata)
 
-    bottle.redirect('/uploadcsv/{}'.format(res["_id"]))
+    # - redirect to page with unique ID for dataset
+    bottle.redirect('/adddata/{}'.format(res["_id"]))
 
-@app.get('/uploadcsv/<fileid>')
+@app.get('/adddata/<fileid>')
 def uploadcsv_existing(fileid):
     # - select column you want to reconcile
     # - select any other columns you want to show
@@ -274,32 +351,65 @@ def uploadcsv_existing(fileid):
 
     # allow option to delete file
     res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
-    return bottle.template('uploaded_csv', file=res["_source"])
+    return bottle.template('csv_findfield', file=res["_source"], fileid=fileid)
 
-@app.post('/uploadcsv/<fileid>')
-def uploadcsv_existing(fileid):
-    reconcile_field = bottle.request.forms["reconcile_field"]
+@app.post('/adddata/<fileid>')
+def uploadcsv_existing_post(fileid):
     res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
+    reconcile_field = bottle.request.forms.get("reconcile_field", res["_source"]["reconcile_field"])
     res["_source"]["reconcile_field"] = reconcile_field
-    res = app.config["es"].index(index=app.config["es_index"], doc_type="csv_data", id=res["_id"], body=res["_source"])
-    bottle.redirect('/uploadcsv/{}/reconcile'.format(res["_id"]))
+    results = []
 
-@app.get('/uploadcsv/<fileid>/reconcile')
-def uploadcsv_existing(fileid):
+    to_reconcile = [r[reconcile_field] for r in res["_source"]["data"]]
+
+    for r in to_reconcile:
+        response = esdoc_orresponse(recon_query(r))
+        response["query"] = r
+        results.append(response)
+
+    res["_source"]["reconcile_results"] = results
+
+    res = app.config["es"].index(index=app.config["es_index"], doc_type="csv_data", id=res["_id"], body=res["_source"])
+    bottle.redirect('/adddata/{}/reconcile'.format(res["_id"]))
+
+@app.get('/adddata/<fileid>/reconcile')
+def uploadcsv_results(fileid):
     # - select column you want to reconcile
     # - select any other columns you want to show
     # - present reconciliation choices
     # - download the resulting CSV file
 
     # allow option to delete file
+    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
+    res["_source"]["reconcile_results"] = {
+        r["query"]: r for r in res["_source"]["reconcile_results"]
+    }
+
+    return bottle.template('csv_checkreconciliation', file=res["_source"], fileid=fileid)
+
+@app.get('/uploadcsv/<fileid>/reconcile.csv')
+def uploadcsv_results_csv(fileid):
+    # - download the resulting CSV file
     res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
     reconcile_field = res["_source"]["reconcile_field"]
 
+    output = io.StringIO()
+    csv_writer = csv.DictWriter(output, fieldnames=res["_source"]["fields"] + ["reconcile_result"])
+    csv_writer.writeheader()
     for r in res["_source"]["data"]:
-        reconcile_value = r[reconcile_field]
-        r["reconcile_result"] = esdoc_orresponse(recon_query(reconcile_value))
+        r["reconcile_result"] = res["_source"]["reconcile_results"][r[reconcile_field]]["result"][0]["id"]
+        csv_writer.writerow(r)
 
-    return bottle.template('uploaded_csv', file=res["_source"])
+    bottle.response.set_header("Content-Type", "text/csv")
+    return output.getvalue()
+
+@app.get('/uploadcsv/files')
+@bottle.auth_basic(check_password)
+def uploadcsv_see_files():
+    doc = {'size' : 10000, 'query': {'match_all' : {}}}
+    res = app.config["es"].search(index=app.config["es_index"], doc_type="csv_data", body=doc)
+    return bottle.template('uploaded_files', files=res["hits"]["hits"])
+
 
 
 def sort_out_date(charity):
@@ -344,6 +454,7 @@ def main():
     app.config["es_index"] = args.es_index
     app.config["es_type"] = args.es_type
     app.config["ga_tracking_id"] = args.ga_tracking_id
+    app.config["max_csv_rows"] = 1000
 
     bottle.debug(args.debug)
 

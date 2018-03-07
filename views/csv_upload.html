@@ -1,0 +1,60 @@
+% rebase('base.html', title="Upload a CSV | Find that charity", heading="Upload a CSV", subtitle="Use this form to add charity data to a CSV file" )
+<div class="columns">
+  <div class="column">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li class="is-active">
+          <a href="/adddata">Add data</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="content">
+      % if error:
+      <div class="notification is-danger">
+        <button class="delete"></button>
+        <strong>Error:</strong> {{error}}
+      </div>
+      % end
+      <form action="/adddata" method="post" enctype="multipart/form-data">
+        <div class="field">
+          <label class="label">CSV File</label>
+          <div class="control">
+            <input type="file" name="uploadcsv" />
+          </div>
+          <p class="help">Must be a valid CSV file. No more than {{csv_max_rows}} rows.</p>
+        </div>
+        <label class="label">Choose the next step</label>
+        <div class="field is-grouped">
+          <div class="control">
+            <input type="submit" value="I need to add charity numbers" class="button is-link" />
+            <p class="help">You'll need to select a column containing the charity name</p>
+          </div>
+          <div class="control">
+            <input type="submit" value="My data has charity numbers" class="button is-link" />
+          </div>
+        </div>
+        <label class="label">Advanced options</label>
+        % for o in csv_options:
+        <div class="field is-horizontal">
+          <div class="field-label is-small">
+            <label class="label">{{csv_options[o][0]}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <div class="select is-small">
+                  <select name="delimiter">
+                    % for value in csv_options[o][1]:
+                    <option value="{{value}}">{{csv_options[o][1][value]}}</option>
+                    % end
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        % end
+      </form>
+    </div>
+  </div>
+</div>

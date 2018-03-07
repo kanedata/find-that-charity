@@ -1,0 +1,39 @@
+% rebase('base.html', title="Uploaded Files | Find that charity", heading="Uploaded Files")
+<div class="columns">
+  <div class="column">
+    <div class="content">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Encoding</th>
+                    <th>Rows of data</th>
+                    <th>Fields</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                % for i in files:
+                <tr>
+                    <td>{{i["_id"]}}</td>
+                    <td>
+                        <a href="/uploadcsv/{{i["_id"]}}">{{i["_source"]["name"]}}</a>
+                    </td>
+                    <td>{{i["_source"].get("file_encoding")}}</td>
+                    <td>{{len(i["_source"].get("data", []))}}</td>
+                    <td>
+                        % if i["_source"].get("fields", []):
+                        {{len(i["_source"].get("fields", []))}}
+                        % end
+                    </td>
+                    <td>
+                        <a href="/uploadcsv/{{i["_id"]}}/delete">Delete</a>
+                    </td>
+                </tr>
+                % end
+            </tbody>
+        </table>
+    </div>
+  </div>
+</div>
