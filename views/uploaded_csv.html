@@ -1,0 +1,67 @@
+% rebase('base.html', title="{} | Find that charity".format(file["name"]), heading=file["name"], subtitle="Reconciling on {}".format(file["reconcile_field"]) )
+<div class="columns">
+  <div class="column">
+    <div class="content">
+      <form method="post">
+        <!--<pre>
+          % import json
+          {{ json.dumps(file["data"][0]["reconcile_result"], indent=4) }}
+        </pre>-->
+        <p>Options needed</p>
+        <ul>
+          <li>Autoclassify based on score</li>
+          <li>Pagination</li>
+          <li>Preview</li>
+          <li>Search for alternative (typeahead-style)</li>
+          <li>Download results</li>
+          <li>Change order (hardest ones first?)</li>
+        </ul>
+        <table>
+          <tr>
+          % for h in file["fields"]:
+            <th>
+              % if file["reconcile_field"]:
+              {{h}}
+              % else:
+              <label>
+                <input type="radio" name="reconcile_field" value="{{h}}" /> 
+                {{h}}
+              </label>
+              % end
+            </th>
+            % if "reconcile_result" in file["data"][0] and h == file["reconcile_field"]:
+            <th>
+              Reconciliation result
+            </th>
+            % end
+          % end
+          </tr>
+        % for k, r in enumerate(file["data"][0:10]): 
+          <tr>
+          % for c in file["fields"]:
+            <td>{{r[c]}}</td>
+            % if "reconcile_result" in r and c == file["reconcile_field"]:
+            <td>
+              % for result in r["reconcile_result"]["result"]:
+                <label>
+                  <input type="radio" name="reconcile_choice_{{k}}" value="{{result["id"]}}">
+                    % if not result["source"]["active"]:
+                    INACTIVE: 
+                    % end
+                    {{result["source"]["known_as"]}} 
+                    (<a href="/charity/{{result["id"]}}" target="_blank">{{result["id"]}}</a>)
+                  [{{result["score"]}}]
+                </label>
+                <br>
+              % end
+            </td>
+            % end
+          % end
+          </tr>
+        % end
+        </table>
+        <input type="submit" value="Reconcile data" />
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+% rebase('base.html', title="Upload a CSV | Find that charity", heading="Upload a CSV" )
+<div class="columns">
+  <div class="column">
+    <div class="content">
+      <form action="/uploadcsv" method="post" enctype="multipart/form-data">
+        <input type="file" name="uploadcsv" />
+        <input type="submit" value="Upload CSV file" />
+      </form>
+    </div>
+  </div>
+</div>

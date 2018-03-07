@@ -9,6 +9,8 @@ from collections import OrderedDict
 import time
 import datetime
 from dateutil import parser
+import csv
+import io
 
 app = bottle.default_app()
 
@@ -225,6 +227,77 @@ def charity_preview(regno):
 @app.route('/about')
 def about():
     return bottle.template('about', this_year=datetime.datetime.now().year)
+
+
+@app.get('/uploadcsv')
+def uploadcsv():
+    return bottle.template('uploadcsv', file=None)
+
+
+@app.post('/uploadcsv')
+def uploadcsv():
+    upload     = bottle.request.files.get('uploadcsv')
+    name, ext = os.path.splitext(upload.filename)
+    if ext not in ('.csv'):
+        return 'File extension not allowed.'
+
+    # Limit on file size
+    # Select encoding
+
+    # - store the CSV data somewhere (elasticsearch?)
+    # - redirect to page with unique ID for dataset
+    filedata = {
+        "data": [],
+        "name": upload.filename,
+        "ext": ext,
+        "fields": [],
+        "encoding": "utf-8",
+        "reconcile_field": None,
+        "uploaded": datetime.datetime.now(),
+    }
+    reader = csv.DictReader(io.TextIOWrapper(upload.file, encoding=filedata["encoding"]))
+    for r in reader:
+        filedata["data"].append(r)
+    filedata["fields"] = reader.fieldnames
+    res = app.config["es"].index(index=app.config["es_index"], doc_type="csv_data", body=filedata)
+
+    bottle.redirect('/uploadcsv/{}'.format(res["_id"]))
+
+@app.get('/uploadcsv/<fileid>')
+def uploadcsv_existing(fileid):
+    # - select column you want to reconcile
+    # - select any other columns you want to show
+    # - present reconciliation choices
+    # - download the resulting CSV file
+
+    # allow option to delete file
+    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
+    return bottle.template('uploaded_csv', file=res["_source"])
+
+@app.post('/uploadcsv/<fileid>')
+def uploadcsv_existing(fileid):
+    reconcile_field = bottle.request.forms["reconcile_field"]
+    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
+    res["_source"]["reconcile_field"] = reconcile_field
+    res = app.config["es"].index(index=app.config["es_index"], doc_type="csv_data", id=res["_id"], body=res["_source"])
+    bottle.redirect('/uploadcsv/{}/reconcile'.format(res["_id"]))
+
+@app.get('/uploadcsv/<fileid>/reconcile')
+def uploadcsv_existing(fileid):
+    # - select column you want to reconcile
+    # - select any other columns you want to show
+    # - present reconciliation choices
+    # - download the resulting CSV file
+
+    # allow option to delete file
+    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
+    reconcile_field = res["_source"]["reconcile_field"]
+
+    for r in res["_source"]["data"]:
+        reconcile_value = r[reconcile_field]
+        r["reconcile_result"] = esdoc_orresponse(recon_query(reconcile_value))
+
+    return bottle.template('uploaded_csv', file=res["_source"])
 
 
 def sort_out_date(charity):
