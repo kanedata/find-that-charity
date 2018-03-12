@@ -296,8 +296,6 @@ def uploadcsv():
 def uploadcsv_post():
     upload     = bottle.request.files.get('uploadcsv')
 
-    print(get_csv_options())
-
     if not upload:
         return bottle.template('csv_upload', error="No file attached.", 
                             csv_max_rows=app.config["max_csv_rows"], 
