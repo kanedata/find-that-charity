@@ -25,6 +25,31 @@
           <li>Download results</li>
           <li>Change order (hardest ones first?)</li>
         </ul>
+        <p>Options for each reconciliation block.</p>
+        <ul>
+          <li>Confirmed result: 
+            <ul>
+              <li>Option to reset to unconfirmed</li>
+            </ul>
+          </li>
+          <li>
+            Result matched:
+            <ul>
+              <li>Global confirm all matched results</li>
+              <li>Option to confirm match</li>
+              <li>Option to reset to unconfirmed</li>
+            </ul>
+          </li>
+          <li>
+            No matched results:
+            <ul>
+              <li>Global confirm the best match in all cases (or use filter/threshold)</li>
+              <li>Select from list (change to confirmed match)</li>
+              <li>Search for an alternative match with textbox (and change to confirmed match if found)</li>
+              <li>Preview more info about the charity</li>
+            </ul>
+          </li>
+        </ul>
         <p>
           {{len(file["data"])}} rows in the file.
         </p>
@@ -46,7 +71,10 @@
           % for c in file["fields"]:
             <td>{{r[c]}}</td>
             % if c == file["reconcile_field"]:
+            % results = file["reconcile_results"][r[file["reconcile_field"]]]["result"]
             <td class="">
+              % hide_results = "hide" if results[0]["match"] else ""
+              <div class="{{hide_results}}">
               % for result in file["reconcile_results"][r[file["reconcile_field"]]]["result"]:
                 <label class="is-size-6">
                   <input type="radio" name="reconcile_choice_{{k}}" value="{{result["id"]}}">
@@ -60,6 +88,7 @@
                 </label>
                 <br>
               % end
+              </div>
             </td>
             % end
           % end

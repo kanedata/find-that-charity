@@ -2,14 +2,16 @@
 <div class="columns">
   <div class="column">
     <div class="content">
-        <table>
+        <p>{{len(files)}} files stored</p>
+        <table class="table is-narrow is-size-6">
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Date uploaded</th>
                     <th>Name</th>
                     <th>Encoding</th>
-                    <th>Rows of data</th>
-                    <th>Fields</th>
+                    <th>Rows</th>
+                    <th>Columns</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -17,6 +19,16 @@
                 % for i in files:
                 <tr>
                     <td>{{i["_id"]}}</td>
+                    <td>
+                        % date_uploaded = i["_source"].get("uploaded")
+                        % if date_uploaded:
+                            % import dateutil.parser
+                            % date_uploaded = dateutil.parser.parse(date_uploaded)
+                            {{ date_uploaded.strftime("%Y-%m-%d %H:%M:%S")}}
+                        % else:
+                        Unknown
+                        % end
+                    </td>
                     <td>
                         <a href="/uploadcsv/{{i["_id"]}}">{{i["_source"]["name"]}}</a>
                     </td>
@@ -28,7 +40,8 @@
                         % end
                     </td>
                     <td>
-                        <a href="/uploadcsv/{{i["_id"]}}/delete">Delete</a>
+                        <a class="button is-small is-warning" href="/uploadcsv/{{i["_id"]}}/reset">Reset</a>
+                        <a class="button is-small is-danger" href="/uploadcsv/{{i["_id"]}}/delete">Delete</a>
                     </td>
                 </tr>
                 % end

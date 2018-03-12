@@ -34,6 +34,7 @@ if os.environ.get("GA_TRACKING_ID"):
 app.config["csv_options"] = {
     "file_encoding": ("File encoding", {
         "utf8": "UTF-8",
+        "utf16": "UTF-16",
         "ascii": "ASCII",
         "latin1": "latin1"
     }),
@@ -295,6 +296,8 @@ def uploadcsv():
 def uploadcsv_post():
     upload     = bottle.request.files.get('uploadcsv')
 
+    print(get_csv_options())
+
     if not upload:
         return bottle.template('csv_upload', error="No file attached.", 
                             csv_max_rows=app.config["max_csv_rows"], 
@@ -387,7 +390,7 @@ def uploadcsv_results(fileid):
 
     return bottle.template('csv_checkreconciliation', file=res["_source"], fileid=fileid)
 
-@app.get('/uploadcsv/<fileid>/reconcile.csv')
+@app.get('/adddata/<fileid>/reconcile.csv')
 def uploadcsv_results_csv(fileid):
     # - download the resulting CSV file
     res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
@@ -406,7 +409,7 @@ def uploadcsv_results_csv(fileid):
 @app.get('/uploadcsv/files')
 @bottle.auth_basic(check_password)
 def uploadcsv_see_files():
-    doc = {'size' : 10000, 'query': {'match_all' : {}}}
+    doc = {'size' : 10000, 'query': {'match_all' : {}}, "sort": [{"uploaded": "desc"}]}
     res = app.config["es"].search(index=app.config["es_index"], doc_type="csv_data", body=doc)
     return bottle.template('uploaded_files', files=res["hits"]["hits"])
 

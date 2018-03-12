@@ -25,7 +25,8 @@
           % for h in file["fields"]:
             <th>
               <label>
-                <input type="radio" name="reconcile_field" value="{{h}}" /> 
+                % checked = "checked" if h == file.get("reconcile_field") else ""
+                <input type="radio" name="reconcile_field" value="{{h}}" {{checked}} /> 
                 {{h}}
               </label>
             </th>
@@ -36,6 +37,13 @@
           % for c in file["fields"]:
             <td>{{r[c]}}</td>
           % end
+          </tr>
+        % end
+        % if len(file["data"]) > 10:
+          <tr>
+            <td colspan="{{len(file["fields"])}}">
+              {{ len(file["data"]) - 10}} more rows...
+            </td>
           </tr>
         % end
         </table>
