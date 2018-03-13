@@ -1,5 +1,7 @@
 ---
 inline:
+  _source:
+    excludes: [ "complete_names" ]
   query:
     function_score:
       query:
