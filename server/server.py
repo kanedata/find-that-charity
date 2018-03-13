@@ -389,7 +389,9 @@ def uploadcsv_existing(fileid):
 def uploadcsv_existing_post(fileid):
     res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
     reconcile_field = bottle.request.forms.get("reconcile_field", res["_source"]["reconcile_field"])
+    charity_number_field = bottle.request.forms.get("charity_number_field", res["_source"].get("charity_number_field","charity_number"))
     res["_source"]["reconcile_field"] = reconcile_field
+    res["_source"]["charity_number_field"] = charity_number_field
     results = []
 
     to_reconcile = [r[reconcile_field] for r in res["_source"]["data"]]
@@ -418,6 +420,29 @@ def uploadcsv_results(fileid):
     }
 
     return bottle.template('csv_checkreconciliation', file=res["_source"], fileid=fileid)
+
+@app.post('/adddata/<fileid>/match')
+def adddata_matched(fileid):
+    # @TODO: add origin confirmation so that it can't be changed by itself.
+    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
+    row = int(bottle.request.params.get("row"))
+    match_id = bottle.request.params.get("match_id")
+    field_name = res["_source"].get("charity_number_field", "charity_number")
+    unmatch = "unmatch" in bottle.request.params
+    if match_id == "":
+        unmatch = True
+    res["_source"]["charity_number_field"] = field_name
+    
+    for i, v in enumerate(res["_source"]["data"]):
+        if i == row:
+            v[field_name] = None if unmatch else match_id
+        else:
+            v[field_name] = None
+
+    res = app.config["es"].index(
+        index=app.config["es_index"], doc_type="csv_data", id=res["_id"], body=res["_source"])
+    return res
+
 
 @app.get('/adddata/<fileid>/reconcile.csv')
 def uploadcsv_results_csv(fileid):

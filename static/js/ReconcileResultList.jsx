@@ -23,12 +23,38 @@ export default class ReconcileResultList extends React.Component {
         this.hideSuggest = this.hideSuggest.bind(this);
     }
 
+    match_url(){
+        return `/adddata/${this.props.file_id}/match`;
+    }
+
     selectInput(result) {
         this.setState({ matched: result })
+        var formData = new FormData();
+        formData.append("row", this.props.row);
+        formData.append("match_id", result.id);
+
+        fetch(this.match_url(), {body: formData, method: 'POST'})
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (myJson) {
+            console.log(myJson);
+        });
     }
 
     unmatch(result) {
-        this.setState({ matched: null })
+        this.setState({ matched: null });
+        var formData = new FormData();
+        formData.append("row", this.props.row);
+        formData.append("match_id", "");
+
+        fetch(this.match_url(), {body: formData, method: 'POST'})
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (myJson) {
+            console.log(myJson);
+        });
     }
 
     showMore(e) {

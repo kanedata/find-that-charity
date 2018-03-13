@@ -30,7 +30,7 @@ export default class ReconcileResultMatched extends React.Component {
     render() {
         return (
             <div className="field is-grouped">
-                <span class="tags has-addons" style={ {display: 'inline', marginBottom: '0px'} }>
+                <span className="tags has-addons" style={ {display: 'inline', marginBottom: '0px'} }>
                     <span className="tag">                        
                         <span className="icon is-small has-text-success">
                             <i className="fa fa-check"></i>

@@ -16,10 +16,13 @@ if(search_form){
     );
 }
 
-document.querySelectorAll('.reconcile-result').forEach(function (recon_result) {
+const file_id = document.querySelector("#file_id");
+if(file_id){
+document.querySelectorAll('.reconcile-result').forEach(function (recon_result, i) {
     var result = JSON.parse(decodeURI(recon_result.dataset.results));
     ReactDOM.render(
-        <ReconcileResultList matches={result} />,
+        <ReconcileResultList matches={result} file_id={file_id.value} row={i} />,
         recon_result
     );
 });
+}
