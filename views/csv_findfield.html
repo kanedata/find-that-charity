@@ -1,16 +1,7 @@
 % rebase('base.html', title="{} | Find that charity".format(file["name"]), heading=file["name"], subtitle="Select charity name field" )
+% include('csv_steps.html', step=2)
 <div class="columns">
   <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li class="">
-          <a href="/adddata">Add data</a>
-        </li>
-        <li class="is-active">
-          <a href="/adddata/{{fileid}}">Find charity name</a>
-        </li>
-      </ul>
-    </nav>
     <div class="content">
       <form method="post">
         <p>

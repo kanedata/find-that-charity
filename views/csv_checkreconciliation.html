@@ -1,19 +1,7 @@
 % rebase('base.html', title="{} | Find that charity".format(file["name"]), heading=file["name"], subtitle="Reconciling on {}".format(file["reconcile_field"]) )
+% include('csv_steps.html', step=3)
 <div class="columns">
   <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li class="">
-          <a href="/adddata">Add data</a>
-        </li>
-        <li class="">
-          <a href="/adddata/{{fileid}}">Find charity name</a>
-        </li>
-        <li class="is-active">
-          <a href="/adddata/{{fileid}}/reconcile">Identify charities</a>
-        </li>
-      </ul>
-    </nav>
     <div class="content">
       <form method="post">
         <p>Options needed</p>
