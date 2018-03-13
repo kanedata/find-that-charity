@@ -56,12 +56,14 @@ export default class ReconcileResultList extends React.Component {
             return <ReconcileResultMatched result={this.state.matched} unmatch={this.unmatch} />;
         }
         return (
-            <div title={this.state.matches.length + " results"}>
+            <div>
                 {this.state.matches.map((match, i) =>
                     i < this.state.show_matches &&
                     <ReconcileResult key={i} result={match} selectInput={this.selectInput} />
                 )}
                 <span className="is-size-7">
+                    <span className="has-text-grey">{this.state.show_matches + " of " + this.state.matches.length + " results"}</span>
+                    {' '}
                     {this.state.matches.length > this.state.show_matches &&
                         <a href="#" onClick={this.showMore}>[more]</a>}
                     {' '}

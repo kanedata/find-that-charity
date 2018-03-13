@@ -13,6 +13,7 @@ export default class ReconcileResult extends React.Component {
     }
 
     handleChange(e) {
+        e.preventDefault();
         this.props.selectInput(this.props.result);
     }
 
@@ -28,24 +29,25 @@ export default class ReconcileResult extends React.Component {
 
     render() {
         return (
-            <div>
-                <label className="is-size-6">
-                    <input type="radio" className="reconcile_choice" name="reconcile_choice_" value={this.props.result.id} onChange={this.handleChange} />
-                    {' '}{this.props.result.source.known_as}{' '}
-                    (<a href={"/charity/" + this.props.result.id} target="_blank">{this.props.result.id}</a>){' '}
-                    <span className="has-text-grey is-size-7">
-                        [{this.props.result.score}]
-                        {' '}
-                        {this.state.show_preview &&
-                            <a href="#" onClick={this.hidePreview}>[hide preview]</a>}
-                        {' '}
-                        {!this.state.show_preview &&
-                            <a href="#" onClick={this.showPreview}>[preview]</a>}
-                    </span>
-                </label>
+            <React.Fragment>
+                <div className="buttons" htmlFor={this.id} style={ {margin: '0px'} }>
+                    <a href="#" onClick={this.handleChange} className="button is-small is-primary is-outlined">
+                        <span className="icon is-small">
+                            <i className="fa fa-check"></i>
+                        </span>
+                        <span className="has-text-dark">{this.props.result.source.known_as + " (" + this.props.result.id + ")"})</span>
+                        <span className="is-italic has-text-grey">
+                            &nbsp;[{this.props.result.score}]
+                        </span>
+                    </a>
+                    {this.state.show_preview &&
+                    <a className="button is-small is-link" href="#" onClick={this.hidePreview}>Hide preview</a>}
+                    {!this.state.show_preview &&
+                    <a className="button is-small is-link is-outlined" href="#" onClick={this.showPreview}>Preview</a>}
+                </div>
                 {this.state.show_preview &&
                     <ReconcilePreview result={this.props.result.source} id={this.props.result.id} hidePreview={this.hidePreview} />}
-            </div>
+            </React.Fragment>
         )
     }
 }

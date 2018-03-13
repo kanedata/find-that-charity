@@ -29,18 +29,27 @@ export default class ReconcileResultMatched extends React.Component {
 
     render() {
         return (
-            <div>
-                <span className="tag is-success">Matched</span>
-                {' '}{this.props.result.source.known_as}{' '}
-                (<a href={"/charity/" + this.props.result.id} target="_blank">{this.props.result.id}</a>){' '}
-                <span className="has-text-grey is-size-7">
-                    [<a href="#" onClick={this.unmatch} >Unmatch</a>]
-                    {' '}
+            <div className="field is-grouped">
+                <span class="tags has-addons" style={ {display: 'inline', marginBottom: '0px'} }>
+                    <span className="tag">                        
+                        <span className="icon is-small has-text-success">
+                            <i className="fa fa-check"></i>
+                        </span>{' '}
+                    </span>
+                    <span className="tag is-success">Matched</span>
+                </span>
+                <span className="field" style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem', marginBottom: '0px'} }>
+                    {this.props.result.source.known_as}{' '}
+                    (<a href={"/charity/" + this.props.result.id} target="_blank">{this.props.result.id}</a>)
+                </span>
+                <span className="field has-addons" style={ {marginBottom: '0px'}}>
+                    <p class="control" style={{ marginBottom: '0px' }}>
+                        <a className="button is-small is-link is-outlined" href="#" onClick={this.unmatch} >Unmatch</a>
+                    </p>
                     {this.state.show_preview &&
-                        <a href="#" onClick={this.hidePreview}>[hide preview]</a>}
-                    {' '}
+                        <p class="control" style={{ marginBottom: '0px' }}><a className="button is-small is-link" href="#" onClick={this.hidePreview}>hide preview</a></p>}
                     {!this.state.show_preview &&
-                        <a href="#" onClick={this.showPreview}>[preview]</a>}
+                        <p class="control" style={{ marginBottom: '0px' }}><a className="button is-small is-link is-outlined" href="#" onClick={this.showPreview}>preview</a></p>}
                 </span>
                 {this.state.show_preview &&
                     <ReconcilePreview result={this.props.result.source} id={this.props.result.id} hidePreview={this.hidePreview} />}
