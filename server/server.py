@@ -30,6 +30,9 @@ for e_v in potential_env_vars:
 if os.environ.get("GA_TRACKING_ID"):
     app.config["ga_tracking_id"] = os.environ.get("GA_TRACKING_ID")
 
+if os.environ.get("ADMIN_PASSWORD"):
+    app.config["admin_password"] = os.environ.get("ADMIN_PASSWORD")
+
 
 app.config["csv_options"] = {
     "file_encoding": ("File encoding", {
@@ -148,7 +151,8 @@ def search_return(query):
 
 
 def check_password(usr, passwd):
-    return True
+    if passwd == app.config["admin_password"]:
+        return True
 
 
 @app.route('/')
@@ -465,6 +469,9 @@ def main():
     parser.add_argument('--debug', action='store_true', dest="debug", help='Debug mode (autoreloads the server)')
     parser.add_argument('--server', default="auto", help='Server backend to use (see http://bottlepy.org/docs/dev/deployment.html#switching-the-server-backend)')
 
+    # http auth
+    parser.add_argument('--admin-password', help='Password for accessing admin pages')
+
     # elasticsearch options
     parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
     parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
@@ -487,6 +494,7 @@ def main():
     app.config["es_type"] = args.es_type
     app.config["ga_tracking_id"] = args.ga_tracking_id
     app.config["max_csv_rows"] = 1000
+    app.config["admin_password"] = args.admin_password
 
     bottle.debug(args.debug)
 
