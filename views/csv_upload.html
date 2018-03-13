@@ -1,34 +1,5 @@
 % rebase('base.html', title="Upload a CSV | Find that charity", heading="Upload a CSV", subtitle="Use this form to add charity data to a CSV file" )
 <div class="columns">
-  <div class="column">
-    <div class="content">
-      % if error:
-      <div class="notification is-danger">
-        <button class="delete"></button>
-        <strong>Error:</strong> {{error}}
-      </div>
-      % end
-      <p>Use this form to upload a CSV containing data about charities.
-        You can use the tool to add charity numbers if you don't already 
-        have them, and also add data about that charity.
-      </p>
-      <p>
-        Data files uploaded using this tool will be kept for seven days then deleted. 
-        You can use the download feature to download your amended data.
-      </p>
-      <article class="message is-warning">
-        <div class="message-header">
-           Important Note
-        </div>
-        <div class="message-body">
-          Do not upload confidential or personal data using this form. You are responsible for the content of any files you upload
-          to this tool, and any files found to contain personal or confidential data will be deleted.
-        </div>
-      </article>
-      <p><strong></strong> 
-      </p>
-    </div>
-  </div>
   <div class="column is-two-thirds">
     <div class="content">
       <form action="/adddata" method="post" enctype="multipart/form-data">
@@ -89,6 +60,35 @@
         % end
         </div>
       </form>
+    </div>
+  </div>
+  <div class="column">
+    <div class="content">
+      % if error:
+      <div class="notification is-danger">
+        <button class="delete"></button>
+        <strong>Error:</strong> {{error}}
+      </div>
+      % end
+      <p>Use this form to upload a CSV containing data about charities.
+        You can use the tool to add charity numbers if you don't already 
+        have them, and also add data about that charity.
+      </p>
+      <p>
+        Data files uploaded using this tool will be kept for seven days then deleted. 
+        You can use the download feature to download your amended data.
+      </p>
+      <article class="message is-warning">
+        <div class="message-header">
+           Important Note
+        </div>
+        <div class="message-body">
+          Do not upload confidential or personal data using this form. You are responsible for the content of any files you upload
+          to this tool, and any files found to contain personal or confidential data will be deleted.
+        </div>
+      </article>
+      <p><strong></strong> 
+      </p>
     </div>
   </div>
 </div>
