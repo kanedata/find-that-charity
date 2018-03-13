@@ -435,7 +435,7 @@ def uploadcsv_results_csv(fileid):
     bottle.response.set_header("Content-Type", "text/csv")
     return output.getvalue()
 
-@app.get('/uploadcsv/files')
+@app.get('/admin/uploaded-files')
 @bottle.auth_basic(check_password)
 def uploadcsv_see_files():
     doc = {'size' : 10000, 'query': {'match_all' : {}}, "sort": [{"uploaded": "desc"}]}
