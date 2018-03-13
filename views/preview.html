@@ -5,9 +5,11 @@
 </head>
   <body>
     <div class="content is-small" style="padding: 5px;">
+      % if not hide_title:
       <h3>
         {{ charity["known_as"] }}
       </h3>
+      % end
       <h5>
         % if charity["active"]:
         <strong>Active</strong>

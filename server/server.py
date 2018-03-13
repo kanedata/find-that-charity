@@ -263,7 +263,7 @@ def charity(regno, filetype='html'):
 def charity_preview(regno):
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
-        return bottle.template('preview', charity=sort_out_date(res["_source"]), charity_id=res["_id"])
+        return bottle.template('preview', charity=sort_out_date(res["_source"]), charity_id=res["_id"], hide_title=("hide_title" in bottle.request.params))
     else:
         bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
 

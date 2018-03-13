@@ -1,5 +1,5 @@
 import React from "react";
-import MatchedReconcileResult from "./MatchedReconcileResult"
+import ReconcileResultMatched from "./ReconcileResultMatched"
 import ReconcileResult from "./ReconcileResult"
 import AutoComplete from "./AutoComplete"
 
@@ -12,7 +12,8 @@ export default class ReconcileResultList extends React.Component {
             matched: (props.matches[0].match ? props.matches[0] : null),
             matches: props.matches,
             show_matches: 3,
-            show_suggest: false
+            show_suggest: false,
+            show_preview: false
         };
         this.selectInput = this.selectInput.bind(this);
         this.unmatch = this.unmatch.bind(this);
@@ -52,7 +53,7 @@ export default class ReconcileResultList extends React.Component {
 
     render() {
         if (this.state.matched) {
-            return <MatchedReconcileResult result={this.state.matched} unmatch={this.unmatch} />;
+            return <ReconcileResultMatched result={this.state.matched} unmatch={this.unmatch} />;
         }
         return (
             <div title={this.state.matches.length + " results"}>
