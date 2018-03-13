@@ -4,6 +4,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>{{ title or default_title }}</title>
+    <link rel="stylesheet" href="/static/dist/main.css" />
     % if ga_tracking:
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking }}"></script>
@@ -15,9 +17,6 @@
       gtag('config', '{{ ga_tracking }}');
     </script>
     % end
-    <title>{{ title or default_title }}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css" integrity="sha256-2k1KVsNPRXxZOsXQ8aqcZ9GOOwmJTMoOB5o5Qp1d6/s="
-      crossorigin="anonymous" />
   </head>
   <body>
     <section class="hero is-dark">

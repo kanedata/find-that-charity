@@ -3,6 +3,9 @@ import ReactDOM from "react-dom";
 import SearchAutoComplete from "./SearchAutoComplete";
 import ReconcileResultList from "./ReconcileResultList";
 
+require('../../node_modules/bulma/css/bulma.css');
+require('../../node_modules/bulma-steps/dist/bulma-steps.min.css');
+
 const search_form = document.querySelector('#search-autocomplete')
 if(search_form){
     ReactDOM.render(
