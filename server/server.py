@@ -103,7 +103,7 @@ def esdoc_orresponse(query):
         i["name"] = i["source"]["known_as"] + " (" + i["id"] + ")"
         if not i["source"]["active"]:
             i["name"] += " [INACTIVE]"
-        if i["name"].lower() == json.loads(query)["params"]["name"].lower() and i["score"] == res["hits"]["max_score"]:
+        if i["source"]["known_as"].lower() == json.loads(query)["params"]["name"].lower() and i["score"] == res["hits"]["max_score"]:
             i["match"] = True
         else:
             i["match"] = False
@@ -267,6 +267,33 @@ def charity_preview(regno):
 @app.route('/about')
 def about():
     return bottle.template('about', this_year=datetime.datetime.now().year)
+
+
+@app.route('/autocomplete')
+def autocomplete():
+    search = bottle.request.params.q
+    doc = {
+        "suggest": {
+            "suggest-1": {
+                "prefix": search,
+                "completion": {
+                    "field": "complete_names",
+                    "fuzzy" : {
+                        "fuzziness" : 1
+                    }
+                }
+            }
+        }
+    }
+    res = app.config["es"].search(
+        index=app.config["es_index"], doc_type="csv_data", body=doc,
+        _source_include=['known_as'])
+    return {"results": [
+        {
+            "label": x["_source"]["known_as"], 
+            "value": x["_id"]
+        } for x in res.get("suggest", {}).get("suggest-1", [])[0]["options"]
+    ]}
 
 
 def get_csv_options():
