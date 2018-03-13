@@ -439,6 +439,10 @@ def uploadcsv_see_files():
     return bottle.template('uploaded_files', files=res["hits"]["hits"])
 
 
+@app.route('/static/<filename:path>')
+def send_static(filename):
+    return bottle.static_file(filename, root='static')
+
 
 def sort_out_date(charity):
     dates = ["date_registered", "date_removed", "last_modified"]
