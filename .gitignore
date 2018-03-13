@@ -12,3 +12,4 @@ scratchpad/
 *.lnk
 
 \.vscode/
+node_modules/
