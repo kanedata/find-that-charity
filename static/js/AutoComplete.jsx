@@ -28,15 +28,15 @@ export default class AutoComplete extends React.Component {
         if (this.state.q.length > 2) {
             this.setState({ "loading": true });
             fetch(`/autocomplete?q=${this.state.q}`)
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (myJson) {
-                    element.setState({
-                        "results": myJson["results"],
-                        "loading": false
-                    });
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (myJson) {
+                element.setState({
+                    "results": myJson["results"],
+                    "loading": false
                 });
+            });
         }
     }
 
