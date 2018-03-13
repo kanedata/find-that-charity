@@ -21,7 +21,7 @@
           <li>Autoclassify based on score</li>
           <li>Pagination</li>
           <li>Preview</li>
-          <li>Search for alternative (typeahead-style)</li>
+          <li><s>Search for alternative (typeahead-style)</s></li>
           <li>Download results</li>
           <li>Change order (hardest ones first?)</li>
         </ul>
@@ -37,15 +37,15 @@
             <ul>
               <li>Global confirm all matched results</li>
               <li>Option to confirm match</li>
-              <li>Option to reset to unconfirmed</li>
+              <li><s>Option to reset to unmatched</s></li>
             </ul>
           </li>
           <li>
             No matched results:
             <ul>
               <li>Global confirm the best match in all cases (or use filter/threshold)</li>
-              <li>Select from list (change to confirmed match)</li>
-              <li>Search for an alternative match with textbox (and change to confirmed match if found)</li>
+              <li><s>Select from list (change to confirmed match)</s></li>
+              <li><s>Search for an alternative match with textbox (and change to confirmed match if found)</s></li>
               <li>Preview more info about the charity</li>
             </ul>
           </li>
@@ -53,6 +53,7 @@
         <p>
           {{len(file["data"])}} rows in the file.
         </p>
+        <div class="reconcile-summary"></div>
         <table class="table is-striped is-narrow">
           <tr>
           % for h in file["fields"]:
@@ -72,12 +73,24 @@
             <td>{{r[c]}}</td>
             % if c == file["reconcile_field"]:
             % results = file["reconcile_results"][r[file["reconcile_field"]]]["result"]
-            <td class="">
-              % hide_results = "hide" if results[0]["match"] else ""
-              <div class="{{hide_results}}">
+            % import json
+            % import urllib.parse
+            <td class="reconcile-result" data-results="{{ urllib.parse.quote(json.dumps(results), safe='!#$&\'()*+,-./:;=?@_~') }}">
+              % hide_results = "is-hidden" if results[0]["match"] else ""
+              % show_results = "" if results[0]["match"] else "is-hidden"
+              <div class="{{show_results}} selected-result">
+                % if results[0]["match"]:
+                  <span class="tag is-success">Matched</span>
+                  {{ results[0]["source"]["known_as"] }} 
+                  (<a href="/charity/{{results[0]["id"]}}" target="_blank">{{results[0]["id"]}}</a>)
+                  <span class="has-text-grey is-size-7">[<a href="#">Unmatch</a>]</span>
+                % end
+              </div>
+              <div class="{{hide_results}} full-results">
               % for result in file["reconcile_results"][r[file["reconcile_field"]]]["result"]:
                 <label class="is-size-6">
-                  <input type="radio" name="reconcile_choice_{{k}}" value="{{result["id"]}}">
+                  <input type="radio" class="reconcile_choice" name="reconcile_choice_{{k}}" value="{{result["id"]}}">
+                    <!-- <code>{{ result }}</code> -->
                     % if not result["source"]["active"]:
                     <span class="has-text-grey">INACTIVE: {{result["source"]["known_as"]}}</span>
                     % else:
@@ -101,4 +114,225 @@
       </form>
     </div>
   </div>
+  <div id="root"></div>
 </div>
+
+<script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+
+<!-- <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script> -->
+<script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+<script type="text/babel">
+  class ReconcileResultList extends React.Component {
+    constructor(props) {
+      super(props);
+
+      this.state = {
+        confirmed: null,
+        matched: (props.matches[0].match ? props.matches[0] : null),
+        matches: props.matches,
+        show_matches: 3,
+        show_suggest: false
+      };
+      this.selectInput = this.selectInput.bind(this);
+      this.unmatch = this.unmatch.bind(this);
+      this.showMore = this.showMore.bind(this);
+      this.showFewer = this.showFewer.bind(this);
+      this.showSuggest = this.showSuggest.bind(this);
+      this.hideSuggest = this.hideSuggest.bind(this);
+    }
+
+    selectInput(result) {
+      this.setState({matched: result})
+    }
+
+    unmatch(result) {
+      this.setState({matched: null})
+    }
+
+    showMore(e){
+      e.preventDefault();
+      this.setState({show_matches: Math.min(this.state.matches.length, this.state.show_matches + 3)})
+    }
+
+    showFewer(e){
+      e.preventDefault();
+      this.setState({show_matches: Math.max(this.state.show_matches - 3, 3)})
+    }
+
+    showSuggest(e){
+      e.preventDefault();
+      this.setState({show_suggest: true})
+    }
+
+    hideSuggest(e){
+      e.preventDefault();
+      this.setState({show_suggest: false})
+    }
+
+    render() {
+      if(this.state.matched){
+        return <MatchedReconcileResult result={this.state.matched} unmatch={this.unmatch} />;
+      }
+      return (
+        <div title={this.state.matches.length + " results"}>
+          {this.state.matches.map((match, i) =>
+            i < this.state.show_matches &&
+              <ReconcileResult key={i} result={match} selectInput={this.selectInput} />
+          )}
+          <span className="is-size-7">
+            {this.state.matches.length > this.state.show_matches && 
+            <a href="#" onClick={this.showMore}>[more]</a>}
+            {' '}
+            {this.state.show_matches > 3 && 
+            <a href="#" onClick={this.showFewer}>[fewer]</a>}
+            {' '}
+            {this.state.show_suggest && 
+            <a href="#" onClick={this.hideSuggest}>[hide search]</a>}
+            {' '}
+            {!this.state.show_suggest && 
+            <a href="#" onClick={this.showSuggest}>[show search]</a>}
+          </span>
+          {this.state.show_suggest &&
+            <div>
+              <AutoComplete selectInput={this.selectInput} />
+            </div>}
+        </div>
+      );
+    }
+  }
+
+  class MatchedReconcileResult extends React.Component {
+    constructor(props) {
+      super(props);
+      this.unmatch = this.unmatch.bind(this);
+    }
+
+    unmatch(e) {
+      e.preventDefault();
+      this.props.unmatch(this.props.result);
+    }
+
+    render(){
+      return (
+        <div>
+          <span className="tag is-success">Matched</span>
+          {' '}{this.props.result.source.known_as}{' '}
+          (<a href={"/charity/" + this.props.result.id} target="_blank">{this.props.result.id}</a>){' '}
+          <span className="has-text-grey is-size-7">[<a href="#" onClick={this.unmatch} >Unmatch</a>]</span>
+        </div>
+      )
+    }
+  }
+
+  class ReconcileResult extends React.Component {
+    constructor(props) {
+      super(props);
+      this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(e) {
+      this.props.selectInput(this.props.result);
+    }
+
+    render() {
+      return (
+        <div>
+          <label className="is-size-6">
+            <input type="radio" className="reconcile_choice" name="reconcile_choice_" value={this.props.result.id} onChange={this.handleChange} />
+              {' '}{this.props.result.source.known_as}{' '}
+              (<a href={"/charity/" + this.props.result.id} target="_blank">{this.props.result.id}</a>){' '}
+            <span className="has-text-grey is-size-7">[{this.props.result.score}]</span>
+          </label>
+        </div>
+      )
+    }
+  }
+
+  class AutoComplete extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        "results": [],
+        "loading": false,
+        "q": ""
+      }
+      this.handleChange = this.handleChange.bind(this);
+      this.selectInput = this.selectInput.bind(this);
+    }
+    
+    selectInput(e) {
+      e.preventDefault();
+      this.props.selectInput({
+        "id": e.target.closest("a").dataset.value,
+        "source": {
+          "known_as": e.target.closest("a").dataset.label
+        }
+      });
+    }
+
+    handleChange(e) {
+      const element = this;
+      this.setState({"q": e.target.value});
+      if(this.state.q.length > 2){
+        this.setState({"loading": true});
+        fetch(`/autocomplete?q=${this.state.q}`)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(myJson) {
+          element.setState({
+            "results": myJson["results"],
+            "loading": false
+          });
+        });
+      }
+    }
+
+    getHighlightedText(text, highlight) {
+        // Split text on higlight term, include term itself into parts, ignore case
+        // https://stackoverflow.com/questions/29652862/highlight-text-using-reactjs
+        var parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+        return <span>{parts.map((part, i) => part.toLowerCase() === highlight.toLowerCase() ? <b key={i}>{part}</b> : part)}</span>;
+    }
+
+    render() {
+      return (
+        <div className="dropdown is-active" style={ {display: 'block'} }>
+          <div className="dropdown-trigger">
+            <div className={(this.state.loading ? "is-loading" : "") + " control"}>
+              <input className="input is-fullwidth" type="text" onChange={this.handleChange} aria-haspopup="true" aria-controls="dropdown-menu" />
+            </div>
+          </div>
+          { this.state.results.length > 0 && 
+          <div className="dropdown-menu" id="dropdown-menu" role="menu" style={ {width: '100%'} }>
+            <div className="dropdown-content">
+              {this.state.results.map((result, i) =>
+                <React.Fragment key={i}>
+                  {i > 0 && <hr className="dropdown-divider" />}
+                  <a href="#" data-value={result.value} data-label={result.label} className="dropdown-item" onClick={this.selectInput}>
+                    <div className="columns">
+                      <div className="column">{this.getHighlightedText(result.label, this.state.q)}</div>
+                      <div className="column is-italic has-text-grey is-narrow">{result.value}</div>
+                    </div>
+                  </a>
+                </React.Fragment>
+              )}
+            </div>
+          </div>
+          }
+        </div>
+      )
+    }
+  }
+
+  document.querySelectorAll('.reconcile-result').forEach(function(recon_result){
+    var result = JSON.parse(decodeURI(recon_result.dataset.results));
+    ReactDOM.render(
+      <ReconcileResultList matches={result} />,
+      recon_result
+    );
+  })
+</script>
