@@ -25,9 +25,9 @@ export default class AutoComplete extends React.Component {
     handleChange(e) {
         const element = this;
         this.setState({ "q": e.target.value });
-        if (this.state.q.length > 2) {
+        if (e.target.value.length > 2) {
             this.setState({ "loading": true });
-            fetch(`/autocomplete?q=${this.state.q}`)
+            fetch(`/autocomplete?q=${e.target.value}`)
             .then(function (response) {
                 return response.json();
             })

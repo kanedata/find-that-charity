@@ -1,16 +1,49 @@
 import React from "react";
+import {connect} from "react-redux";
+
 import ReconcileResultMatched from "./ReconcileResultMatched"
 import ReconcileResult from "./ReconcileResult"
-import AutoComplete from "./AutoComplete"
+import AutoCompleteReconcile from "./AutoCompleteReconcile"
 
-export default class ReconcileResultList extends React.Component {
+import { match_result, unmatch_result } from "../actions/Actions"
+
+const mapStateToProps = (state, ownProps) => {
+    var row = state.data[ownProps.rowid];
+    var matched = null;
+    var charity_id = row[state.charity_number_field];
+    if(!charity_id){
+        charity_id = ownProps.matches[0].match ? ownProps.matches[0].id : charity_id;
+    }
+
+    if(charity_id){
+        matched = ownProps.matches.find(el => el.id == charity_id );
+        matched = matched ? matched : { 
+            id: charity_id, 
+            source: {
+                known_as: row[state.reconcile_field]
+            }
+        }
+    }
+    return {...ownProps, matched: matched }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        matchResult: (rowid, result) => {
+            dispatch(match_result(rowid, result));
+        },
+        unmatchResult: rowid => {
+            dispatch(unmatch_result(rowid));
+        }
+    }
+}
+
+class ReconcileResultList extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             confirmed: null,
-            matched: (props.matches[0].match ? props.matches[0] : null),
-            matches: props.matches,
             show_matches: 3,
             show_suggest: false,
             show_preview: false
@@ -23,43 +56,17 @@ export default class ReconcileResultList extends React.Component {
         this.hideSuggest = this.hideSuggest.bind(this);
     }
 
-    match_url(){
-        return `/adddata/${this.props.file_id}/match`;
-    }
-
     selectInput(result) {
-        this.setState({ matched: result })
-        var formData = new FormData();
-        formData.append("row", this.props.row);
-        formData.append("match_id", result.id);
-
-        fetch(this.match_url(), {body: formData, method: 'POST'})
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (myJson) {
-            console.log(myJson);
-        });
+        this.props.matchResult(this.props.rowid, result);
     }
 
     unmatch(result) {
-        this.setState({ matched: null });
-        var formData = new FormData();
-        formData.append("row", this.props.row);
-        formData.append("match_id", "");
-
-        fetch(this.match_url(), {body: formData, method: 'POST'})
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (myJson) {
-            console.log(myJson);
-        });
+        this.props.unmatchResult(this.props.rowid);
     }
 
     showMore(e) {
         e.preventDefault();
-        this.setState({ show_matches: Math.min(this.state.matches.length, this.state.show_matches + 3) })
+        this.setState({ show_matches: Math.min(this.props.matches.length, this.state.show_matches + 3) })
     }
 
     showFewer(e) {
@@ -78,19 +85,19 @@ export default class ReconcileResultList extends React.Component {
     }
 
     render() {
-        if (this.state.matched) {
-            return <ReconcileResultMatched result={this.state.matched} unmatch={this.unmatch} />;
+        if (this.props.matched) {
+            return <ReconcileResultMatched result={this.props.matched} unmatch={this.unmatch} />;
         }
         return (
             <div>
-                {this.state.matches.map((match, i) =>
+                {this.props.matches.map((match, i) =>
                     i < this.state.show_matches &&
                     <ReconcileResult key={i} result={match} selectInput={this.selectInput} />
                 )}
                 <span className="is-size-7">
-                    <span className="has-text-grey">{this.state.show_matches + " of " + this.state.matches.length + " results"}</span>
+                    <span className="has-text-grey">{this.state.show_matches + " of " + this.props.matches.length + " results"}</span>
                     {' '}
-                    {this.state.matches.length > this.state.show_matches &&
+                    {this.props.matches.length > this.state.show_matches &&
                         <a href="#" onClick={this.showMore}>[more]</a>}
                     {' '}
                     {this.state.show_matches > 3 &&
@@ -104,9 +111,11 @@ export default class ReconcileResultList extends React.Component {
                 </span>
                 {this.state.show_suggest &&
                     <div>
-                        <AutoComplete selectInput={this.selectInput} />
+                        <AutoCompleteReconcile selectInput={this.selectInput} />
                     </div>}
             </div>
         );
     }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReconcileResultList);

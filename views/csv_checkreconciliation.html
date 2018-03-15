@@ -35,14 +35,14 @@
               <li>Global confirm the best match in all cases (or use filter/threshold)</li>
               <li><s>Select from list (change to confirmed match)</s></li>
               <li><s>Search for an alternative match with textbox (and change to confirmed match if found)</s></li>
-              <li>Preview more info about the charity</li>
+              <li><s>Preview more info about the charity</s></li>
             </ul>
           </li>
         </ul>
+        <div id="reconcile-root">
         <p>
           {{len(file["data"])}} rows in the file.
         </p>
-        <div class="reconcile-summary"></div>
         <table class="table is-striped is-narrow">
           <tr>
           % for h in file["fields"]:
@@ -64,7 +64,7 @@
             % results = file["reconcile_results"][r[file["reconcile_field"]]]["result"]
             % import json
             % import urllib.parse
-            <td class="reconcile-result" data-results="{{ urllib.parse.quote(json.dumps(results), safe='!#$&\'()*+,-./:;=?@_~') }}">
+            <td class="reconcile-result">
               % hide_results = "is-hidden" if results[0]["match"] else ""
               % show_results = "" if results[0]["match"] else "is-hidden"
               <div class="{{show_results}} selected-result">
@@ -100,8 +100,12 @@
         <div class="control">
           <input type="submit" value="Add charity numbers to the data" class="button is-link" />
         </div>
+        </div>
       </form>
     </div>
   </div>
-  <div id="root"></div>
 </div>
+% import json
+<script type="text/javascript">
+const reconcile_data = {{ !json.dumps(file) }};
+</script>

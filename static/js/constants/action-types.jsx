@@ -1,0 +1,3 @@
+export const MATCH_RESULT = "MATCH_RESULT";
+export const UNMATCH_RESULT = "UNMATCH_RESULT";
+export const TOGGLE_FIELD = "TOGGLE_FIELD";

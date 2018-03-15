@@ -43,13 +43,13 @@ export default class ReconcileResultMatched extends React.Component {
                     (<a href={"/charity/" + this.props.result.id} target="_blank">{this.props.result.id}</a>)
                 </span>
                 <span className="field has-addons" style={ {marginBottom: '0px'}}>
-                    <p class="control" style={{ marginBottom: '0px' }}>
+                    <p className="control" style={{ marginBottom: '0px' }}>
                         <a className="button is-small is-link is-outlined" href="#" onClick={this.unmatch} >Unmatch</a>
                     </p>
                     {this.state.show_preview &&
-                        <p class="control" style={{ marginBottom: '0px' }}><a className="button is-small is-link" href="#" onClick={this.hidePreview}>hide preview</a></p>}
+                        <p className="control" style={{ marginBottom: '0px' }}><a className="button is-small is-link" href="#" onClick={this.hidePreview}>hide preview</a></p>}
                     {!this.state.show_preview &&
-                        <p class="control" style={{ marginBottom: '0px' }}><a className="button is-small is-link is-outlined" href="#" onClick={this.showPreview}>preview</a></p>}
+                        <p className="control" style={{ marginBottom: '0px' }}><a className="button is-small is-link is-outlined" href="#" onClick={this.showPreview}>preview</a></p>}
                 </span>
                 {this.state.show_preview &&
                     <ReconcilePreview result={this.props.result.source} id={this.props.result.id} hidePreview={this.hidePreview} />}
