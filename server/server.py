@@ -218,8 +218,38 @@ def charity_preview(regno):
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
         return bottle.template('preview', charity=sort_out_date(res["_source"]), charity_id=res["_id"])
-    else:
-        bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
+    bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
+
+
+@app.route('/orgid/<orgid>.json')
+def orgid_json(orgid):
+    query = {
+        "query": {
+            "match": {
+                "org-ids": {
+                    "query": orgid,
+                    "operator": "and",
+                }
+            }
+        }
+    }
+    res = app.config["es"].search(index=app.config["es_index"],
+                                  doc_type=app.config["es_type"], 
+                                  body=query,
+                                  _source_exclude=["complete_names"],
+                                  ignore=[404])
+    if res.get("hits", {}).get("hits", []):
+        org = res["hits"]["hits"][0]["_source"]
+        org.update({"id": res["hits"]["hits"][0]["_id"]})
+        return org
+    bottle.abort(404, bottle.template(
+        'Orgid {{orgid}} not found.', orgid=orgid))
+
+@app.route('/orgid/<orgid>')
+@app.route('/orgid/<orgid>.html')
+def orgid_html(orgid):
+    org = orgid_json(orgid)
+    bottle.redirect('/charity/{}'.format(org["id"]))
 
 
 @app.route('/about')
