@@ -1,16 +1,17 @@
 from __future__ import print_function
 import os
 import argparse
-import bottle
 import json
 import yaml
-from elasticsearch import Elasticsearch
 from collections import OrderedDict
 import time
 import datetime
-from dateutil import parser
 import csv
 import io
+
+import bottle
+from elasticsearch import Elasticsearch
+from dateutil import parser
 
 app = bottle.default_app()
 
