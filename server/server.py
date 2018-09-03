@@ -8,10 +8,12 @@ import time
 from datetime import datetime, timezone
 import csv
 import io
+from dateutil import parser
+import requests
+from bs4 import BeautifulSoup
 
 import bottle
 from elasticsearch import Elasticsearch
-from dateutil import parser
 import requests
 from bs4 import BeautifulSoup
 
@@ -267,8 +269,93 @@ def charity_preview(regno):
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
         return bottle.template('preview', charity=sort_out_date(res["_source"]), charity_id=res["_id"], hide_title=("hide_title" in bottle.request.params))
+    bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
+
+
+@app.route('/orgid/<orgid>.json')
+def orgid_json(orgid):
+    query = {
+        "query": {
+            "match": {
+                "org-ids": {
+                    "query": orgid,
+                    "operator": "and",
+                }
+            }
+        }
+    }
+    res = app.config["es"].search(index=app.config["es_index"],
+                                  doc_type=app.config["es_type"], 
+                                  body=query,
+                                  _source_exclude=["complete_names"],
+                                  ignore=[404])
+    if res.get("hits", {}).get("hits", []):
+        org = res["hits"]["hits"][0]["_source"]
+        org.update({"id": res["hits"]["hits"][0]["_id"]})
+        return org
+    bottle.abort(404, bottle.template(
+        'Orgid {{orgid}} not found.', orgid=orgid))
+
+@app.route('/orgid/<orgid>')
+@app.route('/orgid/<orgid>.html')
+def orgid_html(orgid):
+    org = orgid_json(orgid)
+    bottle.redirect('/charity/{}'.format(org["id"]))
+
+
+@app.route('/feeds/ccew.<filetype>')
+def ccew_rss(filetype):
+    CCEW_URL = 'http://data.charitycommission.gov.uk/'
+    res = requests.get(CCEW_URL)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    items = []
+    for i in soup.find_all('blockquote'):
+        links = i.find_all('a')
+        idate = parser.parse(
+            i.h4.string.split(", ")[1],
+            default=datetime(2018, 1, 12, 0, 0)
+        ).replace(tzinfo=timezone.utc)
+        items.append({
+            "name": i.h4.string,
+            "date": idate,
+            "link": links[0].get('href'),
+            "author": "Charity Commission for England and Wales",
+        })
+
+    feed_contents = dict(
+        items=items,
+        title='Charity Commission for England and Wales data downloads',
+        description='Downloads available from Charity Commission data downloads page.',
+        url=CCEW_URL,
+        feed_url=bottle.request.url,
+        updated=datetime.now().replace(tzinfo=timezone.utc),
+    )
+
+    if filetype == 'atom':
+        bottle.response.content_type = 'application/atom+xml'
+        template = 'atom.xml'
+    elif filetype == "json":
+        bottle.response.content_type = 'application/json'
+        return {
+            "version": "https://jsonfeed.org/version/1",
+            "title": feed_contents["title"],
+            "home_page_url": feed_contents["url"],
+            "feed_url": feed_contents["feed_url"],
+            "description": feed_contents["description"],
+            "items": [
+                {
+                    "id": item["link"],
+                    "url": item["link"],
+                    "title": item["name"],
+                    "date_published": item["date"].isoformat(),
+                } for item in items
+            ]
+        }
     else:
-        bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
+        bottle.response.content_type = 'application/rss+xml'
+        template = 'rss.xml'
+
+    return bottle.template(template, **feed_contents)
 
 
 @app.route('/about')
