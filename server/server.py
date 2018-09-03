@@ -5,13 +5,15 @@ import json
 import yaml
 from collections import OrderedDict
 import time
-import datetime
+from datetime import datetime, timezone
 import csv
 import io
 
 import bottle
 from elasticsearch import Elasticsearch
 from dateutil import parser
+import requests
+from bs4 import BeautifulSoup
 
 app = bottle.default_app()
 
@@ -271,7 +273,7 @@ def charity_preview(regno):
 
 @app.route('/about')
 def about():
-    return bottle.template('about', this_year=datetime.datetime.now().year)
+    return bottle.template('about', this_year=datetime.now().year)
 
 
 @app.route('/autocomplete')
@@ -299,6 +301,60 @@ def autocomplete():
             "value": x["_id"]
         } for x in res.get("suggest", {}).get("suggest-1", [])[0]["options"]
     ]}
+
+@app.route('/feeds/ccew.<filetype>')
+def ccew_rss(filetype):
+    CCEW_URL = 'http://data.charitycommission.gov.uk/'
+    res = requests.get(CCEW_URL)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    items = []
+    for i in soup.find_all('blockquote'):
+        links = i.find_all('a')
+        idate = parser.parse(
+                i.h4.string.split(", ")[1],
+                default=datetime(2018, 1, 12, 0, 0)
+            ).replace(tzinfo=timezone.utc)
+        items.append({
+            "name": i.h4.string,
+            "date": idate,
+            "link": links[0].get('href'),
+            "author": "Charity Commission for England and Wales",
+        })
+
+    feed_contents = dict(
+        items=items, 
+        title='Charity Commission for England and Wales data downloads',
+        description='Downloads available from Charity Commission data downloads page.',
+        url=CCEW_URL,
+        feed_url=bottle.request.url,
+        updated=datetime.now().replace(tzinfo=timezone.utc),
+    )
+
+    if filetype=='atom':
+        bottle.response.content_type = 'application/atom+xml'
+        template='atom.xml'
+    if filetype=="json":
+        bottle.response.content_type = 'application/json'
+        return {
+            "version": "https://jsonfeed.org/version/1",
+            "title": feed_contents["title"],
+            "home_page_url": feed_contents["url"],
+            "feed_url": feed_contents["feed_url"],
+            "description": feed_contents["description"],
+            "items": [
+                {
+                    "id": item["link"],
+                    "url": item["link"],
+                    "title": item["name"],
+                    "date_published": item["date"].isoformat(),
+                } for item in items
+            ]
+        }
+    else:
+        bottle.response.content_type = 'application/rss+xml'
+        template='rss.xml'
+
+    return bottle.template(template, **feed_contents)
 
 
 def get_csv_options():
@@ -348,7 +404,7 @@ def uploadcsv_post():
         "ext": ext,
         "fields": [],
         "reconcile_field": None,
-        "uploaded": datetime.datetime.now(),
+        "uploaded": datetime.now(),
         "size": upload.content_length,
         "type": upload.content_type,
     }
