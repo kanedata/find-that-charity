@@ -65,6 +65,7 @@
             % import json
             % import urllib.parse
             <td class="reconcile-result">
+              % if results:
               % hide_results = "is-hidden" if results[0]["match"] else ""
               % show_results = "" if results[0]["match"] else "is-hidden"
               <div class="{{show_results}} selected-result">
@@ -91,6 +92,7 @@
                 <br>
               % end
               </div>
+              % end
             </td>
             % end
           % end

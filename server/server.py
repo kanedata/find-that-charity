@@ -8,17 +8,18 @@ import json
 from collections import OrderedDict
 import time
 from datetime import datetime, timezone
-import csv
-import io
 
 from dateutil import parser
-import yaml
 import bottle
 from elasticsearch import Elasticsearch
 import requests
 from bs4 import BeautifulSoup
 
+from queries import search_query, recon_query, service_spec, esdoc_orresponse
+from csv_upload import csv_app
+
 app = bottle.default_app()
+app.merge(csv_app)
 
 # everywhere gives a different env var for elasticsearch services...
 POTENTIAL_ENV_VARS = [
@@ -39,118 +40,7 @@ if os.environ.get("GA_TRACKING_ID"):
 if os.environ.get("ADMIN_PASSWORD"):
     app.config["admin_password"] = os.environ.get("ADMIN_PASSWORD")
 
-
-app.config["csv_options"] = {
-    "file_encoding": ("File encoding", {
-        "utf8": "UTF-8",
-        "utf16": "UTF-16",
-        "ascii": "ASCII",
-        "latin1": "latin1"
-    }),
-    "delimiter": ("CSV Field delimiter", {
-        ",": ", (comma)",
-        ";": "; (semi-colon)",
-        "\t": "Tab-delimited",
-        "|": "| (pipe)",
-        "^": "^ (caret)",
-    }),
-    "quotechar": ("Quote Character", {
-        "\"": '" (double quote)',
-        "'": "' (single quote)",
-        "~": "~ (tilde)",
-    }),
-    "escapechar": ("Escape Character", {
-        "": 'No escape character',
-        "\\": '\\ (backslash)',
-    }),
-    "doublequote": ("Double quoting", {
-        "1": 'Doubled quoting',
-        "0": 'No double quoting',
-    }),
-    "quoting": ("When quotes are used", {
-        csv.QUOTE_MINIMAL: "Only when special characters used",
-        csv.QUOTE_ALL: "All fields quoted",
-        csv.QUOTE_NONNUMERIC: "All non-numeric fields quoted",
-        csv.QUOTE_NONE: "No fields quoted",
-    })
-}
-
-def search_query(term):
-    """
-    Fetch the search query and insert the query term
-    """
-    with open('./es_config.yml', 'rb') as yaml_file:
-        json_q = yaml.load(yaml_file)
-        for param in json_q["params"]:
-            json_q["params"][param] = term
-        return json.dumps(json_q)
-
-
-def recon_query(term):
-    """
-    Fetch the reconciliation query and insert the query term
-    """
-    with open('./recon_config.yml', 'rb') as yaml_file:
-        json_q = yaml.load(yaml_file)
-        for param in json_q["params"]:
-            json_q["params"][param] = term
-        return json.dumps(json_q)
-
-
-def esdoc_orresponse(query):
-    """Decorate the elasticsearch document to the OpenRefine response API
-
-    Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
-    """
-    res = app.config["es"].search_template(
-        index=app.config["es_index"],
-        doc_type=app.config["es_type"],
-        body=query,
-        ignore=[404]
-    )
-    res["hits"]["result"] = res["hits"].pop("hits")
-    for i in res["hits"]["result"]:
-        i["id"] = i.pop("_id")
-        i["type"] = [i.pop("_type")]
-        i["score"] = i.pop("_score")
-        i["index"] = i.pop("_index")
-        i["source"] = i.pop("_source")
-        i["name"] = i["source"]["known_as"] + " (" + i["id"] + ")"
-        if not i["source"]["active"]:
-            i["name"] += " [INACTIVE]"
-        if i["source"]["known_as"].lower() == json.loads(query)["params"]["name"].lower() and i["score"] == res["hits"]["max_score"]:
-            i["match"] = True
-        else:
-            i["match"] = False
-    return res["hits"]
-
-
-def service_spec():
-    """Return the default service specification
-
-    Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
-    """
-    service_url = "{}://{}".format(
-        bottle.request.urlparts.scheme,
-        bottle.request.urlparts.netloc,
-    )
-    return {
-        "name": app.config["es_index"],
-        "identifierSpace": "http://rdf.freebase.com/ns/type.object.id",
-        "schemaSpace": "http://rdf.freebase.com/ns/type.object.id",
-        "view": {
-            "url": service_url + "/charity/{{id}}"
-        },
-        "preview": {
-            "url": service_url + "/preview/charity/{{id}}",
-            "width": 430,
-            "height": 300
-        },
-        "defaultTypes": [{
-            "id": "/" + app.config["es_type"],
-            "name": app.config["es_type"]
-        }]
-    }
+csv_app.config.update(app.config)
 
 
 def search_return(query):
@@ -168,11 +58,6 @@ def search_return(query):
         result["_link"] = "/charity/" + result["_id"]
         result["_source"] = sort_out_date(result["_source"])
     return bottle.template('search', res=res, term=json.loads(query)["params"]["name"])
-
-
-def check_password(_, passwd):
-    if passwd == app.config["admin_password"]:
-        return True
 
 
 @app.route('/')
@@ -237,17 +122,22 @@ def reconcile():
     query = recon_query(bottle.request.query.query) or None
     queries = bottle.request.params.queries or None
 
+    service_url = "{}://{}".format(
+        bottle.request.urlparts.scheme,
+        bottle.request.urlparts.netloc,
+    )
+
     # if we're doing a callback request then do that
     if bottle.request.query.callback:
         if bottle.request.query.query:
             bottle.response.content_type = "application/javascript"
-            return "%s(%s)" % (bottle.request.query.callback, esdoc_orresponse(query))
+            return "%s(%s)" % (bottle.request.query.callback, esdoc_orresponse(query, app))
         else:
-            return "%s(%s)" % (bottle.request.query.callback, service_spec())
+            return "%s(%s)" % (bottle.request.query.callback, service_spec(app, service_url))
 
     # try fetching the query as json data or a string
     if bottle.request.query.query:
-        return esdoc_orresponse(query)
+        return esdoc_orresponse(query, app)
 
     if queries:
         queries_json = json.loads(queries)
@@ -259,13 +149,13 @@ def reconcile():
             query_id = "q" + str(counter)
             # print(queries_json[q], queries_json[q]["query"])
             result = esdoc_orresponse(recon_query(
-                queries_json[query_id]["query"]))["result"]
+                queries_json[query_id]["query"]), app)["result"]
             results.update({query_id: {"result": result}})
             counter += 1
         return results
 
     # otherwise just return the service specification
-    return service_spec()
+    return service_spec(app, service_url)
 
 
 @app.route('/charity/<regno>')
@@ -402,6 +292,9 @@ def about():
 
 @app.route('/autocomplete')
 def autocomplete():
+    """
+    Endpoint for autocomplete queries
+    """
     search = bottle.request.params.q
     doc = {
         "suggest": {
@@ -427,182 +320,10 @@ def autocomplete():
     ]}
 
 
-def get_csv_options():
-    # work out CSV options
-    csv_options = {}
-    for o, v in app.config["csv_options"].items():
-        values = [v for v in v[1]]
-        csv_options[o] = values[0]
-        if o in bottle.request.forms:
-            if bottle.request.forms[o] in values:
-                csv_options[o] = bottle.request.forms[o]
-
-    if csv_options["escapechar"] == "":
-        csv_options["escapechar"] = None
-    csv_options["doublequote"] = csv_options["doublequote"] == 1
-
-    return csv_options
-
-
-@app.get('/adddata')
-def uploadcsv():
-    return bottle.template('csv_upload', error=None,
-                           csv_max_rows=app.config["max_csv_rows"],
-                           csv_options=app.config["csv_options"])
-
-@app.post('/adddata')
-def uploadcsv_post():
-    upload = bottle.request.files.get('uploadcsv')
-
-    if not upload:
-        return bottle.template('csv_upload',
-                               error="No file attached.",
-                               csv_max_rows=app.config["max_csv_rows"],
-                               csv_options=app.config["csv_options"])
-
-    _, ext = os.path.splitext(upload.filename)
-    if ext not in ('.csv', '.tsv', '.txt'):
-        return bottle.template('csv_upload',
-                               error="File extension \"{}\" not allowed".format(ext),
-                               csv_max_rows=app.config["max_csv_rows"],
-                               csv_options=app.config["csv_options"])
-
-    # Select encoding and other CSV options
-
-    # - store the CSV data somewhere (elasticsearch?)
-    filedata = {
-        "data": [],
-        "name": upload.filename,
-        "ext": ext,
-        "fields": [],
-        "reconcile_field": None,
-        "uploaded": datetime.now(),
-        "size": upload.content_length,
-        "type": upload.content_type,
-    }
-
-    # work out CSV options
-    csv_options = get_csv_options()
-
-    filedata["file_encoding"] = csv_options["file_encoding"]
-    del csv_options["file_encoding"]
-    filedata["csvoptions"] = csv_options
-
-    fileinput = io.TextIOWrapper(upload.file, encoding=filedata["file_encoding"])
-    reader = csv.DictReader(fileinput, **filedata["csvoptions"])
-    for k, r in enumerate(reader):
-        # Limit on file size
-        if k > app.config["max_csv_rows"]:
-            return bottle.template('csv_upload',
-                                   error="File too big (more than {} rows)".format(app.config["max_csv_rows"]),
-                                   csv_max_rows=app.config["max_csv_rows"],
-                                   csv_options=app.config["csv_options"])
-        filedata["data"].append(r)
-    filedata["fields"] = reader.fieldnames
-    res = app.config["es"].index(index=app.config["es_index"], doc_type="csv_data", body=filedata)
-
-    # - redirect to page with unique ID for dataset
-    bottle.redirect('/adddata/{}'.format(res["_id"]))
-
-@app.get('/adddata/<fileid>')
-def uploadcsv_existing(fileid):
-    # - select column you want to reconcile
-    # - select any other columns you want to show
-    # - present reconciliation choices
-    # - download the resulting CSV file
-
-    # allow option to delete file
-    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
-    return bottle.template('csv_findfield', file=res["_source"], fileid=fileid)
-
-@app.post('/adddata/<fileid>')
-def uploadcsv_existing_post(fileid):
-    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
-    reconcile_field = bottle.request.forms.get("reconcile_field", res["_source"]["reconcile_field"])
-    charity_number_field = bottle.request.forms.get(
-        "charity_number_field",
-        res["_source"].get("charity_number_field","charity_number")
-    )
-    res["_source"]["reconcile_field"] = reconcile_field
-    res["_source"]["charity_number_field"] = charity_number_field
-    results = []
-
-    to_reconcile = [r[reconcile_field] for r in res["_source"]["data"]]
-
-    for r in to_reconcile:
-        response = esdoc_orresponse(recon_query(r))
-        response["query"] = r
-        results.append(response)
-
-    res["_source"]["reconcile_results"] = results
-
-    res = app.config["es"].index(index=app.config["es_index"], doc_type="csv_data", id=res["_id"], body=res["_source"])
-    bottle.redirect('/adddata/{}/reconcile'.format(res["_id"]))
-
-@app.get('/adddata/<fileid>/reconcile')
-def uploadcsv_results(fileid):
-    # - select column you want to reconcile
-    # - select any other columns you want to show
-    # - present reconciliation choices
-    # - download the resulting CSV file
-
-    # allow option to delete file
-    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
-    res["_source"]["reconcile_results"] = {
-        r["query"]: r for r in res["_source"]["reconcile_results"]
-    }
-
-    return bottle.template('csv_checkreconciliation', file=res["_source"], fileid=fileid)
-
-@app.post('/adddata/<fileid>/match')
-def adddata_matched(fileid):
-    # @TODO: add origin confirmation so that it can't be changed by itself.
-    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
-    row = int(bottle.request.params.get("row"))
-    match_id = bottle.request.params.get("match_id")
-    field_name = res["_source"].get("charity_number_field", "charity_number")
-    unmatch = "unmatch" in bottle.request.params
-    if match_id == "":
-        unmatch = True
-    res["_source"]["charity_number_field"] = field_name
-
-    for i, v in enumerate(res["_source"]["data"]):
-        if i == row:
-            v[field_name] = None if unmatch else match_id
-        else:
-            v[field_name] = None
-
-    res = app.config["es"].index(
-        index=app.config["es_index"], doc_type="csv_data", id=res["_id"], body=res["_source"])
-    return res
-
-
-@app.get('/adddata/<fileid>/reconcile.csv')
-def uploadcsv_results_csv(fileid):
-    # - download the resulting CSV file
-    res = app.config["es"].get(index=app.config["es_index"], doc_type="csv_data", id=fileid)
-    reconcile_field = res["_source"]["reconcile_field"]
-
-    output = io.StringIO()
-    csv_writer = csv.DictWriter(output, fieldnames=res["_source"]["fields"] + ["reconcile_result"])
-    csv_writer.writeheader()
-    for r in res["_source"]["data"]:
-        r["reconcile_result"] = res["_source"]["reconcile_results"][r[reconcile_field]]["result"][0]["id"]
-        csv_writer.writerow(r)
-
-    bottle.response.set_header("Content-Type", "text/csv")
-    return output.getvalue()
-
-@app.get('/admin/uploaded-files')
-@bottle.auth_basic(check_password)
-def uploadcsv_see_files():
-    doc = {'size' : 10000, 'query': {'match_all' : {}}, "sort": [{"uploaded": "desc"}]}
-    res = app.config["es"].search(index=app.config["es_index"], doc_type="csv_data", body=doc)
-    return bottle.template('uploaded_files', files=res["hits"]["hits"])
-
-
 @app.route('/static/<filename:path>')
 def send_static(filename):
+    """ Fetch static files
+    """
     return bottle.static_file(filename, root='static')
 
 
@@ -635,7 +356,7 @@ def main():
     parser_args.add_argument('--server', default="auto", help='Server backend to use (see http://bottlepy.org/docs/dev/deployment.html#switching-the-server-backend)')
 
     # http auth
-    parser.add_argument('--admin-password', help='Password for accessing admin pages')
+    parser_args.add_argument('--admin-password', help='Password for accessing admin pages')
 
     # elasticsearch options
     parser_args.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
@@ -658,9 +379,9 @@ def main():
     app.config["es_index"] = args.es_index
     app.config["es_type"] = args.es_type
     app.config["ga_tracking_id"] = args.ga_tracking_id
-    app.config["max_csv_rows"] = 1000
     app.config["admin_password"] = args.admin_password
 
+    csv_app.config.update(app.config)
     bottle.debug(args.debug)
 
     bottle.run(app, server=args.server, host=args.host, port=args.port, reloader=args.debug)
