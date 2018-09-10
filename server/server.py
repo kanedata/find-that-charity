@@ -1,11 +1,14 @@
+"""
+Run the find that charity server
+"""
 from __future__ import print_function
 import os
 import argparse
 import json
-import yaml
 from collections import OrderedDict
 import time
 from datetime import datetime, timezone
+import yaml
 from dateutil import parser
 
 import bottle
@@ -16,12 +19,12 @@ from bs4 import BeautifulSoup
 app = bottle.default_app()
 
 # everywhere gives a different env var for elasticsearch services...
-potential_env_vars = [
+POTENTIAL_ENV_VARS = [
     "ELASTICSEARCH_URL",
     "ES_URL",
     "BONSAI_URL"
 ]
-for e_v in potential_env_vars:
+for e_v in POTENTIAL_ENV_VARS:
     if os.environ.get(e_v):
         app.config["es"] = Elasticsearch(os.environ.get(e_v))
         app.config["es_index"] = 'charitysearch'
@@ -32,18 +35,24 @@ if os.environ.get("GA_TRACKING_ID"):
     app.config["ga_tracking_id"] = os.environ.get("GA_TRACKING_ID")
 
 def search_query(term):
+    """
+    Fetch the search query and insert the query term
+    """
     with open('./es_config.yml', 'rb') as yaml_file:
         json_q = yaml.load(yaml_file)
-        for p in json_q["params"]:
-            json_q["params"][p] = term
+        for param in json_q["params"]:
+            json_q["params"][param] = term
         return json.dumps(json_q)
 
 
 def recon_query(term):
+    """
+    Fetch the reconciliation query and insert the query term
+    """
     with open('./recon_config.yml', 'rb') as yaml_file:
         json_q = yaml.load(yaml_file)
-        for p in json_q["params"]:
-            json_q["params"][p] = term
+        for param in json_q["params"]:
+            json_q["params"][param] = term
         return json.dumps(json_q)
 
 
@@ -104,7 +113,15 @@ def service_spec():
 
 
 def search_return(query):
-    res = app.config["es"].search_template(index=app.config["es_index"], doc_type=app.config["es_type"], body=query, ignore=[404])
+    """
+    Fetch search results and display on a template
+    """
+    res = app.config["es"].search_template(
+        index=app.config["es_index"],
+        doc_type=app.config["es_type"],
+        body=query,
+        ignore=[404]
+    )
     res = res["hits"]
     for result in res["hits"]:
         result["_link"] = "/charity/" + result["_id"]
@@ -114,6 +131,9 @@ def search_return(query):
 
 @app.route('/')
 def home():
+    """
+    Get the index page for the site
+    """
     query = bottle.request.query.get('q')
     if query:
         query = search_query(query)
@@ -124,21 +144,21 @@ def home():
 @app.route('/random')
 @app.route('/random.<filetype>')
 def random(filetype="html"):
-    """ Get a random charity record 
+    """ Get a random charity record
     """
     query = {
-            "size": 1,
-            "query": {
-                "function_score": {
-                    "functions": [
-                        {
-                            "random_score": {
-                                "seed": str(time.time())
-                            }
+        "size": 1,
+        "query": {
+            "function_score": {
+                "functions": [
+                    {
+                        "random_score": {
+                            "seed": str(time.time())
                         }
-                    ]
-                }
+                    }
+                ]
             }
+        }
     }
 
     if "active" in bottle.request.query:
@@ -154,12 +174,11 @@ def random(filetype="html"):
     if "hits" in res:
         if "hits" in res["hits"]:
             char = res["hits"]["hits"][0]
-    
+
     if char:
-        if filetype=="html":
+        if filetype == "html":
             bottle.redirect("/charity/{}".format(char["_id"]))
-        else:
-            return char["_source"]
+        return char["_source"]
 
 
 
@@ -191,10 +210,11 @@ def reconcile():
         results = {}
         counter = 0
         for query in queries_dict:
-            q = "q" + str(counter)
+            query_id = "q" + str(counter)
             # print(queries_json[q], queries_json[q]["query"])
-            result = esdoc_orresponse(recon_query(queries_json[q]["query"]))["result"]
-            results.update({q: {"result": result}})
+            result = esdoc_orresponse(recon_query(
+                queries_json[query_id]["query"]))["result"]
+            results.update({query_id: {"result": result}})
             counter += 1
         return results
 
@@ -205,12 +225,14 @@ def reconcile():
 @app.route('/charity/<regno>')
 @app.route('/charity/<regno>.<filetype>')
 def charity(regno, filetype='html'):
+    """
+    Return a single charity record
+    """
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
         if filetype == "html":
             return bottle.template('charity', charity=sort_out_date(res["_source"]), charity_id=res["_id"])
-        else:
-            return res["_source"]
+        return res["_source"]
     else:
         bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
 
@@ -218,6 +240,11 @@ def charity(regno, filetype='html'):
 @app.route('/preview/charity/<regno>')
 @app.route('/preview/charity/<regno>.html')
 def charity_preview(regno):
+    """
+    Small version of charity record
+
+    Used in reconciliation API
+    """
     res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
     if "_source" in res:
         return bottle.template('preview', charity=sort_out_date(res["_source"]), charity_id=res["_id"])
@@ -226,6 +253,9 @@ def charity_preview(regno):
 
 @app.route('/orgid/<orgid>.json')
 def orgid_json(orgid):
+    """
+    Fetch json representation based on a org-id for a record
+    """
     query = {
         "query": {
             "match": {
@@ -237,7 +267,7 @@ def orgid_json(orgid):
         }
     }
     res = app.config["es"].search(index=app.config["es_index"],
-                                  doc_type=app.config["es_type"], 
+                                  doc_type=app.config["es_type"],
                                   body=query,
                                   _source_exclude=["complete_names"],
                                   ignore=[404])
@@ -251,14 +281,21 @@ def orgid_json(orgid):
 @app.route('/orgid/<orgid>')
 @app.route('/orgid/<orgid>.html')
 def orgid_html(orgid):
+    """
+    Redirect to a record based on the org-id
+    """
     org = orgid_json(orgid)
     bottle.redirect('/charity/{}'.format(org["id"]))
 
 
 @app.route('/feeds/ccew.<filetype>')
 def ccew_rss(filetype):
-    CCEW_URL = 'http://data.charitycommission.gov.uk/'
-    res = requests.get(CCEW_URL)
+    """
+    Get an RSS feed based on when data is
+    uploaded by the Charity Commission
+    """
+    ccew_url = 'http://data.charitycommission.gov.uk/'
+    res = requests.get(ccew_url)
     soup = BeautifulSoup(res.text, 'html.parser')
     items = []
     for i in soup.find_all('blockquote'):
@@ -278,7 +315,7 @@ def ccew_rss(filetype):
         items=items,
         title='Charity Commission for England and Wales data downloads',
         description='Downloads available from Charity Commission data downloads page.',
-        url=CCEW_URL,
+        url=ccew_url,
         feed_url=bottle.request.url,
         updated=datetime.now().replace(tzinfo=timezone.utc),
     )
@@ -312,41 +349,50 @@ def ccew_rss(filetype):
 
 @app.route('/about')
 def about():
+    """About page
+    """
     return bottle.template('about', this_year=datetime.now().year)
 
 
-def sort_out_date(charity):
-    dates = ["date_registered", "date_removed", "last_modified"]
-    for d in dates:
-        if d in charity and charity[d]:
+def sort_out_date(charity_record):
+    """
+    parse date fields in a charity record
+    """
+    date_fields = ["date_registered", "date_removed", "last_modified"]
+    for date_field in date_fields:
+        if charity_record.get(date_field):
             try:
-                charity[d] = parser.parse(charity[d])
+                charity_record[date_field] = parser.parse(
+                    charity_record[date_field])
             except ValueError:
                 pass
-    return charity
+    return charity_record
 
 
 def main():
+    """
+    Run the server (command line version)
+    """
 
-    parser = argparse.ArgumentParser(description='')  # @TODO fill in
+    parser_args = argparse.ArgumentParser(description='')  # @TODO fill in
 
     # server options
-    parser.add_argument('-host', '--host', default="localhost", help='host for the server')
-    parser.add_argument('-p', '--port', default=8080, help='port for the server')
-    parser.add_argument('--debug', action='store_true', dest="debug", help='Debug mode (autoreloads the server)')
-    parser.add_argument('--server', default="auto", help='Server backend to use (see http://bottlepy.org/docs/dev/deployment.html#switching-the-server-backend)')
+    parser_args.add_argument('-host', '--host', default="localhost", help='host for the server')
+    parser_args.add_argument('-p', '--port', default=8080, help='port for the server')
+    parser_args.add_argument('--debug', action='store_true', dest="debug", help='Debug mode (autoreloads the server)')
+    parser_args.add_argument('--server', default="auto", help='Server backend to use (see http://bottlepy.org/docs/dev/deployment.html#switching-the-server-backend)')
 
     # elasticsearch options
-    parser.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
-    parser.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
-    parser.add_argument('--es-url-prefix', default='', help='Elasticsearch url prefix')
-    parser.add_argument('--es-use-ssl', action='store_true', help='Use ssl to connect to elasticsearch')
-    parser.add_argument('--es-index', default='charitysearch', help='index used to store charity data')
-    parser.add_argument('--es-type', default='charity', help='type used to store charity data')
+    parser_args.add_argument('--es-host', default="localhost", help='host for the elasticsearch instance')
+    parser_args.add_argument('--es-port', default=9200, help='port for the elasticsearch instance')
+    parser_args.add_argument('--es-url-prefix', default='', help='Elasticsearch url prefix')
+    parser_args.add_argument('--es-use-ssl', action='store_true', help='Use ssl to connect to elasticsearch')
+    parser_args.add_argument('--es-index', default='charitysearch', help='index used to store charity data')
+    parser_args.add_argument('--es-type', default='charity', help='type used to store charity data')
 
-    parser.add_argument('--ga-tracking-id', help='Google Analytics Tracking ID')
+    parser_args.add_argument('--ga-tracking-id', help='Google Analytics Tracking ID')
 
-    args = parser.parse_args()
+    args = parser_args.parse_args()
 
     app.config["es"] = Elasticsearch(
         host=args.es_host,
