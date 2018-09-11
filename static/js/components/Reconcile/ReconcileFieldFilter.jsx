@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { toggle_field } from "../actions/Actions"
+import { toggle_field } from "../../actions/Actions"
 
 const mapStateToProps = (state) => {
     return {

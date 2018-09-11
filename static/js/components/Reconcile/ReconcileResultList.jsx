@@ -3,9 +3,9 @@ import {connect} from "react-redux";
 
 import ReconcileResultMatched from "./ReconcileResultMatched"
 import ReconcileResult from "./ReconcileResult"
-import AutoCompleteReconcile from "./AutoCompleteReconcile"
+import AutoCompleteReconcile from "../AutoComplete/Reconcile"
 
-import { match_result, unmatch_result } from "../actions/Actions"
+import { match_result, unmatch_result } from "../../actions/Actions"
 
 const mapStateToProps = (state, ownProps) => {
     var row = state.data[ownProps.rowid];

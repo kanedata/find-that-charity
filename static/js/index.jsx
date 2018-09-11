@@ -3,8 +3,8 @@ import ReactDOM from "react-dom";
 import { createStore } from "redux";
 import { Provider } from "react-redux";
 
-import AutoCompleteSearch from "./components/AutoCompleteSearch";
-import ReconcileApp from "./components/ReconcileApp";
+import AutoCompleteSearch from "./components/AutoComplete/Search";
+import ReconcileApp from "./components/Reconcile/App";
 import rootReducer from "./reducers/Reducer";
 
 require('../../node_modules/bulma/css/bulma.css');
@@ -22,8 +22,9 @@ if(search_form){
 
 const reconcile_app = document.querySelector("#reconcile-root");
 if(reconcile_app){
-    reconcile_data.hidden_fields = [];
-    var store = createStore(rootReducer, reconcile_data);
+    // reconcile_data.hidden_fields = [];
+    // var store = createStore(rootReducer, reconcile_data);
+    var store = createStore(rootReducer);
     ReactDOM.render(
         <Provider store={store}>
             <ReconcileApp />

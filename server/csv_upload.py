@@ -79,7 +79,7 @@ def uploadcsv():
     """
     Form for uploading CSV
     """
-    return bottle.template('csv_upload', error=None,
+    return bottle.template('csv_tool', error=None,
                            csv_max_rows=csv_app.config["max_csv_rows"],
                            csv_options=csv_app.config["csv_options"])
 
