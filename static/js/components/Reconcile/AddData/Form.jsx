@@ -59,6 +59,7 @@ class ReconcileAddData extends React.Component {
         this.setState({
             loading: true,
             maxProgress: charity_numbers.size,
+            currentProgress: 0,
         })
 
         let comp = this;
@@ -154,18 +155,20 @@ class ReconcileAddData extends React.Component {
                     </div>
                 </div>
                 <div className="column">
+                    {this.state.loading && 
                     <div>
                         <h2>Progress</h2>
-                        <div>Current progress: {this.state.currentProgress}</div>
+                        {/* <div>Current progress: {this.state.currentProgress}</div>
                         <div>Max progress: {this.state.maxProgress}</div>
-                        <div>Loading: {this.state.loading}</div>
-                        <progress class="progress is-large is-primary" 
+                        <div>Loading: {this.state.loading}</div> */}
+                        <progress className="progress is-large is-primary" 
                             value={this.state.currentProgress} 
                             max={this.state.maxProgress}>
                             {this.state.currentProgress}
                         </progress>
                         {/* @TODO Better progress indicator here */}
                     </div>
+                    }
                 </div>
             </div>
         )
