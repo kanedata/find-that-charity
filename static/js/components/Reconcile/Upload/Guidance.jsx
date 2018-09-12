@@ -16,12 +16,17 @@ class Guidance extends React.Component {
                     Use this form to add more data to a CSV containing data about charities. 
                     Your file will need to contain charity numbers for these charities.
                 </p>
-                <p>
-                    Your data file won't leave your computer, although the names and charity
-                    numbers of charities in your file will be sent as web requests to findthatcharity.uk.
-                    These web requests may be stored in logs on the find that charity server, but
-                    no other information about your file will be stored.
-                </p>
+                <article className="message is-warning">
+                    <div className="message-header">
+                        Data protection
+                    </div>
+                    <div className="message-body">
+                        Your data file won't leave your computer, although the names and charity
+                        numbers of charities in your file will be sent as web requests to findthatcharity.uk.
+                        These web requests may be stored in logs on the find that charity server, but
+                        no other information about your file will be stored.
+                    </div>
+                </article>
             </React.Fragment>
         )
     }

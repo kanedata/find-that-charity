@@ -1,5 +1,5 @@
-import { MATCH_RESULT, UNMATCH_RESULT, TOGGLE_FIELD, SET_DATA, SET_STAGE, SET_FILE, 
-    ADD_CHARITY_NUMBERS, ADD_ORG_RECORD, SET_FIELD_NAMES, SET_FIELDS_TO_ADD } from "../constants/action-types";
+import { SET_DATA, SET_STAGE, SET_FILE, ADD_CHARITY_NUMBERS, 
+    ADD_ORG_RECORD, SET_FIELD_NAMES, SET_FIELDS_TO_ADD } from "../constants/action-types";
 
 const initialState = {
     stage: 'upload',
@@ -35,6 +35,7 @@ const rootReducer = (state = initialState, action) => {
                 fields: action.payload.fields,
             }
         case SET_STAGE:
+            console.log(action.payload);
             return { 
                 ...state, 
                 stage: action.payload

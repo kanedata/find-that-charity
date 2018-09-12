@@ -1,0 +1,8 @@
+table.preview-table td > div {
+    max-height: '40px';
+    overflow-y: 'hidden';
+}
+
+.column.no-overflow {
+    overflow: hidden;
+}

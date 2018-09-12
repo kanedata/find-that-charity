@@ -11,6 +11,7 @@ require('../../node_modules/bulma/css/bulma.css');
 require('../../node_modules/font-awesome/css/font-awesome.min.css');
 require('../../node_modules/bulma-steps/dist/bulma-steps.min.css');
 require('../../node_modules/bulma-quickview/dist/bulma-quickview.min.css');
+require('../css/styles.css');
 
 const search_form = document.querySelector('#search-autocomplete')
 if(search_form){

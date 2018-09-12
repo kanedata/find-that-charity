@@ -3,10 +3,9 @@ import { connect } from "react-redux";
 import file_download from 'js-file-download';
 import Papa from 'papaparse'
 
-import { add_charity_numbers, add_org_record } from "../../../actions/Actions"
+import { add_charity_numbers, add_org_record, set_stage } from "../../../actions/Actions"
 import FieldSelector from "./FieldSelector";
 import FieldsToAdd from "./FieldsToAdd";
-import { potentialFieldsToAdd } from "./FieldsToAdd";
 
 const mapStateToProps = (state) => {
     return { 
@@ -18,8 +17,7 @@ const mapStateToProps = (state) => {
         charity_numbers: state.charity_numbers,
         fields_to_add: state.fields_to_add,
         org_data: state.org_data,
-        progress: state.progress,
-        loading: state.loading,
+        stage: state.stage,
     };
 };
 
@@ -32,12 +30,20 @@ const mapDispatchToProps = dispatch => {
         addOrgRecord: (charity_number, record) => {
             dispatch(add_org_record(charity_number, record))
         },
+        setStage: stage => {
+            dispatch(set_stage(stage))
+        },
     }
 }
 
 class ReconcileAddData extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            loading: false,
+            maxProgress: 1,
+            currentProgress: 0,
+        }
         this.processCharity = this.processCharity.bind(this);
         this.fetchData = this.fetchData.bind(this);
     }
@@ -50,6 +56,10 @@ class ReconcileAddData extends React.Component {
         // based on the charity number field that has been selected
         let charity_numbers = this.getCharityNumbers();
         this.props.addCharityNumbers(charity_numbers);
+        this.setState({
+            loading: true,
+            maxProgress: charity_numbers.size,
+        })
 
         let comp = this;
         if(charity_numbers){
@@ -72,38 +82,15 @@ class ReconcileAddData extends React.Component {
                             charity_number, 
                             comp.processCharity(charity_data)
                         )
+                        comp.setState(function (prevState) {
+                            return {currentProgress: prevState.currentProgress + 1}
+                        });
                     });
 
             // only called when all the data has been fetched from the API
             })).then(function(values){
-
-                // go through each row and return a new object with the extra fields added
-                let file_data = comp.props.data.map((data) => {
-                    // get the charity number based on the charity number field
-                    let charity_number = data[comp.props.charity_number_field];
-
-                    // fetch the data based on the charity number
-                    let extra_data = comp.props.org_data[charity_number];
-
-                    // @TODO rename any duplicate field names before merging
-
-                    // return the original data with the new data merged in
-                    // if two field names are the same then the new fields are used
-                    return Object.assign({}, extra_data, data);
-                })
-
-                // get the field names
-                let field_names = [...comp.props.fields, ...comp.props.fields_to_add]
-
-                // turn it into a CSV string
-                let file_contents = Papa.unparse({
-                    fields: field_names,
-                    data: file_data
-                });
-                
-                // sent the file to the user to download
-                // @TODO: work out better filename 
-                file_download(file_contents, 'test.csv', 'text/csv');
+                console.log(comp.props.stage);
+                comp.props.setStage('download');
             });
         }
 
@@ -168,35 +155,18 @@ class ReconcileAddData extends React.Component {
                     </div>
                 </div>
                 <div className="column">
-                {this.props.org_data &&
                     <div>
-                        <h2>Fetched data</h2>
+                        <h2>Progress</h2>
+                        <div>Current progress: {this.state.currentProgress}</div>
+                        <div>Max progress: {this.state.maxProgress}</div>
+                        <div>Loading: {this.state.loading}</div>
+                        <progress class="progress is-large is-primary" 
+                            value={this.state.currentProgress} 
+                            max={this.state.maxProgress}>
+                            {this.state.currentProgress}
+                        </progress>
                         {/* @TODO Better progress indicator here */}
-                        <table className="table is-striped is-narrow">
-                            <thead>
-                                <tr>
-                                    <th>Charity number</th>
-                                    {potentialFieldsToAdd.filter(f => this.props.fields_to_add.includes(f.slug))
-                                        .map((f, i) =>
-                                        <th key={i}>{f.name}</th>    
-                                    )}
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {Object.keys(this.props.org_data).map((org, i) =>
-                                <tr key={i}>
-                                    <th>{org}</th>
-                                    {potentialFieldsToAdd.filter(f => this.props.fields_to_add.includes(f.slug))
-                                        .map((f, i) =>
-                                            <td key={i}>{this.props.org_data[org][f.slug]}</td>
-                                    )}
-                                </tr>  
-                            )}
-                            </tbody>
-                        </table>
-                        <pre>{JSON.stringify(this.props.org_data, null, '\t')}</pre>
                     </div>
-                }
                 </div>
             </div>
         )

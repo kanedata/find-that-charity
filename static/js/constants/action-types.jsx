@@ -1,6 +1,3 @@
-export const MATCH_RESULT = "MATCH_RESULT";
-export const UNMATCH_RESULT = "UNMATCH_RESULT";
-export const TOGGLE_FIELD = "TOGGLE_FIELD";
 export const SET_DATA = "SET_DATA";
 export const SET_STAGE = "SET_STAGE";
 export const SET_FILE = "SET_FILE";

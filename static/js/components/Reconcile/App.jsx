@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import ReconcileStage from "./Stage"
 import ReconcileForm from "./Upload/Form"
 import ReconcileAddData from "./AddData/Form"
+import ReconcileDownloadData from "./Download/Link"
 
 const mapStateToProps = (state) => {
     return {
@@ -29,6 +30,7 @@ class ReconcileApp extends React.Component {
                 return (
                     <React.Fragment>
                         <ReconcileStage stage={this.props.stage} />
+                        <ReconcileDownloadData />
                     </React.Fragment>
                 )
 
