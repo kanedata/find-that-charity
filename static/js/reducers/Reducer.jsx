@@ -35,7 +35,6 @@ const rootReducer = (state = initialState, action) => {
                 fields: action.payload.fields,
             }
         case SET_STAGE:
-            console.log(action.payload);
             return { 
                 ...state, 
                 stage: action.payload

@@ -89,7 +89,6 @@ class ReconcileAddData extends React.Component {
 
             // only called when all the data has been fetched from the API
             })).then(function(values){
-                console.log(comp.props.stage);
                 comp.props.setStage('download');
             });
         }

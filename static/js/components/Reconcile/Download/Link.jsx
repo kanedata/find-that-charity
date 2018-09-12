@@ -35,7 +35,6 @@ class ReconcileDownloadData extends React.Component {
 
     componentDidMount(){
         let field_renames = this.getFieldNameLookup();
-        console.log(this.getFields(field_renames));
         this.setState({
             enhancedData: this.getFileData(field_renames),
             allFields: this.getFields(field_renames),
@@ -43,9 +42,6 @@ class ReconcileDownloadData extends React.Component {
     }
 
     getFields(field_renames) {
-        console.log(this.props.fields_to_add);
-        console.log(field_renames);
-        console.log(this.props.fields_to_add.map(f => field_renames[f]));
         return [...this.props.fields, ...this.props.fields_to_add.map((f) => field_renames[f] )];
 
     }
