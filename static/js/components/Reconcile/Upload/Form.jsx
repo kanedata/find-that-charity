@@ -44,6 +44,7 @@ class ReconcileForm extends React.Component {
                 form.props.setData(results.data, results.meta.fields);
                 form.props.setStage(stage);
                 form.props.setFile(file);
+                // @TODO save the file configuration for making sure the download looks the same
             },
             skipEmptyLines: true,
             header: true,
@@ -57,9 +58,9 @@ class ReconcileForm extends React.Component {
                     <div className="content">
                         <form>
                             <FileUpload componentReference={this.fileInput} />
-                            <SubmitForm getFileData={this.getFileData} />
-                            {/* TODO:  add CSV options */}
                             {/* TODO:  add textarea to paste data in */}
+                            {/* TODO:  add CSV options */}
+                            <SubmitForm getFileData={this.getFileData} />
                         </form>
                     </div>
                 </div>

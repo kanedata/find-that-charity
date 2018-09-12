@@ -42,25 +42,39 @@ class ReconcileAddData extends React.Component {
         this.fetchData = this.fetchData.bind(this);
     }
 
-    // Fetch the organisation details based on 
+    // Fetch the organisation details based on a charity number
     fetchData(event) {
         event.preventDefault();
+
+        // find all the organisation identifiers in the data
+        // based on the charity number field that has been selected
         let charity_numbers = this.getCharityNumbers();
         this.props.addCharityNumbers(charity_numbers);
+
         let comp = this;
         if(charity_numbers){
+
+            // Promise which will return when all the charity data has been fetched
             Promise.all([...charity_numbers].map(charity_number => {
+
+                // work out the URL to fetch charity data from
                 let charity_url = encodeURI(`/charity/${charity_number}.json`);
+
+                // do the actual fetching of the data
+                // @TODO handle errors here
                 return fetch(charity_url)
                     .then(function (response) {
                         return response.json();
                     })
                     .then(function (charity_data) {
+                        // when the data has been fetched store the record
                         comp.props.addOrgRecord(
                             charity_number, 
                             comp.processCharity(charity_data)
                         )
                     });
+
+            // only called when all the data has been fetched from the API
             })).then(function(values){
 
                 // go through each row and return a new object with the extra fields added
@@ -70,6 +84,8 @@ class ReconcileAddData extends React.Component {
 
                     // fetch the data based on the charity number
                     let extra_data = comp.props.org_data[charity_number];
+
+                    // @TODO rename any duplicate field names before merging
 
                     // return the original data with the new data merged in
                     // if two field names are the same then the new fields are used
@@ -146,6 +162,7 @@ class ReconcileAddData extends React.Component {
                             </div>}
                             <div className="control">
                                 <input type="submit" value="Add data and download" onClick={this.fetchData} className="button is-link" />
+                                {/* @TODO add cancel button to return to first page */}
                             </div>
                         </form>
                     </div>
@@ -154,6 +171,7 @@ class ReconcileAddData extends React.Component {
                 {this.props.org_data &&
                     <div>
                         <h2>Fetched data</h2>
+                        {/* @TODO Better progress indicator here */}
                         <table className="table is-striped is-narrow">
                             <thead>
                                 <tr>
