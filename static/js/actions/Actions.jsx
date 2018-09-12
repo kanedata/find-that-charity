@@ -1,9 +1,6 @@
-import { MATCH_RESULT, UNMATCH_RESULT, TOGGLE_FIELD, SET_DATA, SET_STAGE, SET_FILE, 
+import { SET_DATA, SET_STAGE, SET_FILE, 
     ADD_CHARITY_NUMBERS, ADD_ORG_RECORD, SET_FIELD_NAMES, SET_FIELDS_TO_ADD } from "../constants/action-types";
 
-export const match_result = (rowid, result) => ({ type: MATCH_RESULT, payload: {rowid: rowid, result: result} });
-export const unmatch_result = rowid => ({ type: UNMATCH_RESULT, payload: rowid });
-export const toggle_field = field => ({ type: TOGGLE_FIELD, payload: field });
 export const set_data = (data, fields) => ({ type: SET_DATA, payload: {data: data, fields: fields}});
 export const set_stage = stage => ({ type: SET_STAGE, payload: stage});
 export const set_file = file => ({ type: SET_FILE, payload: file});

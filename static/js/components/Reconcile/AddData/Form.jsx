@@ -1,5 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
+import file_download from 'js-file-download';
+import Papa from 'papaparse'
 
 import { add_charity_numbers, add_org_record } from "../../../actions/Actions"
 import FieldSelector from "./FieldSelector";
@@ -47,9 +49,9 @@ class ReconcileAddData extends React.Component {
         this.props.addCharityNumbers(charity_numbers);
         let comp = this;
         if(charity_numbers){
-            Promise.all(charity_numbers.forEach(charity_number => {
+            Promise.all([...charity_numbers].map(charity_number => {
                 let charity_url = encodeURI(`/charity/${charity_number}.json`);
-                fetch(charity_url)
+                return fetch(charity_url)
                     .then(function (response) {
                         return response.json();
                     })
@@ -60,18 +62,35 @@ class ReconcileAddData extends React.Component {
                         )
                     });
             })).then(function(values){
-                console.log(values);
+
+                // go through each row and return a new object with the extra fields added
+                let file_data = comp.props.data.map((data) => {
+                    // get the charity number based on the charity number field
+                    let charity_number = data[comp.props.charity_number_field];
+
+                    // fetch the data based on the charity number
+                    let extra_data = comp.props.org_data[charity_number];
+
+                    // return the original data with the new data merged in
+                    // if two field names are the same then the new fields are used
+                    return Object.assign({}, extra_data, data);
+                })
+
+                // get the field names
+                let field_names = [...comp.props.fields, ...comp.props.fields_to_add]
+
+                // turn it into a CSV string
+                let file_contents = Papa.unparse({
+                    fields: field_names,
+                    data: file_data
+                });
+                
+                // sent the file to the user to download
+                // @TODO: work out better filename 
+                file_download(file_contents, 'test.csv', 'text/csv');
             });
         }
 
-    }
-    
-    download_file(contents, filename='data_download.csv', mime_type='text/csv'){
-        var element = document.createElement("a");
-        var file = new Blob([contents], { type: mime_type });
-        element.href = URL.createObjectURL(file);
-        element.download = filename;
-        element.click();
     }
 
     getCharityNumbers(){
@@ -114,11 +133,11 @@ class ReconcileAddData extends React.Component {
                                 field_value={this.props.charity_number_field}
                                 fields={this.props.fields}
                                 dispatch={this.props.dispatch} />
-                            <FieldSelector label="Select Org ID field"
+                            {/* <FieldSelector label="Select Org ID field"
                                 name="org_id_field"
                                 field_value={this.props.org_id_field}
                                 fields={this.props.fields}
-                                dispatch={this.props.dispatch} />
+                                dispatch={this.props.dispatch} /> */}
                             <FieldsToAdd fieldsToAdd={this.props.fields_to_add}
                                 dispatch={this.props.dispatch} />
                             {this.props.charity_numbers &&
