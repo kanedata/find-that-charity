@@ -22,8 +22,6 @@ if(search_form){
 
 const reconcile_app = document.querySelector("#reconcile-root");
 if(reconcile_app){
-    // reconcile_data.hidden_fields = [];
-    // var store = createStore(rootReducer, reconcile_data);
     var store = createStore(rootReducer);
     ReactDOM.render(
         <Provider store={store}>

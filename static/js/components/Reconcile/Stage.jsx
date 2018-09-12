@@ -1,9 +1,7 @@
 import React from "react";
 
 const steps = [
-    ["upload", "Upload a CSV."],
-    ["namefield", "Find charity name field."],
-    ["reconcile", "Add charity numbers."],
+    ["upload", "Select a CSV file"],
     ["adddata", "Add charity details."],
     ["download", "Download data."],
 ]

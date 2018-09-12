@@ -47,7 +47,7 @@ class ReconcileAddData extends React.Component {
         this.props.addCharityNumbers(charity_numbers);
         let comp = this;
         if(charity_numbers){
-            charity_numbers.forEach(charity_number => {
+            Promise.all(charity_numbers.forEach(charity_number => {
                 let charity_url = encodeURI(`/charity/${charity_number}.json`);
                 fetch(charity_url)
                     .then(function (response) {
@@ -59,9 +59,19 @@ class ReconcileAddData extends React.Component {
                             comp.processCharity(charity_data)
                         )
                     });
+            })).then(function(values){
+                console.log(values);
             });
         }
 
+    }
+    
+    download_file(contents, filename='data_download.csv', mime_type='text/csv'){
+        var element = document.createElement("a");
+        var file = new Blob([contents], { type: mime_type });
+        element.href = URL.createObjectURL(file);
+        element.download = filename;
+        element.click();
     }
 
     getCharityNumbers(){

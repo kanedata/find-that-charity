@@ -13,9 +13,8 @@ class Guidance extends React.Component {
                     )
                 }
                 <p>
-                    Use this form to add more data to a CSV containing data about charities.
-                    You can use the tool to add charity numbers if you don't already
-                    have them, and also add information about that charity like their postcode.
+                    Use this form to add more data to a CSV containing data about charities. 
+                    Your file will need to contain charity numbers for these charities.
                 </p>
                 <p>
                     Your data file won't leave your computer, although the names and charity
