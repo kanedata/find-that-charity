@@ -9,6 +9,7 @@ import argparse
 import os
 import titlecase
 import datetime
+import math
 
 
 def title_exceptions(word, **kwargs):
@@ -670,35 +671,61 @@ def import_ccni(chars={},
 def clean_chars(chars={}, pc_es=None, es_pc_index="postcode", es_pc_type="postcode"):
 
     ccount = 0
+    geocount = 0
     for c in chars:
         if pc_es:
             geo_data = fetch_postcode(chars[c]["geo"]["postcode"], pc_es, es_pc_index, es_pc_type)
             if geo_data:
                 chars[c]["geo"]["location"] = geo_data[0]
                 chars[c]["geo"]["areas"] = geo_data[1]
+                geocount += 1
 
-        chars[c]["url"] = parse_url(chars[c]["url"])
-        chars[c]["domain"] = get_domain(chars[c]["url"])
-        chars[c]['org-ids'] = add_org_id_prefix(chars[c])
-
-        chars[c]["alt_names"] = [n["name"] for n in chars[c]["names"] if n["name"] != chars[c]["known_as"]]
-        chars[c]["last_modified"] = datetime.datetime.now()
-
-        # @TODO capitalisation of names
+        chars[c] = clean_char(chars[c])
 
         ccount += 1
         if ccount % 10000 == 0:
-            print('\r', "[Geo] %s charites added location details" % ccount, end='')
-    print('\r', "[Geo] %s charites added location details" % ccount)
+            print('\r', "[Prepare] %s charites prepared for indexing" % ccount, end='')
+    print('\r', "[Prepare] %s charites prepared for indexing" % ccount)
+    print('\r', "[Geo] %s charites added location details" % geocount)
 
     return chars
+
+def clean_char(char):
+    
+    char["url"] = parse_url(char["url"])
+    char["domain"] = get_domain(char["url"])
+    char['org-ids'] = add_org_id_prefix(char)
+
+    if not char["known_as"]:
+        char["known_as"] = char["names"][0]["name"]
+
+    names = list(set([n["name"] for n in char["names"]
+                if n["name"] != char["known_as"] and n["name"]]))
+
+    char["alt_names"] = names
+    all_names = names + [char["known_as"]]
+    words = set()
+    for n in all_names:
+        if n:
+            w = n.split()
+            words.update([" ".join(w[r:]) for r in range(len(w))])
+    char["complete_names"] = {
+        "input": list(words),
+        "weight": max(1, math.ceil(math.log1p((char.get("latest_income", 0) or 0))))
+    }
+
+    char["last_modified"] = datetime.datetime.now()
+    
+    # @TODO capitalisation of names
+
+    return char
 
 
 def save_to_elasticsearch(chars, es, es_index):
 
     print('\r', "[elasticsearch] %s charities to save" % len(chars))
     print('\r', "[elasticsearch] saving %s charities to %s index" % (len(chars), es_index))
-    results = bulk(es, list(chars.values()))
+    results = bulk(es, list(chars.values()), raise_on_error=False)
     print('\r', "[elasticsearch] saved %s charities to %s index" % (results[0], es_index))
     print('\r', "[elasticsearch] %s errors reported" % len(results[1]))
 

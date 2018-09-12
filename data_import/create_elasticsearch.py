@@ -23,6 +23,9 @@ INDEXES = [
                             "source": {"type": "string"},
                             "name": {"type": "string"}
                         }
+                    },
+                    "complete_names": {
+                        "type": "completion"
                     }
                 }
             }
