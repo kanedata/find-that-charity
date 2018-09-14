@@ -6,6 +6,7 @@ import Papa from 'papaparse'
 import { add_charity_numbers, add_org_record, set_stage } from "../../../actions/Actions"
 import FieldSelector from "./FieldSelector";
 import FieldsToAdd from "./FieldsToAdd";
+import Progress from "./Progress";
 
 const mapStateToProps = (state) => {
     return { 
@@ -42,7 +43,9 @@ class ReconcileAddData extends React.Component {
         this.state = {
             loading: false,
             maxProgress: 1,
-            currentProgress: 0,
+            organisationsFound: 0,
+            organisationsNotFound: 0,
+            fetchErrors: 0,
         }
         this.processCharity = this.processCharity.bind(this);
         this.fetchData = this.fetchData.bind(this);
@@ -59,7 +62,9 @@ class ReconcileAddData extends React.Component {
         this.setState({
             loading: true,
             maxProgress: charity_numbers.size,
-            currentProgress: 0,
+            organisationsFound: 0,
+            organisationsNotFound: 0,
+            fetchErrors: 0,
         })
 
         let comp = this;
@@ -75,7 +80,12 @@ class ReconcileAddData extends React.Component {
                 // @TODO handle errors here
                 return fetch(charity_url)
                     .then(function (response) {
-                        return response.json();
+                        if(response.ok){
+                            return response.json();
+                        }
+                        comp.setState(function (prevState) {
+                            return { organisationsNotFound: prevState.organisationsNotFound + 1 }
+                        });
                     })
                     .then(function (charity_data) {
                         // when the data has been fetched store the record
@@ -84,7 +94,12 @@ class ReconcileAddData extends React.Component {
                             comp.processCharity(charity_data)
                         )
                         comp.setState(function (prevState) {
-                            return {currentProgress: prevState.currentProgress + 1}
+                            return {organisationsFound: prevState.organisationsFound + 1}
+                        });
+                    })
+                    .catch(function(error){
+                        comp.setState(function (prevState) {
+                            return { fetchErrors: prevState.fetchErrors + 1 }
                         });
                     });
 
@@ -143,10 +158,6 @@ class ReconcileAddData extends React.Component {
                                 dispatch={this.props.dispatch} /> */}
                             <FieldsToAdd fieldsToAdd={this.props.fields_to_add}
                                 dispatch={this.props.dispatch} />
-                            {this.props.charity_numbers &&
-                            <div>
-                                {this.props.charity_numbers.size} charity numbers found
-                            </div>}
                             <div className="control">
                                 <input type="submit" value="Add data and download" onClick={this.fetchData} className="button is-link" />
                                 {/* @TODO add cancel button to return to first page */}
@@ -156,18 +167,11 @@ class ReconcileAddData extends React.Component {
                 </div>
                 <div className="column">
                     {this.state.loading && 
-                    <div>
-                        <h2>Progress</h2>
-                        {/* <div>Current progress: {this.state.currentProgress}</div>
-                        <div>Max progress: {this.state.maxProgress}</div>
-                        <div>Loading: {this.state.loading}</div> */}
-                        <progress className="progress is-large is-primary" 
-                            value={this.state.currentProgress} 
-                            max={this.state.maxProgress}>
-                            {this.state.currentProgress}
-                        </progress>
-                        {/* @TODO Better progress indicator here */}
-                    </div>
+                        <Progress charity_number_field={this.props.charity_number_field}
+                                  maxProgress={this.state.maxProgress}
+                                  organisationsFound={this.state.organisationsFound}
+                                  organisationsNotFound={this.state.organisationsNotFound}
+                                  fetchErrors={this.state.fetchErrors} />
                     }
                 </div>
             </div>

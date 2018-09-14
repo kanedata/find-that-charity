@@ -8,6 +8,7 @@ import json
 from collections import OrderedDict
 import time
 from datetime import datetime, timezone
+import re
 
 from dateutil import parser
 import bottle
@@ -164,13 +165,20 @@ def charity(regno, filetype='html'):
     """
     Return a single charity record
     """
-    res = app.config["es"].get(index=app.config["es_index"], doc_type=app.config["es_type"], id=regno, ignore=[404])
+
+    regno_cleaned = clean_regno(regno)
+    if regno_cleaned == "":
+        return bottle.abort(404, bottle.template(
+            'Charity {{regno}} not found.', regno=regno))
+
+    res = app.config["es"].get(index=app.config["es_index"],
+                               doc_type=app.config["es_type"], id=regno_cleaned, ignore=[404])
     if "_source" in res:
         if filetype == "html":
             return bottle.template('charity', charity=sort_out_date(res["_source"]), charity_id=res["_id"])
         return res["_source"]
     else:
-        bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
+        return bottle.abort(404, bottle.template('Charity {{regno}} not found.', regno=regno))
 
 
 @app.route('/preview/charity/<regno>')
@@ -341,6 +349,15 @@ def sort_out_date(charity_record):
                 pass
     return charity_record
 
+def clean_regno(regno):
+    """
+    Clean up a charity registration number
+    """
+    regno = str(regno)
+    regno = regno.upper()
+    regno = re.sub(r'^[^0-9SCNI]+|[^0-9]+$', '', regno)
+    return regno
+
 
 def main():
     """
@@ -383,6 +400,9 @@ def main():
 
     csv_app.config.update(app.config)
     bottle.debug(args.debug)
+
+    if not app.config["es"].ping():
+        raise ValueError("Elasticsearch connection failed")
 
     bottle.run(app, server=args.server, host=args.host, port=args.port, reloader=args.debug)
 
