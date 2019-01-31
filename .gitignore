@@ -13,3 +13,6 @@ scratchpad/
 
 \.vscode/
 node_modules/
+
+# IDE metadata
+.idea/
