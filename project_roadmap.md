@@ -21,7 +21,7 @@ The solution is to use organisation "identifiers". These are unique pieces of te
 
 ### Consistency
 
-An additional problem is that one organisation might have different identifiers depending on the context. A registered charity, for example, will often also be a registered company and thus have a 
+An additional problem is that one organisation might have different identifiers depending on the context. A registered charity, for example, will often also be a registered company and thus have a company number and a charity number. 
 
 
 Find that charity aims to solve the problem of matching organisations to their identifiers, and finding a consistent identifier for one organisation.
@@ -30,9 +30,9 @@ Find that charity aims to solve the problem of matching organisations to their i
 
 The intended audience for findthatcharity is people in the UK who want to solve the problem above. Examples of this include:
 
-- people working at grant-making organisations who are intending to publish to the [360Giving data standard](http://standard.threesixtygiving.org/en/latest/#). A requirement of the standard is that published data will contain identifiers for the recipient and funder organisations included in the data. If the publisher does not have existing identifiers they can use findthatcharity to add them to their data.
+- People working at grant-making organisations who are intending to publish to the [360Giving data standard](http://standard.threesixtygiving.org/en/latest/#). A requirement of the standard is that published data will contain identifiers for the recipient and funder organisations included in the data. If the publisher does not have existing identifiers they can use findthatcharity to add them to their data. This will help to avoid duplications in the data. 
 
-- data analysts hoping to use data about non-profit organisations. With a list of charities/non-profit organisations, an analyst could use findthatcharity to add organisation identifiers to the list, and then use the identifiers to add data about the organisations (for example show the type of organisation, their latest income, their postcode, etc).
+- Data analysts hoping to use data about non-profit organisations. With a list of charities/non-profit organisations, an analyst could use findthatcharity to add organisation identifiers to the list, and then use the identifiers to add data about the organisations (for example show the type of organisation, their latest income, their postcode, etc). 
 
 ## 3. What does findthatcharity do?
 
@@ -71,29 +71,29 @@ There are competing/complimentary products operating in this space:
 
 Findthatcharity's unique place in this ecosystem is based on a number of factors:
 
-- focus on UK non-profit organisations (wider than charities)
-- focus on doing one thing well - matching a name to an organisation
-- building tools around the data to help with specific problems/tasks
+- Focus on UK non-profit organisations (wider than charities)
+- Focus on doing one thing well - matching a name to an organisation
+- Building tools around the data to help with specific problems/tasks
 
 ## 6. Roadmap
 
-The [current alpha version](https://github.com/drkane/find-that-charity/releases/tag/v0.1) of findthatcharity focuses on organisations registered with the UK's three main charity regulators - the Charity Commission for England and Wales, the Scottish Charity Regulator and the Charity Commission for Northern Ireland. It produces a search engine for these organisations, with a reconciliation API for use with OpenRefine, and a proof-of-concept tool for adding data to a CSV. The alpha version was launched in 
+The [current alpha version](https://github.com/drkane/find-that-charity/releases/tag/v0.1) of findthatcharity focuses on organisations registered with the UK's three main charity regulators - the Charity Commission for England and Wales, the Scottish Charity Regulator and the Charity Commission for Northern Ireland. It produces a search engine for these organisations, with a reconciliation API for use with OpenRefine, and a proof-of-concept tool for adding data to a CSV. The alpha version was launched in 2017. 
 
 ### 5.1 Beta version
 
 The next stage is to move the tool to a beta version. This builds on the concept of the alpha version to improve the usefulness and reliability of the tools. Improvements targeted for [this release](https://github.com/drkane/find-that-charity/milestone/1) include:
 
-- moving from only looking at charities to include a range of non-profit organisation types, based on the [org-id register](http://org-id.guide/results?structure=all&coverage=GB&sector=all).
-- move data scrapers to a separate repository, to improve maintainability. The new [find-that-charity-scrapers repository](https://github.com/drkane/find-that-charity-scrapers) has been created, and the scrapers have been rewritten to use the [scrapy](https://scrapy.org/) library.
-- improve branding, licencing and look and feel of the site.
-- ensure tools and API are robust enough for public use.
+- Moving from only looking at charities to include a range of non-profit organisation types, based on the [org-id register](http://org-id.guide/results?structure=all&coverage=GB&sector=all).
+- Move data scrapers to a separate repository, to improve maintainability. The new [find-that-charity-scrapers repository](https://github.com/drkane/find-that-charity-scrapers) has been created, and the scrapers have been rewritten to use the [scrapy](https://scrapy.org/) library.
+- Improve branding, licencing and look and feel of the site.
+- Ensure tools and API are robust enough for public use.
 
 ### 5.2 Future expansion
 
 After the beta version is completed, the roadmap for the future of findthatcharity includes plans for the following:
 
-- increasing the number of data sources. A [list of potential data sources](https://github.com/drkane/find-that-charity-scrapers/issues?q=is%3Aissue+is%3Aopen+label%3A%22data+source%22) is maintained in the find-that-charity-scrapers repository.
-- adding a tool to allow users to reconcile a list of organisations on the site, without needing to install OpenRefine.
-- allowing user input to improve the data. For example, the reconciliation process could result in additional alternative names that could be saved against an organisation record, allowing better matching of those records in the future.
+- Increasing the number of data sources. A [list of potential data sources](https://github.com/drkane/find-that-charity-scrapers/issues?q=is%3Aissue+is%3Aopen+label%3A%22data+source%22) is maintained in the find-that-charity-scrapers repository.
+- Adding a tool to allow users to reconcile a list of organisations on the site, without needing to install OpenRefine.
+- Allowing user input to improve the data. For example, the reconciliation process could result in additional alternative names that could be saved against an organisation record, allowing better matching of those records in the future.
 
 [Potential site enhancements are stored as github issues](https://github.com/drkane/find-that-charity/issues?q=is%3Aopen+is%3Aissue+no%3Amilestone).
