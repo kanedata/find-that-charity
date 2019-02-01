@@ -12,10 +12,10 @@ import mechanicalsoup
 
 import bcp
 
-DUAL_CSV = 'https://github.com/drkane/charity-lookups/blob/master/dual-registered-uk-charities.csv'
+DUAL_CSV = 'https://raw.githubusercontent.com/drkane/charity-lookups/master/dual-registered-uk-charities.csv'
 OSCR_URL = "https://www.oscr.org.uk/about-charities/search-the-register/charity-register-download"
 CCEW_URL = "http://data.charitycommission.gov.uk/"
-CCNI_URL = "http://www.charitycommissionni.org.uk/charity-search/?q=&include=Linked&include=Removed&exportCSV=1"
+CCNI_URL = "https://www.charitycommissionni.org.uk/umbraco/api/charityApi/ExportSearchResultsToCsv/?pageNumber=1&include=Linked&include=Removed"
 CCNI_EXTRA = "https://gist.githubusercontent.com/BobHarper1/2687545c562b47bc755aef2e9e0de537/raw/ac052c33fd14a08dd4c2a0604b54c50bc1ecc0db/ccni_extra"
 
 def main():
