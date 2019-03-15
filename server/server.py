@@ -143,12 +143,9 @@ def reconcile():
     if queries:
         queries_json = json.loads(queries)
         queries_dict = json.loads(queries, object_pairs_hook=OrderedDict)
-        # print(queries)
         results = {}
         counter = 0
-        for query in queries_dict:
-            query_id = "q" + str(counter)
-            # print(queries_json[q], queries_json[q]["query"])
+        for query_id in queries_dict:
             result = esdoc_orresponse(recon_query(
                 queries_json[query_id]["query"]), app)["result"]
             results.update({query_id: {"result": result}})
