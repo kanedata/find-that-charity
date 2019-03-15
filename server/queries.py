@@ -60,7 +60,7 @@ def service_spec(app, service_url):
     Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
     """
     return {
-        "name": app.config["es_index"],
+        "name": "findthatcharity",
         "identifierSpace": "http://rdf.freebase.com/ns/type.object.id",
         "schemaSpace": "http://rdf.freebase.com/ns/type.object.id",
         "view": {
