@@ -112,11 +112,11 @@ SHELL=/bin/bash
 
 # fetch latest charity data from the regulators
 # run at 2am on the 13th of the month
-0 2 13 * * dokku dokku run find-that-charity python data_import/fetch_data.py --folder '/data'
+0 2 13 * * dokku dokku run find-that-charity python data_import/fetch_data.py --folder '/app/data'
 
 # import latest charity data
 # run at 4am on the 13th of the month
-0 4 13 * * dokku dokku run find-that-charity python data_import/import_data.py --folder '/data'
+0 4 13 * * dokku dokku run find-that-charity python data_import/import_data.py --folder '/app/data'
 
 ### PLACE ALL CRON TASKS ABOVE, DO NOT REMOVE THE WHITESPACE AFTER THIS LINE
 ```
