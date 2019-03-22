@@ -156,6 +156,22 @@ def reconcile():
     return service_spec(app, service_url)
 
 
+@app.route('/charity/all.<filetype>')
+def charity(filetype='csv'):
+    """
+    Return all charity records
+    """
+    if filetype not in ["csv", "xlsx", "json", "jsonl"]:
+        bottle.abort(404, bottle.template(
+            'File download in {{filetype}} not available', filetype=filetype))
+
+    if filetype in ["csv", "json", "jsonl"]:
+        filename = os.path.join("output", "all.{}.gz".format(filetype))
+    elif filetype in ["xlsx"]:
+        filename = os.path.join("output", "all.xlsx")
+    return bottle.static_file(filename, app.config["folder"])
+
+
 @app.route('/charity/<regno>')
 @app.route('/charity/<regno>.<filetype>')
 def charity(regno, filetype='html'):
@@ -369,6 +385,9 @@ def main():
     parser_args.add_argument('--debug', action='store_true', dest="debug", help='Debug mode (autoreloads the server)')
     parser_args.add_argument('--server', default="auto", help='Server backend to use (see http://bottlepy.org/docs/dev/deployment.html#switching-the-server-backend)')
 
+    parser_args.add_argument('--folder', type=str, default='data',
+                        help='Root path of the data folder.')
+
     # http auth
     parser_args.add_argument('--admin-password', help='Password for accessing admin pages')
 
@@ -394,6 +413,7 @@ def main():
     app.config["es_type"] = args.es_type
     app.config["ga_tracking_id"] = args.ga_tracking_id
     app.config["admin_password"] = args.admin_password
+    app.config["folder"] = args.folder
 
     csv_app.config.update(app.config)
     bottle.debug(args.debug)
