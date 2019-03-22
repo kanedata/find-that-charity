@@ -49,6 +49,13 @@ sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
 dokku config:set --no-restart find-that-charity DOKKU_LETSENCRYPT_EMAIL=your@email.tld
 dokku letsencrypt find-that-charity
 dokku letsencrypt:cron-job --add
+
+# create app storage
+mkdir -p /var/lib/dokku/data/storage/ftc-uploads
+chown -R dokku:dokku /var/lib/dokku/data/storage/ftc-uploads
+chown -R 32767:32767 /var/lib/dokku/data/storage/ftc-uploads
+dokku storage:mount find-that-charity /var/lib/dokku/data/storage/ftc-uploads:/app/data
+dokku config:set find-that-charity FOLDER=/app/data
 ```
 
 ### 2. Add as a git remote and push

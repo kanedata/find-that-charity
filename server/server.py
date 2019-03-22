@@ -41,6 +41,9 @@ if os.environ.get("GA_TRACKING_ID"):
 if os.environ.get("ADMIN_PASSWORD"):
     app.config["admin_password"] = os.environ.get("ADMIN_PASSWORD")
 
+if os.environ.get("FOLDER"):
+    app.config["folder"] = os.environ.get("FOLDER")
+
 csv_app.config.update(app.config)
 
 
