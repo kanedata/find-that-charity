@@ -132,9 +132,9 @@ def reconcile():
     if bottle.request.query.callback:
         if bottle.request.query.query:
             bottle.response.content_type = "application/javascript"
-            return "%s(%s)" % (bottle.request.query.callback, esdoc_orresponse(query, app))
+            return "%s(%s);" % (bottle.request.query.callback, json.dumps(esdoc_orresponse(query, app)))
         else:
-            return "%s(%s)" % (bottle.request.query.callback, service_spec(app, service_url))
+            return "%s(%s);" % (bottle.request.query.callback, json.dumps(service_spec(app, service_url)))
 
     # try fetching the query as json data or a string
     if bottle.request.query.query:
