@@ -1,7 +1,10 @@
 import csv
 import re
+import gzip
+import io
+import json
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import bulk
+from elasticsearch.helpers import bulk, scan
 from elasticsearch.exceptions import NotFoundError
 import validators
 from urllib.parse import urlparse
@@ -10,6 +13,7 @@ import os
 import titlecase
 import datetime
 import math
+import xlsxwriter
 
 
 def title_exceptions(word, **kwargs):
@@ -730,6 +734,82 @@ def save_to_elasticsearch(chars, es, es_index):
     print('\r', "[elasticsearch] %s errors reported" % len(results[1]))
 
 
+def create_outputs(es,
+                   data_folder="data",
+                   es_index="charitysearch",
+                   es_type="charity",
+                   debug=False):
+    res = scan(
+        es,
+        index=es_index,
+        doc_type=es_type,
+        query={"query": {"match_all": {}}},
+        _source_exclude=["complete_names"],
+    )
+    
+    print("[Output] Creating output files")
+    
+    if not os.path.exists(os.path.join(data_folder, "output")):
+        os.makedirs(os.path.join(data_folder, "output"))
+
+    outputs = {}
+    for i in ["csv", "json", "jsonl"]:
+        outputs[i] = io.TextIOWrapper(
+            gzip.open(os.path.join(data_folder, "output", "all.{}.gz".format(i)), "w"),
+            newline="",
+            write_through=True,
+            encoding='utf8'
+        )
+    outputs["xlsx"] = xlsxwriter.Workbook(
+        os.path.join(data_folder, "output", "all.xlsx"),
+        {'strings_to_urls': False}
+    )
+
+    headers = ["id", "ccew_number", "oscr_number", "ccni_number", "known_as", "active",
+                "geo.postcode", "url", "latest_income", "date_registered", "date_removed",
+                "org_ids", "alt_names", "last_modified"]
+
+    csv_writer = csv.DictWriter(outputs["csv"], fieldnames=headers)
+    csv_writer.writeheader()
+
+    worksheet = outputs["xlsx"].add_worksheet()
+    worksheet.write_row(0, 0, headers)
+    xl_row = 1
+
+    chars = []
+    for ccount, i in enumerate(res):
+        i["_source"]["id"] = i["_id"]
+        flat_i = {}
+        for h in headers:
+            if h == "geo.postcode":
+                flat_i[h] = i["_source"].get("geo", {}).get("postcode")
+            elif isinstance(i["_source"].get(h), list):
+                flat_i[h] = "; ".join(i["_source"].get(h, []))
+            else:
+                flat_i[h] = i["_source"].get(h)
+
+        chars.append(i["_source"])
+
+        json.dump(i["_source"], outputs["jsonl"])
+        outputs["jsonl"].write('\n')
+
+        csv_writer.writerow(flat_i)
+        
+        worksheet.write_row(xl_row, 0, [flat_i.get(h) for h in headers])
+        xl_row += 1
+        
+        if ccount % 10000 == 0:
+            print('\r', "[Output] %s records written to output files" % ccount, end='')
+    
+    print('\r', "[Output] %s records written to output files" % ccount)
+
+    json.dump({"charities": chars}, outputs["json"])
+
+    for i, f in outputs.items():
+        print("[Output] Records saved to {}".format(getattr(f, "name", getattr(f, "filename", i))))
+        f.close()
+
+
 def main():
 
     parser = argparse.ArgumentParser(description='Import charity data into elasticsearch')
@@ -757,6 +837,8 @@ def main():
                         help='Don\'t fetch data from Office of the Scottish Charity Regulator.')
     parser.add_argument('--skip-ccew', action='store_true',
                         help='Don\'t fetch data from Charity Commission for England and Wales.')
+    parser.add_argument('--skip-output', action='store_true',
+                        help='Don\'t create output files containing the whole dataset.')
 
     parser.add_argument('--debug', action='store_true', help='Only load first 10000 rows for ccew')
 
@@ -818,6 +900,9 @@ def main():
             print(r, chars[r])
     
     save_to_elasticsearch(chars, es, args.es_index)
+
+    if not args.skip_output:
+        create_outputs(es, args.folder, args.es_index, args.es_type)
 
 if __name__ == '__main__':
     main()

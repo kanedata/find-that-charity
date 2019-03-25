@@ -13,7 +13,7 @@ import mechanicalsoup
 import bcp
 
 DUAL_CSV = 'https://raw.githubusercontent.com/drkane/charity-lookups/master/dual-registered-uk-charities.csv'
-OSCR_URL = "https://www.oscr.org.uk/about-charities/search-the-register/charity-register-download"
+OSCR_URL = "https://www.oscr.org.uk/umbraco/Surface/FormsSurface/CharityRegDownload"
 CCEW_URL = "http://data.charitycommission.gov.uk/"
 CCNI_URL = "https://www.charitycommissionni.org.uk/umbraco/api/charityApi/ExportSearchResultsToCsv/?pageNumber=1&include=Linked&include=Removed"
 CCNI_EXTRA = "https://gist.githubusercontent.com/BobHarper1/2687545c562b47bc755aef2e9e0de537/raw/ac052c33fd14a08dd4c2a0604b54c50bc1ecc0db/ccni_extra"
@@ -63,27 +63,8 @@ def main():
 
     # get oscr data
     if not args.skip_oscr:
-
-        form_id = "#uxSiteForm"
-        terms_and_conditions_checkbox = "ctl00$ctl00$ctl00$ContentPlaceHolderDefault$WebsiteContent$ctl05$CharityRegDownload_10$cbTermsConditions"
-
-        browser = mechanicalsoup.StatefulBrowser()
-        print("[OSCR] Using url: %s" % args.oscr)
-        browser.open(args.oscr)
-
-        form = browser.select_form(form_id)
-        form.set_checkbox({terms_and_conditions_checkbox: True})
-        resp = browser.submit_selected()
-        print("[OSCR] Form submitted")
-        try:
-            resp.raise_for_status()
-        except:
-            raise ValueError("[OSCR] Could not download OSCR data. Status %s %s" % (
-                resp.status_code, resp.reason))
-
         oscr_out = os.path.join(args.folder, "oscr.zip")
-        with open(oscr_out, "wb") as oscrfile:
-            oscrfile.write(resp.content)
+        urllib.request.urlretrieve(args.oscr, oscr_out)
         print("[OSCR] ZIP downloaded")
 
         with zipfile.ZipFile(oscr_out) as oscrzip:

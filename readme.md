@@ -49,6 +49,13 @@ sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
 dokku config:set --no-restart find-that-charity DOKKU_LETSENCRYPT_EMAIL=your@email.tld
 dokku letsencrypt find-that-charity
 dokku letsencrypt:cron-job --add
+
+# create app storage
+mkdir -p /var/lib/dokku/data/storage/ftc-uploads
+chown -R dokku:dokku /var/lib/dokku/data/storage/ftc-uploads
+chown -R 32767:32767 /var/lib/dokku/data/storage/ftc-uploads
+dokku storage:mount find-that-charity /var/lib/dokku/data/storage/ftc-uploads:/app/data
+dokku config:set find-that-charity FOLDER=/app/data
 ```
 
 ### 2. Add as a git remote and push
@@ -105,11 +112,11 @@ SHELL=/bin/bash
 
 # fetch latest charity data from the regulators
 # run at 2am on the 13th of the month
-0 2 13 * * dokku dokku run find-that-charity python data_import/fetch_data.py --folder '/data'
+0 2 13 * * dokku dokku run find-that-charity python data_import/fetch_data.py --folder '/app/data'
 
 # import latest charity data
 # run at 4am on the 13th of the month
-0 4 13 * * dokku dokku run find-that-charity python data_import/import_data.py --folder '/data'
+0 4 13 * * dokku dokku run find-that-charity python data_import/import_data.py --folder '/app/data'
 
 ### PLACE ALL CRON TASKS ABOVE, DO NOT REMOVE THE WHITESPACE AFTER THIS LINE
 ```
