@@ -725,7 +725,7 @@ def save_to_elasticsearch(chars, es, es_index):
 
     print('\r', "[elasticsearch] %s charities to save" % len(chars))
     print('\r', "[elasticsearch] saving %s charities to %s index" % (len(chars), es_index))
-    results = bulk(es, list(chars.values()), raise_on_error=False)
+    results = bulk(es, list(chars.values()), raise_on_error=False, request_timeout=60)
     print('\r', "[elasticsearch] saved %s charities to %s index" % (results[0], es_index))
     print('\r', "[elasticsearch] %s errors reported" % len(results[1]))
 
