@@ -16,6 +16,6 @@ PyYAML==4.2b4
 requests==2.21.0
 six==1.10.0
 titlecase==0.12.0
-urllib3==1.24.1
+urllib3==1.24.2
 validators==0.11.3
 XlsxWriter==1.1.5
