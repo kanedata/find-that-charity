@@ -444,6 +444,10 @@ def import_oscr(chars={},
                 es_type="charity",
                 debug=False):
 
+    if not os.path.exists(datafile):
+        print("Could not find {}".format(datafile))
+        return chars
+
     # go through the Scottish charities
     with open(datafile, encoding="latin1") as a:
         csvreader = csv.DictReader(a)
@@ -568,11 +572,12 @@ def import_ccni(chars={},
                 ccni_extra[row["Charity_number"]].append(n.strip())
 
     # go through the Northern Irish charities
-    with open(datafile, encoding="utf-8") as a:
+    with open(datafile, encoding="ISO-8859-1") as a:
         csvreader = csv.DictReader(a)
         ccount = 0
         cadded = 0
         cupdated = 0
+
         for row in csvreader:
             row = clean_row(row)
 
@@ -812,6 +817,12 @@ def create_outputs(es,
 
 def main():
 
+    def add_bool_arg(parser, name, default=False, help=None):
+        group = parser.add_mutually_exclusive_group(required=False)
+        group.add_argument('--' + name, dest=name, action='store_true', help=help)
+        group.add_argument('--no-' + name, dest=name, action='store_false', help=help)
+        parser.set_defaults(**{name:default})
+
     parser = argparse.ArgumentParser(description='Import charity data into elasticsearch')
 
     parser.add_argument('--folder', type=str, default='data',
@@ -833,12 +844,11 @@ def main():
     parser.add_argument('--es-pc-index', default='postcode', help='index used to store postcode data')
     parser.add_argument('--es-pc-type', default='postcode', help='type used to store postcode data')
 
-    parser.add_argument('--skip-oscr', action='store_true',
-                        help='Don\'t fetch data from Office of the Scottish Charity Regulator.')
-    parser.add_argument('--skip-ccew', action='store_true',
-                        help='Don\'t fetch data from Charity Commission for England and Wales.')
-    parser.add_argument('--skip-output', action='store_true',
-                        help='Don\'t create output files containing the whole dataset.')
+    # add args to turn on or off the various data sources
+    add_bool_arg(parser, 'oscr', default=True, help='Fetch data from Office of the Scottish Charity Regulator')
+    add_bool_arg(parser, 'ccew', default=True, help='Fetch data from Charity Commission for England and Wales')
+    add_bool_arg(parser, 'ccni', default=True, help='fetch data from Charity Commission for Northern Ireland')
+    add_bool_arg(parser, 'output', default=False, help='Create output files containing the whole dataset')
 
     parser.add_argument('--debug', action='store_true', help='Only load first 10000 rows for ccew')
 
@@ -877,7 +887,7 @@ def main():
     }
 
     chars = {}
-    if not args.skip_ccew:
+    if args.ccew:
         chars = import_extract_charity(chars, datafile=data_files["extract_charity"], es_index=args.es_index, es_type=args.es_type, debug=args.debug)
         chars = import_extract_main(chars, datafile=data_files["extract_main"], debug=args.debug)
         chars = import_extract_name(chars, datafile=data_files["extract_names"], debug=args.debug)
@@ -886,9 +896,10 @@ def main():
     dual = {}
     if os.path.isfile(data_files["dual_registration"]):
         dual = import_dual_reg(data_files["dual_registration"])
-    if not args.skip_oscr:
+    if args.oscr:
         chars = import_oscr(chars, dual=dual, datafile=data_files["oscr"], es_index=args.es_index, es_type=args.es_type, debug=args.debug)
-    chars = import_ccni(chars, dual=dual, datafile=data_files["ccni"], extra_names=data_files["ccni_extra_names"], es_index=args.es_index, es_type=args.es_type, debug=args.debug)
+    if args.ccni:
+        chars = import_ccni(chars, dual=dual, datafile=data_files["ccni"], extra_names=data_files["ccni_extra_names"], es_index=args.es_index, es_type=args.es_type, debug=args.debug)
     # @TODO include charity commission register of mergers
     chars = clean_chars(chars, pc_es, args.es_pc_index, args.es_pc_type)
 
@@ -901,7 +912,7 @@ def main():
     
     save_to_elasticsearch(chars, es, args.es_index)
 
-    if not args.skip_output:
+    if args.output:
         create_outputs(es, args.folder, args.es_index, args.es_type)
 
 if __name__ == '__main__':
