@@ -130,23 +130,12 @@ def reconcile():
         bottle.request.urlparts.scheme,
         bottle.request.urlparts.netloc,
     )
-
-    # if we're doing a callback request then do that
-    if bottle.request.query.callback:
-        if bottle.request.query.query:
-            bottle.response.content_type = "application/javascript"
-            return "%s(%s);" % (bottle.request.query.callback, json.dumps(esdoc_orresponse(query, app)))
-        else:
-            return "%s(%s);" % (bottle.request.query.callback, json.dumps(service_spec(app, service_url)))
-    else:
-        # Otherwise, add headers for CORS support
-        bottle.response.headers['Access-Control-Allow-Origin'] = '*'
-        bottle.response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
-        bottle.response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    
+    response = service_spec(app, service_url)
 
     # try fetching the query as json data or a string
     if bottle.request.query.query:
-        return esdoc_orresponse(query, app)
+        response = esdoc_orresponse(query, app)
 
     if queries:
         queries_json = json.loads(queries)
@@ -158,10 +147,18 @@ def reconcile():
                 queries_json[query_id]["query"]), app)["result"]
             results.update({query_id: {"result": result}})
             counter += 1
-        return results
+        response = results
 
-    # otherwise just return the service specification
-    return service_spec(app, service_url)
+    # if we're doing a callback request then do that
+    if bottle.request.query.callback:
+        bottle.response.content_type = "application/javascript"
+        return "%s(%s);" % (bottle.request.query.callback, json.dumps(response))
+    else:
+        # Otherwise, add headers for CORS support
+        bottle.response.headers['Access-Control-Allow-Origin'] = '*'
+        bottle.response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+        bottle.response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+        return response
 
 
 @app.route('/charity/all.<filetype>')
