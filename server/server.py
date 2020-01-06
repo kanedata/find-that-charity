@@ -138,6 +138,11 @@ def reconcile():
             return "%s(%s);" % (bottle.request.query.callback, json.dumps(esdoc_orresponse(query, app)))
         else:
             return "%s(%s);" % (bottle.request.query.callback, json.dumps(service_spec(app, service_url)))
+    else:
+        # Otherwise, add headers for CORS support
+        bottle.response.headers['Access-Control-Allow-Origin'] = '*'
+        bottle.response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+        bottle.response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
 
     # try fetching the query as json data or a string
     if bottle.request.query.query:
