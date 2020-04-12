@@ -718,9 +718,14 @@ def clean_char(char):
         if n:
             w = n.split()
             words.update([" ".join(w[r:]) for r in range(len(w))])
+
+    try:
+        weight = max(1, math.ceil(math.log1p((char.get("latest_income", 0) or 0))))
+    except ValueError:
+        weight = 1
     char["complete_names"] = {
         "input": list(words),
-        "weight": max(1, math.ceil(math.log1p((char.get("latest_income", 0) or 0))))
+        "weight": weight,
     }
 
     char["last_modified"] = datetime.datetime.now()
