@@ -9,14 +9,12 @@ class Organisation(models.Model):
         models.CharField(max_length=100, blank=True),
         blank=True,
         null=True,
-        db_index=True,
     )
     name = models.CharField(max_length=255)
     alternateName = ArrayField(
         models.CharField(max_length=255, blank=True),
         blank=True,
         null=True,
-        db_index=True,
     )
     charityNumber = models.CharField(max_length=255, null=True, blank=True)
     companyNumber = models.CharField(max_length=255, null=True, blank=True)
@@ -45,7 +43,6 @@ class Organisation(models.Model):
         models.CharField(max_length=255, blank=True),
         blank=True,
         null=True,
-        db_index=True,
     )
     organisationTypePrimary = models.ForeignKey(
         'OrganisationType',
