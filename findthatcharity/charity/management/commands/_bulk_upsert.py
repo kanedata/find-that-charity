@@ -1,0 +1,38 @@
+from psycopg2.extras import execute_values
+from django.db import connection
+
+# from https://gist.github.com/aisayko/dcacd546bcb17a740dec703de6b2377e
+def bulk_upsert(model, fields, values, by):
+    """
+    Return the tuple of (inserted, updated) ids
+    """
+    result = (None, None)
+
+    def comma_separated(l):
+        return '"' + '", "'.join(l) + '"'
+
+    if values:
+        stmt = """
+            INSERT INTO {table} ({fields_str})
+            VALUES %s
+            ON CONFLICT ({by})
+            DO
+            UPDATE SET ({set_fields})=({set_values})
+        """
+        table_name = model._meta.db_table
+        set_fields = ', '.join([f for f in fields if f != by])
+        set_values = ', '.join(['EXCLUDED.{0}'.format(f) for f in fields if f != by])
+        fields_str = 
+        values_placeholders = ('%s, ' * len(values))[:-2]
+
+        formatted_sql = stmt.format(
+            table=model._meta.db_table,
+            fields_str=comma_separated(fields),
+            by=by,
+            values_placeholders=values_placeholders,
+            set_fields=set_fields,
+            set_values=set_values,
+        )
+
+        with connection.cursor() as cursor:
+            execute_values(cursor, formatted_sql, values)

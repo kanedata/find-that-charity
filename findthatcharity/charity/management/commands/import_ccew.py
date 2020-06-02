@@ -17,6 +17,7 @@ from django.utils.text import slugify
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation
 from charity.models import Charity, CharityFinancial, CharityName, AreaOfOperation
+from charity.management.commands._bulk_upsert import bulk_upsert
 
 
 class Command(HTMLScraper):
@@ -275,6 +276,15 @@ class Command(HTMLScraper):
                 })
             )
             self.object_count += 1
+
+    def close_spider(self):
+        super(Command, self).close_spider()
+        self.records = None
+        self.link_records = None
+
+        # now start upserting charity records
+        bulk_upsert(Charity, )
+
 
     def get_locations(self, record):
         # work out locations
