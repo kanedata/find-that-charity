@@ -16,7 +16,7 @@ from django.utils.text import slugify
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation
-from charity.models import Charity, CharityFinancial, CharityName, AreaOfOperation
+from charity.models import CharityRaw, Charity, CharityFinancial, CharityName, AreaOfOperation
 from charity.management.commands._bulk_upsert import bulk_upsert
 
 
@@ -115,6 +115,64 @@ class Command(HTMLScraper):
             "seqno",  # 	char(4) 	    sequence number (in practice 0-20)
             "object", #  	varchar(255) 	Description of objects of a charity
         ],
+        'extract_financial': [
+            "regno", # 	integer 	registered number of a charity
+            "fystart", # 	datetime 	Charity's financial year start date
+            "fyend", # 	datetime 	Charity's financial year end date
+            "income", # 	integer 	
+            "expend", # 	integer
+        ],
+        "extract_class": [
+            "regno", # integer 	registered number of a charity
+            "class", # integer 	classification code for a charity(multiple occurrences possible)
+        ],
+        "extract_partb": [
+            "regno",
+            "artype",
+            "fystart",
+            "fyend",
+            "inc_leg",
+            "inc_end",
+            "inc_vol",
+            "inc_fr",
+            "inc_char",
+            "inc_invest",
+            "inc_other",
+            "inc_total",
+            "invest_gain",
+            "asset_gain",
+            "pension_gain",
+            "exp_vol",
+            "exp_trade",
+            "exp_invest",
+            "exp_grant",
+            "exp_charble",
+            "exp_gov",
+            "exp_other",
+            "exp_total",
+            "exp_support",
+            "exp_dep",
+            "reserves",
+            "asset_open",
+            "asset_close",
+            "fixed_assets",
+            "open_assets",
+            "invest_assets",
+            "cash_assets",
+            "current_assets",
+            "credit_1",
+            "credit_long",
+            "pension_assets",
+            "total_assets",
+            "funds_end",
+            "funds_restrict",
+            "funds_unrestrict",
+            "funds_total",
+            "employees",
+            "volunteers",
+            "cons_acc",
+            "charity_acc",
+        ],
     }
     orgtypes = [
         "Registered Charity",
@@ -132,6 +190,7 @@ class Command(HTMLScraper):
             if not self.zip_regex.match(l):
                 continue
             r = self.session.get(l)
+            self.logger.info("Using file: {}".format(l))
             self.process_zip(r)
 
     def process_zip(self, response):
@@ -210,6 +269,7 @@ class Command(HTMLScraper):
                 yield (regno, record)
 
     def process_charities(self):
+        return
         
         for regno, record in self.get_all_charities():
 
@@ -282,8 +342,28 @@ class Command(HTMLScraper):
         self.records = None
         self.link_records = None
 
-        # now start upserting charity records
-        bulk_upsert(Charity, )
+        # now start inserting charity records
+        self.logger.info("Inserting CharityRaw records")
+        CharityRaw.objects.bulk_create(self.get_bulk_create())
+        self.logger.info("CharityRaw records inserted")
+
+        self.logger.info("Deleting old CharityRaw records")
+        CharityRaw.objects.filter(
+            spider__exact=self.name,
+        ).exclude(
+            scrape_id=self.scrape.id,
+        ).delete()
+        self.logger.info("Old CharityRaw records deleted")
+
+    def get_bulk_create(self):
+
+        for regno, record in tqdm.tqdm(self.get_all_charities()):
+            yield CharityRaw(
+                org_id=self.get_org_id(record),
+                data=record,
+                scrape=self.scrape,
+                spider=self.name,
+            )
 
 
     def get_locations(self, record):

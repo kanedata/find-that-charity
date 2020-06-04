@@ -1,6 +1,8 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.core.serializers.json import DjangoJSONEncoder
 
+from ftc.models import Scrape
 
 class Charity(models.Model):
     id = models.CharField(max_length=200, primary_key=True)
@@ -37,10 +39,20 @@ class CharityName(models.Model):
         related_name='other_names'
     )
     name = models.CharField(max_length=200, db_index=True)
+    normalisedName = models.CharField(max_length=200, db_index=True, blank=True, null=True)
     name_type = models.CharField(max_length=200, db_index=True)
+
+    class Meta:
+        unique_together = ('charity', 'name',)
 
 
 class CharityFinancial(models.Model):
+
+    class AccountType(models.TextChoices):
+        BASIC = 'basic', 'Basic'
+        CONSOLIDATED = 'consolidated', 'Consolidated'
+        CHARITY = 'charity', 'Charity'
+
     charity = models.ForeignKey(
         'Charity',
         on_delete=models.CASCADE,
@@ -50,11 +62,61 @@ class CharityFinancial(models.Model):
     fystart = models.DateField(null=True, blank=True)
     income = models.BigIntegerField(null=True, blank=True)
     spending = models.BigIntegerField(null=True, blank=True)
-    detail = JSONField(null=True, blank=True)
+    inc_leg = models.BigIntegerField(null=True, blank=True)
+    inc_end = models.BigIntegerField(null=True, blank=True)
+    inc_vol = models.BigIntegerField(null=True, blank=True)
+    inc_fr = models.BigIntegerField(null=True, blank=True)
+    inc_char = models.BigIntegerField(null=True, blank=True)
+    inc_invest = models.BigIntegerField(null=True, blank=True)
+    inc_other = models.BigIntegerField(null=True, blank=True)
+    inc_total = models.BigIntegerField(null=True, blank=True)
+    invest_gain = models.BigIntegerField(null=True, blank=True)
+    asset_gain = models.BigIntegerField(null=True, blank=True)
+    pension_gain = models.BigIntegerField(null=True, blank=True)
+    exp_vol = models.BigIntegerField(null=True, blank=True)
+    exp_trade = models.BigIntegerField(null=True, blank=True)
+    exp_invest = models.BigIntegerField(null=True, blank=True)
+    exp_grant = models.BigIntegerField(null=True, blank=True)
+    exp_charble = models.BigIntegerField(null=True, blank=True)
+    exp_gov = models.BigIntegerField(null=True, blank=True)
+    exp_other = models.BigIntegerField(null=True, blank=True)
+    exp_total = models.BigIntegerField(null=True, blank=True)
+    exp_support = models.BigIntegerField(null=True, blank=True)
+    exp_dep = models.BigIntegerField(null=True, blank=True)
+    reserves = models.BigIntegerField(null=True, blank=True)
+    asset_open = models.BigIntegerField(null=True, blank=True)
+    asset_close = models.BigIntegerField(null=True, blank=True)
+    fixed_assets = models.BigIntegerField(null=True, blank=True)
+    open_assets = models.BigIntegerField(null=True, blank=True)
+    invest_assets = models.BigIntegerField(null=True, blank=True)
+    cash_assets = models.BigIntegerField(null=True, blank=True)
+    current_assets = models.BigIntegerField(null=True, blank=True)
+    credit_1 = models.BigIntegerField(null=True, blank=True)
+    credit_long = models.BigIntegerField(null=True, blank=True)
+    pension_assets = models.BigIntegerField(null=True, blank=True)
+    total_assets = models.BigIntegerField(null=True, blank=True)
+    funds_end = models.BigIntegerField(null=True, blank=True)
+    funds_restrict = models.BigIntegerField(null=True, blank=True)
+    funds_unrestrict = models.BigIntegerField(null=True, blank=True)
+    funds_total = models.BigIntegerField(null=True, blank=True)
+    employees = models.BigIntegerField(null=True, blank=True)
+    volunteers = models.BigIntegerField(null=True, blank=True)
+    account_type = models.CharField(
+        max_length=50, default=AccountType.BASIC, choices=AccountType.choices)
 
     class Meta:
         unique_together = ('charity', 'fyend',)
 
+class CharityRaw(models.Model):
+    org_id = models.CharField(max_length=200)
+    spider = models.CharField(max_length=200, db_index=True)
+    scrape = models.ForeignKey(
+        'ftc.Scrape',
+        on_delete=models.CASCADE,
+    )
+    data = JSONField(
+        encoder=DjangoJSONEncoder
+    )
 
 class AreaOfOperation(models.Model):
     aootype = models.CharField(max_length=1)

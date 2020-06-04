@@ -14,7 +14,7 @@ def bulk_upsert(model, fields, values, by):
     if values:
         stmt = """
             INSERT INTO {table} ({fields_str})
-            VALUES %s
+            VALUES {values_placeholders}
             ON CONFLICT ({by})
             DO
             UPDATE SET ({set_fields})=({set_values})
@@ -22,8 +22,7 @@ def bulk_upsert(model, fields, values, by):
         table_name = model._meta.db_table
         set_fields = ', '.join([f for f in fields if f != by])
         set_values = ', '.join(['EXCLUDED.{0}'.format(f) for f in fields if f != by])
-        fields_str = 
-        values_placeholders = ('%s, ' * len(values))[:-2]
+        values_placeholders = ('%s, ' * len(fields))[:-2]
 
         formatted_sql = stmt.format(
             table=model._meta.db_table,
