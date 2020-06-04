@@ -13,11 +13,13 @@ from collections import defaultdict
 import tqdm
 
 from django.utils.text import slugify
+from django.db import connection
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation
 from charity.models import CharityRaw, Charity, CharityFinancial, CharityName, AreaOfOperation
 from charity.management.commands._bulk_upsert import bulk_upsert
+from charity.management.commands._ccew_sql import UPDATE_CCEW
 
 
 class Command(HTMLScraper):
@@ -269,7 +271,6 @@ class Command(HTMLScraper):
                 yield (regno, record)
 
     def process_charities(self):
-        return
         
         for regno, record in self.get_all_charities():
 
@@ -354,6 +355,14 @@ class Command(HTMLScraper):
             scrape_id=self.scrape.id,
         ).delete()
         self.logger.info("Old CharityRaw records deleted")
+
+        # execute SQL statements
+        with connection.cursor() as cursor:
+            for sql_name, sql in UPDATE_CCEW.items():
+                self.logger.info("Starting SQL: {}".format(sql_name))
+                cursor.execute(sql)
+                self.logger.info("Finished SQL: {}".format(sql_name))
+
 
     def get_bulk_create(self):
 
