@@ -2,6 +2,7 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.text import slugify
+from dbview.models import DbView
 
 class Organisation(models.Model):
     org_id = models.CharField(max_length=200, db_index=True)
@@ -113,3 +114,20 @@ class Scrape(models.Model):
     status = models.CharField(max_length=50, null=True,
                               blank=True, choices=ScrapeStatus.choices)
     
+
+class LinkedOrganisation(DbView):
+    org_id_a = models.CharField(max_length=255)
+    org_id_b = models.CharField(max_length=255)
+
+    @classmethod
+    def view(cl):
+        '''
+        This method returns the SQL string that creates the view, in this
+        example fieldB is the result of annotating another column
+        '''
+        query_top = OrganisationLink.objects.all().\
+            values('org_id_a', 'org_id_b')
+        query_bottom = OrganisationLink.objects.all().\
+            values('org_id_b', 'org_id_a')
+        qs = query_top.union(query_bottom, all=True)
+        return str(qs.query)

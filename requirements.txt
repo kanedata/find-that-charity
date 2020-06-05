@@ -1,5 +1,6 @@
 appdirs==1.4.4
 asgiref==3.2.7
+autopep8==1.5.3
 bcp-reader==0.1.1
 beautifulsoup4==4.9.1
 bs4==0.0.1
@@ -17,6 +18,7 @@ lxml==4.5.1
 openpyxl==3.0.3
 parse==1.15.0
 psycopg2==2.8.5
+pycodestyle==2.6.0
 pyee==7.0.2
 pyexcel-ezodf==0.3.4
 pyexcel-io==0.5.20
@@ -31,6 +33,7 @@ six==1.15.0
 soupsieve==2.0.1
 sqlparse==0.3.1
 titlecase==0.12.0
+toml==0.10.1
 tqdm==4.46.0
 urllib3==1.25.9
 validators==0.15.0

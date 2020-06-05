@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'dbview',
     'ftc.apps.FtcConfig',
     'charity.apps.CharityConfig',
     'django.contrib.admin',
