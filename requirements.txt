@@ -9,6 +9,9 @@ chardet==3.0.4
 cssselect==1.1.0
 decorator==4.4.2
 Django==3.0.6
+django-elasticsearch-dsl==6.4.2
+elasticsearch==6.8.1
+elasticsearch-dsl==6.4.0
 et-xmlfile==1.0.1
 fake-useragent==0.1.11
 idna==2.9
@@ -25,6 +28,7 @@ pyexcel-io==0.5.20
 pyexcel-ods3==0.5.3
 pyppeteer==0.2.2
 pyquery==1.4.1
+python-dateutil==2.8.1
 pytz==2020.1
 requests==2.23.0
 requests-cache==0.5.2

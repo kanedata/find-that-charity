@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_elasticsearch_dsl',
     'dbview',
     'ftc.apps.FtcConfig',
     'charity.apps.CharityConfig',
@@ -85,6 +86,14 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
+}
+
+# Elasticsearch
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'localhost:9200'
+    },
 }
 
 
