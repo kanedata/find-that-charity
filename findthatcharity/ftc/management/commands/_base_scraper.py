@@ -84,6 +84,7 @@ class BaseScraper(BaseCommand):
         self.logger.info("Spider finished")
 
     def close_spider(self):
+        self.object_count = len(self.records)
         self.logger.info("Saving records to database")
         Organisation.objects.bulk_create(self.records)
         self.logger.info("Records saved")

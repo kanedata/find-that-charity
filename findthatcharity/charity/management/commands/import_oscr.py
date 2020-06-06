@@ -3,9 +3,14 @@ import zipfile
 import io
 import csv
 
+import tqdm
+from django.db import connection
+
 from ftc.management.commands._base_scraper import CSVScraper, AREA_TYPES
 from ftc.models import Organisation
+from charity.models import CharityRaw
 
+from charity.management.commands._oscr_sql import UPDATE_OSCR
 
 class Command(CSVScraper):
     name = 'oscr'
@@ -46,6 +51,10 @@ class Command(CSVScraper):
         "Registered Charity",
         "Registered Charity (Scotland)",
     ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.raw_records = []
 
     def parse_file(self, response, source_url):
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
@@ -89,6 +98,8 @@ class Command(CSVScraper):
 
         org_ids = [self.get_org_id(record)]
 
+        self.raw_records.append(record)
+
         self.records.append(
             Organisation(**{
                 "org_id": self.get_org_id(record),
@@ -120,3 +131,38 @@ class Command(CSVScraper):
                 "spider": self.name,
             })
         )
+
+    def close_spider(self):
+        # super(Command, self).close_spider()
+        self.records = None
+        self.link_records = None
+
+        # now start inserting charity records
+        self.logger.info("Inserting CharityRaw records")
+        CharityRaw.objects.bulk_create(self.get_bulk_create())
+        self.logger.info("CharityRaw records inserted")
+
+        self.logger.info("Deleting old CharityRaw records")
+        CharityRaw.objects.filter(
+            spider__exact=self.name,
+        ).exclude(
+            scrape_id=self.scrape.id,
+        ).delete()
+        self.logger.info("Old CharityRaw records deleted")
+
+        # execute SQL statements
+        with connection.cursor() as cursor:
+            for sql_name, sql in UPDATE_OSCR.items():
+                self.logger.info("Starting SQL: {}".format(sql_name))
+                cursor.execute(sql)
+                self.logger.info("Finished SQL: {}".format(sql_name))
+
+    def get_bulk_create(self):
+
+        for record in tqdm.tqdm(self.raw_records):
+            yield CharityRaw(
+                org_id=self.get_org_id(record),
+                data=record,
+                scrape=self.scrape,
+                spider=self.name,
+            )

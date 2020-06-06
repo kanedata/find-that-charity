@@ -136,7 +136,7 @@ class AreaOfOperation(models.Model):
 
 
 class Vocabulary(models.Model):
-    title = models.CharField(max_length=200, db_index=True)
+    title = models.CharField(max_length=200, db_index=True, unique=True)
     single = models.BooleanField()
 
 
@@ -146,6 +146,10 @@ class VocabularyEntries(models.Model):
         on_delete=models.CASCADE,
         related_name='entries'
     )
-    code = models.CharField(max_length=200, db_index=True)
-    title = models.CharField(max_length=200, db_index=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    code = models.CharField(max_length=500, db_index=True)
+    title = models.CharField(max_length=500, db_index=True)
+    parent = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        unique_together = ('vocabulary', 'code',)

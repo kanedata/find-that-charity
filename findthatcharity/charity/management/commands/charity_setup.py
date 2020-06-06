@@ -13,9 +13,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # fetch classifications
-        # self.fetch_cc_classifications()
-        # self.fetch_icnpo()
-        # self.fetch_icnptso()
+        self.fetch_cc_classifications()
+        self.fetch_icnpo()
+        self.fetch_icnptso()
         self.fetch_aoo()
 
 
