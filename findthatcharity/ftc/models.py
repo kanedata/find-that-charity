@@ -1,12 +1,31 @@
+import operator
+
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.text import slugify
 from dbview.models import DbView
 
+PRIORITIES = [
+    "GB-CHC",
+    "GB-SC",
+    "GB-NIC",
+    "GB-EDU",
+    "GB-LAE",
+    "GB-PLA",
+    "GB-LAS",
+    "GB-LANI",
+    "GB-GOR",
+    "GB-COH",
+]
 class Organisation(models.Model):
     org_id = models.CharField(max_length=200, db_index=True)
     orgIDs = ArrayField(
+        models.CharField(max_length=100, blank=True),
+        blank=True,
+        null=True,
+    )
+    linked_orgs = ArrayField(
         models.CharField(max_length=100, blank=True),
         blank=True,
         null=True,
@@ -61,12 +80,49 @@ class Organisation(models.Model):
         unique_together = ('org_id', 'scrape',)
         indexes = [
             GinIndex(fields=["orgIDs"]),
+            GinIndex(fields=["linked_orgs"]),
             GinIndex(fields=["alternateName"]),
             GinIndex(fields=["organisationType"]),
         ]
 
     def __str__(self):
-        return '<%s %s>' % (self.organisationTypePrimary.title, self.org_id)
+        return '%s %s' % (self.organisationTypePrimary.title, self.org_id)
+
+    @staticmethod
+    def get_orgid_prefix(org_id):
+        return "-".join(org_id.split("-")[0:2])
+
+    @staticmethod
+    def prioritise_orgs(orgs):
+        # Decide what order a list of organisations should go in,
+        # based on their priority
+        if len(orgs) == 1:
+            return orgs
+
+        def get_priority_fields(o):
+            prefix = Organisation.get_orgid_prefix(o.org_id)
+            if prefix in PRIORITIES:
+                prefix_order = PRIORITIES.index(prefix)
+            else:
+                prefix_order = len(PRIORITIES) + 1
+            return (
+                o.org_id,
+                prefix,
+                PRIORITIES.index(Organisation.get_orgid_prefix(o.org_id)),
+                o.dateRegistered,
+            )
+
+        orgs = {o.org_id: o for o in orgs}
+
+        to_prioritise = sorted(
+            [get_priority_fields(o) for o in orgs.values() if o.active],
+            key=operator.itemgetter(2, 3)
+        ) + sorted(
+            [get_priority_fields(o) for o in orgs.values() if not o.active],
+            key=operator.itemgetter(2, 3)
+        )
+        return [orgs[p[0]] for p in to_prioritise]
+
 
 class OrganisationType(models.Model):
     slug = models.SlugField(max_length=255, editable=False, primary_key=True)

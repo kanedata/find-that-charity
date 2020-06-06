@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
     update_sql = """
     update ftc_organisation o
-    set "orgIDs" = linked_orgs
+    set "linked_orgs" = a.linked_orgs
     from (
         WITH RECURSIVE search_graph(org_id_a, org_id_b) AS (
                 SELECT a.org_id_a, a.org_id_b

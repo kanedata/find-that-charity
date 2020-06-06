@@ -1,0 +1,96 @@
+{% set frontpage = true %}
+{% extends 'base.html.j2' %}
+{% from 'components/org_id.html.j2' import orgid_link %}
+
+{% block content %}
+<div class="w-60-l w-100 center">
+    <p>A search engine for non profit organisations working in the UK</p>
+    <div class="mv5">
+        {% include 'components/_search_form.html.j2' %}
+    </div>
+    <p>Lookup individual charities based on their charity number:
+    <ul>
+        <li>Charity registered in England and Wales:
+            {# <a class="underline dark-blue f4"
+                href="{{ url('charity_index', regno=examples['registered-charity-england-and-wales']|replace('GB-CHC-', '')) }}">
+                /charity/{{ examples['registered-charity-england-and-wales']|replace('GB-CHC-', '') }}
+            </a> #}
+        </li>
+        <li>Charity registered in Scotland:
+            {# <a class="underline dark-blue f4"
+                href="{{ url('charity_index', regno=examples['registered-charity-scotland']|replace('GB-SC-', '')) }}">
+                /charity/{{ examples['registered-charity-scotland']|replace('GB-SC-', '') }}
+            </a> #}
+        </li>
+        <li>Charity registered in Northern Ireland:
+            {# <a class="underline dark-blue f4"
+                href="{{ url('charity_index', regno=examples['registered-charity-northern-ireland']|replace('GB-NIC-', 'NIC')) }}">
+                /charity/{{ examples['registered-charity-northern-ireland']|replace('GB-NIC-', 'NIC') }}
+            </a> #}
+        </li>
+    </ul>
+    These can also be accessed as json data by adding <code>.json</code> to the end of the url
+    </p>
+    <p>Lookup other types of organisations with an <a class="underline dark-blue f4" href="http://org-id.guide/"
+            target="_blank">OrgID</a>:
+    <ul>
+        <li>
+            Community Interest Company:
+            {#{ orgid_link(examples['community-interest-company'], request, large=true) }#}
+        </li>
+        <li>
+            Local Authority:
+            {#{ orgid_link(examples['local-authority'], request, large=true) }#}
+        </li>
+        <li>
+            University:
+            {#{ orgid_link(examples['universities'], request, large=true) }#}
+        </li>
+    </ul>
+    These can also be accessed as json data by adding <code>.json</code> to the end of the url
+    </p>
+    <p>
+        <a class="underline dark-blue f4" href="{#{ url('csvtool') }#}">
+            Add data about organisations to a CSV file
+        </a>
+    </p>
+    <p>As an <a class="underline dark-blue f4"
+            href="https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation">OpenRefine
+            reconciliation service</a> via <code>/reconcile</code>.</p>
+    <p>Find a <a class="underline dark-blue f4" href="{#{ url('random_org') }#}?active=true">random
+            charity</a>.</p>
+    <div class="mv5 cf">
+        <h3>Types of organisation available</h3>
+        <div class="">
+            {# {% for ot, o in org_types.items() if o.key in key_types %}
+            <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
+                <a href="{#{ url('orgid_type', orgtype=ot) }#}{#"
+                    class="link near-black underline-hover pa2 dib fl">{{ o.key }}</a>
+                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(o.doc_count) }}</span>
+            </div>
+            {% endfor %} #}
+        </div>
+    </div>
+    <div class="mv5 cf">
+        <h3>Data sources</h3>
+        <div class="">
+            {# {% for o in sources_count %}
+            <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
+                <a href="{#{ url('orgid_source', source=o.key) }#}{#"
+                    class="link near-black underline-hover pa2 dib fl">
+                    {{ sources.get(o.key, {}).get("publisher", {}).get("name", o.key) }}
+                    {% if sources.get(o.key, {}).get("publisher", {}).get("duplicate", False) %}
+                    <br><span class="is-size-7">({{ sources.get(o.key, {}).get("title") }})</span>
+                    {% endif %}
+                </a>
+                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(o.doc_count) }}</span>
+            </div>
+            {% endfor %} #}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyscripts %}
+<script src='{#{url("static", path="/js/autocomplete.js")}#}' type="text/javascript"></script>
+{% endblock %}

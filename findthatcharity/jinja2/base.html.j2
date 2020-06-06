@@ -1,0 +1,87 @@
+{% set default_title = 'Find that Charity' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Archivo:400,700|Raleway:400,700|Material+Icons">
+    <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
+    <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
+    {% block headscripts %}
+    {% endblock %}
+    {% if ga_tracking %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', '{{ ga_tracking }}');
+    </script>
+    {% endif %}
+    <title>{{ (title or default_title)|striptags }}</title>
+  </head>
+  <body class="home w-100 sans-serif near-black base-font bg-wavy">
+    <header class="body header-font normal ph3 ph5-ns pt3 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
+      <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
+          {# <a href="{{ url('about') }}" class="white logo underline double underline-yellow">About</a>
+            | <a href="{{ url('about') }}#data-sources" class="white logo underline double underline-yellow">Data sources</a>
+            | <a href="{{ url('about') }}#privacy" class="white logo underline double underline-yellow">Privacy</a> #}
+      </div>
+      <h1 class="{% if frontpage %}f-subheadline-ns{% endif %} tracked-tight f1 lh-title mv0 logo normal">
+        <a href="{{ url('index') }}" class="link moon-gray underline-yellow underline">
+          {{ default_title }}
+        </a>
+      </h1>
+    </header>
+    <main class="ph0 bg-white cf">
+      {% block header %}
+      <header class="fl w-100 ph3 ph5-ns entry-content lh-copy f4">
+        {% if (heading or title) not in [None, default_title] and (heading or title) %}
+        <h2 class="f2-ns mt4 mb0 f3 lh-solid normal">
+          {{ (heading or title)|safe }}
+        </h2>
+        {% if subtitle %}
+        <h3 class="f3-ns f4 lh-solid mv0 normal gray">
+        {{ subtitle|safe }}
+        </h3>
+        {% endif %}
+        {% endif %}
+      </header>
+      {% endblock %}
+      <section id="content" class="{% block sectionstyles %}fl w-100 ph3 pv5 ph5-ns lh-copy f4{% endblock %}">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+    <footer id="contentinfo" class="body ph3 ph5-ns db pv5 moon-gray bg-near-black">
+        <p class="ma0 pa0">© {{now.year}} <a href="https://drkane.net/" class="link yellow underline-hover">David Kane</a></p>
+        <p class="mv2 pa0">
+            <strong>Find that Charity</strong>
+            {# | <a href="{{ url('about') }}" class="link yellow underline-hover">About</a>
+            | <a href="{{ url('about') }}#data-sources" class="link yellow underline-hover">Data sources</a>
+            | <a href="{{ url('about') }}#privacy" class="link yellow underline-hover">Privacy</a> #}
+        </p>
+        <div class="mv2 pa0">
+            Supported by <a href="http://www.threesixtygiving.org/" target="_blank" class="link yellow underline-hover">360Giving</a>
+        </div>
+        <div class="mv2 pa0">
+            <a href="https://github.com/drkane/find-that-charity" class="">
+                <span class="icon mw2 dib">
+                    <svg xmlns="http://www.w3.org/2000/svg" aria-label="Github" role="img"
+                        viewBox="0 0 512 512">
+                        <rect width="512" height="512" rx="15%" />
+                        <clipPath id="a">
+                            <rect width="512" height="512" rx="15%" />
+                        </clipPath>
+                        <path fill="#fff"
+                            d="M335 499c14 0 12 17 12 17H165s-2-17 12-17c13 0 16-6 16-12l-1-50c-71 16-86-28-86-28-12-30-28-37-28-37-24-16 1-16 1-16 26 2 40 26 40 26 22 39 59 28 74 22 2-17 9-28 16-35-57-6-116-28-116-126 0-28 10-51 26-69-3-6-11-32 3-67 0 0 21-7 70 26 42-12 86-12 128 0 49-33 70-26 70-26 14 35 6 61 3 67 16 18 26 41 26 69 0 98-60 120-117 126 10 8 18 24 18 48l-1 70c0 6 3 12 16 12z"
+                            clip-path="url(#a)" />
+                    </svg>
+                </span>
+            </a>
+        </div>
+    </footer>
+    {% block bodyscripts %}
+    {% endblock %}
+  </body>
+</html>

@@ -10,14 +10,10 @@ from .models import Organisation
 class FullOrganisation(Document):
 
     complete_names = fields.CompletionField()
-    orgIDs = fields.TextField()
+    orgIDs = fields.KeywordField()
     alternateName = fields.TextField()
-    organisationType = fields.TextField()
-    source = fields.TextField()
-
-    def __init__(self, **kwargs):
-        super(FullOrganisation, self).__init__(**kwargs)
-        self.records_seen = set()
+    organisationType = fields.KeywordField()
+    source = fields.KeywordField()
 
     class Index:
         # Name of the Elasticsearch index
@@ -56,7 +52,7 @@ class FullOrganisation(Document):
         Return the queryset that should be indexed by this doc type.
         """
         sql = """
-        select distinct on (o."orgIDs") o.*
+        select distinct on (o."linked_orgs") o.*
         from (
             select *
             from ftc_organisation 
@@ -88,3 +84,6 @@ class FullOrganisation(Document):
         # Paginate the django queryset used to populate the index with the specified size
         # (by default it uses the database driver's default setting)
         # queryset_pagination = 5000
+
+    def get_related_orgs(self):
+        return Organisation.objects.filter(org_id__in=self.orgIDs)
