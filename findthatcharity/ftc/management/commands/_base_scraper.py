@@ -36,7 +36,7 @@ class BaseScraper(BaseCommand):
         self.orgtype_cache = {}
         self.records = []
         self.link_records = []
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("ftc.{}".format(self.name))
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -84,16 +84,25 @@ class BaseScraper(BaseCommand):
         self.logger.info("Spider finished")
 
     def close_spider(self):
-        self.object_count = len(self.records)
-        self.logger.info("Saving records to database")
-        Organisation.objects.bulk_create(self.records)
-        self.logger.info("Records saved")
+        results = {
+            "records": len(self.records)
+        }
+        self.object_count = results['records']
+        self.scrape.items = results['records']
+        if self.records:
+            self.logger.info("Saving {:,.0f} organisation records".format(results['records']))
+            Organisation.objects.bulk_create(self.records)
+            self.logger.info("Saved {:,.0f} organisation records".format(results['records']))
+
         if self.link_records:
-            self.logger.info("Saving link records to database")
+            results['link_records'] = len(self.link_records)
+            self.object_count += results['link_records']
+            self.logger.info("Saving {:,.0f} link records".format(results['link_records']))
             OrganisationLink.objects.bulk_create(self.link_records)
-            self.logger.info("Link records saved")
-        self.scrape.items = self.object_count
+            self.logger.info("Saved {:,.0f} link records".format(
+                results['link_records']))
         self.scrape.errors = self.error_count
+        self.scrape.result = results
         if self.object_count == 0:
             self.scrape.status = Scrape.ScrapeStatus.FAILED
         elif self.error_count > 0:
@@ -103,7 +112,8 @@ class BaseScraper(BaseCommand):
         self.scrape.save()
 
         # if we've been successfull then delete previous items
-        if self.scrape.items > 0:
+        if self.object_count > 0:
+            self.logger.info("Deleting previous records")
             Organisation.objects.filter(
                 spider__exact=self.name,
             ).exclude(
@@ -114,6 +124,7 @@ class BaseScraper(BaseCommand):
             ).exclude(
                 scrape_id=self.scrape.id,
             ).delete()
+            self.logger.info("Deleted previous records")
 
 
 

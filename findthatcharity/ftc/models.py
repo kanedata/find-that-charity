@@ -68,7 +68,7 @@ class Organisation(models.Model):
     organisationTypePrimary = models.ForeignKey(
         'OrganisationType',
         on_delete=models.CASCADE,
-        related_name="+",
+        related_name="organisations",
     )
     scrape = models.ForeignKey(
         'Scrape',
@@ -158,7 +158,7 @@ class Scrape(models.Model):
         FAILED = 'failed', 'Failed to complete'
 
     spider = models.CharField(max_length=200)
-    result = models.TextField(null=True, blank=True)
+    result = JSONField(null=True, blank=True)
     start_time = models.DateTimeField(auto_now_add=True)
     finish_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     log = models.TextField(null=True, blank=True)

@@ -25,9 +25,11 @@ class Command(BaseCommand):
                 group by org_id_a
             ) as a
             where a.org_id = o.org_id;
-            """,
+        """,
         "Add missing orgIDs": """
-
+            update ftc_organisation 
+            set linked_orgs = string_to_array(org_id, '')
+            where linked_orgs is null;
         """
     }
 

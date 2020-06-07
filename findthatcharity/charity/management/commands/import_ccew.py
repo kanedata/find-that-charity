@@ -344,9 +344,12 @@ class Command(HTMLScraper):
         self.link_records = None
 
         # now start inserting charity records
+        self.charity_count = 0
         self.logger.info("Inserting CharityRaw records")
         CharityRaw.objects.bulk_create(self.get_bulk_create())
-        self.logger.info("CharityRaw records inserted")
+        self.logger.info("Inserted {:,.0f} CharityRaw records inserted".format(self.charity_count))
+        self.scrape.result['charity_records'] = self.charity_count
+        self.scrape.save()
 
         self.logger.info("Deleting old CharityRaw records")
         CharityRaw.objects.filter(
@@ -367,6 +370,7 @@ class Command(HTMLScraper):
     def get_bulk_create(self):
 
         for regno, record in tqdm.tqdm(self.get_all_charities()):
+            self.charity_count += 1
             yield CharityRaw(
                 org_id=self.get_org_id(record),
                 data=record,
