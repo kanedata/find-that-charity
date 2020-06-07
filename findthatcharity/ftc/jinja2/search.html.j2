@@ -1,0 +1,20 @@
+{% set frontpage = false %}
+{% extends 'base.html.j2' %}
+
+{% set heading = 'Search results' %}
+
+{% block content %}
+<div class="columns">
+    <div class="column">
+        {% include 'components/search_form.html.j2' %}
+        <br>
+        {% if term %}
+        {% include 'components/search_results.html.j2' %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyscripts %}
+{# <script src='{{url("static", path="/js/autocomplete.js")}}' type="text/javascript"></script> #}
+{% endblock %}

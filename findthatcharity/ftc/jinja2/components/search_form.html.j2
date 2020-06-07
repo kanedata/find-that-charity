@@ -12,13 +12,13 @@
             class="f6 f5-l input-reset bl bt bb br-0 b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-30-ns">
             <option value="all">All organisation types</option>
             <option disabled>----------</option>
-            {#% for ot, o in org_types.items() if o.key in key_types %}
+            {% for o in orgtypes.values()|sort(attribute='title') if o.is_keytype() %}
                 {% if o.slug == selected_org_type -%}
-                <option value="{{ o.slug }}" selected="selected">{{ o.key }}</option>
+                <option value="{{ o.slug }}" selected="selected">{{ o.title }}</option>
                 {% else -%}
-                <option value="{{ o.slug }}">{{ o.key }}</option>
+                <option value="{{ o.slug }}">{{ o.title }}</option>
                 {%- endif -%}
-            {%- endfor -%#}
+            {%- endfor -%}
         </select>
         <input type="submit" value="Search" class="f6 f5-l button-reset br bt bb bl-0 b--black-20 fl pv3 tc bg-animate bg-yellow dim near-black pointer w-100 w-20-m w-20-l br2-ns br--right-ns">
     </div>

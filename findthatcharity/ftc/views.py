@@ -3,14 +3,60 @@ from django.db.models import Q, Count, Func, F
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
+from django.views.decorators.cache import cache_page
 
 from ftc.documents import FullOrganisation
-from ftc.models import Organisation, RelatedOrganisation
+from ftc.models import Organisation, RelatedOrganisation, OrganisationType, Source
 
 # site homepage
+
+
+@cache_page(60 * 60)
 def index(request):
-    context = {}
+    if 'q' in request.GET:
+        return org_search(request)
+
+    orgs = Organisation.objects
+
+    by_orgtype = orgs.annotate(orgtype=Func(
+        F('organisationType'), function='unnest')).values('orgtype').annotate(records=Count('*')).order_by('-records')
+    by_source = orgs.values('source').annotate(
+        records=Count('source')).order_by('-records')
+
+    context = dict(
+        examples = {
+            'registered-charity-england-and-wales': 'GB-CHC-1177548',
+            'registered-charity-scotland': 'GB-SC-SC007427',
+            'registered-charity-northern-ireland': 'GB-NIC-104226',
+            'community-interest-company': 'GB-COH-08255580',
+            'local-authority': 'GB-LAE-IPS',
+            'universities': 'GB-EDU-133808',
+        },
+        term='',
+        by_orgtype=by_orgtype,
+        by_source=by_source,
+    )
     return render(request, 'index.html.j2', context)
+
+
+def org_search(request):
+    criteria = {}
+    if 'q' in request.GET:
+        criteria['name__search'] = request.GET['q']
+    if 'orgtype' in request.GET and request.GET.get('orgtype') != 'all':
+        criteria["organisationType__contains"] = [request.GET['orgtype']]
+
+    orgs = Organisation.objects.filter(
+        **{k: v for k, v in criteria.items() if v})
+    paginator = Paginator(orgs, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'search.html.j2', {
+        'res': page_obj,
+        'term': request.GET.get('q'),
+        'selected_org_type': request.GET.get('orgtype'),
+    })
 
 
 def get_orgid(request, org_id, filetype="html"):
@@ -48,12 +94,8 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
 
     if 'q' in request.GET:
         criteria['name__search'] = request.GET['q']
-    print(criteria)
 
     orgs = Organisation.objects.filter(**{k: v for k, v in criteria.items() if v})
-
-
-
 
     by_orgtype = orgs.annotate(orgtype=Func(
         F('organisationType'), function='unnest')).values('orgtype').annotate(records=Count('*')).order_by('-records')
@@ -72,7 +114,6 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
             "by_source": by_source,
         }
     })
-
 
 
 def orgid_type_download(request, orgtype=None, source=None, filetype="html"):

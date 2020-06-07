@@ -6,7 +6,7 @@
 <div class="w-60-l w-100 center">
     <p>A search engine for non profit organisations working in the UK</p>
     <div class="mv5">
-        {% include 'components/_search_form.html.j2' %}
+        {% include 'components/search_form.html.j2' %}
     </div>
     <p>Lookup individual charities based on their charity number:
     <ul>
@@ -36,15 +36,15 @@
     <ul>
         <li>
             Community Interest Company:
-            {#{ orgid_link(examples['community-interest-company'], request, large=true) }#}
+            {{ orgid_link(examples['community-interest-company'], request, large=true) }}
         </li>
         <li>
             Local Authority:
-            {#{ orgid_link(examples['local-authority'], request, large=true) }#}
+            {{ orgid_link(examples['local-authority'], request, large=true) }}
         </li>
         <li>
             University:
-            {#{ orgid_link(examples['universities'], request, large=true) }#}
+            {{ orgid_link(examples['universities'], request, large=true) }}
         </li>
     </ul>
     These can also be accessed as json data by adding <code>.json</code> to the end of the url
@@ -62,30 +62,28 @@
     <div class="mv5 cf">
         <h3>Types of organisation available</h3>
         <div class="">
-            {# {% for ot, o in org_types.items() if o.key in key_types %}
+            {% for ot in by_orgtype if orgtypes[ot.orgtype].is_keytype() %}
             <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
-                <a href="{#{ url('orgid_type', orgtype=ot) }#}{#"
-                    class="link near-black underline-hover pa2 dib fl">{{ o.key }}</a>
-                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(o.doc_count) }}</span>
+                <a href="{{ url('orgid_type', kwargs=dict(orgtype=orgtypes[ot.orgtype].slug)) }}"
+                    class="link near-black underline-hover pa2 dib fl">{{ orgtypes[ot.orgtype].title }}</a>
+                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(ot.records) }}</span>
             </div>
-            {% endfor %} #}
+            {% endfor %}
         </div>
     </div>
     <div class="mv5 cf">
         <h3>Data sources</h3>
         <div class="">
-            {# {% for o in sources_count %}
+            {% for o in by_source %}
             <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
-                <a href="{#{ url('orgid_source', source=o.key) }#}{#"
+                <a href="{{ url('orgid_source', kwargs=dict(source=o.source)) }}"
                     class="link near-black underline-hover pa2 dib fl">
-                    {{ sources.get(o.key, {}).get("publisher", {}).get("name", o.key) }}
-                    {% if sources.get(o.key, {}).get("publisher", {}).get("duplicate", False) %}
-                    <br><span class="is-size-7">({{ sources.get(o.key, {}).get("title") }})</span>
-                    {% endif %}
+                    {{ sources[o.source].data.publisher.name }}
+                    {# <br><span class="is-size-7">({{ sources[o.source].data.title }})</span> #}
                 </a>
-                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(o.doc_count) }}</span>
+                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(o.records) }}</span>
             </div>
-            {% endfor %} #}
+            {% endfor %}
         </div>
     </div>
 </div>
