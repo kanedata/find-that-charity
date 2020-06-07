@@ -9,6 +9,7 @@ from .models import Organisation
 @registry.register_document
 class FullOrganisation(Document):
 
+    org_id = fields.KeywordField()
     complete_names = fields.CompletionField()
     orgIDs = fields.KeywordField()
     alternateName = fields.TextField()
@@ -47,6 +48,9 @@ class FullOrganisation(Document):
     def prepare_source(self, instance):
         return instance.source_id
 
+    def prepare_org_id(self, instance):
+        return str(instance.org_id)
+
     def get_queryset(self):
         """
         Return the queryset that should be indexed by this doc type.
@@ -67,7 +71,6 @@ class FullOrganisation(Document):
 
         # The fields of the model you want to be indexed in Elasticsearch
         fields = [
-            'org_id',
             'name',
             'postalCode',
             'dateModified',
