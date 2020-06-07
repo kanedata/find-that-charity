@@ -11,7 +11,8 @@
     <p class="mv1 pa0 mid-gray f6">{{ source.description }}</p>
     {% endif %}
     {% if source.modified %}
-    <p class="mv1 pa0 f5"><strong>Last updated:</strong> {{ "{:%Y-%m-%d}".format(source.modified) }}</p>
+    <p class="mv1 pa0 f5"><strong>Last updated:</strong> {{ source.modified }}</p>
+    {# <p class="mv1 pa0 f5"><strong>Last updated:</strong> {{ "{:%Y-%m-%d}".format(source.modified) }}</p> #}
     {% endif %}
     <p class="mv1 pa0 f5">
       <a class="link underline blue" href="{{ source.license }}">{{ source.license_name }}</a>
@@ -32,25 +33,25 @@
       {% endfor %}
       </ul>
       {% endif %}
-      {% for r in org.records if r.source == source.identifier %}
+      {% for r in org.records if r.source.id == source.identifier %}
         {% if loop.first %}
         <p class="mt1 mb0 pa0 f6"><strong>Source for records: </strong></p>
         <ul class="mt1 mb1 pa0 list">
         {% endif %}
-            <li class="dib mr2">{{ orgid_link(r.id, request) }}</li>
+            <li class="dib mr2">{{ orgid_link(r.org_id, request) }}</li>
         {% if loop.last %}
         </ul>
         {% endif %}
       {% endfor %}
     
     <p class="mv1 pa0 f5">
-      {% for r in org.org_links if r.source == source.identifier %}
+      {% for r in org.org_links if r.source.id == source.identifier %}
         {% if loop.first %}
         <p class="mt1 mb0 pa0 f6"><strong>Source for record links:</strong></p>
         <ul class="mt1 mb1 pa0 list">
         {% endif %}
             <li class="f6">
-              {{ orgid_connection(r.organisation_id_a, r.organisation_id_b, request) }}
+              {{ orgid_connection(r.org_id_a, r.org_id_b, request) }}
             </li>
         {% if loop.last %}
         </ul>

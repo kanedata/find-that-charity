@@ -18,6 +18,7 @@ PRIORITIES = [
     "GB-GOR",
     "GB-COH",
 ]
+
 class Organisation(models.Model):
     org_id = models.CharField(max_length=200, db_index=True)
     orgIDs = ArrayField(
@@ -92,37 +93,11 @@ class Organisation(models.Model):
     def get_orgid_prefix(org_id):
         return "-".join(org_id.split("-")[0:2])
 
-    @staticmethod
-    def prioritise_orgs(orgs):
-        # Decide what order a list of organisations should go in,
-        # based on their priority
-        if len(orgs) == 1:
-            return orgs
-
-        def get_priority_fields(o):
-            prefix = Organisation.get_orgid_prefix(o.org_id)
-            if prefix in PRIORITIES:
-                prefix_order = PRIORITIES.index(prefix)
-            else:
-                prefix_order = len(PRIORITIES) + 1
-            return (
-                o.org_id,
-                prefix,
-                PRIORITIES.index(Organisation.get_orgid_prefix(o.org_id)),
-                o.dateRegistered,
-            )
-
-        orgs = {o.org_id: o for o in orgs}
-
-        to_prioritise = sorted(
-            [get_priority_fields(o) for o in orgs.values() if o.active],
-            key=operator.itemgetter(2, 3)
-        ) + sorted(
-            [get_priority_fields(o) for o in orgs.values() if not o.active],
-            key=operator.itemgetter(2, 3)
+    def org_links(self):
+        return OrganisationLink.objects.filter(
+            models.Q(org_id_a=self.org_id) |
+            models.Q(org_id_b=self.org_id)
         )
-        return [orgs[p[0]] for p in to_prioritise]
-
 
 class OrganisationType(models.Model):
     slug = models.SlugField(max_length=255, editable=False, primary_key=True)
@@ -132,6 +107,28 @@ class OrganisationType(models.Model):
         value = self.title
         self.slug = slugify(value, allow_unicode=True)
         super().save(*args, **kwargs)
+
+    KEY_TYPES = [
+        # "registered-charity",
+        "registered-charity-england-and-wales",
+        "registered-charity-scotland",
+        "registered-charity-northern-ireland",
+        "registered-company",
+        # "company limited by guarantee",
+        "charitable-incorporated-organisation",
+        "education",
+        "community-interest-company",
+        "health",
+        "registered-society",
+        "community-amateur-sports-club",
+        "registered-provider-of-social-housing",
+        "government-organisation",
+        "local-authority",
+        "university",
+    ]
+
+    def is_keytype(self):
+        return self.slug in self.KEY_TYPES
 
 class OrganisationLink(models.Model):
     org_id_a = models.CharField(max_length=255, db_index=True)
@@ -196,3 +193,140 @@ class LinkedOrganisation(DbView):
             values('org_id_b', 'org_id_b'),
         )
         return str(qs.query)
+
+
+class RelatedOrganisation:
+
+    EXTERNAL_LINKS = {
+        "GB-CHC": [
+            ["http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber={}&SubsidiaryNumber=0&Ref=CO",
+             "Charity Commission England and Wales"],
+            ["http://beta.charitycommission.gov.uk/charity-details/?regid={}&subid=0",
+             "Charity Commission England and Wales (beta)"],
+            ["https://charitybase.uk/charities/{}", "CharityBase"],
+            ["http://opencharities.org/charities/{}", "OpenCharities"],
+            ["http://www.guidestar.org.uk/summary.aspx?CCReg={}", "GuideStar"],
+            ["http://www.charitychoice.co.uk/charities/search?t=qsearch&q={}",
+             "Charities Direct"],
+            ["https://olib.uk/charity/html/{}", "CharityData by Olly Benson"],
+        ],
+        "GB-COH": [
+            ["https://beta.companieshouse.gov.uk/company/{}", "Companies House"],
+            ["https://opencorporates.com/companies/gb/{}", "Opencorporates"],
+        ],
+        "GB-NIC": [
+            ["http://www.charitycommissionni.org.uk/charity-details/?regid={}&subid=0",
+             "Charity Commission Northern Ireland"],
+        ],
+        "GB-SC": [
+            ["https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={}",
+             "Office of Scottish Charity Regulator"],
+        ],
+        "GB-EDU": [
+            ["https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{}",
+             "Get information about schools"],
+        ],
+        "GB-NHS": [
+            ["https://odsportal.hscic.gov.uk/Organisation/Details/{}", "NHS Digital"],
+        ],
+        "GB-LAE": [
+            ["https://www.registers.service.gov.uk/registers/local-authority-eng/records/{}",
+             "Local authorities in England"],
+        ],
+        "GB-LAN": [
+            ["https://www.registers.service.gov.uk/registers/local-authority-nir/records/{}",
+             "Local authorities in Northern Ireland"],
+        ],
+        "GB-LAS": [
+            ["https://www.registers.service.gov.uk/registers/local-authority-sct/records/{}",
+             "Local authorities in Scotland"],
+        ],
+        "GB-PLA": [
+            ["https://www.registers.service.gov.uk/registers/principal-local-authority/records/{}",
+             "Principal Local authorities in Wales"],
+        ],
+        "GB-GOR": [
+            ["https://www.registers.service.gov.uk/registers/government-organisation/records/{}",
+             "Government organisations on GOV.UK"],
+        ],
+        "XI-GRID": [
+            ["https://www.grid.ac/institutes/{}",
+             "Global Research Identifier Database"],
+        ],
+    }
+
+    def __init__(self, orgs):
+        self.records = self.prioritise_orgs(orgs)
+        self.orgIDs = set(self.get_all("orgIDs"))
+        self.alternateName = list(self.get_all("alternateName"))
+        self.sources = list(self.get_all("source"))
+
+        self.org_links = []
+        for o in self.records:
+            self.org_links.extend(o.org_links())
+        self.org_links = list(set(self.org_links))
+        self.sources.extend(list(set([o.source for o in self.org_links])))
+        self.sources = list(set(self.sources))
+
+    def __getattr__(self, key, *args):
+        return getattr(self.records[0], key, *args)
+
+    def first(self, field):
+        for r in self.records:
+            if getattr(r, field, None):
+                return {
+                    "value": getattr(r, field),
+                    "orgid": r.org_id,
+                    "source": r.source,
+                }
+
+    def get_all(self, field):
+        seen = set()
+        for r in self.records:
+            values = getattr(r, field, None)
+            if not isinstance(values, list):
+                values = [values]
+            for v in values:
+                if v not in seen:
+                    yield v
+                seen.add(v)
+
+    def prioritise_orgs(self, orgs):
+        # Decide what order a list of organisations should go in,
+        # based on their priority
+        if len(orgs) == 1:
+            return orgs
+
+        def get_priority_fields(o):
+            prefix = Organisation.get_orgid_prefix(o.org_id)
+            if prefix in PRIORITIES:
+                prefix_order = PRIORITIES.index(prefix)
+            else:
+                prefix_order = len(PRIORITIES) + 1
+            return (
+                o.org_id,
+                prefix,
+                prefix_order,
+                o.dateRegistered,
+            )
+
+        orgs = {o.org_id: o for o in orgs}
+
+        to_prioritise = sorted(
+            [get_priority_fields(o) for o in orgs.values() if o.active],
+            key=operator.itemgetter(2, 3)
+        ) + sorted(
+            [get_priority_fields(o) for o in orgs.values() if not o.active],
+            key=operator.itemgetter(2, 3)
+        )
+        return [orgs[p[0]] for p in to_prioritise]
+
+    def get_links(self):
+        if self.url:
+            yield (self.url, 'Organisation Website')
+        for o in self.orgIDs:
+            for prefix, ls in self.EXTERNAL_LINKS.items():
+                if o.startswith(prefix + "-"):
+                    regno = o.replace(prefix + "-", "")
+                    for l in ls:
+                        yield (l[0].format(regno), l[1])

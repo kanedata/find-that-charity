@@ -32,8 +32,8 @@ class Command(CSVScraper):
                 }
             ],
             "_parse_row": lambda row: {
-                "organisation_id_a": "GB-HESA-{}".format(row["HESA ID"]),
-                "organisation_id_b": row["OrgID"]
+                "org_id_a": "GB-HESA-{}".format(row["HESA ID"]),
+                "org_id_b": row["OrgID"]
             }
         },
         {
@@ -56,8 +56,8 @@ class Command(CSVScraper):
                 }
             ],
             "_parse_row": lambda row: {
-                "organisation_id_a": "GB-SC-{}".format(row["Scottish Charity Number"].strip()),
-                "organisation_id_b": "GB-CHC-{}".format(row["E&W Charity Number"].strip()),
+                "org_id_a": "GB-SC-{}".format(row["Scottish Charity Number"].strip()),
+                "org_id_b": "GB-CHC-{}".format(row["E&W Charity Number"].strip()),
             }
         },
         {
@@ -102,8 +102,8 @@ class Command(CSVScraper):
                 }
             ],
             "_parse_row": lambda row: {
-                "organisation_id_a": "GB-EDU-{}".format(row["URN"].strip()),
-                "organisation_id_b": "GB-COH-{}".format(row["CompanyNumber"].strip()),
+                "org_id_a": "GB-EDU-{}".format(row["URN"].strip()),
+                "org_id_b": "GB-COH-{}".format(row["CompanyNumber"].strip()),
             }
         },
         {
@@ -126,8 +126,8 @@ class Command(CSVScraper):
                 }
             ],
             "_parse_row": lambda row: {
-                "organisation_id_a": "GB-EDU-{}".format(row["URN"].strip()),
-                "organisation_id_b": "GB-CHC-{}".format(row["charity_number"].strip()) if row["charity_number"].strip() else None,
+                "org_id_a": "GB-EDU-{}".format(row["URN"].strip()),
+                "org_id_b": "GB-CHC-{}".format(row["charity_number"].strip()) if row["charity_number"].strip() else None,
             }
         },
         {
@@ -150,8 +150,8 @@ class Command(CSVScraper):
                 }
             ],
             "_parse_row": lambda row: {
-                "organisation_id_a": "GB-CHC-{}".format(row["transferor_regno"].strip()) if row["transferor_subno"].strip()=="0" else None,
-                "organisation_id_b": "GB-CHC-{}".format(row["transferee_regno"].strip()) if row["transferee_subno"].strip() == "0" else None,
+                "org_id_a": "GB-CHC-{}".format(row["transferor_regno"].strip()) if row["transferor_subno"].strip()=="0" else None,
+                "org_id_b": "GB-CHC-{}".format(row["transferee_regno"].strip()) if row["transferee_subno"].strip() == "0" else None,
                 "description": "merger"
             }
         },
@@ -175,8 +175,8 @@ class Command(CSVScraper):
                 }
             ],
             "_parse_row": lambda row: {
-                "organisation_id_a": "GB-COH-{}".format(row["company_number"].strip()) if row["company_number"].strip() else None,
-                "organisation_id_b": "GB-CHC-{}".format(row["charity_number"].strip()) if row["charity_number"].strip() else None,
+                "org_id_a": "GB-COH-{}".format(row["company_number"].strip()) if row["company_number"].strip() else None,
+                "org_id_b": "GB-CHC-{}".format(row["charity_number"].strip()) if row["charity_number"].strip() else None,
             }
         },
     ]
@@ -208,11 +208,11 @@ class Command(CSVScraper):
                 if "_parse_row" in source:
                     row = source["_parse_row"](row)
                 row["source"] = source["identifier"]
-                if row.get("organisation_id_a") and row.get("organisation_id_b"):
+                if row.get("org_id_a") and row.get("org_id_b"):
                     self.link_records.append(
                         OrganisationLink(
-                            org_id_a = row['organisation_id_a'],
-                            org_id_b = row['organisation_id_b'],
+                            org_id_a = row['org_id_a'],
+                            org_id_b = row['org_id_b'],
                             spider = self.name,
                             source = self.source_cache[source['identifier']],
                             scrape = self.scrape,

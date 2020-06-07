@@ -1,0 +1,50 @@
+{% if res.has_other_pages() %}
+<nav class="pagination" role="navigation" aria-label="pagination">
+    <ul class="pagination-list list ma0 pa0">
+        {% if res.has_previous() %}
+        <li class="dib mr4">
+        <a href="{{ url_replace(request, page=res.previous_page_number()) }}" 
+           class="pagination-previous pa2 link br1 b--light-gray ba bw1 f5 near-black">Previous</a>
+        </li>
+        {% endif %}
+        {% if res.number > 2 %}
+        <li class="dib">
+            <a href="{{ url_replace(request, page=1) }}" class="pagination-link pa2 link br1 b--light-gray ba bw1 f5 near-black" aria-label="Goto page 1">1</a>
+        </li>
+        {% endif %}
+        {% if res.has_previous() %}
+        {% if (res.previous_page_number() - 1) > 1 %}
+        <li class="dib">
+            <span class="pagination-ellipsis">&hellip;</span>
+        </li>
+        {% endif %}
+        <li class="dib">
+            <a href="{{ url_replace(request, page=res.previous_page_number()) }}" class="pagination-link pa2 link br1 b--light-gray ba bw1 f5 near-black" aria-label="Goto page {{res.previous_page_number()}}">{{res.previous_page_number()}}</a>
+        </li>
+        {% endif %}
+        <li class="dib">
+            <a href="{{ url_replace(request, page=res.number) }}" class="pagination-link pa2 link br1 b--light-gray ba bw1 f5 dark-blue b bg-light-gray is-current" aria-label="Page {{res.number}}" aria-current="page">{{res.number}}</a>
+        </li>
+        {% if res.has_next() %}
+        <li class="dib">
+            <a href="{{ url_replace(request, page=res.next_page_number()) }}" class="pagination-link pa2 link br1 b--light-gray ba bw1 f5 near-black" aria-label="Goto page {{res.next_page_number()}}">{{res.next_page_number()}}</a>
+        </li>
+        {% if (res.paginator.num_pages - res.next_page_number()) > 1 %}
+        <li class="dib">
+            <span class="pagination-ellipsis">&hellip;</span>
+        </li>
+        {% endif %}
+        {% endif %}
+        {% if res.number != res.paginator.num_pages and res.next_page_number() != res.paginator.num_pages %}
+        <li class="dib">
+            <a href="{{ url_replace(request, page=res.paginator.num_pages) }}" class="pagination-link pa2 link br1 b--light-gray ba bw1 f5 near-black" aria-label="Goto page {{res.paginator.num_pages}}">{{res.paginator.num_pages}}</a>
+        </li>
+        {% endif %}
+        {% if res.has_next() %}
+        <li class="dib ml4">
+        <a href="{{ url_replace(request, page=res.next_page_number()) }}" class="pagination-next pa2 link br1 b--light-gray ba bw1 f5 near-black">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

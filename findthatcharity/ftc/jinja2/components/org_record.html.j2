@@ -9,11 +9,12 @@
           </h3>
           <div class="card-header-title is-block tracked-tight f6">
             <span class="dib">Organisation record from </span>
-            {% if sources.get(record.source) %}
-            <a href="#data-source-{{ record.source }}" class="link b blue dib">
-              {{ sources[record.source].publisher.name }}
+            {% if record.source %}
+            <a href="#data-source-{{ record.source.id }}" class="link b blue dib">
+              {{ record.source.data.publisher.name }}
             </a><br>
-            <i class="gray">Last updated {{ "{:%d %B %Y}".format(sources[record.source].modified) }}</i>
+            {# <i class="gray">Last updated {{ "{:%d %B %Y}".format(record.source.data.modified) }}</i> #}
+            <i class="gray">Last updated {{ record.source.data.modified }}</i>
             {% endif %}
           </div>
         </header>
@@ -24,8 +25,9 @@
             {% else %}
             <span class="pv1 ph2 br1 bg-red white dib mr2 mb2 link">Inactive</span>
             {% endif %}
-            {% for t in record.organisationType %}
-            <span class="pv1 ph2 br1 bg-light-gray near-black dib mr2 mb2">{{ t }}</span>
+            <span class="pv1 ph2 br1 bg-light-gray near-black dib mr2 mb2">{{ record.organisationTypePrimary.title }}</span>
+            {% for t in record.organisationType if t != record.organisationTypePrimary.slug %}
+            <span class="pv1 ph2 br1 bg-light-gray near-black dib mr2 mb2">{{ orgtypes[t].title }}</span>
             {% endfor %}
           </div>
           {% for v in record.orgIDs %}

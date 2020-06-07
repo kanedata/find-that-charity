@@ -52,9 +52,15 @@
 
 {% block header %}
 <header class="fl w-100 w-50-l ph3 ph5-ns entry-content lh-copy f4">
-  <h2 class="f2-ns mt4 mb0 f3 lh-solid normal">
+  <h2 class="f2-ns mt4 mb0 f3 lh-title normal">
       {{ org.name }}
   </h2>
+  <h3 class="f3-ns mb4 mt3 f4 lh-subtitle normal">
+    <a class="near-black link" 
+       href="{{ url('orgid_type', kwargs={'orgtype': org.organisationTypePrimary.slug}) }}">
+       {{ org.organisationTypePrimary.title }}
+    </a>
+  </h4>
   <div class="mv3 w-100">
     {{ orgid_link(org.org_id, request, true) }}
     {% for v in org.orgIDs if v != org.org_id %}
@@ -68,11 +74,11 @@
     {% else %}
     <span class="pv1 ph2 br2 bg-dark-red white dib mr2 mb2">Inactive</span>
     {% endif %}
-    {% for ot in org.organisationType if v in key_types %}
-    <a class="pv1 ph2 br2 bg-light-gray near-black dib mr2 mb2 link" href="{{ url('orgid_type', kwargs={'orgtype': ot}) }}">{{ ot }}</a>
-    {% endfor %}
-    {% for ot in org.organisationType if v not in key_types %}
-    <a class="pv1 ph2 br1 bg-light-gray near-black dib mr2 mb2 link f5" href="{{ url('orgid_type', kwargs={'orgtype': ot}) }}">{{ ot }}</a>
+    {% for ot in org.organisationType if ot != org.organisationTypePrimary.slug %}
+    <a class="pv1 ph2 br1 bg-light-gray near-black dib mr2 mb2 link f5"
+       href="{{ url('orgid_type', kwargs={'orgtype': ot}) }}">
+       {{ orgtypes[ot].title }}
+    </a>
     {% endfor %}
   </div>
 </header>
@@ -82,7 +88,7 @@
 <div class="w-100 w-80-l fl">
   <div class="measure-wide f5">
     <div class="content">
-      {% set description = org.description %}
+      {% set description = org.first("description") %}
       {% if description %}
       <h4>Description</h4>
       <p>
@@ -90,7 +96,7 @@
         <span class="gray f7 dib">
           [Source: 
           {{ description.orgid }},
-          {# {{ sources.get(description.source).publisher.name -}} #}
+          {{ description.source.data.publisher.name -}}
           ]
         </span>
       </p>
@@ -110,7 +116,7 @@
   </div>
 
   <div class="w-100 flex flex-wrap">
-    {% for record in orgs %}
+    {% for record in org.records %}
     <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
     {{ org_record(record, {}, request) }}
     </div>
@@ -122,7 +128,7 @@
 
 <div class="w-100 w-20-l fl">
 
-  {# {% set links = org.get_links()|list %} #}
+  {% set links = org.get_links()|list %}
   {% if links %}
   <article class="message is-info">
     <h4 class="ma0 pa0">More about this organisation</h4>
@@ -139,30 +145,30 @@
   </article>
   {% endif %}
   
-  {#{% if org.main.location|length %}
+  {% if org.location|length %}
   <article class="message is-info">
     <h4 class="ma0 pa0">Locations</h4>
     <div class="message-body">
       <ul class="mb4 mt2 list mh0 pa0 f5">
-      {% for v in org.main.location %}
+      {% for v in org.location %}
         {% if v.geoCode and v.geoCode|regex_search("[ENWS][0-9]{8}") %}
         <li class="w-100 mb2">
           <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ v.geoCode }}.html" target="_blank">{{ v.name }}</a>
           {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
-          {# {{ show_sources(v) }} #}{#
+          {# {{ show_sources(v) }} #}
         </li>
         {% else %}
         <li class="w-100 mb2">
           {{ v.name }}
           {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
-          {# {{ show_sources(v) }} #}{#
+          {# {{ show_sources(v) }} #}
         </li>
         {% endif %}
       {% endfor %}
       </ul>
     </div>
   </article>
-  {% endif %}#}
+  {% endif %}
   
   {# {% if org.parent.keys()|length %}
   <article class="message is-info">
@@ -199,8 +205,8 @@
 <div class="w-100 cf fl">
   <h3 class="ma0 pa0">Data sources</h3>
 
-  {% for s in org.sources if sources.get(s) %}
-  {{ data_source(sources[s], org, request) }}
+  {% for s in org.sources %}
+  {{ data_source(s.data, org, request) }}
   {% endfor %}
 </div>
 {% endblock %}
