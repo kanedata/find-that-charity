@@ -78,7 +78,7 @@
             <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
                 <a href="{{ url('orgid_source', kwargs=dict(source=o.source)) }}"
                     class="link near-black underline-hover pa2 dib fl">
-                    {{ sources[o.source].data.publisher.name }}
+                    {{ sources[o.source].title }}
                     {# <br><span class="is-size-7">({{ sources[o.source].data.title }})</span> #}
                 </a>
                 <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(o.records) }}</span>

@@ -197,6 +197,13 @@ class Source(models.Model):
                           db_index=True, primary_key=True)
     data = JSONField()
 
+    @property
+    def title(self):
+        return self.data.get('publisher', {}).get('name')
+
+    @property
+    def slug(self):
+        return self.id
 
 class Scrape(models.Model):
 

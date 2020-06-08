@@ -1,7 +1,7 @@
 {% extends 'base.html.j2' %}
-{% set heading = 'orgtype results' %}
-{#% set heading = query|list_to_string %}
-{% set selected_org_type = query|list_to_string %#}
+{% set heading = '{}'.format(
+    query.base_query.title,
+) %}
 {% if res.has_other_pages() %}
     {% set subtitle = "Showing organisation {:,.0f} to {:,.0f} out of {:,.0f}".format(
         res.start_index(),
@@ -21,25 +21,24 @@
                     value="{{term or ''}}" autocomplete='off'>
                 <input type="submit" value="Search" class="f6 f5-l button-reset br bt bb bl-0 b--black-20 fl pv3 tc bg-animate bg-yellow dim near-black pointer w-100 w-20-m w-20-l br2-ns br--right-ns">
             </div>
-            {#
-            {% if 'orgtype' in request.query_params.keys() or 'source' in request.query_params.keys() %}
+            {% if query.orgtype or query.source %}
             <div class="w-100">
                 <span class="f6 b mr2">Filters: </span>
-                {% for r in request.query_params.getlist('orgtype') %}
-                <span class="bg-moon-gray b--dark-gray bw1 ba mr2 mb2 dib f6 br-pill pv1 ph2">
+                {% for r in query.orgtype if r in orgtypes and query.base_query.slug != r %}
+                <span class="bg-moon-gray b--dark-gray bw0 ba mr2 mb2 dib f6 br3 pv1 ph2">
                     Type: 
-                    {{ org_types.get(r, {}).get('key', r) }}
+                    {{ orgtypes[r].title }}
                 </span>
                 {% endfor %}
-                {% for r in request.query_params.getlist('source') %}
-                <span class="bg-moon-gray b--dark-gray bw1 ba mr2 mb2 dib f6 br-pill pv1 ph2">
+                {% for r in query.source if r in sources and query.base_query.slug != r %}
+                <span class="bg-moon-gray b--dark-gray bw0 ba mr2 mb2 dib f6 br3 pv1 ph2">
                     Source: 
-                    {{ sources.get(r, {}).get('publisher', {}).get('name', r) }}
+                    {{ sources[r].title }}
                 </span>
                 {% endfor %}
-                <a href="{{ request.url.remove_query_params(['orgtype', 'source']) }}" class="f6 link blue underline">Clear filters</a>
+                <a href="{{ url_remove(request, ['orgtype', 'source']) }}" class="f6 link blue underline">Clear filters</a>
             </div>
-            {% endif %} #}
+            {% endif %}
             <div class="mt4">
                 {% include 'components/search_results.html.j2' %}
             </div>
@@ -47,7 +46,7 @@
         <div class="fl w-100 w-30-l pa2">
             <a class="mb3 tr w-100 db b link dark-blue underline-hover" href="{{ download_url }}">Download as CSV</a>
             <label class="mb3 dib lh-title">
-                <input type='checkbox' class="mr1" name="inactive" value="include_inactive" />
+                <input type='checkbox' class="mr1" name="inactive" value="include_inactive" {% if query.include_inactive %}checked=checked{% endif %} />
                 Include inactive organisations
             </label>
             <h4 class="ma0 pa0">Related organisation types</h4>
@@ -74,7 +73,7 @@
             {% for t in aggs.by_source %}
                 <li class="w-100 f4 mb2">
                     <div class="lh-title">
-                        <a class="link dark-blue underline-hover mr3 lh-title" href="{{ url_replace(request, source=t.source) }}">{{ sources[t.source].data.publisher.name }}</a>
+                        <a class="link dark-blue underline-hover mr3 lh-title" href="{{ url_replace(request, source=t.source) }}">{{ sources[t.source].title }}</a>
                         <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
                     </div>
                 </li>

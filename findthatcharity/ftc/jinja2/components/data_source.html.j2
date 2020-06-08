@@ -3,29 +3,29 @@
 
 {% macro data_source(source, org, request) %}
   <div class="mt4 measure-wide bb b--light-gray pb3 bw3">
-    <h4 class="ma0 pa0" id='data-source-{{source.identifier}}'><a class="link near-black underline-hover" href="{{ source.publisher.website }}">{{ source.publisher.name }}</a></h4>
-    {% if source.title != source.publisher.name %}
-    <h5 class="ma0 pa0 f5 b">{{ source.title }}</h5>
+    <h4 class="ma0 pa0" id='data-source-{{source.data.identifier}}'><a class="link near-black underline-hover" href="{{ source.data.publisher.website }}">{{ source.data.publisher.name }}</a></h4>
+    {% if source.data.title != source.data.publisher.name %}
+    <h5 class="ma0 pa0 f5 b">{{ source.data.title }}</h5>
     {% endif %}
-    {% if source.description %}
-    <p class="mv1 pa0 mid-gray f6">{{ source.description }}</p>
+    {% if source.data.description %}
+    <p class="mv1 pa0 mid-gray f6">{{ source.data.description }}</p>
     {% endif %}
-    {% if source.modified %}
-    <p class="mv1 pa0 f5"><strong>Last updated:</strong> {{ source.modified }}</p>
-    {# <p class="mv1 pa0 f5"><strong>Last updated:</strong> {{ "{:%Y-%m-%d}".format(source.modified) }}</p> #}
+    {% if source.data.modified %}
+    <p class="mv1 pa0 f5"><strong>Last updated:</strong> {{ source.data.modified }}</p>
+    {# <p class="mv1 pa0 f5"><strong>Last updated:</strong> {{ "{:%Y-%m-%d}".format(source.data.modified) }}</p> #}
     {% endif %}
     <p class="mv1 pa0 f5">
-      <a class="link underline blue" href="{{ source.license }}">{{ source.license_name }}</a>
-      {% if source.distribution|length == 1 %}
-      | <a class="link underline blue" href="{{ source.distribution[0].accessURL }}">Access data</a>
-      | <a class="link underline blue" href="{{ source.distribution[0].downloadURL }}" title="Download links may be large files">
-          Download data {{ get_filetype(source.distribution[0].downloadURL) }}
+      <a class="link underline blue" href="{{ source.data.license }}">{{ source.data.license_name }}</a>
+      {% if source.data.distribution|length == 1 %}
+      | <a class="link underline blue" href="{{ source.data.distribution[0].accessURL }}">Access data</a>
+      | <a class="link underline blue" href="{{ source.data.distribution[0].downloadURL }}" title="Download links may be large files">
+          Download data {{ get_filetype(source.data.distribution[0].downloadURL) }}
         </a><br>
       {% endif %}
     </p>
-      {% if source.distribution|length > 1 %}
+      {% if source.data.distribution|length > 1 %}
       <ul class="f5">
-      {% for d in source.distribution %}
+      {% for d in source.data.distribution %}
         <li class="">
           <a class="link underline blue" href="{{ d.accessURL }}">{{ d.title }}</a>
           <a class="link underline blue" href="{{ d.downloadURL }}" title="Download links may be large files">Download data {{ get_filetype(d.downloadURL) }}</a>
@@ -33,7 +33,7 @@
       {% endfor %}
       </ul>
       {% endif %}
-      {% for r in org.records if r.source.id == source.identifier %}
+      {% for r in org.records if r.source == source %}
         {% if loop.first %}
         <p class="mt1 mb0 pa0 f6"><strong>Source for records: </strong></p>
         <ul class="mt1 mb1 pa0 list">
@@ -45,7 +45,7 @@
       {% endfor %}
     
     <p class="mv1 pa0 f5">
-      {% for r in org.org_links if r.source.id == source.identifier %}
+      {% for r in org.org_links if r.source == source %}
         {% if loop.first %}
         <p class="mt1 mb0 pa0 f6"><strong>Source for record links:</strong></p>
         <ul class="mt1 mb1 pa0 list">

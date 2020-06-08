@@ -11,7 +11,7 @@
             <span class="dib">Organisation record from </span>
             {% if record.source %}
             <a href="#data-source-{{ record.source.id }}" class="link b blue dib">
-              {{ record.source.data.publisher.name }}
+              {{ record.source.title }}
             </a><br>
             {# <i class="gray">Last updated {{ "{:%d %B %Y}".format(record.source.data.modified) }}</i> #}
             <i class="gray">Last updated {{ record.source.data.modified }}</i>

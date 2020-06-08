@@ -76,24 +76,41 @@ def get_orgid_by_hash(request, org_id, filetype="html"):
 
 
 def orgid_type(request, orgtype=None, source=None, filetype="html"):
-    criteria = {
-        "organisationType__contains": [],
-        "source__id__in": [],
+    query = {
+        'orgtype': [],
+        'source': [],
+        'q': None,
+        'include_inactive': False,
     }
     if orgtype:
-        criteria["organisationType__contains"].append(orgtype)
-    if source:
-        criteria["source__id__in"].append(source)
+        query['base_query'] = get_object_or_404(OrganisationType, slug=orgtype)
+        query['orgtype'].append(orgtype)
+    elif source:
+        query['base_query'] = get_object_or_404(Source, id=source)
+        query['source'].append(source)
 
+    # add additional criteria from the get params
     if 'orgtype' in request.GET:
-        criteria["organisationType__contains"].extend(
+        query['orgtype'].extend(
             request.GET.getlist('orgtype'))
-
     if 'source' in request.GET:
-        criteria["source__id__in"].extend(request.GET.getlist('source'))
-
+        query['source'].extend(request.GET.getlist('source'))
     if 'q' in request.GET:
-        criteria['name__search'] = request.GET['q']
+        query['q'] = request.GET['q']
+    if request.GET.get('inactive') == 'include_inactive':
+        query['include_inactive'] = True
+
+    # convert query to criteria
+    criteria = {}
+    if query.get('orgtype'):
+        criteria["organisationType__contains"] = query['orgtype']
+    if query.get('source'):
+        criteria["source__id__in"] = query['source']
+    if query.get('q'):
+        criteria['name__search'] = query['q']
+    if not query.get('include_inactive'):
+        criteria['active'] = True
+
 
     orgs = Organisation.objects.filter(**{k: v for k, v in criteria.items() if v})
 
@@ -107,7 +124,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
 
     return render(request, 'orgtype.html.j2', {
         "res": page_obj,
-        "query": criteria,
+        "query": query,
         "term": request.GET.get('q'),
         "aggs": {
             "by_orgtype": by_orgtype,

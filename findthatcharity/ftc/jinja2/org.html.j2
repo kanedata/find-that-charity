@@ -12,7 +12,7 @@
 <span class="gray f7 dib">
   [Source: {% for s in v.sources|reject('none')|unique -%}
     {%- if sources.get(s) -%}
-      {{ sources.get(s).publisher.name }}
+      {{ sources.get(s).title }}
     {%- else -%}
       {{ s }}
     {%- endif -%}
@@ -96,7 +96,7 @@
         <span class="gray f7 dib">
           [Source: 
           {{ description.orgid }},
-          {{ description.source.data.publisher.name -}}
+          {{ description.source.title -}}
           ]
         </span>
       </p>
@@ -206,7 +206,7 @@
   <h3 class="ma0 pa0">Data sources</h3>
 
   {% for s in org.sources %}
-  {{ data_source(s.data, org, request) }}
+  {{ data_source(s, org, request) }}
   {% endfor %}
 </div>
 {% endblock %}
