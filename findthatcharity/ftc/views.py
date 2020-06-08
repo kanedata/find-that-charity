@@ -75,10 +75,6 @@ def get_orgid(request, org_id, filetype="html"):
     })
 
 
-def get_orgid_by_hash(request, org_id, filetype="html"):
-    return HttpResponse()
-
-
 def orgid_type(request, orgtype=None, source=None, filetype="html"):
     query = {
         'orgtype': [],

@@ -29,5 +29,4 @@ urlpatterns = [
     path('<path:org_id>.json', views.get_orgid, {"filetype": "json"}),
     path('<path:org_id>.html', views.get_orgid, {"filetype": "html"}),
     path('<path:org_id>', views.get_orgid, {"filetype": "html"}, name='orgid_html'),
-    path('hash/<str:org_id>', views.get_orgid_by_hash, name='get_orgid_by_hash'),
 ]
