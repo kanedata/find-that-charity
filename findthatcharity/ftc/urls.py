@@ -18,10 +18,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('type/<slug:orgtype>.csv', views.orgid_type_download),
+    path('type/<slug:orgtype>.csv', views.orgid_type, 
+        {'filetype': 'csv'}, name='orgid_type_download'),
     path('type/<slug:orgtype>.html', views.orgid_type),
     path('type/<slug:orgtype>', views.orgid_type, name='orgid_type'),
-    path('source/<str:source>.csv', views.orgid_type_download),
+    path('source/<str:source>.csv', views.orgid_type,
+         {'filetype': 'csv'}, name='orgid_source_download'),
     path('source/<str:source>.html', views.orgid_type),
     path('source/<str:source>', views.orgid_type, name='orgid_source'),
     path('<path:org_id>.json', views.get_orgid, {"filetype": "json"}),

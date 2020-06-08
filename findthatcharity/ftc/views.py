@@ -1,9 +1,13 @@
+import io
+import csv
+
 from django.forms.models import model_to_dict
 from django.db.models import Q, Count, Func, F
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
 from django.views.decorators.cache import cache_page
+from django.urls import reverse
 
 from ftc.documents import FullOrganisation
 from ftc.models import Organisation, RelatedOrganisation, OrganisationType, Source
@@ -85,9 +89,15 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
     if orgtype:
         query['base_query'] = get_object_or_404(OrganisationType, slug=orgtype)
         query['orgtype'].append(orgtype)
+        download_url = reverse('orgid_type_download', 
+                                kwargs={'orgtype': orgtype})
     elif source:
         query['base_query'] = get_object_or_404(Source, id=source)
         query['source'].append(source)
+        download_url = reverse('orgid_source_download',
+                               kwargs={'source': source})
+    if request.GET:
+        download_url += '?' + request.GET.urlencode()
 
     # add additional criteria from the get params
     if 'orgtype' in request.GET:
@@ -108,11 +118,41 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         criteria["source__id__in"] = query['source']
     if query.get('q'):
         criteria['name__search'] = query['q']
-    if not query.get('include_inactive'):
+    if not query.get('include_inactive') and filetype != 'csv':
         criteria['active'] = True
 
-
     orgs = Organisation.objects.filter(**{k: v for k, v in criteria.items() if v})
+
+    if filetype == "csv":
+        columns = {
+            "org_id": "id",
+            "name": "name",
+            "charityNumber": "charityNumber",
+            "companyNumber": "companyNumber",
+            "postalCode": "postalCode",
+            "url": "url",
+            "latestIncome": "latestIncome",
+            "latestIncomeDate": "latestIncomeDate",
+            "dateRegistered": "dateRegistered",
+            "dateRemoved": "dateRemoved",
+            "active": "active",
+            "dateModified": "dateModified",
+            "orgIDs": "orgIDs",
+            "organisationType": "organisationType",
+            "organisationTypePrimary__title": "organisationTypePrimary",
+            "source": "source",
+        }
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(
+            query['base_query'].slug
+        )
+        writer = csv.writer(response)
+        writer.writerow(columns.values())
+        res = orgs.values_list(*columns.keys()).order_by('org_id')
+        for r in res:
+            writer.writerow(r)
+        return response
+        
 
     by_orgtype = orgs.annotate(orgtype=Func(
         F('organisationType'), function='unnest')).values('orgtype').annotate(records=Count('*')).order_by('-records')
@@ -129,9 +169,6 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         "aggs": {
             "by_orgtype": by_orgtype,
             "by_source": by_source,
-        }
+        },
+        "download_url": download_url,
     })
-
-
-def orgid_type_download(request, orgtype=None, source=None, filetype="html"):
-    return HttpResponse()
