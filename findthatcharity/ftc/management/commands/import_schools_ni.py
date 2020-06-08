@@ -132,5 +132,6 @@ class Command(HTMLScraper):
                 "scrape": self.scrape,
                 "source": self.source,
                 "spider": self.name,
+                "org_id_scheme": self.orgid_scheme,
             })
         )

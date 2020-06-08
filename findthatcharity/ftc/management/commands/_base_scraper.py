@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.text import slugify
 
 from ftc.models import (Organisation, OrganisationLink, OrganisationType,
-                        Scrape, Source)
+                        Scrape, Source, OrgidScheme)
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
@@ -50,6 +50,12 @@ class BaseScraper(BaseCommand):
         if options.get("cache"):
             requests_cache.install_cache('http_cache')
         self.session = requests.Session()
+
+        # set up orgidscheme object
+        self.orgid_scheme, _ = OrgidScheme.objects.get_or_create(
+            code=self.org_id_prefix,
+            defaults={'data': {}},
+        )
 
         # save any orgtypes
         self.logger.info("Saving orgtypes")

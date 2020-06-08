@@ -7,19 +7,6 @@ from django.utils.text import slugify
 
 from dbview.models import DbView
 
-PRIORITIES = [
-    "GB-CHC",
-    "GB-SC",
-    "GB-NIC",
-    "GB-EDU",
-    "GB-LAE",
-    "GB-PLA",
-    "GB-LAS",
-    "GB-LANI",
-    "GB-GOR",
-    "GB-COH",
-]
-
 
 class Orgid(str):
 
@@ -118,6 +105,12 @@ class Organisation(models.Model):
     )
     spider = models.CharField(max_length=200, db_index=True)
     location = JSONField(null=True, blank=True)
+    org_id_scheme = models.ForeignKey(
+        'OrgidScheme',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         unique_together = ('org_id', 'scrape',)
@@ -138,10 +131,10 @@ class Organisation(models.Model):
         )
 
     def get_priority(self):
-        if self.org_id.scheme in PRIORITIES:
-            prefix_order = PRIORITIES.index(self.org_id.scheme)
+        if self.org_id.scheme in OrgidScheme.PRIORITIES:
+            prefix_order = OrgidScheme.PRIORITIES.index(self.org_id.scheme)
         else:
-            prefix_order = len(PRIORITIES) + 1
+            prefix_order = len(OrgidScheme.PRIORITIES) + 1
         return (
             0 if self.active else 1,
             prefix_order,
@@ -224,6 +217,32 @@ class Scrape(models.Model):
     status = models.CharField(max_length=50, null=True,
                               blank=True, choices=ScrapeStatus.choices)
     
+
+class OrgidScheme(models.Model):
+
+    PRIORITIES = [
+        "GB-CHC",
+        "GB-SC",
+        "GB-NIC",
+        "GB-EDU",
+        "GB-LAE",
+        "GB-PLA",
+        "GB-LAS",
+        "GB-LANI",
+        "GB-GOR",
+        "GB-COH",
+    ]
+
+    code = models.CharField(max_length=200, primary_key=True, db_index=True)
+    data = JSONField()
+    priority = models.IntegerField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.code in self.PRIORITIES:
+            self.priority = self.PRIORITIES.index(self.code)
+        else:
+            self.priority = len(self.PRIORITIES) + 1
+        super().save(*args, **kwargs)
 
 class LinkedOrganisation(DbView):
     org_id_a = OrgidField(max_length=255)

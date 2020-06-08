@@ -122,6 +122,7 @@ It includes cross-linkages to a range of other identifier sources.''',
                 "scrape": self.scrape,
                 "source": self.source,
                 "spider": self.name,
+                "org_id_scheme": self.orgid_scheme,
             })
         )
 

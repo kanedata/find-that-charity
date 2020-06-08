@@ -66,6 +66,16 @@ class FullOrganisation(Document):
 
         return self.django.model.objects.raw(sql)
 
+    def get_indexing_queryset(self):
+        """
+        Build queryset (iterator) for use by indexing.
+        """
+        qs = self.get_queryset()
+        kwargs = {}
+        if DJANGO_VERSION >= (2,) and self.django.queryset_pagination:
+            kwargs = {'chunk_size': self.django.queryset_pagination}
+        return qs.iterator(**kwargs)
+
     class Django:
         model = Organisation  # The model associated with this Document
 
