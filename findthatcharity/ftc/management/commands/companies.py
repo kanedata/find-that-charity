@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
+import csv
 import datetime
 import io
-import csv
 import re
 import zipfile
 
-import scrapy
 from tqdm import tqdm
 
-from .base_scraper import BaseScraper
+import scrapy
+
 from ..items import Organisation, Source
+from .base_scraper import BaseScraper
+
 
 class CompaniesSpider(BaseScraper):
     name = 'companies'

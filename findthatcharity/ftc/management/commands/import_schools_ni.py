@@ -1,6 +1,6 @@
+import csv
 import datetime
 import io
-import csv
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation

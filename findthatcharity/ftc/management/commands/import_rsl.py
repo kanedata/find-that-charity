@@ -3,7 +3,7 @@ import io
 
 from openpyxl import load_workbook
 
-from ftc.management.commands._base_scraper import HTMLScraper, AREA_TYPES
+from ftc.management.commands._base_scraper import AREA_TYPES, HTMLScraper
 from ftc.models import Organisation
 
 

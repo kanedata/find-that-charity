@@ -1,16 +1,16 @@
-import io
 import csv
 
-from django.forms.models import model_to_dict
-from django.db.models import Q, Count, Func, F
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
-from django.views.decorators.cache import cache_page
+from django.db.models import Count, F, Func, Q
+from django.forms.models import model_to_dict
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
+from django.views.decorators.cache import cache_page
 
 from ftc.documents import FullOrganisation
-from ftc.models import Organisation, RelatedOrganisation, OrganisationType, Source
+from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
+                        Source)
 
 # site homepage
 

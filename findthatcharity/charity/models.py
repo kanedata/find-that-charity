@@ -1,8 +1,9 @@
 from django.contrib.postgres.fields import JSONField
-from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 
 from ftc.models import Scrape
+
 
 class Charity(models.Model):
     id = models.CharField(max_length=200, primary_key=True)

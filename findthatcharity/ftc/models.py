@@ -4,6 +4,7 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.text import slugify
+
 from dbview.models import DbView
 
 PRIORITIES = [

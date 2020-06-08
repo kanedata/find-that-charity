@@ -1,8 +1,8 @@
+import csv
 import datetime
 import io
-import csv
 
-from ftc.management.commands._base_scraper import CSVScraper, AREA_TYPES
+from ftc.management.commands._base_scraper import AREA_TYPES, CSVScraper
 from ftc.models import OrganisationLink, Source
 
 

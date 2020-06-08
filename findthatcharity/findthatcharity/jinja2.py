@@ -1,10 +1,9 @@
-import re
 import datetime
+import re
 
 from django.templatetags.static import static
 from django.urls import reverse
 from humanize import naturaldelta
-
 from jinja2 import Environment
 
 from ftc.models import OrganisationType, Source

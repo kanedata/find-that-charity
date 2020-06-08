@@ -1,18 +1,18 @@
-import io
 import csv
 import datetime
-import re
+import io
 import logging
+import re
 
-import validators
-import titlecase
 import requests
 import requests_cache
-
+import titlecase
+import validators
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.text import slugify
 
-from ftc.models import Organisation, OrganisationType, Source, Scrape, OrganisationLink
+from ftc.models import (Organisation, OrganisationLink, OrganisationType,
+                        Scrape, Source)
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 

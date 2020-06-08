@@ -1,5 +1,5 @@
-from django.db import migrations
 from django.apps import apps
+from django.db import migrations
 
 
 class CreateView(migrations.CreateModel):

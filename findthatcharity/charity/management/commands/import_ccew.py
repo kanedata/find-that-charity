@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
+import csv
 import datetime
 import io
-import csv
-import zipfile
-import re
-import bcp
-import tempfile
 import os
 import pickle
+import re
+import tempfile
+import zipfile
 from collections import defaultdict
 
+import bcp
 import tqdm
-
-from django.utils.text import slugify
 from django.db import connection
+from django.utils.text import slugify
 
-from ftc.management.commands._base_scraper import HTMLScraper
-from ftc.models import Organisation
-from charity.models import CharityRaw, Charity, CharityFinancial, CharityName, AreaOfOperation
 from charity.management.commands._bulk_upsert import bulk_upsert
 from charity.management.commands._ccew_sql import UPDATE_CCEW
+from charity.models import (AreaOfOperation, Charity, CharityFinancial,
+                            CharityName, CharityRaw)
+from ftc.management.commands._base_scraper import HTMLScraper
+from ftc.models import Organisation
 
 
 class Command(HTMLScraper):

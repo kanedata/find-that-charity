@@ -5,8 +5,9 @@ import string
 import requests
 from django.core.management.base import BaseCommand
 
+from charity.models import (AreaOfOperation, Charity, CharityFinancial,
+                            CharityName, Vocabulary, VocabularyEntries)
 from ftc.management.commands._base_scraper import CSVScraper
-from charity.models import Charity, CharityFinancial, CharityName, Vocabulary, VocabularyEntries, AreaOfOperation
 
 
 class Command(BaseCommand):

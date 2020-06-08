@@ -1,16 +1,16 @@
-import datetime
-import zipfile
-import io
 import csv
+import datetime
+import io
+import zipfile
 
 import tqdm
 from django.db import connection
 
-from ftc.management.commands._base_scraper import CSVScraper, AREA_TYPES
-from ftc.models import Organisation
-from charity.models import CharityRaw
-
 from charity.management.commands._oscr_sql import UPDATE_OSCR
+from charity.models import CharityRaw
+from ftc.management.commands._base_scraper import AREA_TYPES, CSVScraper
+from ftc.models import Organisation
+
 
 class Command(CSVScraper):
     name = 'oscr'

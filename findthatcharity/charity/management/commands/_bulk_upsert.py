@@ -1,5 +1,6 @@
-from psycopg2.extras import execute_values
 from django.db import connection
+from psycopg2.extras import execute_values
+
 
 # from https://gist.github.com/aisayko/dcacd546bcb17a740dec703de6b2377e
 def bulk_upsert(model, fields, values, by):

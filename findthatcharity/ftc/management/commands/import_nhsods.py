@@ -1,8 +1,8 @@
-import zipfile
-import json
-import io
-import datetime
 import csv
+import datetime
+import io
+import json
+import zipfile
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation

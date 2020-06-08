@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from .base_scraper import BaseScraper
+
 from ..items import Identifier
+from .base_scraper import BaseScraper
 
 
 class OrgidSpider(BaseScraper):

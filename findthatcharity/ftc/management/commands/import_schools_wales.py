@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 import io
+
 from pyexcel_ods3 import get_data
 
-from ftc.management.commands._base_scraper import HTMLScraper, AREA_TYPES
+from ftc.management.commands._base_scraper import AREA_TYPES, HTMLScraper
 from ftc.models import Organisation
 
 WAL_LAS = {

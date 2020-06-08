@@ -3,10 +3,8 @@ import re
 
 from requests_html import HTMLSession
 
-from ftc.management.commands._base_scraper import CSVScraper, AREA_TYPES
+from ftc.management.commands._base_scraper import AREA_TYPES, CSVScraper
 from ftc.models import Organisation
-
-
 
 REGION_CONVERT = {
     "A": "E12000001",
