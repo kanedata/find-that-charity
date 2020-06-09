@@ -15,7 +15,7 @@ from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
 # site homepage
 
 
-@cache_page(60 * 60)
+# @cache_page(60 * 60)
 def index(request):
     if 'q' in request.GET:
         return org_search(request)
@@ -63,7 +63,7 @@ def org_search(request):
     })
 
 
-def get_orgid(request, org_id, filetype="html"):
+def get_orgid(request, org_id, filetype="html", preview=False):
     orgs = get_list_or_404(Organisation, linked_orgs__contains=[org_id])
     org = RelatedOrganisation(orgs)
     if filetype=="json":

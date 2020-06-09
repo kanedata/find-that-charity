@@ -1,5 +1,5 @@
 {% extends 'base.html.j2' %}
-{% from 'components/org_id.html.j2' import orgid_link %}
+{% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
 {% from 'components/org_record.html.j2' import org_record %}
 {% from 'components/data_source.html.j2' import data_source %}
 {% set heading = org["name"] %} 
@@ -35,18 +35,23 @@
       {{ org.name }}
   </h2>
   <h3 class="f3-ns mb4 mt3 f4 lh-subtitle normal">
-    <a class="near-black link" 
-       href="{{ url('orgid_type', kwargs={'orgtype': org.organisationTypePrimary.slug}) }}">
-       {{ org.organisationTypePrimary.title }}
-    </a>
+    A {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in the UK
   </h3>
+  <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">
+    The identifier for this organisation is:
+  </h4>
   <div class="mv3 w-100">
-    {{ orgid_link(org.org_id, request, true) }}
-    {% for v in org.orgIDs if v != org.org_id %}
-    {{ orgid_link(v, request, true) }}
-    {% endfor %}
-    <a href="#" class="blue link underline-hover f7">[What are these?]</a>
+    {{ orgid_link(org.org_id, request, true) }}<br>
+    <a href="#" class="blue link underline-hover f7">What is an organisation identifier?</a>
   </div>
+  {% if org.orgIDs|length > 1 %}
+  <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">The organisation can also be identified by:</h4>
+  <div class="mv3 w-100">
+    {% for v in org.orgIDs if v != org.org_id %}
+    {{ orgid_link(v, request) }}
+    {% endfor %}
+  </div>
+  {% endif %}
   <div class="mv3 w-100">
     {% if org.active %}
     <span class="pv1 ph2 br2 bg-green white dib mr2 mb2">Active</span>
@@ -54,10 +59,7 @@
     <span class="pv1 ph2 br2 bg-dark-red white dib mr2 mb2">Inactive</span>
     {% endif %}
     {% for ot in org.organisationType if ot != org.organisationTypePrimary.slug %}
-    <a class="pv1 ph2 br1 bg-light-gray near-black dib mr2 mb2 link f5"
-       href="{{ url('orgid_type', kwargs={'orgtype': ot}) }}">
-       {{ orgtypes[ot].title }}
-    </a>
+    {{ orgtype_link(orgtypes[ot], large=true) }}
     {% endfor %}
   </div>
 </header>
@@ -94,6 +96,11 @@
     </div>
   </div>
 
+  {% if org.records|length > 1 %}
+  <h4 class="f5 f4-ns mb3 mt0 normal">
+    This organisation is based on records:
+  </h4>
+  {% endif %}
   <div class="w-100 flex flex-wrap">
     {% for record in org.records %}
     <div class="w-third-l w-50-m w-100 f5 pr3 pb3">

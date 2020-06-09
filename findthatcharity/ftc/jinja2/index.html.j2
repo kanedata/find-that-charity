@@ -11,22 +11,22 @@
     <p>Lookup individual charities based on their charity number:
     <ul>
         <li>Charity registered in England and Wales:
-            {# <a class="underline dark-blue f4"
-                href="{{ url('charity_index', regno=examples['registered-charity-england-and-wales']|replace('GB-CHC-', '')) }}">
+            <a class="underline dark-blue f4"
+                href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-england-and-wales']|replace('GB-CHC-', ''))) }}">
                 /charity/{{ examples['registered-charity-england-and-wales']|replace('GB-CHC-', '') }}
-            </a> #}
+            </a>
         </li>
         <li>Charity registered in Scotland:
-            {# <a class="underline dark-blue f4"
-                href="{{ url('charity_index', regno=examples['registered-charity-scotland']|replace('GB-SC-', '')) }}">
+            <a class="underline dark-blue f4"
+                href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-scotland']|replace('GB-SC-', ''))) }}">
                 /charity/{{ examples['registered-charity-scotland']|replace('GB-SC-', '') }}
-            </a> #}
+            </a>
         </li>
         <li>Charity registered in Northern Ireland:
-            {# <a class="underline dark-blue f4"
-                href="{{ url('charity_index', regno=examples['registered-charity-northern-ireland']|replace('GB-NIC-', 'NIC')) }}">
+            <a class="underline dark-blue f4"
+                href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-northern-ireland']|replace('GB-NIC-', 'NIC'))) }}">
                 /charity/{{ examples['registered-charity-northern-ireland']|replace('GB-NIC-', 'NIC') }}
-            </a> #}
+            </a>
         </li>
     </ul>
     These can also be accessed as json data by adding <code>.json</code> to the end of the url

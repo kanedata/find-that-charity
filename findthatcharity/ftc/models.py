@@ -409,9 +409,10 @@ class RelatedOrganisation:
         if self.alternateName:
             obj['alternateName'] = self.alternateName
         if self.dateRegistered:
-            obj["foundingDate"] = self.dateRegistered
-        if not self.active or self.first("dateRemoved"):
-            obj["dissolutionDate"] = self.first("dateRemoved")
+            obj["foundingDate"] = self.dateRegistered.isoformat()
+        if not self.active and self.first("dateRemoved"):
+            obj["dissolutionDate"] = self.first(
+                "dateRemoved").get("value").isoformat()
         if len(self.orgIDs) > 1:
             if request:
                 obj["sameAs"] = [request.build_absolute_uri(

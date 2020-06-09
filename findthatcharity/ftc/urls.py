@@ -28,5 +28,6 @@ urlpatterns = [
     path('source/<str:source>', views.orgid_type, name='orgid_source'),
     path('<path:org_id>.json', views.get_orgid, {"filetype": "json"}),
     path('<path:org_id>.html', views.get_orgid, {"filetype": "html"}),
+    path('<path:org_id>/preview', views.get_orgid, {"filetype": "html", "preview": True}, name='orgid_html_preview'),
     path('<path:org_id>', views.get_orgid, {"filetype": "html"}, name='orgid_html'),
 ]
