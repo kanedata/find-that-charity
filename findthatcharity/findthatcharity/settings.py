@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'dbview',
     'ftc.apps.FtcConfig',
     'charity.apps.CharityConfig',
+    'reconcile.apps.ReconcileConfig',
     'django.contrib.postgres',
     'django.contrib.admin',
     'django.contrib.auth',

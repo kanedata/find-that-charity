@@ -19,10 +19,12 @@ from django.urls import include, path
 import ftc.urls
 import ftc.views
 import charity.urls
+import reconcile.views
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='about'),
     path('', ftc.views.index, name='index'),
     path('orgid/', include(ftc.urls)),
     path('charity/', include(charity.urls)),
+    path('reconcile', reconcile.views.index, name='reconcile'),
 ]
