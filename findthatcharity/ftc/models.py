@@ -3,6 +3,7 @@ import operator
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 
 from dbview.models import DbView
@@ -355,6 +356,7 @@ class RelatedOrganisation:
                     "orgid": r.org_id,
                     "source": r.source,
                 }
+        return {}
 
     def get_all(self, field):
         seen = set()
@@ -382,3 +384,38 @@ class RelatedOrganisation:
                     link[0].format(o.id),
                     link[1]
                 )
+
+    @property
+    def sameAs(self):
+        return [
+            reverse('orgid_html', kwargs=dict(org_id=o))
+            for o in self.orgIDs if o != self.org_id
+        ]
+
+    def schema_dot_org(self, request=None):
+        """Return a schema.org Organisation object representing this organisation"""
+
+        obj = {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": self.name,
+            "identifier": self.org_id,
+        }
+
+        if self.first("url"):
+            obj['url'] = self.first("url").get("value")
+        if self.first("description"):
+            obj['description'] = self.first("description").get("value")
+        if self.alternateName:
+            obj['alternateName'] = self.alternateName
+        if self.dateRegistered:
+            obj["foundingDate"] = self.dateRegistered
+        if not self.active or self.first("dateRemoved"):
+            obj["dissolutionDate"] = self.first("dateRemoved")
+        if len(self.orgIDs) > 1:
+            if request:
+                obj["sameAs"] = [request.build_absolute_uri(
+                    l) for l in self.sameAs]
+            else:
+                obj["sameAs"] = self.sameAs
+        return obj

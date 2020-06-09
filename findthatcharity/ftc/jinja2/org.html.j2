@@ -24,30 +24,9 @@
 
 {% block headscripts %}
 {{ super() }}
-{# <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  {% if org.url %}
-  "url": {{ org.url.values()|map(attribute='value')|list|first|tojson }},
-  {% endif %}
-  "name": {{ org.name|tojson }},
-  "identifier": {{ org.org_id|tojson }},
-  {% if org.description %}
-  "description": {{ org.description.values()|map(attribute='value')|reject('equalto', '')|list|tojson }},
-  {% endif %}
-  {% if org.alternateName %}
-  "alternateName": {{ org.alternateName.values()|map(attribute='value')|list|tojson }},
-  {% endif %}
-  {% if org.dateRegistered %}
-  "foundingDate": {{ org.dateRegistered.values()|map(attribute='value')|list|first|string|tojson }},
-  {% endif %}
-  {% if not org.active %}
-  "dissolutionDate": {{ org.dateRemoved.values()|map(attribute='value')|list|last|string|tojson }},
-  {%- endif %}
-  "sameAs": {{ org.orgIDs.values()|map(attribute='value')|list|tojson }},
-}
-</script> #}
+<script type="application/ld+json">
+{{ org.schema_dot_org(request)|tojson(indent=4) }}
+</script>
 {% endblock %}
 
 {% block header %}
@@ -60,7 +39,7 @@
        href="{{ url('orgid_type', kwargs={'orgtype': org.organisationTypePrimary.slug}) }}">
        {{ org.organisationTypePrimary.title }}
     </a>
-  </h4>
+  </h3>
   <div class="mv3 w-100">
     {{ orgid_link(org.org_id, request, true) }}
     {% for v in org.orgIDs if v != org.org_id %}
