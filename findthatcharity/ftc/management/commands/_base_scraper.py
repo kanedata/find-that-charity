@@ -10,11 +10,45 @@ import titlecase
 import validators
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.text import slugify
+from django.db import connection
 
 from ftc.models import (Organisation, OrganisationLink, OrganisationType,
                         Scrape, Source, OrgidScheme)
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
+
+UPDATE_DOMAINS = """
+    update ftc_organisation
+    set domain = lower(substring(email from '@(.*)$'))
+    where lower(substring(email from '@(.*)$')) not in (
+        'gmail.com', 'hotmail.com', 'btinternet.com',
+        'hotmail.co.uk', 'yahoo.co.uk', 'outlook.com',
+        'aol.com', 'btconnect.com', 'yahoo.com',
+        'googlemail.com', 'ntlworld.com',
+        'talktalk.net',
+        'sky.com',
+        'live.co.uk',
+        'ntlworld.com',
+        'tiscali.co.uk',
+        'icloud.com',
+        'btopenworld.com',
+        'blueyonder.co.uk',
+        'virginmedia.com',
+        'nhs.net',
+        'me.com',
+        'msn.com',
+        'talk21.com',
+        'aol.co.uk',
+        'mail.com',
+        'live.com',
+        'virgin.net',
+        'ymail.com',
+        'mac.com',
+        'waitrose.com',
+        'gmail.co.uk'
+    ) 
+        and spider = %(spider_name)s;
+    """
 
 class BaseScraper(BaseCommand):
 
@@ -37,6 +71,9 @@ class BaseScraper(BaseCommand):
         self.records = []
         self.link_records = []
         self.logger = logging.getLogger("ftc.{}".format(self.name))
+        self.post_sql = {
+            "update_domains": UPDATE_DOMAINS
+        }
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -132,6 +169,12 @@ class BaseScraper(BaseCommand):
             ).delete()
             self.logger.info("Deleted previous records")
 
+        # do any SQL actions after the data has been included
+        with connection.cursor() as cursor:
+            for sql_name, sql in self.post_sql.items():
+                self.logger.info("Starting SQL: {}".format(sql_name))
+                cursor.execute(sql, {"spider_name": self.name})
+                self.logger.info("Finished SQL: {}".format(sql_name))
 
 
     def save_sources(self):

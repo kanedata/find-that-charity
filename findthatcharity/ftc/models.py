@@ -1,4 +1,5 @@
 import operator
+import datetime
 
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.contrib.postgres.indexes import GinIndex
@@ -8,6 +9,34 @@ from django.utils.text import slugify
 
 from dbview.models import DbView
 
+
+IGNORE_DOMAINS = (
+	'gmail.com', 'hotmail.com', 'btinternet.com',
+	'hotmail.co.uk', 'yahoo.co.uk', 'outlook.com',
+	'aol.com', 'btconnect.com', 'yahoo.com',
+	'googlemail.com', 'ntlworld.com',
+	'talktalk.net',
+	'sky.com',
+	'live.co.uk',
+	'ntlworld.com',
+	'tiscali.co.uk',
+	'icloud.com',
+	'btopenworld.com',
+	'blueyonder.co.uk',
+	'virginmedia.com',
+	'nhs.net',
+	'me.com',
+	'msn.com',
+	'talk21.com',
+	'aol.co.uk',
+	'mail.com',
+	'live.com',
+	'virgin.net',
+	'ymail.com',
+	'mac.com',
+	'waitrose.com',
+	'gmail.co.uk'
+)
 
 class Orgid(str):
 
@@ -78,6 +107,7 @@ class Organisation(models.Model):
     email = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
+    domain = models.CharField(max_length=255, null=True, blank=True, db_index=True)
     latestIncome = models.BigIntegerField(null=True, blank=True)
     latestIncomeDate = models.DateField(null=True, blank=True)
     dateRegistered = models.DateField(null=True, blank=True)
@@ -139,7 +169,7 @@ class Organisation(models.Model):
         return (
             0 if self.active else 1,
             prefix_order,
-            self.dateRegistered,
+            self.dateRegistered if self.dateRegistered else datetime.date.min,
         )
 
 
@@ -334,8 +364,8 @@ class RelatedOrganisation:
 
     def __init__(self, orgs):
         self.records = self.prioritise_orgs(orgs)
-        self.orgIDs = set(self.get_all("orgIDs"))
-        self.alternateName = list(self.get_all("alternateName"))
+        self.orgIDs = list(set(self.get_all("orgIDs")))
+        self.alternateName = list(set(self.get_all("alternateName")))
         self.sources = list(self.get_all("source"))
 
         self.org_links = []
@@ -345,17 +375,27 @@ class RelatedOrganisation:
         self.sources.extend(list(set([o.source for o in self.org_links])))
         self.sources = list(set(self.sources))
 
+    @classmethod
+    def from_orgid(cls, org_id):
+        orgs = Organisation.objects.filter(
+            linked_orgs__contains=[org_id])
+        return cls(orgs)
+
     def __getattr__(self, key, *args):
         return getattr(self.records[0], key, *args)
 
-    def first(self, field):
+    def first(self, field, justvalue=False):
         for r in self.records:
             if getattr(r, field, None):
+                if justvalue:
+                    return getattr(r, field)
                 return {
                     "value": getattr(r, field),
                     "orgid": r.org_id,
                     "source": r.source,
                 }
+        if justvalue:
+            return None
         return {}
 
     def get_all(self, field):

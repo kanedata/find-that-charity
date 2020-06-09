@@ -2,8 +2,9 @@ from collections import defaultdict
 
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
+import tqdm
 
-from .models import Organisation
+from .models import Organisation, RelatedOrganisation
 
 
 @registry.register_document
@@ -15,6 +16,8 @@ class FullOrganisation(Document):
     alternateName = fields.TextField()
     organisationType = fields.KeywordField()
     source = fields.KeywordField()
+    domain = fields.KeywordField()
+    latestIncome = fields.IntegerField()
 
     class Index:
         # Name of the Elasticsearch index
@@ -45,6 +48,12 @@ class FullOrganisation(Document):
     def prepare_organisationType(self, instance):
         return instance.organisationType
 
+    def prepare_domain(self, instance):
+        return instance.domain
+
+    def prepare_latestIncome(self, instance):
+        return instance.latestIncome
+
     def prepare_source(self, instance):
         return instance.source_id
 
@@ -56,12 +65,8 @@ class FullOrganisation(Document):
         Return the queryset that should be indexed by this doc type.
         """
         sql = """
-        select distinct on (o."linked_orgs") o.*
-        from (
-            select *
-            from ftc_organisation 
-            order by active desc, "dateRemoved" desc, "dateRegistered" desc
-        ) as o
+        select distinct on ("linked_orgs") "id", "org_id", "linked_orgs"
+        from ftc_organisation
         """
 
         return self.django.model.objects.raw(sql)
@@ -71,10 +76,8 @@ class FullOrganisation(Document):
         Build queryset (iterator) for use by indexing.
         """
         qs = self.get_queryset()
-        kwargs = {}
-        if DJANGO_VERSION >= (2,) and self.django.queryset_pagination:
-            kwargs = {'chunk_size': self.django.queryset_pagination}
-        return qs.iterator(**kwargs)
+        for o in tqdm.tqdm(qs):
+            yield RelatedOrganisation.from_orgid(o.linked_orgs[0])
 
     class Django:
         model = Organisation  # The model associated with this Document
