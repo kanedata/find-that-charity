@@ -37,3 +37,17 @@
 ## Set up data feeds
 
 - charity commission data files - when are they updated
+
+## Better charity pages
+
+- financial overview
+- filter charities
+- get area profile
+
+## Build and document rest API
+
+- use django-rest-api?
+
+## Build and document graphQL API
+
+- probably a plugin for that?
