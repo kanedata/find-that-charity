@@ -172,6 +172,20 @@ class Organisation(models.Model):
             self.dateRegistered if self.dateRegistered else datetime.date.min,
         )
 
+    @classmethod
+    def get_fields_as_properties(cls):
+        internal_fields = [
+            "scrape", "spider"
+        ]
+        return [
+            {
+                "id": f.name,
+                "name": f.verbose_name,
+            }
+            for f in cls._meta.get_fields()
+            if f.name not in internal_fields
+        ]
+
 
 class OrganisationType(models.Model):
     slug = models.SlugField(max_length=255, editable=False, primary_key=True)

@@ -27,6 +27,11 @@ def index(request, orgtype='all'):
             results[query_id] = do_reconcile_query(**query, orgtype=orgtype)
         return JsonResponse(results)
 
+    extend = request.POST.get("extend", request.GET.get("extend"))
+    if extend:
+        extend = json.loads(extend)
+        return JsonResponse(do_extend_query(**extend))
+
     return JsonResponse(service_spec(request))
 
 
@@ -101,6 +106,28 @@ def do_reconcile_query(query, orgtype='all', type='/Organization', limit=5, prop
     } for k, o in enumerate(result)]
 
 
+def do_extend_query(ids, properties):
+    result = {
+        "meta": [],
+        "rows": {}
+    }
+    all_fields = {
+        f["id"]: f
+        for f in Organisation.get_fields_as_properties()
+    }
+    fields = [p["id"] for p in properties if p["id"] in all_fields.keys()]
+    result["meta"] = [all_fields[f] for f in fields]
+    for r in Organisation.objects.filter(org_id__in=ids).values("org_id", *fields):
+        result["rows"][r['org_id']] = {k: v for k, v in r.items() if k in fields}
+
+    # add in rows for any data that is missing
+    for i in ids:
+        if i not in result["rows"]:
+            result["rows"][i] = {k: None for k in fields}
+
+    return result
+
+
 def recon_query(term, orgtype='all', postcode=None):
     """
     Fetch the reconciliation query and insert the query term
@@ -147,19 +174,8 @@ def propose_properties(request):
 
     limit = int(request.GET.get("limit", "500"))
 
-    internal_fields = [
-        "scrape", "spider"
-    ]
-
     return JsonResponse({
         "limit": limit,
         "type": type_,
-        "properties": [
-            {
-                "id": f.name,
-                "name": f.verbose_name,
-            }
-            for f in Organisation._meta.get_fields()
-            if f.name not in internal_fields
-        ]
+        "properties": Organisation.get_fields_as_properties(),
     })
