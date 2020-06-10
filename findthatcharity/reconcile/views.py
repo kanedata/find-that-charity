@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from elasticsearch_dsl.query import MultiMatch, Match
 from django.utils.text import slugify
 
-from ftc.models import Organisation
+from ftc.models import Organisation, OrganisationType
 from ftc.documents import FullOrganisation
 
 
@@ -67,6 +67,13 @@ def service_spec(request):
             },
             "property_settings": []
         },
+        "suggest": {
+            "entity": {
+                "service_url": request.build_absolute_uri(reverse('index')),
+                "service_path": "/suggest",
+                # "flyout_service_path": "/suggest/flyout/${id}"
+            }
+        }
     }
 
 
@@ -192,3 +199,72 @@ def propose_properties(request):
         "type": type_,
         "properties": Organisation.get_fields_as_properties(),
     })
+
+
+@csrf_exempt
+def suggest(request, orgtype="all"):
+    SUGGEST_NAME = 'name_complete'
+
+    prefix = request.GET.get("prefix")
+    cursor = request.GET.get("cursor")
+    if not prefix:
+        raise Http404("Prefix must be supplied")
+    print(autocomplete_query(
+        prefix,
+        orgtype=orgtype,
+    ))
+    q = FullOrganisation.search()
+
+    q = q.suggest(
+        SUGGEST_NAME,
+        prefix,
+        completion={
+            "field": "complete_names",
+            "fuzzy": {
+                "fuzziness": 1
+            }
+        }
+    ).source(['org_id', 'name', 'organisationType'])
+    # if orgtype and orgtype != "all":
+    #     q = q.filter('terms', organisationType=orgtype.split("+"))
+    result = q.execute()
+
+    return JsonResponse({
+        "result": [
+            {
+                "id": r["_source"]["org_id"], 
+                "name": r["_source"]["name"], 
+            }
+            for r in result.suggest[SUGGEST_NAME][0]["options"]
+        ]
+    })
+
+
+def autocomplete_query(term, orgtype='all'):
+    """
+    Look up an organisation using the first part of the name
+    """
+    doc = {
+        "suggest": {
+            "suggest-1": {
+                "prefix": term,
+                "completion": {
+                    "field": "complete_names",
+                    "fuzzy": {
+                        "fuzziness": 1
+                    }
+                }
+            }
+        }
+    }
+
+    # if not orgtype or orgtype == 'all':
+    #     orgtype = [o.slug for o in OrganisationType.objects.all()]
+    # elif orgtype:
+    #     orgtype = orgtype.split("+")
+
+    # doc["suggest"]["suggest-1"]["completion"]["contexts"] = {
+    #     "organisationType": orgtype
+    # }
+
+    return doc
