@@ -1,6 +1,7 @@
 import json
 import os
 import copy
+import urllib.parse
 
 from django.http import JsonResponse, Http404
 from django.shortcuts import reverse
@@ -45,14 +46,14 @@ def service_spec(request):
         "identifierSpace": "http://org-id.guide",
         "schemaSpace": "https://schema.org",
         "view": {
-            "url": request.build_absolute_uri(
+            "url": urllib.parse.unquote(request.build_absolute_uri(
                 reverse('orgid_html', kwargs={'org_id': '{{id}}'})
-            )
+            ))
         },
         "preview": {
-            "url": request.build_absolute_uri(
+            "url": urllib.parse.unquote(request.build_absolute_uri(
                 reverse('orgid_html_preview', kwargs={'org_id': '{{id}}'})
-            ),
+            )),
             "width": 430,
             "height": 300
         },
@@ -63,14 +64,14 @@ def service_spec(request):
         "extend": {
             "propose_properties": {
                 "service_url": request.build_absolute_uri(reverse('index')),
-                "service_path": "/reconcile/propose_properties"
+                "service_path": reverse('propose_properties'),
             },
             "property_settings": []
         },
         "suggest": {
             "entity": {
                 "service_url": request.build_absolute_uri(reverse('index')),
-                "service_path": "/suggest",
+                "service_path": reverse('suggest'),
                 # "flyout_service_path": "/suggest/flyout/${id}"
             }
         }

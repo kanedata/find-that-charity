@@ -14,7 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, reverse
+from django.views.generic import RedirectView
 
 import ftc.urls
 import ftc.views
@@ -26,5 +27,6 @@ urlpatterns = [
     path('', ftc.views.index, name='index'),
     path('orgid/', include(ftc.urls)),
     path('charity/', include(charity.urls)),
-    path('reconcile', include(reconcile.urls)),
+    path('reconcile/', include(reconcile.urls)),
+    path('reconcile', RedirectView.as_view(url='/reconcile/')),
 ]
