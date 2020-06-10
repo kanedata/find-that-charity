@@ -2,7 +2,7 @@ import json
 import os
 import copy
 
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.shortcuts import reverse
 from django.views.decorators.csrf import csrf_exempt
 from elasticsearch_dsl.query import MultiMatch, Match
@@ -54,7 +54,14 @@ def service_spec(request):
         "defaultTypes": [{
             "id": "/Organization",
             "name": "Organisation",
-        }]
+        }],
+        "extend": {
+            "propose_properties": {
+                "service_url": request.build_absolute_uri(reverse('index')),
+                "service_path": "/reconcile/propose_properties"
+            },
+            "property_settings": []
+        },
     }
 
 
@@ -131,3 +138,28 @@ def recon_query(term, orgtype='all', postcode=None):
         }
 
     return (json_q["inline"], params)
+
+
+def propose_properties(request):
+    type_ = request.GET.get("type", "Organization")
+    if type_ != "Organization":
+        raise Http404("type must be Organization")
+
+    limit = int(request.GET.get("limit", "500"))
+
+    internal_fields = [
+        "scrape", "spider"
+    ]
+
+    return JsonResponse({
+        "limit": limit,
+        "type": type_,
+        "properties": [
+            {
+                "id": f.name,
+                "name": f.verbose_name,
+            }
+            for f in Organisation._meta.get_fields()
+            if f.name not in internal_fields
+        ]
+    })
