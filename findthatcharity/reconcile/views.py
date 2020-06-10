@@ -90,6 +90,7 @@ def do_reconcile_query(query, orgtype='all', type='/Organization', limit=5, prop
         query,
         orgtype=orgtype,
         postcode=properties.get("postalCode"),
+        domain=properties.get("domain"),
     )
     q = FullOrganisation.search().from_dict(query_template)[:limit]
     result = q.execute(params=params)
@@ -128,7 +129,7 @@ def do_extend_query(ids, properties):
     return result
 
 
-def recon_query(term, orgtype='all', postcode=None):
+def recon_query(term, orgtype='all', postcode=None, domain=None):
     """
     Fetch the reconciliation query and insert the query term
     """
@@ -150,6 +151,18 @@ def recon_query(term, orgtype='all', postcode=None):
         })
         params["postcode"] = postcode
 
+    # add domain searching
+    if domain:
+        json_q["inline"]["query"]["function_score"]["functions"].append({
+            "filter": {
+                "term": {
+                    "domain": "{{domain}}"
+                }
+            },
+            "weight": 200000
+        })
+        params["domain"] = domain
+
     # check for organisation type
     if orgtype and orgtype != "all":
         if not isinstance(orgtype, list):
@@ -166,7 +179,7 @@ def recon_query(term, orgtype='all', postcode=None):
 
     return (json_q["inline"], params)
 
-
+@csrf_exempt
 def propose_properties(request):
     type_ = request.GET.get("type", "Organization")
     if type_ != "Organization":
