@@ -1,10 +1,48 @@
 from collections import defaultdict
 
 from django_elasticsearch_dsl import Document, fields
+from django_elasticsearch_dsl.search import Search
 from django_elasticsearch_dsl.registries import registry
+from elasticsearch_dsl.connections import get_connection
 import tqdm
 
 from .models import Organisation, RelatedOrganisation
+
+
+class SearchWithTemplate(Search):
+
+    def execute(self, ignore_cache=False, params=None):
+        """
+        Execute the search and return an instance of ``Response`` wrapping all
+        the data.
+        :arg ignore_cache: if set to ``True``, consecutive calls will hit
+            ES, while cached result will be ignored. Defaults to `False`
+        """
+        if ignore_cache or not hasattr(self, '_response'):
+            es = get_connection(self._using)
+
+            if params:
+                self._response = self._response_class(
+                    self,
+                    es.search_template(
+                        index=self._index,
+                        body={
+                            "source": self.to_dict(),
+                            "params": params,
+                        },
+                        **self._params
+                    )
+                )
+            else:
+                self._response = self._response_class(
+                    self,
+                    es.search(
+                        index=self._index,
+                        body=self.to_dict(),
+                        **self._params
+                    )
+                )
+        return self._response
 
 
 @registry.register_document
@@ -19,6 +57,14 @@ class FullOrganisation(Document):
     domain = fields.KeywordField()
     latestIncome = fields.IntegerField()
 
+    @classmethod
+    def search(cls, using=None, index=None):
+        return SearchWithTemplate(
+            using=cls._get_using(using),
+            index=cls._default_index(index),
+            doc_type=[cls],
+            model=cls.django.model
+        )
     class Index:
         # Name of the Elasticsearch index
         name = 'ftc_organisation'
@@ -77,7 +123,8 @@ class FullOrganisation(Document):
         """
         qs = self.get_queryset()
         for o in tqdm.tqdm(qs):
-            yield RelatedOrganisation.from_orgid(o.linked_orgs[0])
+            if o:
+                yield RelatedOrganisation.from_orgid(o.linked_orgs[0])
 
     class Django:
         model = Organisation  # The model associated with this Document

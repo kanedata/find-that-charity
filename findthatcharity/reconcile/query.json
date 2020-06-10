@@ -1,0 +1,82 @@
+{
+    "inline": {
+        "_source": {
+            "excludes": [
+                "complete_names"
+            ]
+        },
+        "query": {
+            "function_score": {
+                "query": {
+                    "dis_max": {
+                        "queries": [
+                            {
+                                "multi_match": {
+                                    "query": "{{name}}",
+                                    "fields": [
+                                        "name^3",
+                                        "alternateName"
+                                    ]
+                                }
+                            },
+                            {
+                                "match_phrase": {
+                                    "name": "{{name}}"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "functions": [
+                    {
+                        "filter": {
+                            "match_phrase_prefix": {
+                                "name": "{{name}}"
+                            }
+                        },
+                        "weight": 200
+                    },
+                    {
+                        "filter": {
+                            "multi_match": {
+                                "query": "{{name}}",
+                                "fields": [
+                                    "name^3",
+                                    "alternateName"
+                                ],
+                                "operator": "and"
+                            }
+                        },
+                        "weight": 10
+                    },
+                    {
+                        "filter": {
+                            "match": {
+                                "active": false
+                            }
+                        },
+                        "weight": 0.9
+                    },
+                    {
+                        "filter": {
+                            "terms": {
+                                "source": ["ccew", "ccni", "oscr"]
+                            }
+                        },
+                        "weight": 5
+                    },
+                    {
+                        "field_value_factor": {
+                            "field": "latest_income",
+                            "modifier": "log2p",
+                            "missing": 1
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "params": {
+        "name": "term"
+    }
+}

@@ -26,5 +26,6 @@ urlpatterns = [
     path('', ftc.views.index, name='index'),
     path('orgid/', include(ftc.urls)),
     path('charity/', include(charity.urls)),
-    path('reconcile', reconcile.views.index, name='reconcile'),
+    path('reconcile', reconcile.views.index, {'orgtype': 'registered-charity'}, name='reconcile'),
+    path('reconcile/<str:orgtype>', reconcile.views.index),
 ]
