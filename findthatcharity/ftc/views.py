@@ -8,9 +8,10 @@ from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
 
-from ftc.documents import FullOrganisation
+from ftc.documents import FullOrganisation, DSEPaginator
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
                         Source)
+from reconcile.query import recon_query
 
 # site homepage
 
@@ -46,13 +47,18 @@ def index(request):
 def org_search(request):
     criteria = {}
     if 'q' in request.GET:
-        criteria['name__search'] = request.GET['q']
+        query = request.GET['q']
+    orgtype = []
     if 'orgtype' in request.GET and request.GET.get('orgtype') != 'all':
-        criteria["organisationType__contains"] = [request.GET['orgtype']]
+        orgtype = request.GET.get('orgtype')
 
-    orgs = Organisation.objects.filter(
-        **{k: v for k, v in criteria.items() if v})
-    paginator = Paginator(orgs, 25)
+    query_template, params = recon_query(
+        query,
+        orgtype=orgtype,
+    )
+    q = FullOrganisation.search().from_dict(query_template)
+    result = q.execute(params=params)
+    paginator = DSEPaginator(result, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 

@@ -24,6 +24,7 @@
     - setup cache tables
     - populate DB (import_all)
     - create and populate elasticsearch (`--rebuild`)
+    - something on static urls?
 - set up ongoing tasks
     - populate DB
     - repopulate elasticsearch
@@ -38,7 +39,8 @@
 
 ## Front page search
 
-- switch to elasticsearch
+- ✔ switch to elasticsearch
+- add organisationTypePrimary to elasticsearch
 
 ## Set up data feeds
 

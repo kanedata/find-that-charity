@@ -13,6 +13,17 @@ def regex_search(s, regex):
     return re.search(regex, s) is not None
 
 
+def list_to_string(l, sep=", ", final_sep=" and "):
+    if not isinstance(l, list):
+        return l
+
+    if len(l) == 1:
+        return l[0]
+    elif len(l) == 2:
+        return final_sep.join(l)
+    else:
+        return sep.join(l[0:-1]) + final_sep + l[-1]
+
 # templates = Jinja2Templates(directory='templates')
 
 # templates.env.filters["list_to_string"] = list_to_string
@@ -56,5 +67,6 @@ def environment(**options):
         'regex_search': regex_search,
         "naturaldelta": lambda x: naturaldelta(
             x, minimum_unit="milliseconds"),
+        "list_to_string": list_to_string,
     })
     return env

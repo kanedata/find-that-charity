@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from django.core.paginator import Paginator, Page
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.search import Search
 from django_elasticsearch_dsl.registries import registry
@@ -43,6 +44,23 @@ class SearchWithTemplate(Search):
                     )
                 )
         return self._response
+
+
+class DSEPaginator(Paginator):
+    """
+    Override Django's built-in Paginator class to take in a count/total number of items;
+    Elasticsearch provides the total as a part of the query results, so we can minimize hits.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(DSEPaginator, self).__init__(*args, **kwargs)
+        self._count = self.object_list.hits.total
+
+    def page(self, number):
+        # this is overridden to prevent any slicing of the object_list - Elasticsearch has
+        # returned the sliced data already.
+        number = self.validate_number(number)
+        return Page(self.object_list, number, self)
 
 
 @registry.register_document
