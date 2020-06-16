@@ -2,12 +2,14 @@
 
 ## Organisation JSON response
 
-- add JSON response
+- ✔ add JSON response
 
 ## Autocomplete API
 
-- (but implemented with /reconcile/suggest?)
-- Add vuejs app to front page
+- ✔ (but implemented with /reconcile/suggest?)
+- ✔ Add vuejs app to front page
+- allow to be filtered by orgtype
+- better suggestions
 
 ## CSV data tool
 

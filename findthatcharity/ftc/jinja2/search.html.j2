@@ -1,5 +1,5 @@
 {% set frontpage = false %}
-{% extends 'base.html.j2' %}
+{% extends 'index.html.j2' %}
 
 {% set heading = 'Search results' %}
 
@@ -13,8 +13,4 @@
         {% endif %}
     </div>
 </div>
-{% endblock %}
-
-{% block bodyscripts %}
-{# <script src='{{url("static", path="/js/autocomplete.js")}}' type="text/javascript"></script> #}
 {% endblock %}

@@ -235,6 +235,10 @@ def suggest(request, orgtype="all"):
             {
                 "id": r["_source"]["org_id"], 
                 "name": r["_source"]["name"], 
+                "url": request.build_absolute_uri(
+                    reverse('orgid_html', kwargs={"org_id": r["_source"]["org_id"]})
+                ),
+                "orgtypes": list(r["_source"]["organisationType"]),
             }
             for r in result.suggest[SUGGEST_NAME][0]["options"]
         ]
