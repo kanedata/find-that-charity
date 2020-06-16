@@ -3,6 +3,7 @@ import re
 
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.text import slugify
 from humanize import naturaldelta
 from jinja2 import Environment
 
@@ -23,18 +24,6 @@ def list_to_string(l, sep=", ", final_sep=" and "):
         return final_sep.join(l)
     else:
         return sep.join(l[0:-1]) + final_sep + l[-1]
-
-# templates = Jinja2Templates(directory='templates')
-
-# templates.env.filters["list_to_string"] = list_to_string
-# templates.env.filters["regex_search"] = regex_search
-# templates.env.filters["slugify"] = slugify
-# templates.env.filters["naturaldelta"] = 
-# templates.env.globals["sources"] = fetch_all_sources()
-# templates.env.globals["org_types"] = ORGTYPES
-# templates.env.globals["sources_count"] = SOURCES
-# templates.env.globals["key_types"] = settings.KEY_TYPES
-# templates.env.globals["now"] = datetime.datetime.now()
 
 
 def url_replace(request, **kwargs):
@@ -68,5 +57,6 @@ def environment(**options):
         "naturaldelta": lambda x: naturaldelta(
             x, minimum_unit="milliseconds"),
         "list_to_string": list_to_string,
+        "slugify": slugify,
     })
     return env
