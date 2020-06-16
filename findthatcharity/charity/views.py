@@ -25,7 +25,7 @@ def get_charity(request, regno, filetype="html", preview=False):
     org = RelatedOrganisation(orgs)
     if filetype == "json":
         return JsonResponse({
-            "org": org.to_json()
+            "org": org.to_json(charity=True)
         })
     return render(request, 'org.html.j2', {
         "org": org,

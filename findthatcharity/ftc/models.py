@@ -474,3 +474,117 @@ class RelatedOrganisation:
             else:
                 obj["sameAs"] = self.sameAs
         return obj
+
+    def to_json(self, charity=False):
+        address_fields = [
+            "streetAddress",
+            "addressLocality",
+            "addressRegion",
+            "addressCountry",
+            "postalCode",
+        ]
+        orgtypes = [
+            y for y in 
+            self.get_all('organisationType')
+        ]
+        orgtypes = [o.title for o in OrganisationType.objects.filter(slug__in=orgtypes)]
+
+        if charity:
+            ccew_number = None
+            ccew_link = None
+            oscr_number = None
+            oscr_link = None
+            ccni_number = None
+            ccni_link = None
+            company_numbers = []
+            for o in self.orgIDs:
+                if o.startswith("GB-CHC-"):
+                    ccew_number = o.replace("GB-CHC-", "")
+                    ccew_link = self.EXTERNAL_LINKS['GB-CHC'][1][0].format(ccew_number)
+                elif o.startswith("GB-NIC-"):
+                    ccni_number = o.replace("GB-NIC-", "")
+                    ccni_link = self.EXTERNAL_LINKS['GB-NIC'][0][0].format(
+                        ccni_number)
+                elif o.startswith("GB-SC-"):
+                    oscr_number = o.replace("GB-SC-", "")
+                    oscr_link = self.EXTERNAL_LINKS['GB-SC'][0][0].format(
+                        oscr_number)
+                elif o.startswith("GB-COH-"):
+                    company_numbers.append({
+                        "number": o.replace("GB-COH-", ""),
+                        "url": self.EXTERNAL_LINKS['GB-COH'][0][0].format(o.replace("GB-COH-", "")),
+                        "source": self.source.id
+                    })
+            names = []
+            names_seen = set()
+            for r in self.records:
+                if r.name not in names_seen:
+                    names.append({
+                        'name': r.name,
+                        'type': "registered name",
+                        'source': r.source.id,
+                    })
+                    names_seen.add(r.name)
+                for n in r.alternateName:
+                    if n not in names_seen:
+                        names.append({
+                            'name': n,
+                            'type': "other name",
+                            'source': r.source.id,
+                        })
+                        names_seen.add(n)
+
+            return {
+                "ccew_number": ccew_number,
+                "oscr_number": oscr_number,
+                "ccni_number": ccni_number,
+                "active": self.active,
+                "names": names,
+                "known_as": self.name,
+                "geo": {
+                    "areas": [],
+                    "postcode": self.postalCode,
+                    "location": self.location
+                },
+                "url": self.url,
+                "domain": "centre404.org.uk",
+                "latest_income": self.latestIncome,
+                "company_number": company_numbers,
+                "parent": self.parent,
+                "ccew_link": ccew_link,
+                "oscr_link": oscr_link,
+                "ccni_link": ccni_link,
+                "date_registered": self.dateRegistered,
+                "date_removed": self.dateRemoved,
+                "org-ids": self.orgIDs,
+                "alt_names": self.alternateName,
+                "last_modified": self.dateModified,
+            }
+
+        return {
+            "sources": [s.id for s in self.sources],
+            "name": self.name,
+            "charityNumber": self.charityNumber,
+            "companyNumber": self.companyNumber,
+            "telephone": self.telephone,
+            "email": self.email,
+            "description": self.description,
+            "url": self.url,
+            "latestIncome": self.latestIncome,
+            "dateModified": self.dateModified,
+            "dateRegistered": self.dateRegistered,
+            "dateRemoved": self.dateRemoved,
+            "active": self.active,
+            "parent": self.parent,
+            "organisationType": orgtypes,
+            "organisationTypePrimary": self.organisationTypePrimary.title,
+            "alternateName": self.alternateName,
+            "orgIDs": self.orgIDs,
+            "id": self.org_id,
+            "location": self.location,
+            "address": {
+                k: getattr(self, k)
+                for k in address_fields
+                if getattr(self, k, None)
+            }
+        }
