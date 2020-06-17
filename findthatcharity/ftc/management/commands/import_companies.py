@@ -1,29 +1,30 @@
-# -*- coding: utf-8 -*-
-import csv
-import datetime
-import io
 import re
 import zipfile
+import csv
+import io
+import datetime
 
-from tqdm import tqdm
+from requests_html import HTMLSession
+import requests
+import requests_cache
+import tqdm
 
-import scrapy
-
-from ..items import Organisation, Source
-from .base_scraper import BaseScraper
+from ftc.management.commands._base_scraper import CSVScraper
+from ftc.models import Organisation
 
 
-class CompaniesSpider(BaseScraper):
+class Command(CSVScraper):
     name = 'companies'
     allowed_domains = ['companieshouse.gov.uk']
     start_urls = ["http://download.companieshouse.gov.uk/en_output.html"]
-    zip_regex = re.compile(r"BasicCompanyData-.*\.zip")
+    zip_regex = re.compile(r".*/BasicCompanyData-.*\.zip")
     org_id_prefix = "GB-COH"
     clg_types = [
         "PRI/LBG/NSC (Private, Limited by guarantee, no share capital, use of 'Limited' exemption)",
         "PRI/LTD BY GUAR/NSC (Private, limited by guarantee, no share capital)",
     ]
-    included_types = [
+    orgtypes = [
+        "Registered Company",
         "Charitable Incorporated Organisation",
         "Community Interest Company",
         "Company Limited by Guarantee",
@@ -75,43 +76,49 @@ class CompaniesSpider(BaseScraper):
         "distribution": [],
     }
 
-    def start_requests(self):
+    def fetch_file(self):
+        requests_cache.install_cache('http_cache')
+        self.session = HTMLSession()
+        self.files = {}
+        for u in self.start_urls:
+            response = self.session.get(u)
+            for l in response.html.absolute_links:
+                if self.zip_regex.match(l):
+                    self.logger.info("Fetching: {}".format(l))
+                    try:
+                        self.files[l] = self.session.get(l)
+                    except requests.exceptions.ChunkedEncodingError as err:
+                        self.logger.error("Error fetching: {}".format(l))
+                        self.logger.error(str(err))
 
-        return [scrapy.Request(self.start_urls[0], callback=self.fetch_zip)]
-
-    def fetch_zip(self, response):
-        self.source["modified"] = datetime.datetime.now().isoformat()
-        links = []
-        for i, link in enumerate(response.css("a::attr(href)").re(self.zip_regex)):
-
-            self.source["distribution"].append({
-                "accessURL": self.start_urls[0],
-                "downloadURL": response.urljoin(link),
-                "title": "Free Company Data Product",
-            })
-
-            links.append(scrapy.Request(response.urljoin(link), callback=self.process_zip))
-        return links
-
-    def process_zip(self, response):
-        yield Source(**self.source)
-        with zipfile.ZipFile(io.BytesIO(response.body)) as z:
+    def parse_file(self, response, source_url):
+        self.logger.info("Opening: {}".format(source_url))
+        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
             for f in z.infolist():
                 self.logger.info("Opening: {}".format(f.filename))
                 with z.open(f) as csvfile:
-                    reader = csv.DictReader(io.TextIOWrapper(csvfile, encoding='latin1'))
+                    reader = csv.DictReader(
+                        io.TextIOWrapper(csvfile, encoding='latin1'))
                     rowcount = 0
-                    for row in tqdm(reader):
-                        if self.settings.getbool("DEBUG_ENABLED") and rowcount >= self.settings.getint("DEBUG_ROWS", 100):
-                            break
-
+                    for row in tqdm.tqdm(reader):
                         # We only want data from a subset of companies
-                        if row.get("CompanyCategory") not in self.included_types:
+                        if row.get("CompanyCategory") not in self.orgtypes:
                             continue
+                        self.parse_row(row)
 
-                        rowcount += 1
+    # def fetch_zip(self, response):
+    #     self.source["modified"] = datetime.datetime.now().isoformat()
+    #     links = []
+    #     for i, link in enumerate(response.css("a::attr(href)").re(self.zip_regex)):
 
-                        yield self.parse_row(row)
+    #         self.source["distribution"].append({
+    #             "accessURL": self.start_urls[0],
+    #             "downloadURL": response.urljoin(link),
+    #             "title": "Free Company Data Product",
+    #         })
+
+    #         links.append(scrapy.Request(response.urljoin(link), callback=self.process_zip))
+    #     return links
 
     def parse_row(self, row):
         row = {k.strip().replace(".", "_"): row[k] for k in row}
@@ -156,34 +163,39 @@ class CompaniesSpider(BaseScraper):
                 address1.append(record.get(f))
 
         orgtypes = [
-            "Registered Company",
-            record.get("CompanyCategory")
+            self.orgtype_cache['registered-company'],
+            self.add_org_type(record.get("CompanyCategory")),
         ]
 
-        return Organisation(**{
-            "id": self.get_org_id(record),
-            "name": self.parse_name(record.get("CompanyName")),
-            "charityNumber": None,
-            "companyNumber": record.get(self.id_field),
-            "streetAddress": ", ".join(address1),
-            "addressLocality": record.get("RegAddress_PostTown"),
-            "addressRegion": record.get("RegAddress_County"),
-            "addressCountry": record.get("RegAddress_Country"),
-            "postalCode": record.get("RegAddress_PostCode"),
-            "telephone": None,
-            "alternateName": [self.parse_name(n["CompanyName"]) for n in record["previous_names"]],
-            "email": None,
-            "description": None,
-            "organisationType": orgtypes,
-            "organisationTypePrimary": record.get("CompanyCategory", "Regisered Company"),
-            "url": None,
-            "location": [],
-            "latestIncome": None,
-            "dateModified": datetime.datetime.now(),
-            "dateRegistered": record.get("IncorporationDate"),
-            "dateRemoved": record.get("DissolutionDate"),
-            "active": (record.get("CompanyStatus") not in ['Dissolved', 'Inactive', 'Converted / Closed'] and not record.get("DissolutionDate")),
-            "parent": None,
-            "orgIDs": [self.get_org_id(record)],
-            "source": self.source["identifier"],
-        })
+        self.records.append(
+            Organisation(**{
+                "org_id": self.get_org_id(record),
+                "name": self.parse_name(record.get("CompanyName")),
+                "charityNumber": None,
+                "companyNumber": record.get(self.id_field),
+                "streetAddress": ", ".join(address1),
+                "addressLocality": record.get("RegAddress_PostTown"),
+                "addressRegion": record.get("RegAddress_County"),
+                "addressCountry": record.get("RegAddress_Country"),
+                "postalCode": record.get("RegAddress_PostCode"),
+                "telephone": None,
+                "alternateName": [self.parse_name(n["CompanyName"]) for n in record["previous_names"]],
+                "email": None,
+                "description": None,
+                "organisationType": [o.slug for o in orgtypes],
+                "organisationTypePrimary": self.add_org_type(record.get("CompanyCategory")),
+                "url": None,
+                "location": [],
+                "latestIncome": None,
+                "dateModified": datetime.datetime.now(),
+                "dateRegistered": record.get("IncorporationDate"),
+                "dateRemoved": record.get("DissolutionDate"),
+                "active": (record.get("CompanyStatus") not in ['Dissolved', 'Inactive', 'Converted / Closed'] and not record.get("DissolutionDate")),
+                "parent": None,
+                "orgIDs": [self.get_org_id(record)],
+                "scrape": self.scrape,
+                "source": self.source,
+                "spider": self.name,
+                "org_id_scheme": self.orgid_scheme,
+            })
+        )

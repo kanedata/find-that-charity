@@ -31,7 +31,7 @@
 
 ## Companies data import
 
-- needs coverting to new format
+- ✔ needs coverting to new format
 
 ## Return a random organisation
 
