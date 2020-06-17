@@ -40,7 +40,7 @@
 ## Front page search
 
 - ✔ switch to elasticsearch
-- add organisationTypePrimary to elasticsearch
+- ✔ add organisationTypePrimary to elasticsearch
 
 ## Set up data feeds
 

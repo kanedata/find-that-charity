@@ -4,6 +4,7 @@ from django.core.paginator import Paginator, Page
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.search import Search
 from django_elasticsearch_dsl.registries import registry
+from elasticsearch_dsl.field import Completion
 from elasticsearch_dsl.connections import get_connection
 import tqdm
 
@@ -67,10 +68,17 @@ class DSEPaginator(Paginator):
 class FullOrganisation(Document):
 
     org_id = fields.KeywordField()
-    complete_names = fields.CompletionField()
+    complete_names = fields.CompletionField(contexts=[
+        {
+            "name": "organisationType",
+            "type": "category",
+            "path": "organisationType"
+        }
+    ])
     orgIDs = fields.KeywordField()
     alternateName = fields.TextField()
     organisationType = fields.KeywordField()
+    organisationTypePrimary = fields.KeywordField()
     source = fields.KeywordField()
     domain = fields.KeywordField()
     latestIncome = fields.IntegerField()
@@ -111,6 +119,9 @@ class FullOrganisation(Document):
 
     def prepare_organisationType(self, instance):
         return instance.organisationType
+
+    def prepare_organisationTypePrimary(self, instance):
+        return instance.organisationTypePrimary.slug
 
     def prepare_domain(self, instance):
         return instance.domain
