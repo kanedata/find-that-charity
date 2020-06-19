@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django_elasticsearch_dsl',
-    'dbview',
     'ftc.apps.FtcConfig',
     'charity.apps.CharityConfig',
     'reconcile.apps.ReconcileConfig',

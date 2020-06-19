@@ -13,10 +13,42 @@ class Command(BaseCommand):
             from (
                 WITH RECURSIVE search_graph(org_id_a, org_id_b) AS (
                         SELECT a.org_id_a, a.org_id_b
-                        FROM ftc_linkedorganisation a
+                        FROM (
+                            SELECT ftc_organisationlink.org_id_a,
+                                ftc_organisationlink.org_id_b
+                            FROM ftc_organisationlink
+                            UNION
+                            SELECT ftc_organisationlink.org_id_b AS org_id_a,
+                                ftc_organisationlink.org_id_a AS org_id_b
+                            FROM ftc_organisationlink
+                            UNION
+                            SELECT ftc_organisationlink.org_id_a,
+                                ftc_organisationlink.org_id_a AS org_id_b
+                            FROM ftc_organisationlink
+                            UNION
+                            SELECT ftc_organisationlink.org_id_b AS org_id_a,
+                                ftc_organisationlink.org_id_b
+                            FROM ftc_organisationlink
+                        ) a
                     union
                         SELECT sg.org_id_a, a.org_id_b
-                        FROM ftc_linkedorganisation a
+                        FROM (
+                            SELECT ftc_organisationlink.org_id_a,
+                                ftc_organisationlink.org_id_b
+                            FROM ftc_organisationlink
+                            UNION
+                            SELECT ftc_organisationlink.org_id_b AS org_id_a,
+                                ftc_organisationlink.org_id_a AS org_id_b
+                            FROM ftc_organisationlink
+                            UNION
+                            SELECT ftc_organisationlink.org_id_a,
+                                ftc_organisationlink.org_id_a AS org_id_b
+                            FROM ftc_organisationlink
+                            UNION
+                            SELECT ftc_organisationlink.org_id_b AS org_id_a,
+                                ftc_organisationlink.org_id_b
+                            FROM ftc_organisationlink
+                        ) a
                             inner JOIN search_graph sg
                                 ON a.org_id_a = sg.org_id_b
                 )

@@ -4,6 +4,7 @@ import re
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.text import slugify
+from django.db import connection
 from humanize import naturaldelta
 from jinja2 import Environment
 
@@ -43,12 +44,20 @@ def url_remove(request, fields):
 
 def environment(**options):
     env = Environment(**options)
+
+    orgtypes = {}
+    sources = {}
+    if OrganisationType._meta.db_table in connection.introspection.table_names():
+        orgtypes = {o.slug: o for o in OrganisationType.objects.all()}
+    if Source._meta.db_table in connection.introspection.table_names():
+        sources = {s.id: s for s in Source.objects.all()}
+
     env.globals.update({
         'static': static,
         'url': reverse,
         'now': datetime.datetime.now(),
-        'orgtypes': {o.slug: o for o in OrganisationType.objects.all()},
-        'sources': {s.id: s for s in Source.objects.all()},
+        'orgtypes': orgtypes,
+        'sources': sources,
         "url_replace": url_replace,
         "url_remove": url_remove,
     })

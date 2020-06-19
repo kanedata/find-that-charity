@@ -7,8 +7,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 
-from dbview.models import DbView
-
 
 IGNORE_DOMAINS = (
 	'gmail.com', 'hotmail.com', 'btinternet.com',
@@ -288,32 +286,6 @@ class OrgidScheme(models.Model):
         else:
             self.priority = len(self.PRIORITIES) + 1
         super().save(*args, **kwargs)
-
-class LinkedOrganisation(DbView):
-    org_id_a = OrgidField(max_length=255)
-    org_id_b = OrgidField(max_length=255)
-
-    @classmethod
-    def view(cl):
-        '''
-        This method returns the SQL string that creates the view, in this
-        example fieldB is the result of annotating another column
-        '''
-        qs = OrganisationLink.objects.all().\
-            values('org_id_a', 'org_id_b')
-        qs = qs.union(
-            OrganisationLink.objects.all().\
-            values('org_id_b', 'org_id_a'),
-        )
-        qs = qs.union(
-            OrganisationLink.objects.all().
-            values('org_id_a', 'org_id_a'),
-        )
-        qs = qs.union(
-            OrganisationLink.objects.all().
-            values('org_id_b', 'org_id_b'),
-        )
-        return str(qs.query)
 
 
 class RelatedOrganisation:
