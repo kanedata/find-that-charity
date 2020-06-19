@@ -12,9 +12,9 @@ class TestImportCompanies(TestCase):
         dirname = os.path.dirname(__file__)
         with open(os.path.join(dirname, 'data', 'CompaniesHomePage.html')) as a:
             m.get("http://download.companieshouse.gov.uk/en_output.html", text=a.read())
-        with open(os.path.join(dirname, 'data', 'CompaniesHouseTestDate.zip')) as a:
+        with open(os.path.join(dirname, 'data', 'CompaniesHouseTestData.zip'), 'rb') as a:
             matcher = re.compile(
-                "$http://download.companieshouse.gov.uk/BasicCompanyData-")
+                "http://download.companieshouse.gov.uk/BasicCompanyData-")
             m.get(matcher, content=a.read())
 
     def test_import_companies(self):
