@@ -8,7 +8,7 @@
 
 - ✔ (but implemented with /reconcile/suggest?)
 - ✔ Add vuejs app to front page
-- allow to be filtered by orgtype
+- ✔ allow to be filtered by orgtype
 - better suggestions
 
 ## CSV data tool

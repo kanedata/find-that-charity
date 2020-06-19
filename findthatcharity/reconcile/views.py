@@ -96,24 +96,24 @@ def suggest(request, orgtype="all"):
     cursor = request.GET.get("cursor")
     if not prefix:
         raise Http404("Prefix must be supplied")
-    print(autocomplete_query(
-        prefix,
-        orgtype=orgtype,
-    ))
     q = FullOrganisation.search()
+
+    completion = {
+        "field": "complete_names",
+        "fuzzy": {
+            "fuzziness": 1
+        }
+    }
+    if orgtype and orgtype != "all":
+        completion['contexts'] = dict(
+            organisationType=orgtype.split("+")
+        )
 
     q = q.suggest(
         SUGGEST_NAME,
         prefix,
-        completion={
-            "field": "complete_names",
-            "fuzzy": {
-                "fuzziness": 1
-            }
-        }
+        completion=completion
     ).source(['org_id', 'name', 'organisationType'])
-    # if orgtype and orgtype != "all":
-    #     q = q.filter('terms', organisationType=orgtype.split("+"))
     result = q.execute()
 
     return JsonResponse({
