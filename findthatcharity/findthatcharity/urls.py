@@ -21,10 +21,12 @@ import ftc.urls
 import ftc.views
 import charity.urls
 import reconcile.urls
+import addtocsv.views
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='about'),
     path('', ftc.views.index, name='index'),
+    path('addtocsv', addtocsv.views.index, name='addtocsv'),
     path('orgid/', include(ftc.urls)),
     path('charity/', include(charity.urls)),
     path('reconcile/', include(reconcile.urls)),

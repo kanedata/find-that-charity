@@ -1,8 +1,7 @@
 # Find that Charity v4 - tasks todo
 
-## Organisation JSON response
-
-- ✔ add JSON response
+- add ccni to charity raw
+- tests
 
 ## Autocomplete API
 
@@ -13,10 +12,10 @@
 
 ## CSV data tool
 
-- Use `/reconcile/?extend=...` and `/reconcile/propose_properties` to get data
-- Design app in Vue JS
+- ✔ Use `/reconcile/?extend=...` and `/reconcile/propose_properties` to get data
+- ✔ Design app in Vue JS
 - org_id hashes like postcode app
-- add verbose names to data models
+- ✔ add verbose names to data models
 
 ## Setup
 
@@ -29,23 +28,6 @@
 - set up ongoing tasks
     - populate DB
     - repopulate elasticsearch
-
-## Companies data import
-
-- ✔ needs coverting to new format
-
-## Return a random organisation
-
-- ✔ use elasticsearch query
-
-## Front page search
-
-- ✔ switch to elasticsearch
-- ✔ add organisationTypePrimary to elasticsearch
-
-## Set up data feeds
-
-- ✔ charity commission data files - when are they updated
 
 ## Better charity pages
 

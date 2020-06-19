@@ -3,6 +3,8 @@ import json
 import copy
 
 from django.utils.text import slugify
+from ftc.models import Organisation
+from ftc.documents import FullOrganisation
 
 with open(os.path.join(os.path.dirname(__file__), 'query.json')) as a:
     RECONCILE_QUERY = json.load(a)

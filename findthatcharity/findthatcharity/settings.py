@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'ftc.apps.FtcConfig',
     'charity.apps.CharityConfig',
     'reconcile.apps.ReconcileConfig',
+    'addtocsv.apps.AddtocsvConfig',
     'django.contrib.postgres',
     'django.contrib.admin',
     'django.contrib.auth',

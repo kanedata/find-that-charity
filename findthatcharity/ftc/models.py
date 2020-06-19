@@ -77,43 +77,46 @@ class OrgidField(models.CharField):
 
 
 class Organisation(models.Model):
-    org_id = OrgidField(db_index=True)
+    org_id = OrgidField(db_index=True, verbose_name="Organisation Identifier")
     orgIDs = ArrayField(
         OrgidField(blank=True),
         blank=True,
         null=True,
+        verbose_name="Other organisation identifiers",
     )
     linked_orgs = ArrayField(
         models.CharField(max_length=100, blank=True),
         blank=True,
         null=True,
+        verbose_name="Linked organisations",
     )
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, verbose_name="Name")
     alternateName = ArrayField(
         models.CharField(max_length=255, blank=True),
         blank=True,
         null=True,
+        verbose_name="Other names",
     )
-    charityNumber = models.CharField(max_length=255, null=True, blank=True)
-    companyNumber = models.CharField(max_length=255, null=True, blank=True)
-    streetAddress = models.CharField(max_length=255, null=True, blank=True)
-    addressLocality = models.CharField(max_length=255, null=True, blank=True)
-    addressRegion = models.CharField(max_length=255, null=True, blank=True)
-    addressCountry = models.CharField(max_length=255, null=True, blank=True)
-    postalCode = models.CharField(max_length=255, null=True, blank=True)
-    telephone = models.CharField(max_length=255, null=True, blank=True)
-    email = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    url = models.URLField(null=True, blank=True)
-    domain = models.CharField(max_length=255, null=True, blank=True, db_index=True)
-    latestIncome = models.BigIntegerField(null=True, blank=True)
-    latestIncomeDate = models.DateField(null=True, blank=True)
-    dateRegistered = models.DateField(null=True, blank=True)
-    dateRemoved = models.DateField(null=True, blank=True)
-    active = models.BooleanField(null=True, blank=True)
-    status = models.CharField(max_length=200, null=True, blank=True)
-    parent = models.CharField(max_length=200, null=True, blank=True)
-    dateModified = models.DateTimeField(auto_now=True)
+    charityNumber = models.CharField(max_length=255, null=True, blank=True, verbose_name="Charity number")
+    companyNumber = models.CharField(max_length=255, null=True, blank=True, verbose_name="Company number")
+    streetAddress = models.CharField(max_length=255, null=True, blank=True, verbose_name="Address: street")
+    addressLocality = models.CharField(max_length=255, null=True, blank=True, verbose_name="Address: locality")
+    addressRegion = models.CharField(max_length=255, null=True, blank=True, verbose_name="Address: region")
+    addressCountry = models.CharField(max_length=255, null=True, blank=True, verbose_name="Address: country")
+    postalCode = models.CharField(max_length=255, null=True, blank=True, verbose_name="Postcode")
+    telephone = models.CharField(max_length=255, null=True, blank=True, verbose_name="Telephone")
+    email = models.CharField(max_length=255, null=True, blank=True, verbose_name="Email address")
+    description = models.TextField(null=True, blank=True, verbose_name="Description")
+    url = models.URLField(null=True, blank=True, verbose_name="Website address")
+    domain = models.CharField(max_length=255, null=True, blank=True, db_index=True, verbose_name="Website domain")
+    latestIncome = models.BigIntegerField(null=True, blank=True, verbose_name="Latest income")
+    latestIncomeDate = models.DateField(null=True, blank=True, verbose_name="Latest financial year end")
+    dateRegistered = models.DateField(null=True, blank=True, verbose_name="Date registered")
+    dateRemoved = models.DateField(null=True, blank=True, verbose_name="Date removed")
+    active = models.BooleanField(null=True, blank=True, verbose_name="Active")
+    status = models.CharField(max_length=200, null=True, blank=True, verbose_name="Status")
+    parent = models.CharField(max_length=200, null=True, blank=True, verbose_name="Parent organisation")
+    dateModified = models.DateTimeField(auto_now=True, verbose_name="Date record was last modified")
     source = models.ForeignKey(
         'Source',
         on_delete=models.CASCADE,
@@ -122,11 +125,13 @@ class Organisation(models.Model):
         models.CharField(max_length=255, blank=True),
         blank=True,
         null=True,
+        verbose_name="Primary organisation type"
     )
     organisationTypePrimary = models.ForeignKey(
         'OrganisationType',
         on_delete=models.CASCADE,
         related_name="organisations",
+        verbose_name="Other organisation types"
     )
     scrape = models.ForeignKey(
         'Scrape',
@@ -173,7 +178,7 @@ class Organisation(models.Model):
     @classmethod
     def get_fields_as_properties(cls):
         internal_fields = [
-            "scrape", "spider"
+            "scrape", "spider", "id"
         ]
         return [
             {
