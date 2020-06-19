@@ -154,3 +154,17 @@ class VocabularyEntries(models.Model):
 
     class Meta:
         unique_together = ('vocabulary', 'code',)
+
+
+class CcewDataFile(models.Model):
+    title = models.CharField(max_length=500, db_index=True, unique=True)
+    url = models.URLField()
+    description = models.CharField(max_length=500, db_index=True)
+    first_added = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "<CcewDataFile {}>".format(self.title)
+
+    def get_absolute_url(self):
+        return self.url

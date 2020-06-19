@@ -16,6 +16,7 @@
 - Use `/reconcile/?extend=...` and `/reconcile/propose_properties` to get data
 - Design app in Vue JS
 - org_id hashes like postcode app
+- add verbose names to data models
 
 ## Setup
 
@@ -44,7 +45,7 @@
 
 ## Set up data feeds
 
-- charity commission data files - when are they updated
+- ✔ charity commission data files - when are they updated
 
 ## Better charity pages
 
