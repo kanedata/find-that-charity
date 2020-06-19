@@ -155,6 +155,11 @@ class FullOrganisation(Document):
             if o:
                 yield RelatedOrganisation.from_orgid(o.linked_orgs[0])
 
+    def bulk(self, actions, **kwargs):
+        if self.django.queryset_pagination and 'chunk_size' not in kwargs:
+            kwargs['chunk_size'] = self.django.queryset_pagination
+        return bulk(client=self._get_connection(), actions=actions, **kwargs)
+
     class Django:
         model = Organisation  # The model associated with this Document
 
@@ -175,7 +180,7 @@ class FullOrganisation(Document):
 
         # Paginate the django queryset used to populate the index with the specified size
         # (by default it uses the database driver's default setting)
-        # queryset_pagination = 5000
+        queryset_pagination = 3000
 
     def get_related_orgs(self):
         return Organisation.objects.filter(org_id__in=self.orgIDs)

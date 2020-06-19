@@ -23,7 +23,7 @@
     - create DB
     - setup cache tables
     - populate DB (import_all)
-    - create and populate elasticsearch (`--rebuild`)
+    - create and populate elasticsearch (`python findthatcharity/manage.py search_index --populate --no-count --parallel`)
     - something on static urls?
 - set up ongoing tasks
     - populate DB
@@ -35,7 +35,7 @@
 
 ## Return a random organisation
 
-- use elasticsearch query
+- ✔ use elasticsearch query
 
 ## Front page search
 
