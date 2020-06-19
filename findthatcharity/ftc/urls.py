@@ -18,6 +18,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('random', views.get_random_org, name='random_'),
     path('type/<slug:orgtype>.csv', views.orgid_type, 
         {'filetype': 'csv'}, name='orgid_type_download'),
     path('type/<slug:orgtype>.html', views.orgid_type),

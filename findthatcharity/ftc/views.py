@@ -11,6 +11,7 @@ from django.views.decorators.cache import cache_page
 from ftc.documents import FullOrganisation, DSEPaginator
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
                         Source)
+from ftc.query import random_query
 from reconcile.query import recon_query
 
 # site homepage
@@ -79,6 +80,17 @@ def get_orgid(request, org_id, filetype="html", preview=False):
     return render(request, 'org.html.j2', {
         "org": org,
     })
+
+
+def get_random_org(request):
+    """ Get a random charity record
+    """
+    filetype = request.GET.get("filetype", "html")
+    active = request.GET.get("active", False)
+    q = FullOrganisation.search().from_dict(random_query(active, "registered-charity"))[0]
+    result = q.execute()
+    for r in result:
+        return JsonResponse(r.__dict__['_d_'])
 
 
 def orgid_type(request, orgtype=None, source=None, filetype="html"):
