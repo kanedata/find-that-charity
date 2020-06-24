@@ -1,2 +1,2 @@
-web: gunicorn findthatcharity.findthatcharity.wsgi:application
+web: gunicorn findthatcharity.wsgi:application
 release: python findthatcharity/manage.py migrate --noinput
