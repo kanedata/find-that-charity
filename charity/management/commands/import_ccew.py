@@ -13,6 +13,7 @@ import bcp
 import tqdm
 from django.db import connection
 from django.utils.text import slugify
+import redis
 
 from charity.management.commands._bulk_upsert import bulk_upsert
 from charity.management.commands._ccew_sql import UPDATE_CCEW
@@ -187,7 +188,13 @@ class Command(HTMLScraper):
     ]
 
     def parse_file(self, response, source_urls):
-        self.redis = False
+
+        if os.environ.get('REDIS_URL'):
+            self.redis = redis.StrictRedis.from_url(
+                os.environ.get('REDIS_URL'))
+        else:
+            self.redis = None
+
         for l in response.html.absolute_links:
             if not self.zip_regex.match(l):
                 continue
