@@ -89,10 +89,11 @@ class BaseScraper(BaseCommand):
         self.session = requests.Session()
 
         # set up orgidscheme object
-        self.orgid_scheme, _ = OrgidScheme.objects.get_or_create(
-            code=self.org_id_prefix,
-            defaults={'data': {}},
-        )
+        if hasattr(self, 'org_id_prefix'):
+            self.orgid_scheme, _ = OrgidScheme.objects.get_or_create(
+                code=self.org_id_prefix,
+                defaults={'data': {}},
+            )
 
         # save any orgtypes
         self.logger.info("Saving orgtypes")
