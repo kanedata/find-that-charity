@@ -1,5 +1,5 @@
 Find that charity
-=================
+================
 
 Elasticsearch-powered search engine for looking for charities. Allows for:
 
@@ -254,3 +254,21 @@ Future development:
 
 - upload a CSV file and reconcile each row with a charity
 - allow updating a charity with additional possible names
+=======
+
+
+# Setup steps
+
+## Populate the elasticsearch index
+
+run
+
+```sh
+python ./manage.py search_index --rebuild --no-count
+
+# or
+
+python ./manage.py search_index --populate --no-count
+```
+
+

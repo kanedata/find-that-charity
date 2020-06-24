@@ -1,0 +1,51 @@
+{% from 'components/org_id.html.j2' import orgid_link %}
+
+{% if res.paginator.count > 0 and term %}
+<article class="message is-success pa2 bg-washed-green mb4">
+    <div class="message-body">
+    {% if res.paginator.count == 1 %}
+        1 result found found for "{{term}}"
+    {% elif res.has_other_pages() %}
+        {{ "{:,}".format(res.paginator.count) }} results found for "{{term}}".
+        Showing results {{ res.start_index() }} to {{ res.end_index() }}.
+    {% else %}
+        {{ "{:,}".format(res.paginator.count) }} results found for "{{term}}"
+    {% endif %}
+    </div>
+</article>
+{% elif term %}
+<article class="message is-error pa2 bg-washed-red mb2">
+    <div class="message-body">
+        No results found for "{{term}}"
+    </div>
+</article>
+{% endif %}
+
+{% for result in res %}
+<div class="content measure-wide mb4">
+    <h3 class="title pa0 mb1 mt0 mh0">
+        {% if result.active %}
+        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">{{result.name }}</a>
+        {% else %}
+        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}" class="blue link underline-hover tracked-tight lh-copy normal">{{result.name }}</a>
+        <span class="red tracked-tight lh-copy normal ml2">(Inactive)</span>
+        {% endif %}
+    </h3>
+    <h4 class="subtitle mt0 mb2 pa0 f5 mid-gray normal">
+        {#<a class="link mid-gray underline-hover" 
+           href="{{ url('orgid_type', kwargs=dict(orgtype=result.organisationTypePrimary.slug)) }}">
+           {{ result.organisationTypePrimary.title }}
+        </a>#}
+        {% for o in result.orgIDs %}
+        {{ orgid_link(o, request) }}
+        {% endfor %}
+    </h4>
+    <div class="cf">
+        {# {% for k in result.organisationType if k != result.organisationTypePrimary.slug %} #}
+        {% for k in result.organisationType %}
+        <a class="f6 bg-light-gray br1 pv1 ph2 link near-black dib mr2 mb2 fl" href="{{ url('orgid_type', kwargs=dict(orgtype=k)) }}">{{ orgtypes[k].title }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% include 'components/pagination.html.j2' %}

@@ -1,0 +1,198 @@
+{% extends 'base.html.j2' %}
+{% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
+{% from 'components/org_record.html.j2' import org_record %}
+{% from 'components/data_source.html.j2' import data_source %}
+{% set heading = org["name"] %} 
+{% set subtitle = "Org ID: {}{}".format(
+    org["id"],
+    "" if org.active else " | Inactive"
+) %}
+
+{% macro show_sources(v) %}
+<span class="gray f7 dib">
+  [Source: {% for s in v.sources|reject('none')|unique -%}
+    {%- if sources.get(s) -%}
+      {{ sources.get(s).title }}
+    {%- else -%}
+      {{ s }}
+    {%- endif -%}
+    {%- if not loop.last %}, {% endif -%}
+  {%- endfor -%}]
+  {# [{{ v["sources"]|list_to_string }}] #}
+</span>
+{% endmacro %}
+
+{% block headscripts %}
+{{ super() }}
+<script type="application/ld+json">
+{{ org.schema_dot_org(request)|tojson(indent=4) }}
+</script>
+{% endblock %}
+
+{% block header %}
+<header class="fl w-100 w-50-l ph3 ph5-ns entry-content lh-copy f4">
+  <h2 class="f2-ns mt4 mb0 f3 lh-title normal">
+      {{ org.name }}
+  </h2>
+  <h3 class="f3-ns mb4 mt3 f4 lh-subtitle normal">
+    A {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in the UK
+  </h3>
+  <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">
+    The identifier for this organisation is:
+  </h4>
+  <div class="mv3 w-100">
+    {{ orgid_link(org.org_id, request, true) }}<br>
+    <a href="#" class="blue link underline-hover f7">What is an organisation identifier?</a>
+  </div>
+  {% if org.orgIDs|length > 1 %}
+  <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">The organisation can also be identified by:</h4>
+  <div class="mv3 w-100">
+    {% for v in org.orgIDs if v != org.org_id %}
+    {{ orgid_link(v, request) }}
+    {% endfor %}
+  </div>
+  {% endif %}
+  <div class="mv3 w-100">
+    {% if org.active %}
+    <span class="pv1 ph2 br2 bg-green white dib mr2 mb2">Active</span>
+    {% else %}
+    <span class="pv1 ph2 br2 bg-dark-red white dib mr2 mb2">Inactive</span>
+    {% endif %}
+    {% for ot in org.organisationType if ot != org.organisationTypePrimary.slug %}
+    {{ orgtype_link(orgtypes[ot], large=true) }}
+    {% endfor %}
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="w-100 w-80-l fl">
+  <div class="measure-wide f5">
+    <div class="content">
+      {% set description = org.first("description") %}
+      {% if description %}
+      <h4>Description</h4>
+      <p>
+        {{ description.value }}
+        <span class="gray f7 dib">
+          [Source: 
+          {{ description.orgid }},
+          {{ description.source.title -}}
+          ]
+        </span>
+      </p>
+      {% endif %}
+      {% if org.alternateName %}
+      <h4>Also known as</h4>
+      <ul>
+        {% for n in org.alternateName[0:10] %}
+        <li>{{ n }}</li>
+        {% endfor %}
+        {% if org.alternateName|length > 10 %}
+        <li>...and {{ "{:,.0f}".format(org.alternateName|length - 10) }} other names</li>
+        {% endif %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if org.records|length > 1 %}
+  <h4 class="f5 f4-ns mb3 mt0 normal">
+    This organisation is based on records from {{ org.sources|map(attribute="title")|unique|list|list_to_string }}:
+  </h4>
+  {% endif %}
+  <div class="w-100 flex flex-wrap">
+    {% for record in org.records %}
+    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(record, {}, request) }}
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+
+<div class="w-100 w-20-l fl">
+
+  {% set links = org.get_links()|list %}
+  {% if links %}
+  <article class="message is-info">
+    <h4 class="ma0 pa0">More about this organisation</h4>
+    <p class="f6 gray">Find that Charity is not responsible for the content of external websites</p>
+    <div class="message-body">
+      <ul class="mb4 mt2 list mh0 pa0 f5">
+        {# <li class="w-100 mb2"><a class="link dark-blue underline" href="{{ v.value }}" target="_blank">Organisation website</a> {{ show_sources(v) }}</li>
+        {% endfor %} #}
+        {% for link, text in links %}
+        <li class="w-100 mb2"><a class="link dark-blue underline" href="{{ link }}" target="_blank">{{ text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </article>
+  {% endif %}
+  
+  {% if org.location|length %}
+  <article class="message is-info">
+    <h4 class="ma0 pa0">Locations</h4>
+    <div class="message-body">
+      <ul class="mb4 mt2 list mh0 pa0 f5">
+      {% for v in org.location %}
+        {% if v.geoCode and v.geoCode|regex_search("[ENWS][0-9]{8}") %}
+        <li class="w-100 mb2">
+          <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ v.geoCode }}.html" target="_blank">{{ v.name }}</a>
+          {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
+          {# {{ show_sources(v) }} #}
+        </li>
+        {% else %}
+        <li class="w-100 mb2">
+          {{ v.name }}
+          {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
+          {# {{ show_sources(v) }} #}
+        </li>
+        {% endif %}
+      {% endfor %}
+      </ul>
+    </div>
+  </article>
+  {% endif %}
+  
+  {# {% if org.parent.keys()|length %}
+  <article class="message is-info">
+    <h4 class="ma0 pa0">Parent organisations</h4>
+    <div class="message-body">
+      <ul class="mb4 mt2 list mh0 pa0 f5">
+      {% for k, v in org.parent.items() %}
+        {% if v.value in parent_orgs %}
+        <li class="w-100 mb2"><a class="link dark-blue underline-hover" href="{{ url('orgid_html', org_id=v.value) }}" target="_blank">{{ parent_org[v.value].name }}</a> {{ show_sources(v) }}</li>
+        {% else %}
+        <li class="w-100 mb2"><a class="link dark-blue underline-hover" href="{{ url('orgid_html', org_id=v.value) }}" target="_blank">{{ v.value }}</a> {{ show_sources(v) }}</li>
+        {% endif %}
+      {% endfor %}
+      </ul>
+    </div>
+  </article>
+  {% endif %}
+
+  {% if child_orgs|length %}
+  <article class="message is-info">
+    <h4 class="ma0 pa0">Child organisations</h4>
+    <div class="message-body">
+      <ul class="mb4 mt2 list mh0 pa0 f5">
+      {% for o in child_orgs %}
+        <li class="w-100 mb2"><a class="link dark-blue underline-hover" href="{{ url('orgid_html', org_id=o.id) }}" target="_blank">{{ o.name }}</a> {{ show_sources(o) }}</li>
+      {% endfor %}
+      </ul>
+    </div>
+  </article>
+  {% endif %} #}
+
+</div>
+
+<div class="w-100 cf fl">
+  <h3 class="ma0 pa0">Data sources</h3>
+
+  {% for s in org.sources %}
+  {{ data_source(s, org, request) }}
+  {% endfor %}
+</div>
+{% endblock %}

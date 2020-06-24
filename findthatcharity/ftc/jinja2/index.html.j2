@@ -1,0 +1,115 @@
+{% set frontpage = true %}
+{% extends 'base.html.j2' %}
+{% from 'components/org_id.html.j2' import orgid_link %}
+
+{% block content %}
+<div class="w-60-l w-100 center">
+    <p>A search engine for non profit organisations working in the UK</p>
+    <div class="mt5 mb6">
+        {% include 'components/search_form.html.j2' %}
+    </div>
+    <section class="w-100 cf mv3">
+        <h3 class="w-100 pa0 mv2 f2">Find charities</h3>
+        <img class="fr shadow-3 w5 ma3" src="{{ static('images/fp-charity-example.png') }}" />
+        <p>Find that Charity contains information about {{ "{:,.0f}".format((by_orgtype|selectattr('orgtype', 'equalto', 'registered-charity')|first).records) }} 
+        UK charities.</p>
+        <p>The data comes from the three main regulators of charities in the UK.</p>
+        <p>Each charity has its own page 
+            (<a href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-england-and-wales']|replace('GB-CHC-', ''))) }}">see an example</a>).</p>
+        {# <ul>
+            <li>Charity registered in England and Wales:
+                <a class="underline dark-blue f4"
+                    href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-england-and-wales']|replace('GB-CHC-', ''))) }}">
+                    /charity/{{ examples['registered-charity-england-and-wales']|replace('GB-CHC-', '') }}
+                </a>
+            </li>
+            <li>Charity registered in Scotland:
+                <a class="underline dark-blue f4"
+                    href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-scotland']|replace('GB-SC-', ''))) }}">
+                    /charity/{{ examples['registered-charity-scotland']|replace('GB-SC-', '') }}
+                </a>
+            </li>
+            <li>Charity registered in Northern Ireland:
+                <a class="underline dark-blue f4"
+                    href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-northern-ireland']|replace('GB-NIC-', 'NIC'))) }}">
+                    /charity/{{ examples['registered-charity-northern-ireland']|replace('GB-NIC-', 'NIC') }}
+                </a>
+            </li>
+        </ul>
+        <small>These can also be accessed as json data by adding <code>.json</code> to the end of the url</small> #}
+    </section>
+    <section class="w-100 cf mv3">
+        <h3 class="w-100 pa0 mv2 f2">Find other non profit organisations</h3>
+        <img class="fr shadow-3 w5 ma3" src="{{ static('images/fp-nonprofit-example.png') }}" />
+        <p>You can also explore other UK non-profit organisations, such as:</p>
+        <ul class="list">
+            <li><a href="{{ url('orgid_type', kwargs=dict(orgtype='community-interest-company')) }}"
+                class="link dark-blue underline">Community Interest Companies</a></li>
+            <li><a href="{{ url('orgid_type', kwargs=dict(orgtype='registered-society')) }}"
+                class="link dark-blue underline">Registered Societies</a></li>
+            <li><a href="{{ url('orgid_type', kwargs=dict(orgtype='university')) }}"
+                class="link dark-blue underline">Universities</a></li>
+            <li><a href="{{ url('orgid_type', kwargs=dict(orgtype='local-authority')) }}"
+                class="link dark-blue underline">Local Authorities</a></li>
+            <li><a href="{{ url('orgid_type', kwargs=dict(orgtype='community-amateur-sports-club')) }}"
+                class="link dark-blue underline">Sports Clubs</a></li>
+            <li><a href="{{ url('orgid_type', kwargs=dict(orgtype='nhs')) }}"
+                class="link dark-blue underline">NHS Bodies</a></li>
+        </ul>
+        <p>Organisations are identified using their <a class="underline dark-blue f4" href="http://org-id.guide/"
+        target="_blank">OrgID</a>. For example {{ orgid_link(examples['community-interest-company'], request, large=true) }} identifies a Community Interest Company.</p>
+        <p>Data on other UK non-profit organisations comes from official regulators of those organisations, such as Companies House.</p>
+    </section>
+    <section class="w-100 cf mv3">
+        <h3 class="w-100 pa0 mv2 f2">Use the data</h3>
+        <p>
+            <a class="underline dark-blue f4" href="{#{ url('csvtool') }#}">
+                Add data about organisations to a CSV file
+            </a>
+        </p>
+        <p>As an <a class="underline dark-blue f4"
+                href="https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation">OpenRefine
+                reconciliation service</a> via <code>/reconcile</code>.</p>
+        <p>Find a <a class="underline dark-blue f4" href="{#{ url('random_org') }#}?active=true">random
+                charity</a>.</p>
+    </section>
+    <div class="mv5 cf">
+        <h3>Types of organisation available</h3>
+        <div class="">
+            {% for ot in by_orgtype if orgtypes[ot.orgtype].is_keytype() %}
+            <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
+                <a href="{{ url('orgid_type', kwargs=dict(orgtype=orgtypes[ot.orgtype].slug)) }}"
+                    class="link near-black underline-hover pa2 dib fl">{{ orgtypes[ot.orgtype].title }}</a>
+                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(ot.records) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="mv5 cf">
+        <h3>Data sources</h3>
+        <div class="">
+            {% for o in by_source %}
+            <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
+                <a href="{{ url('orgid_source', kwargs=dict(source=o.source)) }}"
+                    class="link near-black underline-hover pa2 dib fl">
+                    {{ sources[o.source].title }}
+                    {# <br><span class="is-size-7">({{ sources[o.source].data.title }})</span> #}
+                </a>
+                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(o.records) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyscripts %}
+<script type="text/javascript">
+    var autocomplete_url = {{ request.build_absolute_uri(url('suggest', kwargs={'orgtype': 'all'}))|tojson }};
+    var orgtypes = {
+        {% for o in orgtypes.values() %}{{o.slug|tojson}}: {{o.title|tojson}},
+        {% endfor %}
+    }
+</script>
+<script src='{{ static("js/autocomplete.js") }}' type="text/javascript"></script>
+{% endblock %}
