@@ -129,15 +129,15 @@ class BaseScraper(BaseCommand):
         self.logger.info("Spider finished")
 
     def close_spider(self):
+        self.object_count += len(self.records)
+        self.scrape.items = self.object_count
         results = {
-            "records": len(self.records)
+            "records": self.object_count
         }
-        self.object_count = results['records']
-        self.scrape.items = results['records']
         if self.records:
-            self.logger.info("Saving {:,.0f} organisation records".format(results['records']))
+            self.logger.info("Saving {:,.0f} organisation records".format(len(self.records)))
             Organisation.objects.bulk_create(self.records)
-            self.logger.info("Saved {:,.0f} organisation records".format(results['records']))
+            self.logger.info("Saved {:,.0f} organisation records".format(len(self.records)))
 
         if self.link_records:
             results['link_records'] = len(self.link_records)
@@ -181,11 +181,12 @@ class BaseScraper(BaseCommand):
     def add_org_record(self, record):
         self.records.append(record)
         if len(self.records) > self.bulk_limit:
+            self.object_count += len(self.records)
             self.logger.info(
-                "Saving {:,.0f} organisation records".format(results['records']))
+                "Saving {:,.0f} organisation records".format(len(self.records)))
             Organisation.objects.bulk_create(self.records)
             self.logger.info(
-                "Saved {:,.0f} organisation records".format(results['records']))
+                "Saved {:,.0f} organisation records".format(len(self.records)))
             self.records = []
 
     def save_sources(self):
