@@ -8,12 +8,15 @@ certifi==2020.4.5.1
 chardet==3.0.4
 cssselect==1.1.0
 decorator==4.4.2
+dj-database-url==0.5.0
 Django==3.0.6
 django-elasticsearch-dsl==7.1.1
+django-environ==0.4.5
 elasticsearch==7.7.1
 elasticsearch-dsl==7.2.1
 et-xmlfile==1.0.1
 fake-useragent==0.1.11
+humanize==2.4.0
 idna==2.9
 jdcal==1.4.1
 Jinja2==2.11.2
@@ -31,6 +34,7 @@ pyexcel-ods3==0.5.3
 pyppeteer==0.2.2
 pyquery==1.4.1
 python-dateutil==2.8.1
+python-dotenv==0.13.0
 pytz==2020.1
 requests==2.23.0
 requests-cache==0.5.2
@@ -45,3 +49,4 @@ urllib3==1.25.9
 validators==0.15.0
 w3lib==1.22.0
 websockets==8.1
+whitenoise==5.1.0
