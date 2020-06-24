@@ -180,7 +180,7 @@ class BaseScraper(BaseCommand):
 
     def add_org_record(self, record):
         self.records.append(record)
-        if len(self.records) > self.bulk_limit:
+        if len(self.records) >= self.bulk_limit:
             self.object_count += len(self.records)
             self.logger.info(
                 "Saving {:,.0f} organisation records".format(len(self.records)))
