@@ -255,6 +255,7 @@ class Command(HTMLScraper):
         self.aooref = {(a.aootype, a.aookey): a for a in self.aooref}
 
         if self.redis:
+            self.logger.info("Caching results in redis")
             return self.redis.delete('charities')
         self.charities = {}
 
@@ -308,7 +309,7 @@ class Command(HTMLScraper):
                     org_types.append("Charitable Incorporated Organisation - Foundation")
             org_types = [self.orgtype_cache[slugify(o)] for o in org_types]
 
-            self.records.append(
+            self.add_org_record(
                 Organisation(**{
                     "org_id": self.get_org_id(record),
                     "name": self.parse_name(record.get("name")),

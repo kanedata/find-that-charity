@@ -68,7 +68,7 @@ class Command(CSVScraper):
             org_types.append(company_type)
             org_ids.append("GB-COH-{}".format(coyno))
 
-        self.records.append(
+        self.add_org_record(
             Organisation(**{
                 "org_id": self.get_org_id(record),
                 "name": record.get("Charity name").replace("`", "'"),

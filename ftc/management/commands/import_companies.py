@@ -110,20 +110,7 @@ class Command(CSVScraper):
                         if row.get("CompanyCategory") not in self.orgtypes:
                             continue
                         self.parse_row(row)
-
-    # def fetch_zip(self, response):
-    #     self.source["modified"] = datetime.datetime.now().isoformat()
-    #     links = []
-    #     for i, link in enumerate(response.css("a::attr(href)").re(self.zip_regex)):
-
-    #         self.source["distribution"].append({
-    #             "accessURL": self.start_urls[0],
-    #             "downloadURL": response.urljoin(link),
-    #             "title": "Free Company Data Product",
-    #         })
-
-    #         links.append(scrapy.Request(response.urljoin(link), callback=self.process_zip))
-    #     return links
+        response = None
 
     def parse_row(self, row):
         row = {k.strip().replace(".", "_"): row[k] for k in row}
@@ -172,7 +159,7 @@ class Command(CSVScraper):
             self.add_org_type(record.get("CompanyCategory")),
         ]
 
-        self.records.append(
+        self.add_org_record(
             Organisation(**{
                 "org_id": self.get_org_id(record),
                 "name": self.parse_name(record.get("CompanyName")),

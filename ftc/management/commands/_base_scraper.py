@@ -57,6 +57,7 @@ class BaseScraper(BaseCommand):
     bool_fields = []
     encoding = "utf8"
     orgtypes = []
+    bulk_limit = 10000
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -177,6 +178,15 @@ class BaseScraper(BaseCommand):
                 cursor.execute(sql, {"spider_name": self.name})
                 self.logger.info("Finished SQL: {}".format(sql_name))
 
+    def add_org_record(self, record):
+        self.records.append(record)
+        if len(self.records) > self.bulk_limit:
+            self.logger.info(
+                "Saving {:,.0f} organisation records".format(results['records']))
+            Organisation.objects.bulk_create(self.records)
+            self.logger.info(
+                "Saved {:,.0f} organisation records".format(results['records']))
+            self.records = []
 
     def save_sources(self):
         if hasattr(self, 'source'):
