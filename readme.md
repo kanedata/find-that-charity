@@ -259,6 +259,14 @@ Future development:
 
 # Setup steps
 
+## Import organisations
+
+```sh
+python ./manage.py import_companies
+python ./manage.py import_charities
+python ./manage.py import_all
+```
+
 ## Populate the elasticsearch index
 
 run

@@ -4,6 +4,7 @@ import csv
 import io
 import datetime
 
+from django.core import management
 from requests_html import HTMLSession
 import requests
 import requests_cache
@@ -75,6 +76,10 @@ class Command(CSVScraper):
         },
         "distribution": [],
     }
+
+    def handle(self, *args, **options):
+        super().handle()
+        management.call_command("update_orgids")
 
     def fetch_file(self):
         requests_cache.install_cache('http_cache')
