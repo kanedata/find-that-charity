@@ -8,7 +8,6 @@ import re
 import tempfile
 import zipfile
 from collections import defaultdict
-import shelve
 
 import bcp
 import tqdm
@@ -245,12 +244,12 @@ class Command(HTMLScraper):
             self.set_charity(row['regno'], charity)
 
     def initialise_charities(self):
-        if self.redis:
-            return self.redis.delete('charities')
-        self.charities = shelve.open('ftc_import_charities')
-
         self.aooref = AreaOfOperation.objects.all()
         self.aooref = {(a.aootype, a.aookey): a for a in self.aooref}
+
+        if self.redis:
+            return self.redis.delete('charities')
+        self.charities = {}
 
     def get_charity(self, regno):
         if self.redis:
@@ -367,8 +366,6 @@ class Command(HTMLScraper):
                 self.logger.info("Starting SQL: {}".format(sql_name))
                 cursor.execute(sql)
                 self.logger.info("Finished SQL: {}".format(sql_name))
-
-        self.charities.close()
 
 
     def get_bulk_create(self):
