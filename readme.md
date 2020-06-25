@@ -271,6 +271,8 @@ python ./manage.py import_all
 
 run
 
+https://github.com/dokku/dokku-elasticsearch/issues/72 - set up es 7.X
+
 ```sh
 python ./manage.py search_index --rebuild --no-count
 

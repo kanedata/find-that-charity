@@ -4,6 +4,7 @@ from django.core.paginator import Paginator, Page
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.search import Search
 from django_elasticsearch_dsl.registries import registry
+from elasticsearch.helpers import bulk
 from elasticsearch_dsl.field import Completion
 from elasticsearch_dsl.connections import get_connection
 import tqdm
