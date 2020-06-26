@@ -113,7 +113,7 @@ CACHES = {
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': os.environ.get('ES_URL'),
+        'hosts': os.environ.get('ELASTICSEARCH_URL'),
     },
 }
 
