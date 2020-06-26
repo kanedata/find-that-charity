@@ -117,7 +117,8 @@ class BaseScraper(BaseCommand):
         self.logger.info("Processing files")
         for u, f in self.files.items():
             self.parse_file(f, u)
-        self.logger.info("Files processed. Found {:,.0f} records".format(len(self.records)))
+        self.logger.info("Files processed. Found {:,.0f} records".format(
+            len(self.object_count)))
 
         # get any link records that need to be created
         self.logger.info("Getting link records")
@@ -186,7 +187,10 @@ class BaseScraper(BaseCommand):
                 "Saving {:,.0f} organisation records".format(len(self.records)))
             Organisation.objects.bulk_create(self.records)
             self.logger.info(
-                "Saved {:,.0f} organisation records".format(len(self.records)))
+                "Saved {:,.0f} organisation records ({:,.0f} total)".format(
+                    len(self.records),
+                    self.object_count,
+                ))
             self.records = []
 
     def save_sources(self):

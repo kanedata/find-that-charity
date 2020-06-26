@@ -355,8 +355,8 @@ class Command(HTMLScraper):
         # now start inserting charity records
         self.charity_count = 0
         self.logger.info("Inserting CharityRaw records")
-        CharityRaw.objects.bulk_create(self.get_bulk_create())
-        self.logger.info("Inserted {:,.0f} CharityRaw records inserted".format(self.charity_count))
+        self.bulk_create()
+        self.logger.info("Inserted {:,.0f} CharityRaw records".format(self.charity_count))
         self.scrape.result['charity_records'] = self.charity_count
         self.scrape.save()
 
@@ -375,17 +375,26 @@ class Command(HTMLScraper):
                 cursor.execute(sql)
                 self.logger.info("Finished SQL: {}".format(sql_name))
 
+    def bulk_create(self):
 
-    def get_bulk_create(self):
+        self.raw_records = []
 
         for regno, record in tqdm.tqdm(self.get_all_charities()):
             self.charity_count += 1
-            yield CharityRaw(
+            self.raw_records.append(CharityRaw(
                 org_id=self.get_org_id(record),
                 data=record,
                 scrape=self.scrape,
                 spider=self.name,
-            )
+            ))
+
+            if len(self.raw_records) >= self.bulk_limit:
+                CharityRaw.objects.bulk_create(self.raw_records)
+                self.raw_records = []
+            
+        if self.raw_records:
+            CharityRaw.objects.bulk_create(self.raw_records)
+            self.raw_records = []
 
 
     def get_locations(self, record):
