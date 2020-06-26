@@ -2,6 +2,9 @@
 
 data/
 
+# djangofiles
+static/
+
 
 # python files
 __pycache__/
