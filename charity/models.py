@@ -1,6 +1,7 @@
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.utils.text import slugify
 
 from ftc.models import Scrape
 
@@ -189,8 +190,9 @@ class VocabularyEntries(models.Model):
         verbose_name_plural = 'Vocabulary Entries'
 
     def __str__(self):
-        return str(self.vocabulary) + " - " + self.title
-
+        if slugify(self.title) == slugify(self.code):
+            return self.title
+        return "[{}] {}".format(self.code, self.title)
 
 class CcewDataFile(models.Model):
     title = models.CharField(max_length=500, db_index=True, unique=True)
