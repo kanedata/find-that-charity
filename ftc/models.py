@@ -1,7 +1,8 @@
 import operator
 import datetime
 
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django_better_admin_arrayfield.models.fields import ArrayField
+from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.urls import reverse
@@ -119,22 +120,24 @@ class Organisation(models.Model):
     dateModified = models.DateTimeField(auto_now=True, verbose_name="Date record was last modified")
     source = models.ForeignKey(
         'Source',
+        related_name='organisations',
         on_delete=models.CASCADE,
     )
     organisationType = ArrayField(
         models.CharField(max_length=255, blank=True),
         blank=True,
         null=True,
-        verbose_name="Primary organisation type"
+        verbose_name="Other organisation types"
     )
     organisationTypePrimary = models.ForeignKey(
         'OrganisationType',
         on_delete=models.CASCADE,
         related_name="organisations",
-        verbose_name="Other organisation types"
+        verbose_name="Primary organisation type"
     )
     scrape = models.ForeignKey(
         'Scrape',
+        related_name='organisations',
         on_delete=models.CASCADE,
     )
     spider = models.CharField(max_length=200, db_index=True)
@@ -221,18 +224,26 @@ class OrganisationType(models.Model):
     def is_keytype(self):
         return self.slug in self.KEY_TYPES
 
+    def __str__(self):
+        return self.title
+
 class OrganisationLink(models.Model):
     org_id_a = OrgidField(max_length=255, db_index=True)
     org_id_b = OrgidField(max_length=255, db_index=True)
     spider = models.CharField(max_length=200, db_index=True)
     source = models.ForeignKey(
         'Source',
+        related_name='organisation_links',
         on_delete=models.CASCADE,
     )
     scrape = models.ForeignKey(
         'Scrape',
+        related_name='organisation_links',
         on_delete=models.CASCADE,
     )
+
+    def __str__(self):
+        return "From {} to {}".format(self.org_id_a, self.org_id_b)
 
 class Source(models.Model):
     id = models.CharField(max_length=200, unique=True,
@@ -241,11 +252,18 @@ class Source(models.Model):
 
     @property
     def title(self):
+        return self.data.get("title")
+
+    @property
+    def publisher(self):
         return self.data.get('publisher', {}).get('name')
 
     @property
     def slug(self):
         return self.id
+
+    def __str__(self):
+        return self.title
 
 class Scrape(models.Model):
 
@@ -264,7 +282,13 @@ class Scrape(models.Model):
     errors = models.IntegerField(default=0)
     status = models.CharField(max_length=50, null=True,
                               blank=True, choices=ScrapeStatus.choices)
-    
+
+    def __str__(self):
+        return "{} [{}] {:%Y-%m-%d %H:%M}".format(
+            self.spider,
+            self.status,
+            self.start_time
+        )
 
 class OrgidScheme(models.Model):
 
@@ -292,6 +316,8 @@ class OrgidScheme(models.Model):
             self.priority = len(self.PRIORITIES) + 1
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return "{} - {}".format(self.code, self.data.get("name", {}).get("en"))
 
 class RelatedOrganisation:
 

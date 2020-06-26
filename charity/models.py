@@ -32,6 +32,12 @@ class Charity(models.Model):
     areas_of_operation = models.ManyToManyField('AreaOfOperation')
     classification = models.ManyToManyField('VocabularyEntries')
 
+    class Meta:
+        verbose_name_plural = 'Charities'
+
+    def __str__(self):
+        return "{} [{}]".format(self.name, self.id)
+
 
 class CharityName(models.Model):
     charity = models.ForeignKey(
@@ -45,6 +51,9 @@ class CharityName(models.Model):
 
     class Meta:
         unique_together = ('charity', 'name',)
+
+    def __str__(self):
+        return "{} [{}]".format(self.name, self.charity.id)
 
 
 class CharityFinancial(models.Model):
@@ -108,6 +117,9 @@ class CharityFinancial(models.Model):
     class Meta:
         unique_together = ('charity', 'fyend',)
 
+    def __str__(self):
+        return "{} {}".format(self.charity.name, self.fyend)
+
 class CharityRaw(models.Model):
     org_id = models.CharField(max_length=200)
     spider = models.CharField(max_length=200, db_index=True)
@@ -118,6 +130,13 @@ class CharityRaw(models.Model):
     data = JSONField(
         encoder=DjangoJSONEncoder
     )
+
+    class Meta:
+        verbose_name = 'Raw charity data'
+        verbose_name_plural = 'Raw charity data'
+
+    def __str__(self):
+        return "{} {}".format(self.spider, self.org_id)
 
 class AreaOfOperation(models.Model):
     aootype = models.CharField(max_length=1)
@@ -130,15 +149,27 @@ class AreaOfOperation(models.Model):
     ISO3166_1 = models.CharField(verbose_name="ISO3166-1 country code (2 character)", max_length=2, null=True, blank=True, db_index=True)
     ISO3166_1_3 = models.CharField(verbose_name="ISO3166-1 country code (3 character)", max_length=3, null=True, blank=True, db_index=True)
     ISO3166_2_GB = models.CharField(verbose_name="ISO3166-2 region code (GB only)", max_length=6, null=True, blank=True, db_index=True)
-    ContinentCode = models.CharField(verbose_name="ISO3166-2 region code (GB only)", max_length=2, null=True, blank=True, db_index=True)
+    ContinentCode = models.CharField(verbose_name="Continent", max_length=2, null=True, blank=True, db_index=True)
     
     class Meta:
         unique_together = ('aootype', 'aookey',)
+        verbose_name = 'Area of operation'
+        verbose_name_plural = 'Areas of operation'
+
+    def __str__(self):
+        return "{}-{} {}".format(self.aootype, self.aookey, self.aooname)
 
 
 class Vocabulary(models.Model):
     title = models.CharField(max_length=200, db_index=True, unique=True)
     single = models.BooleanField()
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'Vocabulary'
+        verbose_name_plural = 'Vocabularies'
 
 
 class VocabularyEntries(models.Model):
@@ -154,6 +185,11 @@ class VocabularyEntries(models.Model):
 
     class Meta:
         unique_together = ('vocabulary', 'code',)
+        verbose_name = 'Vocabulary Entry'
+        verbose_name_plural = 'Vocabulary Entries'
+
+    def __str__(self):
+        return str(self.vocabulary) + " - " + self.title
 
 
 class CcewDataFile(models.Model):
@@ -164,7 +200,11 @@ class CcewDataFile(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "<CcewDataFile {}>".format(self.title)
+        return "Charity Commission data file: {}".format(self.title)
 
     def get_absolute_url(self):
         return self.url
+
+    class Meta:
+        verbose_name = 'Charity Commission data file'
+        verbose_name_plural = 'Charity Commission data files'
