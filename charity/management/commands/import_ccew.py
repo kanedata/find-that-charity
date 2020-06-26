@@ -345,7 +345,6 @@ class Command(HTMLScraper):
                     "org_id_scheme": self.orgid_scheme,
                 })
             )
-            self.object_count += 1
 
     def close_spider(self):
         super(Command, self).close_spider()
