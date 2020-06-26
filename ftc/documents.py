@@ -131,7 +131,7 @@ class FullOrganisation(Document):
         return instance.latestIncome
 
     def prepare_source(self, instance):
-        return instance.sources
+        return [s.id for s in instance.sources]
 
     def prepare_org_id(self, instance):
         return str(instance.org_id)
