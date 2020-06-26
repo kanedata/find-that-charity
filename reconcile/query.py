@@ -70,15 +70,19 @@ def do_extend_query(ids, properties):
     return result
 
 
-def recon_query(term, orgtype='all', postcode=None, domain=None):
+def recon_query(term=None, orgtype='all', postcode=None, domain=None, source=None):
     """
     Fetch the reconciliation query and insert the query term
     """
     json_q = copy.deepcopy(RECONCILE_QUERY)
-    params = {
-        param: term
-        for param in json_q["params"]
-    }
+
+    params = {}
+
+    if term:
+        for param in json_q["params"]:
+            params[param] = term
+    else:
+        json_q["inline"]["query"]["function_score"]["query"]["bool"]["must"] = {"match_all": {}}
 
     # add postcode
     if postcode:
@@ -105,18 +109,26 @@ def recon_query(term, orgtype='all', postcode=None, domain=None):
         params["domain"] = domain
 
     # check for organisation type
+    filter_ = []
     if orgtype and orgtype != "all":
         if not isinstance(orgtype, list):
             orgtype = [orgtype]
-        dis_max = json_q["inline"]["query"]["function_score"]["query"]
-        json_q["inline"]["query"]["function_score"]["query"] = {
-            "bool": {
-                "must": dis_max,
-                "filter": {
-                    "terms": {"organisationType": orgtype}
-                }
+        filter_.append({
+            "terms": {
+                "organisationType": orgtype
             }
-        }
+        })
+
+    # check for source
+    if source:
+        filter_.append({
+            "term": {
+                "source": source
+            }
+        })
+
+    if filter_:
+        json_q["inline"]["query"]["function_score"]["query"]["bool"]["filter"] = filter_
 
     return (json_q["inline"], params)
 

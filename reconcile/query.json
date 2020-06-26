@@ -8,23 +8,27 @@
         "query": {
             "function_score": {
                 "query": {
-                    "dis_max": {
-                        "queries": [
-                            {
-                                "multi_match": {
-                                    "query": "{{name}}",
-                                    "fields": [
-                                        "name^3",
-                                        "alternateName"
-                                    ]
-                                }
-                            },
-                            {
-                                "match_phrase": {
-                                    "name": "{{name}}"
-                                }
+                    "bool": {
+                        "must": {
+                            "dis_max": {
+                                "queries": [
+                                    {
+                                        "multi_match": {
+                                            "query": "{{name}}",
+                                            "fields": [
+                                                "name^3",
+                                                "alternateName"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "name": "{{name}}"
+                                        }
+                                    }
+                                ]
                             }
-                        ]
+                        }
                     }
                 },
                 "functions": [

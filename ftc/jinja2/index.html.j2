@@ -15,28 +15,8 @@
         UK charities.</p>
         <p>The data comes from the three main regulators of charities in the UK.</p>
         <p>Each charity has its own page 
-            (<a href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-england-and-wales']|replace('GB-CHC-', ''))) }}">see an example</a>).</p>
-        {# <ul>
-            <li>Charity registered in England and Wales:
-                <a class="underline dark-blue f4"
-                    href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-england-and-wales']|replace('GB-CHC-', ''))) }}">
-                    /charity/{{ examples['registered-charity-england-and-wales']|replace('GB-CHC-', '') }}
-                </a>
-            </li>
-            <li>Charity registered in Scotland:
-                <a class="underline dark-blue f4"
-                    href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-scotland']|replace('GB-SC-', ''))) }}">
-                    /charity/{{ examples['registered-charity-scotland']|replace('GB-SC-', '') }}
-                </a>
-            </li>
-            <li>Charity registered in Northern Ireland:
-                <a class="underline dark-blue f4"
-                    href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-northern-ireland']|replace('GB-NIC-', 'NIC'))) }}">
-                    /charity/{{ examples['registered-charity-northern-ireland']|replace('GB-NIC-', 'NIC') }}
-                </a>
-            </li>
-        </ul>
-        <small>These can also be accessed as json data by adding <code>.json</code> to the end of the url</small> #}
+            (<a href="{{ url('charity_html', kwargs=dict(regno=examples['registered-charity-england-and-wales']|replace('GB-CHC-', ''))) }}" class="link dark-blue underline">see an example</a>).</p>
+        <p><a href="{{ url('orgid_type', kwargs=dict(orgtype='registered-charity')) }}" class="link pa2 f4 br2 pa2 bg-blue white">Search registered charities</a></p>
     </section>
     <section class="w-100 cf mv3">
         <h3 class="w-100 pa0 mv2 f2">Find other non profit organisations</h3>

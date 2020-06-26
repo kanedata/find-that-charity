@@ -70,6 +70,19 @@ def org_search(request):
     })
 
 
+def search_organisations(criteria, use_pagination=True, search_source='elasticsearch'):
+    if search_source not in ('elasticsearch', 'db'):
+        raise ValueError("Search source must be elasticsearch or db")
+
+    if search_source == 'elasticsearch':
+        query_template, params = recon_query(
+            query,
+            orgtype=orgtype,
+        )
+        q = FullOrganisation.search().from_dict(query_template)
+        result = q.execute(params=params)
+        paginator = DSEPaginator(result, 25)
+
 def get_orgid(request, org_id, filetype="html", preview=False):
     orgs = get_list_or_404(Organisation, linked_orgs__contains=[org_id])
     org = RelatedOrganisation(orgs)
