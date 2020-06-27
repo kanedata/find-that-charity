@@ -11,12 +11,10 @@ from django.views.decorators.cache import cache_page
 from ftc.documents import FullOrganisation, DSEPaginator
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
                         Source)
-from ftc.query import random_query
+from ftc.query import random_query, OrganisationSearch
 from reconcile.query import recon_query
 
 # site homepage
-
-
 # @cache_page(60 * 60)
 def index(request):
     if 'q' in request.GET:
@@ -46,22 +44,16 @@ def index(request):
 
 
 def org_search(request):
-    criteria = {}
-    if 'q' in request.GET:
-        query = request.GET['q']
-    orgtype = []
-    if 'orgtype' in request.GET and request.GET.get('orgtype') != 'all':
-        orgtype = request.GET.get('orgtype')
 
-    query_template, params = recon_query(
-        query,
-        orgtype=orgtype,
-    )
-    q = FullOrganisation.search().from_dict(query_template)
-    result = q.execute(params=params)
-    paginator = DSEPaginator(result, 25)
+    s = OrganisationSearch()
+    if 'q' in request.GET:
+        s.set_criteria(term=request.GET['q'])
+    if 'orgtype' in request.GET and request.GET.get('orgtype') != 'all':
+        s.set_criteria(base_orgtype=request.GET.get('orgtype'))
+        
+    s.run_es(with_pagination=True, with_aggregation=False)
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = s.paginator.get_page(page_number)
 
     return render(request, 'search.html.j2', {
         'res': page_obj,
@@ -113,9 +105,11 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         'q': None,
         'include_inactive': False,
     }
+    s = OrganisationSearch()
     if orgtype:
         query['base_query'] = get_object_or_404(OrganisationType, slug=orgtype)
         query['orgtype'].append(orgtype)
+        s.set_criteria(base_orgtype=orgtype)
         download_url = reverse('orgid_type_download', 
                                 kwargs={'orgtype': orgtype})
     elif source:
@@ -130,25 +124,19 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
     if 'orgtype' in request.GET:
         query['orgtype'].extend(
             request.GET.getlist('orgtype'))
+        s.set_criteria(other_orgtypes=request.GET.getlist('orgtype'))
     if 'source' in request.GET:
         query['source'].extend(request.GET.getlist('source'))
     if 'q' in request.GET:
         query['q'] = request.GET['q']
+        s.set_criteria(term=query['q'])
     if request.GET.get('inactive') == 'include_inactive':
         query['include_inactive'] = True
 
     # convert query to criteria
-    criteria = {}
-    if query.get('orgtype'):
-        criteria["organisationType__contains"] = query['orgtype']
-    if query.get('source'):
-        criteria["source__id__in"] = query['source']
-    if query.get('q'):
-        criteria['name__search'] = query['q']
+    s.set_criteria(source=query['source'])
     if not query.get('include_inactive') and filetype != 'csv':
-        criteria['active'] = True
-
-    orgs = Organisation.objects.filter(**{k: v for k, v in criteria.items() if v})
+        s.set_criteria(active=True)
 
     if filetype == "csv":
         columns = {
@@ -175,27 +163,24 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         )
         writer = csv.writer(response)
         writer.writerow(columns.values())
-        res = orgs.values_list(*columns.keys()).order_by('org_id')
+        s.run_db()
+        res = s.query.values_list(*columns.keys()).order_by('org_id')
         for r in res:
             writer.writerow(r)
         return response
-        
 
-    by_orgtype = orgs.annotate(orgtype=Func(
-        F('organisationType'), function='unnest')).values('orgtype').annotate(records=Count('*')).order_by('-records')
-    by_source = orgs.values('source').annotate(records=Count('source')).order_by('-records')
-
-    paginator = Paginator(orgs.order_by('name'), 25)
+    s.run_es(with_pagination=True, with_aggregation=True)
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = s.paginator.get_page(page_number)
+    print(page_obj.has_other_pages())
 
     return render(request, 'orgtype.html.j2', {
         "res": page_obj,
         "query": query,
         "term": request.GET.get('q'),
         "aggs": {
-            "by_orgtype": by_orgtype,
-            "by_source": by_source,
+            "by_orgtype": s.aggregation.get("by_orgtype"),
+            "by_source": s.aggregation.get("by_source"),
         },
         "download_url": download_url,
     })

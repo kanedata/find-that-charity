@@ -70,7 +70,7 @@ def do_extend_query(ids, properties):
     return result
 
 
-def recon_query(term=None, orgtype='all', postcode=None, domain=None, source=None):
+def recon_query(term=None, orgtype='all', other_orgtypes=None, postcode=None, domain=None, source=None):
     """
     Fetch the reconciliation query and insert the query term
     """

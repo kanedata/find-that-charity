@@ -1,6 +1,9 @@
 from collections import defaultdict
+from math import ceil
 
-from django.core.paginator import Paginator, Page
+from django.core.paginator import Paginator, Page, PageNotAnInteger, EmptyPage
+from django.utils.translation import gettext_lazy as _
+from django.utils.functional import cached_property
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.search import Search
 from django_elasticsearch_dsl.registries import registry
@@ -54,15 +57,43 @@ class DSEPaginator(Paginator):
     Elasticsearch provides the total as a part of the query results, so we can minimize hits.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, params=None, **kwargs):
         super(DSEPaginator, self).__init__(*args, **kwargs)
-        self._count = self.object_list.hits.total
+        self._params = params
+        self.count = None
+        self.num_pages = None
+
+    def validate_number(self, number):
+        """Validate the given 1-based page number."""
+        try:
+            if isinstance(number, float) and not number.is_integer():
+                raise ValueError
+            number = int(number)
+        except (TypeError, ValueError):
+            raise PageNotAnInteger(_('That page number is not an integer'))
+        if number < 1:
+            raise EmptyPage(_('That page number is less than 1'))
+        return number
 
     def page(self, number):
-        # this is overridden to prevent any slicing of the object_list - Elasticsearch has
-        # returned the sliced data already.
+        """Return a Page object for the given 1-based page number."""
         number = self.validate_number(number)
-        return Page(self.object_list, number, self)
+        bottom = (number - 1) * self.per_page
+        top = bottom + self.per_page
+        return self._get_page(self.object_list[bottom:top], number, self)
+
+    def _get_page(self, object_list, number, paginator):
+        self.result = object_list.execute(params=self._params)
+        if isinstance(self.result.hits.total, int):
+            self.count = self.result.hits.total
+        else:
+            self.count = int(self.result.hits.total.value)
+
+        if self.count == 0 and not self.allow_empty_first_page:
+            return 0
+        hits = max(1, self.count - self.orphans)
+        self.num_pages = ceil(hits / self.per_page)
+        return Page(self.result, number, self)
 
 
 @registry.register_document
