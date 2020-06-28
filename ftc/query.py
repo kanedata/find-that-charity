@@ -120,12 +120,17 @@ class OrganisationSearch:
 
         params = {}
 
+        sort_by = False
         if self.term:
             for param in self.es_query["params"]:
                 params[param] = self.term
         else:
             self.es_query["inline"]["query"]["function_score"]["query"]["bool"]["must"] = {
                 "match_all": {}}
+            # first two functions reference the {{name}} parameter
+            self.es_query["inline"]["query"]["function_score"]["functions"] = self.es_query["inline"]["query"]["function_score"]["functions"][2:]
+            # sort_by = 'name.keyword'
+            sort_by = 'org_id'
 
         # add postcode
         if self.postcode:
@@ -179,7 +184,11 @@ class OrganisationSearch:
         if filter_:
             self.es_query["inline"]["query"]["function_score"]["query"]["bool"]["filter"] = filter_
 
-        q = FullOrganisation.search().from_dict(self.es_query["inline"])
+        q = FullOrganisation.search().from_dict(self.es_query["inline"]).params(
+            track_total_hits=True
+        )
+        if sort_by:
+            q = q.sort(sort_by)
 
         if with_aggregation:
             by_source = A('terms', field='source')
