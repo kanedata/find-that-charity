@@ -26,7 +26,7 @@ import addtocsv.views
 urlpatterns = [
     path('admin/', admin.site.urls, name='about'),
     path('', ftc.views.index, name='index'),
-    path('addtocsv', addtocsv.views.index, name='addtocsv'),
+    path('addtocsv', addtocsv.views.index, name='csvtool'),
     path('orgid/', include(ftc.urls)),
     path('charity/', include(charity.urls)),
     path('reconcile/', include(reconcile.urls)),
