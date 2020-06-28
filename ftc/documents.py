@@ -1,5 +1,6 @@
 from collections import defaultdict
 from math import ceil
+import re
 
 from django.core.paginator import Paginator, Page, PageNotAnInteger, EmptyPage
 from django.utils.translation import gettext_lazy as _
@@ -109,6 +110,7 @@ class FullOrganisation(Document):
     ])
     orgIDs = fields.KeywordField()
     alternateName = fields.TextField()
+    sortname = fields.KeywordField()
     organisationType = fields.KeywordField()
     organisationTypePrimary = fields.KeywordField()
     source = fields.KeywordField()
@@ -148,6 +150,12 @@ class FullOrganisation(Document):
 
     def prepare_alternateName(self, instance):
         return instance.alternateName
+
+    def prepare_sortname(self, instance):
+        n = re.sub('[^0-9a-zA-Z ]+', '', instance.name.lower().strip())
+        if n.startswith('the '):
+            n = n[4:]
+        return n
 
     def prepare_organisationType(self, instance):
         return instance.organisationType

@@ -259,6 +259,12 @@ Future development:
 
 # Setup steps
 
+## first time setup
+
+```sh
+python manage.py createcachetable
+```
+
 ## Import organisations
 
 ```sh

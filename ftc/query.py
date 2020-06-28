@@ -129,8 +129,7 @@ class OrganisationSearch:
                 "match_all": {}}
             # first two functions reference the {{name}} parameter
             self.es_query["inline"]["query"]["function_score"]["functions"] = self.es_query["inline"]["query"]["function_score"]["functions"][2:]
-            # sort_by = 'name.keyword'
-            sort_by = 'org_id'
+            sort_by = 'sortname'
 
         # add postcode
         if self.postcode:
