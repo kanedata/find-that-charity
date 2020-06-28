@@ -192,7 +192,7 @@ class FullOrganisation(Document):
         """
         qs = self.get_queryset()
         for o in tqdm.tqdm(qs):
-            if o:
+            if o and o.linked_orgs[0]:
                 yield RelatedOrganisation.from_orgid(o.linked_orgs[0])
 
     def bulk(self, actions, **kwargs):

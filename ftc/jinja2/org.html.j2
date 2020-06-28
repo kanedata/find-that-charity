@@ -98,7 +98,7 @@
 
   {% if org.records|length > 1 %}
   <h4 class="f5 f4-ns mb3 mt0 normal">
-    This organisation is based on records from {{ org.sources|map(attribute="title")|unique|list|list_to_string }}:
+    This organisation is based on records from {{ org.sources|map(attribute="publisher")|unique|list|list_to_string }}:
   </h4>
   {% endif %}
   <div class="w-100 flex flex-wrap">
