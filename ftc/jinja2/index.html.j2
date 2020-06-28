@@ -68,15 +68,17 @@
     <div class="mv5 cf">
         <h3>Data sources</h3>
         <div class="">
-            {% for o in by_source %}
+            {% for pub, items in by_source|groupby('publisher') %}
+            {% for s in items if s.records > 0 %}
             <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
-                <a href="{{ url('orgid_source', kwargs=dict(source=o.source)) }}"
+                <a href="{{ url('orgid_source', kwargs=dict(source=s.id)) }}"
                     class="link near-black underline-hover pa2 dib fl">
-                    {{ sources[o.source].title }}
-                    {# <br><span class="is-size-7">({{ sources[o.source].data.title }})</span> #}
+                    {{ s.publisher }}
+                    {% if loop.length > 1 %}<span class="f7">({{ s.title }})</span>{% endif %}
                 </a>
-                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(o.records) }}</span>
+                <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(s.records) }}</span>
             </div>
+            {% endfor %}
             {% endfor %}
         </div>
     </div>

@@ -15,17 +15,23 @@ from ftc.query import random_query, OrganisationSearch
 from reconcile.query import recon_query
 
 # site homepage
-# @cache_page(60 * 60)
+@cache_page(60 * 60)
 def index(request):
     if 'q' in request.GET:
         return org_search(request)
 
     orgs = Organisation.objects
 
-    by_orgtype = orgs.annotate(orgtype=Func(
-        F('organisationType'), function='unnest')).values('orgtype').annotate(records=Count('*')).order_by('-records')
-    by_source = orgs.values('source').annotate(
-        records=Count('source')).order_by('-records')
+    by_orgtype = orgs.annotate(
+        orgtype=Func(
+            F('organisationType'),
+            function='unnest')
+        ).values('orgtype').annotate(
+            records=Count('*')
+        ).order_by('-records')
+    by_source = Source.objects.all().annotate(
+        records=Count('organisations')
+    ).order_by('-records')
 
     context = dict(
         examples = {
