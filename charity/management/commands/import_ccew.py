@@ -13,14 +13,17 @@ import bcp
 import tqdm
 from django.db import connection
 from django.utils.text import slugify
+import psycopg2
 import redis
 
 from charity.management.commands._bulk_upsert import bulk_upsert
 from charity.management.commands._ccew_sql import UPDATE_CCEW
 from charity.models import (AreaOfOperation, Charity, CharityFinancial,
-                            CharityName, CharityRaw)
+                            CharityName, CharityRaw, CCEWCharity, CCEWCharityAOO,
+                            CCEWClass, CCEWFinancial, CCEWMainCharity, CCEWName,
+                            CCEWObjects, CCEWPartB, CCEWRegistration)
 from ftc.management.commands._base_scraper import HTMLScraper
-from ftc.models import Organisation
+from ftc.models import Organisation, OrganisationLink
 
 
 class Command(HTMLScraper):
@@ -58,6 +61,17 @@ class Command(HTMLScraper):
                 "title": "Registered charities in England and Wales"
             }
         ],
+    }
+    ccew_file_to_object = {
+        'extract_charity': CCEWCharity,
+        'extract_main_charity': CCEWMainCharity,
+        'extract_name': CCEWName,
+        'extract_registration': CCEWRegistration,
+        'extract_charity_aoo': CCEWCharityAOO,
+        'extract_objects': CCEWObjects,
+        'extract_financial': CCEWFinancial,
+        "extract_class": CCEWClass,
+        "extract_partb": CCEWPartB,
     }
     ccew_files = {
         'extract_charity': [
@@ -188,13 +202,6 @@ class Command(HTMLScraper):
     ]
 
     def parse_file(self, response, source_urls):
-
-        if os.environ.get('REDIS_URL'):
-            self.redis = redis.StrictRedis.from_url(
-                os.environ.get('REDIS_URL'))
-        else:
-            self.redis = None
-
         for l in response.html.absolute_links:
             if not self.zip_regex.match(l):
                 continue
@@ -204,7 +211,6 @@ class Command(HTMLScraper):
 
     def process_zip(self, response):
         self.logger.info("File size: {}".format(len(response.content)))
-        self.initialise_charities()
         
         with tempfile.TemporaryDirectory() as tmpdirname:
             cczip_name = os.path.join(tmpdirname, 'ccew.zip')
@@ -230,210 +236,87 @@ class Command(HTMLScraper):
                     self.logger.info("Processing: {}".format(filename))
                     self.process_bcp(bcpfile, filename)
 
-        return self.process_charities()
-
     def process_bcp(self, bcpfile, filename):
 
         fields = self.ccew_files.get(filename)
+        db_table = self.ccew_file_to_object.get(filename)
+        page_size = 1000
         self.date_fields = [f for f in fields if f.endswith("date")]
 
-        bcpreader = bcp.DictReader(bcpfile, fieldnames=fields)
-        for k, row in tqdm.tqdm(enumerate(bcpreader)):
-            row = self.clean_fields(row)
-            if not row.get("regno"):
-                continue
-            charity = self.get_charity(row['regno'])
-            if (filename in ["extract_main_charity", "extract_charity"] and row.get("subno", '0') == '0'):
-                for field in row:
-                    charity[field] = row[field]
-            else:
-                charity[filename].append(row)
-            self.set_charity(row['regno'], charity)
-
-    def initialise_charities(self):
-        self.aooref = AreaOfOperation.objects.all()
-        self.aooref = {(a.aootype, a.aookey): a for a in self.aooref}
-
-        if self.redis:
-            self.logger.info("Caching results in redis")
-            return self.redis.delete('charities')
-        self.charities = {}
-
-    def get_charity(self, regno):
-        if self.redis:
-            charity = self.redis.hget('charities', regno)
-            return pickle.loads(charity) if charity else {f: [] for f in self.ccew_files.keys()}
-        return self.charities.get(regno, {f: [] for f in self.ccew_files.keys()})
-
-    def set_charity(self, regno, charity):
-        if self.redis:
-            return self.redis.hset('charities', regno, pickle.dumps(charity))
-        self.charities[regno] = charity
-
-    def get_all_charities(self):
-        if self.redis:
-            for regno, charity in self.redis.hscan_iter('charities'):
-                yield (regno.decode(), pickle.loads(charity))
-        else:
-            for regno, record in self.charities.items():
-                yield (regno, record)
-
-    def process_charities(self):
+        def get_data(bcpreader):
+            for k, row in tqdm.tqdm(enumerate(bcpreader)):
+                row = self.clean_fields(row)
+                if not row.get("regno"):
+                    continue
+                yield [k] + list(row.values())
         
-        for regno, record in self.get_all_charities():
-
-            # helps with debugging - shouldn't normally be empty
-            record["regno"] = regno
-
-            # work out registration dates
-            registration_date, removal_date = self.get_regdates(record)
-
-            # work out org_types and org_ids
-            org_types = [
-                "Registered Charity",
-                "Registered Charity (England and Wales)"
-            ]
-            org_ids = [self.get_org_id(record)]
-            coyno = self.parse_company_number(record.get("coyno"))
-            if coyno:
-                org_types.append("Registered Company")
-                org_types.append("Incorporated Charity")
-                org_ids.append("GB-COH-{}".format(coyno))
-
-            # check for CIOs
-            if record.get("gd") and record["gd"].startswith("CIO - "):
-                org_types.append("Charitable Incorporated Organisation")
-                if record["gd"].lower().startswith("cio - association"):
-                    org_types.append("Charitable Incorporated Organisation - Association")
-                elif record["gd"].lower().startswith("cio - foundation"):
-                    org_types.append("Charitable Incorporated Organisation - Foundation")
-            org_types = [self.orgtype_cache[slugify(o)] for o in org_types]
-
-            self.add_org_record(
-                Organisation(**{
-                    "org_id": self.get_org_id(record),
-                    "name": self.parse_name(record.get("name")),
-                    "charityNumber": record.get("regno"),
-                    "companyNumber": coyno,
-                    "streetAddress": record.get("add1"),
-                    "addressLocality": record.get("add2"),
-                    "addressRegion": record.get("add3"),
-                    "addressCountry": record.get("add4"),
-                    "postalCode": self.parse_postcode(record.get("postcode")),
-                    "telephone": record.get("phone"),
-                    "alternateName": [
-                        self.parse_name(c["name"])
-                        for c in record.get("extract_name", [])
-                    ],
-                    "email": record.get("email"),
-                    "description": self.get_objects(record),
-                    "organisationType": [o.slug for o in org_types],
-                    "organisationTypePrimary": org_types[0],
-                    "url": self.parse_url(record.get("web")),
-                    "location": self.get_locations(record),
-                    "latestIncome": int(record["income"]) if record.get("income") else None,
-                    "latestIncomeDate": record["incomedate"] if record.get("incomedate") else None,
-                    "dateModified": datetime.datetime.now(),
-                    "dateRegistered": registration_date,
-                    "dateRemoved": removal_date,
-                    "active": record.get("orgtype") == "R",
-                    "parent": None,
-                    "orgIDs": org_ids,
-                    "scrape": self.scrape,
-                    "source": self.source,
-                    "spider": self.name,
-                    "org_id_scheme": self.orgid_scheme,
-                })
+        with connection.cursor() as cursor:
+            bcpreader = bcp.DictReader(bcpfile, fieldnames=fields)
+            self.logger.info('Starting table insert [{}]'.format(
+                db_table._meta.db_table))
+            db_table.objects.all().delete()
+            psycopg2.extras.execute_values(
+                cursor, 
+                """INSERT INTO {} VALUES %s;""".format(db_table._meta.db_table), 
+                get_data(bcpreader), 
+                page_size=page_size
             )
+            self.logger.info('Finished table insert [{}]'.format(
+                db_table._meta.db_table))
 
     def close_spider(self):
-        super(Command, self).close_spider()
-        self.records = None
-        self.link_records = None
-
-        # now start inserting charity records
-        self.charity_count = 0
-        self.logger.info("Inserting CharityRaw records")
-        self.bulk_create()
-        self.logger.info("Inserted {:,.0f} CharityRaw records".format(self.charity_count))
-        self.scrape.result['charity_records'] = self.charity_count
-        self.scrape.save()
-
-        self.logger.info("Deleting old CharityRaw records")
-        CharityRaw.objects.filter(
-            spider__exact=self.name,
-        ).exclude(
-            scrape_id=self.scrape.id,
-        ).delete()
-        self.logger.info("Old CharityRaw records deleted")
 
         # execute SQL statements
         with connection.cursor() as cursor:
             for sql_name, sql in UPDATE_CCEW.items():
                 self.logger.info("Starting SQL: {}".format(sql_name))
-                cursor.execute(sql)
+                cursor.execute(sql.format(
+                    scrape_id=self.scrape.id,
+                    source=self.name,
+                ))
                 self.logger.info("Finished SQL: {}".format(sql_name))
 
-    def bulk_create(self):
+        self.object_count = Organisation.objects.filter(
+            spider__exact=self.name,
+            scrape_id=self.scrape.id,
+        ).count()
+        self.scrape.items = self.object_count
+        results = {
+            "records": self.object_count
+        }
+        self.logger.info(
+            "Saved {:,.0f} organisation records".format(self.object_count))
 
-        self.raw_records = []
+        link_records_count = OrganisationLink.objects.filter(
+            spider__exact=self.name,
+            scrape_id=self.scrape.id,
+        ).count()
+        if link_records_count:
+            results['link_records'] = link_records_count
+            self.object_count += results['link_records']
+            self.logger.info("Saved {:,.0f} link records".format(results['link_records']))
 
-        for regno, record in tqdm.tqdm(self.get_all_charities()):
-            self.charity_count += 1
-            self.raw_records.append(CharityRaw(
-                org_id=self.get_org_id(record),
-                data=record,
-                scrape=self.scrape,
-                spider=self.name,
-            ))
+        self.scrape.errors = self.error_count
+        self.scrape.result = results
+        if self.object_count == 0:
+            self.scrape.status = Scrape.ScrapeStatus.FAILED
+        elif self.error_count > 0:
+            self.scrape.status = Scrape.ScrapeStatus.ERRORS
+        else:
+            self.scrape.status = Scrape.ScrapeStatus.SUCCESS
+        self.scrape.save()
 
-            if len(self.raw_records) >= self.bulk_limit:
-                CharityRaw.objects.bulk_create(self.raw_records)
-                self.raw_records = []
-            
-        if self.raw_records:
-            CharityRaw.objects.bulk_create(self.raw_records)
-            self.raw_records = []
-
-
-    def get_locations(self, record):
-        # work out locations
-        locations = []
-        for l in record.get("extract_charity_aoo", []):
-            aookey = (l["aootype"], l["aookey"])
-            aoo = self.aooref.get(aookey)
-            if not aoo:
-                continue
-            if aoo.GSS != "":
-                locations.append({
-                    "id": aoo["GSS"],
-                    "name": aoo["aooname"],
-                    "geoCode": aoo["GSS"],
-                    "geoCodeType": AREA_TYPES.get(aoo["GSS"][0:3], "Unknown"),
-                })
-            elif aoo.get("ISO3166_1", "") != "":
-                locations.append({
-                    "id": aoo["ISO3166_1"],
-                    "name": aoo["aooname"],
-                    "geoCode": aoo["ISO3166_1"],
-                    "geoCodeType": "ISO3166-1",
-                })
-        return locations
-
-    def get_regdates(self, record):
-        reg = [r for r in record.get("extract_registration", []) if r.get("regdate") and (r.get("subno") == '0')]
-        reg = sorted(reg, key=lambda x: x.get("regdate"))
-        if not reg:
-            return (None, None)
-
-        return (
-            reg[0].get("regdate"),
-            reg[-1].get("remdate")
-        )
-
-    def get_objects(self, record):
-        objects = []
-        for o in record.get("extract_objects", []):
-            if o.get("subno") == '0' and isinstance(o['object'], str):
-                objects.append(re.sub("[0-9]{4}$", "", o['object']))
-        return ''.join(objects)
+        # if we've been successfull then delete previous items
+        if self.object_count > 0:
+            self.logger.info("Deleting previous records")
+            Organisation.objects.filter(
+                spider__exact=self.name,
+            ).exclude(
+                scrape_id=self.scrape.id,
+            ).delete()
+            OrganisationLink.objects.filter(
+                spider__exact=self.name,
+            ).exclude(
+                scrape_id=self.scrape.id,
+            ).delete()
+            self.logger.info("Deleted previous records")

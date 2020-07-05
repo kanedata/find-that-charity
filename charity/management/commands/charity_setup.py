@@ -112,6 +112,9 @@ class Command(BaseCommand):
                     string.ascii_letters[string.ascii_letters.index(code[0]) + 1],
                     r["master"], 
                 )]
+            for k, v in r.items():
+                if v == "":
+                    r[k] = None
             ve, _ = AreaOfOperation.objects.update_or_create(
                 aootype=r['aootype'],
                 aookey=r['aookey'],

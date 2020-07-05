@@ -122,7 +122,7 @@ class CharityFinancial(models.Model):
         return "{} {}".format(self.charity.name, self.fyend)
 
 class CharityRaw(models.Model):
-    org_id = models.CharField(max_length=200)
+    org_id = models.CharField(max_length=200, db_index=True)
     spider = models.CharField(max_length=200, db_index=True)
     scrape = models.ForeignKey(
         'ftc.Scrape',
@@ -210,3 +210,165 @@ class CcewDataFile(models.Model):
     class Meta:
         verbose_name = 'Charity Commission data file'
         verbose_name_plural = 'Charity Commission data files'
+        
+
+class CCEWCharity(models.Model):
+    regno = models.CharField(db_index=True, max_length=255)  #	     integer 	    registered number of a charity
+    # integer 	    subsidiary number of a charity (may be 0 for main/group charity)
+    subno = models.IntegerField(db_index=True)
+    # varchar(150) 	main name of the charity
+    name = models.CharField(max_length=255, null=True, blank=True)
+    # varchar(2) 	R (registered) or RM (removed)
+    orgtype = models.CharField(max_length=255, null=True, blank=True)
+    # varchar(250) 	Description of Governing Document
+    gd = models.TextField(null=True, blank=True)
+    # varchar(175) 	area of benefit - may not be defined
+    aob = models.TextField(null=True, blank=True)
+    # char(1) 	    area of benefit defined by Governing Document (T/F)
+    aob_defined = models.CharField(max_length=255, null=True, blank=True)
+    # char(1) 	    NHS charity (T/F)
+    nhs = models.CharField(max_length=255, null=True, blank=True)
+    # varchar(20) 	Housing Association number
+    ha_no = models.CharField(max_length=255, null=True, blank=True)
+    corr = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(70) 	Charity correspondent name
+    add1 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
+    add2 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
+    add3 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
+    add4 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
+    add5 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
+    # varchar(8) 	postcode of charity's correspondent
+    postcode = models.CharField(max_length=255, null=True, blank=True)
+    # varchar(23) 	telephone of charity's correspondent
+    phone = models.CharField(max_length=255, null=True, blank=True)
+    # varchar(23) 	fax of charity's correspondent
+    fax = models.CharField(max_length=255, null=True, blank=True)
+
+
+class CCEWMainCharity(models.Model):
+    # integer 	    registered number of a charity
+    regno = models.CharField(db_index=True, max_length=255)
+    # integer 	    company registration number
+    coyno = models.CharField(max_length=255, null=True, blank=True)
+    # char(1) 	    trustees incorporated (T/F)
+    trustees = models.CharField(max_length=255, null=True, blank=True)
+    # char(4) 	    Financial year end
+    fyend = models.CharField(max_length=255, null=True, blank=True)
+    # char(1) 	    requires correspondence in both Welsh & English (T/F)
+    welsh = models.CharField(max_length=255, null=True, blank=True)
+    # datetime 	    date for latest gross income (blank if income is an estimate)
+    incomedate = models.DateField(null=True, blank=True)
+    income = models.BigIntegerField(null=True, blank=True)  # integer
+    # varchar(4) 	    may be blank
+    grouptype = models.CharField(max_length=255, null=True, blank=True)
+    # varchar(255) 	email address
+    email = models.CharField(max_length=255, null=True, blank=True)
+    # varchar(255) 	website address
+    web = models.CharField(max_length=255, null=True, blank=True)
+
+
+class CCEWName(models.Model):
+    # integer 	    registered number of a charity
+    regno = models.CharField(db_index=True, max_length=255)
+    # integer 	    subsidiary number of a charity (may be 0 for main/group charity)
+    subno = models.IntegerField(db_index=True)
+    nameno = models.IntegerField()  # integer 	    number identifying a charity name
+    name = models.CharField(max_length=255)   #     varchar(150) 	name of a charity (multiple occurrences possible)
+
+
+class CCEWRegistration(models.Model):
+    # integer 	    registered number of a charity
+    regno = models.CharField(db_index=True, max_length=255)
+    # integer 	    subsidiary number of a charity (may be 0 for main/group charity)
+    subno = models.IntegerField(db_index=True)
+    regdate = models.DateField() #    datetime 	    date of registration for a charity
+    # datetime 	    Removal date of a charity - Blank for Registered Charities
+    remdate = models.DateField(null=True, blank=True)
+    # varchar(3) 	    Register removal reason code
+    remcode = models.CharField(max_length=255, null=True, blank=True)
+
+
+class CCEWCharityAOO(models.Model):
+    # integer 	    registered number of a charity
+    regno = models.CharField(db_index=True, max_length=255)
+    aootype = models.CharField(max_length=255) # 	    char(1) 	    A B or D
+    aookey = models.IntegerField() # 	    integer 	    up to three digits
+    # char(1) 	    Flag: Y or blank
+    welsh = models.CharField(max_length=255, null=True, blank=True)
+    # integer 	    may be blank. If aootype=D then holds continent; if aootype=B then holds GLA/met county
+    master = models.IntegerField(null=True, blank=True)
+
+
+class CCEWObjects(models.Model):
+    # integer 	    registered number of a charity
+    regno = models.CharField(db_index=True, max_length=255)
+    # integer 	    subsidiary number of a charity (may be 0 for main/group charity)
+    subno = models.IntegerField(db_index=True)
+    # char(4) 	    sequence number (in practice 0-20)
+    seqno = models.CharField(db_index=True, max_length=255)
+    # varchar(255) 	Description of objects of a charity
+    object_text = models.TextField(db_column='object')
+
+
+class CCEWFinancial(models.Model):
+    # integer 	registered number of a charity
+    regno = models.CharField(db_index=True, max_length=255)
+    fystart = models.DateField() # 	datetime 	Charity's financial year start date
+    # datetime 	Charity's financial year end date
+    fyend = models.DateField(db_index=True)
+    income = models.BigIntegerField(null=True, blank=True) # 	integer 	
+    expend = models.BigIntegerField(null=True, blank=True)  # integer
+
+
+class CCEWClass(models.Model):
+    # integer 	registered number of a charity
+    regno = models.CharField(db_index=True, max_length=255)
+    # integer 	classification code for a charity(multiple occurrences possible)
+    classification = models.CharField(db_column='class', max_length=255)
+
+
+class CCEWPartB(models.Model):
+    regno = models.CharField(db_index=True, max_length=255)
+    artype = models.CharField(max_length=255)
+    fystart = models.DateField()
+    fyend = models.DateField(db_index=True)
+    inc_leg = models.BigIntegerField(null=True, blank=True)
+    inc_end = models.BigIntegerField(null=True, blank=True)
+    inc_vol = models.BigIntegerField(null=True, blank=True)
+    inc_fr = models.BigIntegerField(null=True, blank=True)
+    inc_char = models.BigIntegerField(null=True, blank=True)
+    inc_invest = models.BigIntegerField(null=True, blank=True)
+    inc_other = models.BigIntegerField(null=True, blank=True)
+    inc_total = models.BigIntegerField(null=True, blank=True)
+    invest_gain = models.BigIntegerField(null=True, blank=True)
+    asset_gain = models.BigIntegerField(null=True, blank=True)
+    pension_gain = models.BigIntegerField(null=True, blank=True)
+    exp_vol = models.BigIntegerField(null=True, blank=True)
+    exp_trade = models.BigIntegerField(null=True, blank=True)
+    exp_invest = models.BigIntegerField(null=True, blank=True)
+    exp_grant = models.BigIntegerField(null=True, blank=True)
+    exp_charble = models.BigIntegerField(null=True, blank=True)
+    exp_gov = models.BigIntegerField(null=True, blank=True)
+    exp_other = models.BigIntegerField(null=True, blank=True)
+    exp_total = models.BigIntegerField(null=True, blank=True)
+    exp_support = models.BigIntegerField(null=True, blank=True)
+    exp_dep = models.BigIntegerField(null=True, blank=True)
+    reserves = models.BigIntegerField(null=True, blank=True)
+    asset_open = models.BigIntegerField(null=True, blank=True)
+    asset_close = models.BigIntegerField(null=True, blank=True)
+    fixed_assets = models.BigIntegerField(null=True, blank=True)
+    open_assets = models.BigIntegerField(null=True, blank=True)
+    invest_assets = models.BigIntegerField(null=True, blank=True)
+    cash_assets = models.BigIntegerField(null=True, blank=True)
+    current_assets = models.BigIntegerField(null=True, blank=True)
+    credit_1 = models.BigIntegerField(null=True, blank=True)
+    credit_long = models.BigIntegerField(null=True, blank=True)
+    pension_assets = models.BigIntegerField(null=True, blank=True)
+    total_assets = models.BigIntegerField(null=True, blank=True)
+    funds_end = models.BigIntegerField(null=True, blank=True)
+    funds_restrict = models.BigIntegerField(null=True, blank=True)
+    funds_unrestrict = models.BigIntegerField(null=True, blank=True)
+    funds_total = models.BigIntegerField(null=True, blank=True)
+    employees = models.BigIntegerField(null=True, blank=True)
+    volunteers = models.BigIntegerField(null=True, blank=True)
+    cons_acc = models.CharField(max_length=255, null=True, blank=True)
+    charity_acc = models.CharField(max_length=255, null=True, blank=True)

@@ -81,9 +81,14 @@ class Command(CSVScraper):
         super().handle()
         management.call_command("update_orgids")
 
-    def fetch_file(self):
-        requests_cache.install_cache('http_cache')
+    def set_session(self, install_cache=False):
+        from requests_html import HTMLSession
+        if install_cache:
+            self.logger.info("Using requests_cache")
+            requests_cache.install_cache('http_cache')
         self.session = HTMLSession()
+
+    def fetch_file(self):
         self.files = {}
         for u in self.start_urls:
             response = self.session.get(u)

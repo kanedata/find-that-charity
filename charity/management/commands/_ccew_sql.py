@@ -4,36 +4,42 @@ UPDATE_CCEW['Insert into charity table'] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread, address, 
 	postcode, phone, active, date_registered, date_removed, removal_reason, web, email, 
     company_number, source, first_added, last_updated )
-select c.org_id as "id",
-	c.data->>'name' as "name",
-	c.data->>'gd' as "constitution",
-	c.data->>'aob' as "geographical_spread",
+select CONCAT('GB-CHC-', c.regno) as "id",
+	c.name as "name",
+	c.gd as "constitution",
+	c.aob as "geographical_spread",
 	NULLIF(concat_ws(', ', 
-        c.data->>'add1',
-        c.data->>'add2',
-        c.data->>'add3',
-        c.data->>'add4',
-        c.data->>'add5'
+        c."add1",
+        c."add2",
+        c."add3",
+        c."add4",
+        c."add5"
      ), '') as "address",
-	c.data->>'postcode' as "postcode",
-	c.data->>'phone' as "phone",
-	c.data->>'orgtype' = 'R' as "active",
- 	to_date(c.data->'extract_registration'->0->>'regdate', 'YYYY-MM-DD') as "date_registered",
-	to_date(c.data->'extract_registration'->-1->>'remdate', 'YYYY-MM-DD') as "date_removed",
-	c.data->'extract_registration'->-1->>'remcode' as "removal_reason",
-	c.data->>'web' as "web",
-	c.data->>'email' as "email",
-	c.data->>'coyno' as "company_number",
-	-- c.data->>'' as "activities",
-	c.spider as "source",
+	c.postcode as postcode,
+	c.phone as "phone",
+	c.orgtype = 'R' as active,
+ 	to_date(reg.data->0->>'regdate', 'YYYY-MM-DD') as "date_registered",
+	to_date(reg.data->-1->>'remdate', 'YYYY-MM-DD') as "date_removed",
+	reg.data->-1->>'remcode' as "removal_reason",
+	cm.web as "web",
+	cm.email as "email",
+	lpad(cm.coyno, 8, '0') as "company_number",
+	'{source}' as "source",
  	NOW() as "first_added",
  	NOW() as "last_updated"
-	-- c.data->>'' as "income",
-	-- c.data->>'' as "spending",
-	-- c.data->>'' as "latest_fye",
-	-- c.data->>'' as "dual_registered"
-from charity_charityraw c
-where c.spider = 'ccew'
+from charity_ccewcharity c
+	left outer join charity_ccewmaincharity cm
+		on c.regno = cm.regno
+	left outer join (
+		select regno,
+			subno,
+			jsonb_agg(cr order by regdate desc) as data
+		from charity_ccewregistration cr 
+		group by regno, subno
+	) as reg
+		on c.regno = reg.regno
+			and c.subno = reg.subno
+where c.subno = 0
 on conflict (id) do update 
 set "name" = EXCLUDED.name,
 	constitution = COALESCE(EXCLUDED.constitution, cc.constitution),
@@ -57,15 +63,15 @@ UPDATE_CCEW['Insert into charity financial'] = """
 insert into charity_charityfinancial as cf (charity_id, fyend, fystart, income, spending, account_type)
 select DISTINCT ON ("org_id", "fyend") a.*
 from (
-	select c.org_id,
-		to_date(jsonb_array_elements(c.data->'extract_financial')->>'fyend', 'YYYY-MM-DD') as "fyend",
-		to_date(jsonb_array_elements(c.data->'extract_financial')->>'fystart', 'YYYY-MM-DD') as "fystart",
-		(jsonb_array_elements(c.data->'extract_financial')->>'income')::int as "income",
-		(jsonb_array_elements(c.data->'extract_financial')->>'expend')::int as "spending",
+	select CONCAT('GB-CHC-', c.regno) as org_id,
+		c."fyend",
+		c."fystart",
+		c."income",
+		c."expend" as "spending",
 		'basic' as "account_type"
-	from charity_charityraw c
+	from charity_ccewfinancial c
+	where "income" is not null
 ) as a
-where "income" is not null
 on conflict (charity_id, fyend) do update 
 set fystart = EXCLUDED.fystart,
     income = EXCLUDED.income,
@@ -115,56 +121,9 @@ set
     funds_total = a.funds_total,
     employees = a.employees,
     volunteers = a.volunteers,
-    account_type = case when "cons_acc" then 'consolidated' else 'charity' end 
-from (
-    select c.org_id,
-        jsonb_array_elements(c.data->'extract_partb')->>'artype' as "artype",
-        to_date(jsonb_array_elements(c.data->'extract_partb')->>'fyend', 'YYYY-MM-DD') as "fyend",
-        to_date(jsonb_array_elements(c.data->'extract_partb')->>'fystart', 'YYYY-MM-DD') as "fystart",
-        (jsonb_array_elements(c.data->'extract_partb')->>'inc_leg')::bigint as "inc_leg",
-        (jsonb_array_elements(c.data->'extract_partb')->>'inc_end')::bigint as "inc_end",
-        (jsonb_array_elements(c.data->'extract_partb')->>'inc_vol')::bigint as "inc_vol",
-        (jsonb_array_elements(c.data->'extract_partb')->>'inc_fr')::bigint as "inc_fr",
-        (jsonb_array_elements(c.data->'extract_partb')->>'inc_char')::bigint as "inc_char",
-        (jsonb_array_elements(c.data->'extract_partb')->>'inc_invest')::bigint as "inc_invest",
-        (jsonb_array_elements(c.data->'extract_partb')->>'inc_other')::bigint as "inc_other",
-        (jsonb_array_elements(c.data->'extract_partb')->>'inc_total')::bigint as "inc_total",
-        (jsonb_array_elements(c.data->'extract_partb')->>'invest_gain')::bigint as "invest_gain",
-        (jsonb_array_elements(c.data->'extract_partb')->>'asset_gain')::bigint as "asset_gain",
-        (jsonb_array_elements(c.data->'extract_partb')->>'pension_gain')::bigint as "pension_gain",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_vol')::bigint as "exp_vol",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_trade')::bigint as "exp_trade",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_invest')::bigint as "exp_invest",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_grant')::bigint as "exp_grant",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_charble')::bigint as "exp_charble",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_gov')::bigint as "exp_gov",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_other')::bigint as "exp_other",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_total')::bigint as "exp_total",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_support')::bigint as "exp_support",
-        (jsonb_array_elements(c.data->'extract_partb')->>'exp_dep')::bigint as "exp_dep",
-        (jsonb_array_elements(c.data->'extract_partb')->>'reserves')::bigint as "reserves",
-        (jsonb_array_elements(c.data->'extract_partb')->>'asset_open')::bigint as "asset_open",
-        (jsonb_array_elements(c.data->'extract_partb')->>'asset_close')::bigint as "asset_close",
-        (jsonb_array_elements(c.data->'extract_partb')->>'fixed_assets')::bigint as "fixed_assets",
-        (jsonb_array_elements(c.data->'extract_partb')->>'open_assets')::bigint as "open_assets",
-        (jsonb_array_elements(c.data->'extract_partb')->>'invest_assets')::bigint as "invest_assets",
-        (jsonb_array_elements(c.data->'extract_partb')->>'cash_assets')::bigint as "cash_assets",
-        (jsonb_array_elements(c.data->'extract_partb')->>'current_assets')::bigint as "current_assets",
-        (jsonb_array_elements(c.data->'extract_partb')->>'credit_1')::bigint as "credit_1",
-        (jsonb_array_elements(c.data->'extract_partb')->>'credit_long')::bigint as "credit_long",
-        (jsonb_array_elements(c.data->'extract_partb')->>'pension_assets')::bigint as "pension_assets",
-        (jsonb_array_elements(c.data->'extract_partb')->>'total_assets')::bigint as "total_assets",
-        (jsonb_array_elements(c.data->'extract_partb')->>'funds_end')::bigint as "funds_end",
-        (jsonb_array_elements(c.data->'extract_partb')->>'funds_restrict')::bigint as "funds_restrict",
-        (jsonb_array_elements(c.data->'extract_partb')->>'funds_unrestrict')::bigint as "funds_unrestrict",
-        (jsonb_array_elements(c.data->'extract_partb')->>'funds_total')::bigint as "funds_total",
-        (jsonb_array_elements(c.data->'extract_partb')->>'employees')::bigint as "employees",
-        (jsonb_array_elements(c.data->'extract_partb')->>'volunteers')::bigint as "volunteers",
-        jsonb_array_elements(c.data->'extract_partb')->>'cons_acc'='Yes' as "cons_acc",
-        jsonb_array_elements(c.data->'extract_partb')->>'charity_acc'='Yes' as "charity_acc"
-    from charity_charityraw c
-) as a
-where cf.charity_id = a.org_id
+    account_type = case when "cons_acc" = 'Yes' then 'consolidated' else 'charity' end 
+from charity_ccewpartb a
+where cf.charity_id = CONCAT('GB-CHC-', a.regno)
     and cf.fyend = a.fyend;
 """
 
@@ -186,37 +145,27 @@ where cf.charity_id = charity_charity.id;
 
 UPDATE_CCEW['Insert into charity areas of operation'] = """
 insert into charity_charity_areas_of_operation as ca (charity_id, areaofoperation_id )
-select aoo.org_id,
-	aooref.id
-from (
-    select c.org_id,
-        (jsonb_array_elements(c.data->'extract_charity_aoo')->>'aookey')::int as "aookey",
-        jsonb_array_elements(c.data->'extract_charity_aoo')->>'aootype' as "aootype"
-    from charity_charityraw c
-    where c.spider = 'ccew'
-) as aoo
-	inner join charity_areaofoperation aooref
-		on aoo.aookey = aooref.aookey 
-			and aoo.aootype = aooref.aootype
+select CONCAT('GB-CHC-', c.regno) as charity_id,
+	aoo.id as "areaofoperation_id"
+from charity_ccewcharityaoo c
+	inner join charity_areaofoperation aoo
+		on c.aookey = aoo.aookey 
+			and c.aootype = aoo.aootype 
 on conflict (charity_id, areaofoperation_id) do nothing;
 """
 
 UPDATE_CCEW['Insert into charity names'] = """
 insert into charity_charityname as cn (charity_id, name, "normalisedName", name_type)
-select a.org_id,
-	"name",
-	"name" as "normalisedName",
-	case when "primary_name" = "name" then 'Primary'
-		when "subno" = '0' then 'Alternative'
-		else 'Subsidiary' end as "name_type"
-from (
-	select c.org_id,
-		c.data->>'name' as "primary_name",
-		jsonb_array_elements(c.data->'extract_name')->>'name' as "name",
-		jsonb_array_elements(c.data->'extract_name')->>'subno' as "subno"
-	from charity_charityraw c
-    where c.spider = 'ccew'
-) as a
+select CONCAT('GB-CHC-', c.regno) as charity_id,
+	c."name",
+	c."name" as "normalisedName",
+	case when c.subno != '0' then 'Subsidiary'
+		when c.name = ccc."name" then 'Primary'
+		else 'Alternative' end as "name_type"
+from charity_ccewname c
+	left outer join charity_ccewcharity ccc
+		on c.regno = ccc.regno 
+			and c.subno = ccc.subno
 on conflict (charity_id, name) do nothing;
 """
 
@@ -224,20 +173,17 @@ UPDATE_CCEW['Update charity objects'] = """
 update charity_charity 
 set activities = "objects"
 from (
-	select org_id,
-		string_agg(regexp_replace("object", "seqno" || '$', ''), '' order by seqno) as "objects"
-	from (
-		select c.org_id,
-			to_char((jsonb_array_elements(c.data->'extract_objects')->>'seqno')::int + 1, 'fm0000') as "seqno",
-			jsonb_array_elements(c.data->'extract_objects')->>'object' as "object",
-			jsonb_array_elements(c.data->'extract_objects')->>'subno' as "subno"
-		from charity_charityraw c
-        where c.spider = 'ccew'
-	) as a
-    where a.subno = '0'
-	group by org_id
+    select CONCAT('GB-CHC-', a.regno) as charity_id,
+        string_agg(regexp_replace("object", "next_seqno" || '$', ''), '' order by seqno) as "objects"
+    from (
+        select *,
+            to_char(seqno::int + 1, 'fm0000') as "next_seqno"
+        from charity_ccewobjects cc 
+        where cc.subno = '0'
+    ) as a
+    group by charity_id
 ) as a
-where charity_charity.id = a.org_id;
+where charity_charity.id = a.charity_id;
 """
 
 UPDATE_CCEW['Insert into charity classification'] = """
@@ -245,9 +191,9 @@ insert into charity_charity_classification as ca (charity_id, vocabularyentries_
 select org_id,
 	ve.id
 from (
-select c.org_id,
-	jsonb_array_elements(c.data->'extract_class')->>'class' as "c_class"
-from charity_charityraw c
+	select CONCAT('GB-CHC-', c.regno) as org_id,
+		c.class as "c_class"
+	from charity_ccewclass c
 ) as c_class
 	inner join charity_vocabularyentries ve
 		on c_class.c_class = ve.code 
@@ -255,4 +201,111 @@ from charity_charityraw c
 		on ve.vocabulary_id = v.id 
 where v.title like 'ccew_%'
 on conflict (charity_id, vocabularyentries_id) do nothing;
+"""
+
+UPDATE_CCEW['Insert into organisation table'] = """
+insert into ftc_organisation (
+	org_id, "orgIDs", linked_orgs, name, "alternateName",
+	"charityNumber", "companyNumber", "streetAddress", "addressLocality",
+	"addressRegion", "addressCountry", "postalCode",
+	telephone, email, description, url, "latestIncome",
+	"latestIncomeDate", "dateRegistered", "dateRemoved", active,
+	status, parent, "dateModified", "organisationType", spider,
+	location, org_id_scheme_id, "organisationTypePrimary_id",
+	scrape_id, source_id 
+)
+select cc.id as org_id,
+	case when company_number in ('01234567', '12345678') then array[cc.id]
+		when company_number is not null then array[cc.id, CONCAT('GB-COH-', company_number)]
+		else array[cc.id] end as "orgIDs",
+	case when company_number in ('01234567', '12345678') then array[cc.id]
+		when company_number is not null then array[cc.id, CONCAT('GB-COH-', company_number)]
+		else array[cc.id] end as "linked_orgs",
+	cc.name,
+	cn."alternateName" as "alternateName",
+	regexp_replace(cc.id, 'GB\-(SC|NIC|COH|CHC)\-', '') as "charityNumber",
+	cc.company_number as "companyNumber",
+	concat_ws(', ', ccew.add1, ccew.add2) as "streetAddress",
+	ccew.add3 as "addressLocality",
+	ccew.add4 as "addressRegion",
+	ccew.add5 as "addressCountry",
+	cc.postcode as "postalCode",
+	cc.phone as telephone,
+	cc.email as email,
+	cc.activities as description,
+	cc.web as url,
+	cc.income as "latestIncome",
+	cc.latest_fye as "latestIncomeDate",
+	cc.date_registered as "dateRegistered",
+	cc.date_removed as "dateRemoved",
+	cc.active,
+	null as status,
+	null as parent,
+	now() as "dateModified",
+	array['registered-charity'] ||
+		case when cc."source" = 'ccew' then array['registered-charity-england-and-wales'] 
+			when cc."source" = 'oscr' then array['registered-charity-scotland'] 
+			when cc."source" = 'ccni' then array['registered-charity-northern-ireland'] 
+			else array[]::text[] end ||
+		case when cc.company_number is not null then array['registered-company', 'incorporated-charity'] 
+			else array[]::text[] end ||
+		case when cc.constitution ilike 'CIO - %' then array['charitable-incorporated-organisation', 'incorporated-charity'] 
+			else array[]::text[] end ||
+		case when cc.constitution ilike 'cio - association %' then array['charitable-incorporated-organisation-association'] 
+			else array[]::text[] end ||
+		case when cc.constitution ilike 'cio - foundation %' then array['charitable-incorporated-organisation-foundation'] 
+			else array[]::text[] end 
+		as "organisationType",
+	cc."source" as spider,
+	l.location as "location",
+	case when cc."source" = 'ccew' then 'GB-CHC'
+		when cc."source" = 'oscr' then 'GB-SC'
+		when cc."source" = 'ccni' then 'GB-NIC'
+		else null end as "org_id_scheme_id",
+	ot.slug as "organisationTypePrimary_id",
+	{scrape_id} as scrape_id,
+	cc."source" as source_id
+from charity_charity cc 
+	left outer join (
+		select charity_id,
+			array_agg(name) as "alternateName"
+		from charity_charityname 
+		group by charity_id
+	) as cn
+		on cc.id = cn.charity_id 
+	left outer join charity_ccewcharity ccew
+		on cc.id = CONCAT('GB-CHC-', ccew.regno)
+			and ccew.subno = '0'
+	left outer join (select charity_id,
+			jsonb_agg(jsonb_build_object(
+				'id', coalesce(ca."GSS", ca."ISO3166_1", ca."ContinentCode"),
+				'name', aooname, 
+				'geoCode', coalesce(ca."GSS", ca."ISO3166_1", ca."ContinentCode")
+			)) as "location"
+		from charity_charity_areas_of_operation ccaoo
+			inner join charity_areaofoperation ca
+				on ccaoo.areaofoperation_id = ca.id 
+		group by charity_id) as l
+	on l.charity_id = cc.id,
+	ftc_organisationtype ot
+where ot.title = 'Registered Charity'
+    and cc.source = '{source}'
+"""
+
+UPDATE_CCEW['Insert into organisation link table'] = """
+insert into "ftc_organisationlink" (
+    org_id_a,
+    org_id_b,
+    spider,
+    scrape_id,
+    source_id
+)
+select cc.id as org_id_a,
+	CONCAT('GB-COH-', company_number) as org_id_b,
+	cc.source as spider,
+	{scrape_id} as scrape_id,
+	cc.source as source_id
+from charity_charity cc
+where company_number not in ('01234567', '12345678')
+    and cc.source = '{source}'
 """

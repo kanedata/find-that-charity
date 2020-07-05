@@ -2,6 +2,7 @@
 
 - add ccni to charity raw
 - tests
+- better data source info - download URL, last modified date
 
 ## Autocomplete API
 

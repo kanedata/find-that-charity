@@ -83,11 +83,15 @@ class BaseScraper(BaseCommand):
             help='Cache request',
         )
 
-    def handle(self, *args, **options):
-        # set up cache if we're caching
-        if options.get("cache"):
+    def set_session(self, install_cache=False):
+        if install_cache:
+            self.logger.info("Using requests_cache")
             requests_cache.install_cache('http_cache')
         self.session = requests.Session()
+
+    def handle(self, *args, **options):
+        # set up cache if we're caching
+        self.set_session(options.get("cache"))
 
         # set up orgidscheme object
         if hasattr(self, 'org_id_prefix'):
@@ -497,9 +501,14 @@ class CSVScraper(BaseScraper):
 
 class HTMLScraper(BaseScraper):
 
-    def fetch_file(self):
+    def set_session(self, install_cache=False):
         from requests_html import HTMLSession
+        if install_cache:
+            self.logger.info("Using requests_cache")
+            requests_cache.install_cache('http_cache')
         self.session = HTMLSession()
+
+    def fetch_file(self):
         self.files = {}
         for u in self.start_urls:
             r = self.session.get(u)
