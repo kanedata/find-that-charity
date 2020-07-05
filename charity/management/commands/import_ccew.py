@@ -23,7 +23,7 @@ from charity.models import (AreaOfOperation, Charity, CharityFinancial,
                             CCEWClass, CCEWFinancial, CCEWMainCharity, CCEWName,
                             CCEWObjects, CCEWPartB, CCEWRegistration)
 from ftc.management.commands._base_scraper import HTMLScraper
-from ftc.models import Organisation, OrganisationLink
+from ftc.models import Organisation, OrganisationLink, Scrape
 
 
 class Command(HTMLScraper):
