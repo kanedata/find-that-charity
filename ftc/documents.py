@@ -1,3 +1,4 @@
+from itertools import groupby
 from collections import defaultdict
 from math import ceil
 import re
@@ -155,13 +156,14 @@ class FullOrganisation(Document):
         n = re.sub('[^0-9a-zA-Z ]+', '', instance.name.lower().strip())
         if n.startswith('the '):
             n = n[4:]
+        n = re.sub(' +', ' ', n).strip()
         return n
 
     def prepare_organisationType(self, instance):
         return instance.organisationType
 
     def prepare_organisationTypePrimary(self, instance):
-        return instance.organisationTypePrimary.slug
+        return instance.organisationTypePrimary_id
 
     def prepare_domain(self, instance):
         return instance.domain
@@ -179,21 +181,26 @@ class FullOrganisation(Document):
         """
         Return the queryset that should be indexed by this doc type.
         """
-        sql = """
-        select distinct on ("linked_orgs") "id", "org_id", "linked_orgs"
-        from ftc_organisation
-        """
-
-        return self.django.model.objects.raw(sql)
+        return self.django.model.objects\
+                   .order_by('linked_orgs')\
+                   .prefetch_related('organisationTypePrimary')\
+                   .prefetch_related('source')
 
     def get_indexing_queryset(self):
         """
         Build queryset (iterator) for use by indexing.
         """
         qs = self.get_queryset()
-        for o in tqdm.tqdm(qs):
-            if o and o.linked_orgs[0]:
-                yield RelatedOrganisation.from_orgid(o.linked_orgs[0])
+        for k, orgs in groupby(
+            tqdm.tqdm(
+                qs.iterator(),
+                total=qs.count(),
+                position=0,
+                smoothing=0.1,
+                leave=True),
+            key=lambda o: o.linked_orgs
+        ):
+            yield RelatedOrganisation(orgs)
 
     def bulk(self, actions, **kwargs):
         if self.django.queryset_pagination and 'chunk_size' not in kwargs:
