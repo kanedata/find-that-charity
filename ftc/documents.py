@@ -30,26 +30,22 @@ class SearchWithTemplate(Search):
             es = get_connection(self._using)
 
             if params:
-                self._response = self._response_class(
-                    self,
-                    es.search_template(
-                        index=self._index,
-                        body={
-                            "source": self.to_dict(),
-                            "params": params,
-                        },
-                        **self._params
-                    )
-                )
+                search_body = es.render_search_template(
+                    body={
+                        "source": self.to_dict(),
+                        "params": params,
+                    },
+                )['template_output']
             else:
-                self._response = self._response_class(
-                    self,
-                    es.search(
-                        index=self._index,
-                        body=self.to_dict(),
-                        **self._params
-                    )
+                search_body = self.to_dict()
+            self._response = self._response_class(
+                self,
+                es.search(
+                    index=self._index,
+                    body=search_body,
+                    **self._params
                 )
+            )
         return self._response
 
 
