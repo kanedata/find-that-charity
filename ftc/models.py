@@ -181,6 +181,8 @@ class Organisation(models.Model):
 
     @property
     def all_names(self):
+        if self.name is None:
+            return self.alternateName
         return [self.name] + self.alternateName
 
     @classmethod
@@ -389,7 +391,6 @@ class RelatedOrganisation:
         self.setNames()
         self.orgIDs = list(set(self.get_all("orgIDs")))
         self.alternateName = self.get_alternateNames()
-        print(self.get_alternateNames())
         self.name = self.names.get(self.records[0].name.lower(), self.records[0].name)
         self.sources = list(self.get_all("source"))
 
