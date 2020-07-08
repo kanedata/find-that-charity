@@ -156,7 +156,7 @@ class FullOrganisation(Document):
         return n
 
     def prepare_organisationType(self, instance):
-        return instance.organisationType
+        return instance.get_all("organisationType")
 
     def prepare_organisationTypePrimary(self, instance):
         return instance.organisationTypePrimary_id

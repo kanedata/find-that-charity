@@ -167,7 +167,7 @@ class Command(CSVScraper):
         self.add_org_record(
             Organisation(**{
                 "org_id": self.get_org_id(record),
-                "name": self.parse_name(record.get("CompanyName")),
+                "name": record.get("CompanyName"),
                 "charityNumber": None,
                 "companyNumber": record.get(self.id_field),
                 "streetAddress": ", ".join(address1),
@@ -176,7 +176,7 @@ class Command(CSVScraper):
                 "addressCountry": record.get("RegAddress_Country"),
                 "postalCode": record.get("RegAddress_PostCode"),
                 "telephone": None,
-                "alternateName": [self.parse_name(n["CompanyName"]) for n in record["previous_names"]],
+                "alternateName": record["previous_names"],
                 "email": None,
                 "description": None,
                 "organisationType": [o.slug for o in orgtypes],

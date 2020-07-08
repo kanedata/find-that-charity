@@ -4,7 +4,7 @@
       <div class="br2 b--light-gray ba bw1 h-100 {% if not record.active %}silver bg-washed-yellow{% endif %}">
         <header class="bb b--light-gray bw1 pa3">
           <h3 class="ma0 pa0 header-font tracked-tight">
-            {{ record.name }}
+            {{ record.name|titlecase }}
             {% if not record.active %}<span class="normal red">(inactive)</span>{% endif %}
           </h3>
           <div class="card-header-title is-block tracked-tight f6">

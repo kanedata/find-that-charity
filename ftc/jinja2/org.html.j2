@@ -32,7 +32,7 @@
 {% block header %}
 <header class="fl w-100 w-50-l ph3 ph5-ns entry-content lh-copy f4">
   <h2 class="f2-ns mt4 mb0 f3 lh-title normal">
-      {{ org.name }}
+      {{ org.name|titlecase }}
   </h2>
   <h3 class="f3-ns mb4 mt3 f4 lh-subtitle normal">
     A {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in the UK
@@ -58,7 +58,7 @@
     {% else %}
     <span class="pv1 ph2 br2 bg-dark-red white dib mr2 mb2">Inactive</span>
     {% endif %}
-    {% for ot in org.organisationType if ot != org.organisationTypePrimary.slug %}
+    {% for ot in org.get_all('organisationType') if ot != org.organisationTypePrimary.slug %}
     {{ orgtype_link(orgtypes[ot], large=true) }}
     {% endfor %}
   </div>
@@ -73,7 +73,7 @@
       {% if description %}
       <h4>Description</h4>
       <p>
-        {{ description.value }}
+        {{ description.value|titlecase(sentence=true) }}
         <span class="gray f7 dib">
           [Source: 
           {{ description.orgid }},
@@ -86,7 +86,7 @@
       <h4>Also known as</h4>
       <ul>
         {% for n in org.alternateName[0:10] %}
-        <li>{{ n }}</li>
+        <li>{{ n|titlecase }}</li>
         {% endfor %}
         {% if org.alternateName|length > 10 %}
         <li>...and {{ "{:,.0f}".format(org.alternateName|length - 10) }} other names</li>
@@ -139,7 +139,7 @@
       {% for v in org.location %}
         {% if v.geoCode and v.geoCode|regex_search("[ENWS][0-9]{8}") %}
         <li class="w-100 mb2">
-          <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ v.geoCode }}.html" target="_blank">{{ v.name }}</a>
+          <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ v.geoCode }}.html" target="_blank">{{ v.name|titlecase }}</a>
           {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
           {# {{ show_sources(v) }} #}
         </li>

@@ -9,38 +9,8 @@ from humanize import naturaldelta
 from jinja2 import Environment
 
 from ftc.models import OrganisationType, Source
+from findthatcharity.utils import url_remove, url_replace, list_to_string, regex_search, to_titlecase
 
-
-def regex_search(s, regex):
-    return re.search(regex, s) is not None
-
-
-def list_to_string(l, sep=", ", final_sep=" and "):
-    if not isinstance(l, list):
-        return l
-
-    if len(l) == 1:
-        return l[0]
-    elif len(l) == 2:
-        return final_sep.join(l)
-    else:
-        return sep.join(l[0:-1]) + final_sep + l[-1]
-
-
-def url_replace(request, **kwargs):
-    dict_ = request.GET.copy()
-    for field, value in kwargs.items():
-        dict_[field] = value
-    return request.build_absolute_uri(request.path) + '?' + dict_.urlencode()
-
-def url_remove(request, fields):
-    dict_ = request.GET.copy()
-    if not isinstance(fields, list):
-        fields = [fields]
-    for field in fields:
-        if field in dict_:
-            del dict_[field]
-    return request.build_absolute_uri(request.path) + '?' + dict_.urlencode()
 
 def environment(**options):
     env = Environment(**options)
@@ -67,5 +37,6 @@ def environment(**options):
             x, minimum_unit="milliseconds"),
         "list_to_string": list_to_string,
         "slugify": slugify,
+        "titlecase": to_titlecase,
     })
     return env

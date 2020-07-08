@@ -25,9 +25,9 @@
 <div class="content measure-wide mb4">
     <h3 class="title pa0 mb1 mt0 mh0">
         {% if result.active %}
-        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">{{result.name }}</a>
+        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">{{result.name|titlecase }}</a>
         {% else %}
-        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}" class="blue link underline-hover tracked-tight lh-copy normal">{{result.name }}</a>
+        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}" class="blue link underline-hover tracked-tight lh-copy normal">{{result.name|titlecase }}</a>
         <span class="red tracked-tight lh-copy normal ml2">(Inactive)</span>
         {% endif %}
     </h3>

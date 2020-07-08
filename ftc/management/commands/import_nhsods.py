@@ -146,7 +146,7 @@ class Command(HTMLScraper):
         self.records.append(
             Organisation(**{
                 "org_id": self.get_org_id(record),
-                "name": self.parse_name(record.get("Name")),
+                "name": record.get("Name"),
                 "charityNumber": None,
                 "companyNumber": None,
                 "streetAddress": address["streetAddress"],

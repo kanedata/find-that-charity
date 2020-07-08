@@ -1,5 +1,6 @@
 import operator
 import datetime
+from collections import defaultdict
 
 from django_better_admin_arrayfield.models.fields import ArrayField
 from django.contrib.postgres.fields import JSONField
@@ -177,6 +178,10 @@ class Organisation(models.Model):
             prefix_order,
             self.dateRegistered if self.dateRegistered else datetime.date.min,
         )
+
+    @property
+    def all_names(self):
+        return [self.name] + self.alternateName
 
     @classmethod
     def get_fields_as_properties(cls):
@@ -381,8 +386,11 @@ class RelatedOrganisation:
 
     def __init__(self, orgs):
         self.records = self.prioritise_orgs(orgs)
+        self.setNames()
         self.orgIDs = list(set(self.get_all("orgIDs")))
-        self.alternateName = list(set(self.get_all("alternateName")))
+        self.alternateName = self.get_alternateNames()
+        print(self.get_alternateNames())
+        self.name = self.names.get(self.records[0].name.lower(), self.records[0].name)
         self.sources = list(self.get_all("source"))
 
         self.org_links = []
@@ -425,6 +433,23 @@ class RelatedOrganisation:
                 if v not in seen:
                     yield v
                 seen.add(v)
+
+    def setNames(self):
+        self.names = {}
+        for r in self.records:
+            for n in r.all_names:
+                if n not in self.names or not n.isupper() or not n.islower():
+                    self.names[n.lower().strip()] = n
+
+    def get_alternateNames(self):
+        names = self.get_all("all_names")
+        return list(
+            set([
+                self.names.get(n.lower().strip(), n)
+                for n in names 
+                if n.lower().strip() != self.name.lower().strip()
+            ])
+        )
 
     def prioritise_orgs(self, orgs):
         # Decide what order a list of organisations should go in,
