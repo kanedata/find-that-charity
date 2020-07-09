@@ -9,11 +9,11 @@ import requests_cache
 import titlecase
 import validators
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.text import slugify
 from django.db import connection
+from django.utils.text import slugify
 
 from ftc.models import (Organisation, OrganisationLink, OrganisationType,
-                        Scrape, Source, OrgidScheme)
+                        OrgidScheme, Scrape, Source)
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 

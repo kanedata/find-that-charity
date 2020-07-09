@@ -17,11 +17,11 @@ from django.contrib import admin
 from django.urls import include, path, reverse
 from django.views.generic import RedirectView
 
+import addtocsv.views
+import charity.urls
 import ftc.urls
 import ftc.views
-import charity.urls
 import reconcile.urls
-import addtocsv.views
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='about'),

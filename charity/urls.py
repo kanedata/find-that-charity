@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views, feeds
+from . import feeds, views
 
 urlpatterns = [
     path('ccew/feed.rss', feeds.CcewDataFeedRSS()),

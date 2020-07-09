@@ -1,14 +1,13 @@
-import operator
 import datetime
+import operator
 from collections import defaultdict
 
-from django_better_admin_arrayfield.models.fields import ArrayField
 from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
-
+from django_better_admin_arrayfield.models.fields import ArrayField
 
 IGNORE_DOMAINS = (
 	'gmail.com', 'hotmail.com', 'btinternet.com',

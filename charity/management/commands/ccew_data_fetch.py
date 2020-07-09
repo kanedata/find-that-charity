@@ -1,8 +1,8 @@
 import requests_html
 from django.core.management.base import BaseCommand
 
-from charity.models import CcewDataFile
 from charity.feeds import CCEW_DATA_URL
+from charity.models import CcewDataFile
 
 
 class Command(BaseCommand):

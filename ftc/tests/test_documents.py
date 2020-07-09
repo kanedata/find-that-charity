@@ -1,12 +1,14 @@
 import os
 import re
+from unittest import TestCase
 
 import requests_mock
-from unittest import TestCase
-# from django.test import TestCase
 
 from ftc.documents import FullOrganisation
 from ftc.models import Organisation
+
+# from django.test import TestCase
+
 
 class TestDocuments(TestCase):
     

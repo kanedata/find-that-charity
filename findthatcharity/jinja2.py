@@ -1,15 +1,16 @@
 import datetime
 import re
 
+from django.db import connection
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.text import slugify
-from django.db import connection
 from humanize import naturaldelta
-from jinja2 import Environment
 
+from findthatcharity.utils import (list_to_string, regex_search, to_titlecase,
+                                   url_remove, url_replace)
 from ftc.models import OrganisationType, Source
-from findthatcharity.utils import url_remove, url_replace, list_to_string, regex_search, to_titlecase
+from jinja2 import Environment
 
 
 def environment(**options):

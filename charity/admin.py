@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib.postgres.fields import JSONField
-from django.urls import reverse, resolve
+from django.urls import resolve, reverse
 from django.utils.text import slugify
 from prettyjson.widgets import PrettyJSONWidget
 
-import charity.models as charity
+from charity import models as charity
 
 
 class JSONFieldAdmin(admin.ModelAdmin):

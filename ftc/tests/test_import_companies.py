@@ -6,6 +6,7 @@ from django.test import TestCase
 
 from ftc.management.commands.import_companies import Command
 
+
 class TestImportCompanies(TestCase):
 
     def mock_csv_downloads(self, m):

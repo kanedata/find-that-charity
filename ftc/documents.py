@@ -1,18 +1,18 @@
-from itertools import groupby
-from collections import defaultdict
-from math import ceil
 import re
+from collections import defaultdict
+from itertools import groupby
+from math import ceil
 
-from django.core.paginator import Paginator, Page, PageNotAnInteger, EmptyPage
-from django.utils.translation import gettext_lazy as _
-from django.utils.functional import cached_property
-from django_elasticsearch_dsl import Document, fields
-from django_elasticsearch_dsl.search import Search
-from django_elasticsearch_dsl.registries import registry
-from elasticsearch.helpers import bulk
-from elasticsearch_dsl.field import Completion
-from elasticsearch_dsl.connections import get_connection
 import tqdm
+from django.core.paginator import EmptyPage, Page, PageNotAnInteger, Paginator
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+from django_elasticsearch_dsl import Document, fields
+from django_elasticsearch_dsl.registries import registry
+from django_elasticsearch_dsl.search import Search
+from elasticsearch.helpers import bulk
+from elasticsearch_dsl.connections import get_connection
+from elasticsearch_dsl.field import Completion
 
 from .models import Organisation, RelatedOrganisation
 

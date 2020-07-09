@@ -8,11 +8,12 @@ from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
 
-from ftc.documents import FullOrganisation, DSEPaginator
+from ftc.documents import DSEPaginator, FullOrganisation
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
                         Source)
-from ftc.query import random_query, OrganisationSearch
+from ftc.query import OrganisationSearch, random_query
 from reconcile.query import recon_query
+
 
 # site homepage
 @cache_page(60 * 60)

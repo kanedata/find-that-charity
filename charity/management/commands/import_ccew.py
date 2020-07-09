@@ -10,18 +10,18 @@ import zipfile
 from collections import defaultdict
 
 import bcp
+import psycopg2
+import redis
 import tqdm
 from django.db import connection
 from django.utils.text import slugify
-import psycopg2
-import redis
 
 from charity.management.commands._bulk_upsert import bulk_upsert
 from charity.management.commands._ccew_sql import UPDATE_CCEW
-from charity.models import (AreaOfOperation, Charity, CharityFinancial,
-                            CharityName, CharityRaw, CCEWCharity, CCEWCharityAOO,
-                            CCEWClass, CCEWFinancial, CCEWMainCharity, CCEWName,
-                            CCEWObjects, CCEWPartB, CCEWRegistration)
+from charity.models import (
+    AreaOfOperation, CCEWCharity, CCEWCharityAOO, CCEWClass, CCEWFinancial,
+    CCEWMainCharity, CCEWName, CCEWObjects, CCEWPartB, CCEWRegistration,
+    Charity, CharityFinancial, CharityName, CharityRaw)
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation, OrganisationLink, Scrape
 

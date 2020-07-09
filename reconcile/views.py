@@ -1,16 +1,16 @@
+import copy
 import json
 import os
-import copy
 import urllib.parse
 
-from django.http import JsonResponse, Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import reverse
 from django.views.decorators.csrf import csrf_exempt
-from elasticsearch_dsl.query import MultiMatch, Match
+from elasticsearch_dsl.query import Match, MultiMatch
 
-from ftc.models import Organisation, OrganisationType
 from ftc.documents import FullOrganisation
-from reconcile.query import do_reconcile_query, do_extend_query
+from ftc.models import Organisation, OrganisationType
+from reconcile.query import do_extend_query, do_reconcile_query
 
 
 @csrf_exempt

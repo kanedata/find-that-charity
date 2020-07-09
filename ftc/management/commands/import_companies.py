@@ -1,14 +1,14 @@
+import csv
+import datetime
+import io
 import re
 import zipfile
-import csv
-import io
-import datetime
 
-from django.core import management
-from requests_html import HTMLSession
 import requests
 import requests_cache
 import tqdm
+from django.core import management
+from requests_html import HTMLSession
 
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation

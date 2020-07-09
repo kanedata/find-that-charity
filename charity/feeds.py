@@ -1,6 +1,6 @@
-from django.utils.feedgenerator import Atom1Feed
 from django.contrib.syndication.views import Feed
 from django.urls import reverse
+from django.utils.feedgenerator import Atom1Feed
 from requests_html import HTMLSession
 
 from charity.models import CcewDataFile

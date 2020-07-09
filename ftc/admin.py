@@ -2,10 +2,10 @@ from django.contrib import admin
 from django.contrib.postgres.fields import JSONField
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from prettyjson.widgets import PrettyJSONWidget
 from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
+from prettyjson.widgets import PrettyJSONWidget
 
-import ftc.models as ftc
+from ftc import models as ftc
 
 
 class JSONFieldAdmin(admin.ModelAdmin, DynamicArrayMixin):

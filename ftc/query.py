@@ -4,9 +4,10 @@ from django.core.paginator import Paginator
 from django.db.models import Count, F, Func, Q
 from elasticsearch_dsl import A
 
-from reconcile.query import RECONCILE_QUERY
-from ftc.documents import FullOrganisation, DSEPaginator
+from ftc.documents import DSEPaginator, FullOrganisation
 from ftc.models import Organisation
+from reconcile.query import RECONCILE_QUERY
+
 
 def random_query(active=False, orgtype=None, aggregate=False, source=None):
     query = {
