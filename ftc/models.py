@@ -183,6 +183,8 @@ class Organisation(models.Model):
     def all_names(self):
         if self.name is None:
             return self.alternateName
+        if self.alternateName is None:
+            return [self.name]
         return [self.name] + self.alternateName
 
     @classmethod
