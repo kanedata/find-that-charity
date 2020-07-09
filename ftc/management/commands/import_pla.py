@@ -1,7 +1,6 @@
 import datetime
 
 from ftc.management.commands._base_scraper import CSVScraper
-from ftc.management.commands.import_lae import LA_TYPES
 from ftc.models import Organisation
 
 

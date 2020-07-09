@@ -84,7 +84,6 @@ class Command(HTMLScraper):
                 self.parse_row(row)
                 self.object_count += 1
 
-
     def parse_row(self, record):
 
         if record.get(self.id_field) == "UNKNOWN":

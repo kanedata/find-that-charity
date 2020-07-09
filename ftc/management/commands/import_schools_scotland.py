@@ -75,7 +75,7 @@ class Command(HTMLScraper):
 
     def parse_file(self, response, source_url):
         link = [
-            l for l in response.html.absolute_links if l.endswith(".xlsx")][0]
+            link for link in response.html.absolute_links if link.endswith(".xlsx")][0]
         # self.source["distribution"][0]["downloadURL"] = link
         # self.source["distribution"][0]["accessURL"] = self.start_urls[0]
         # self.source["modified"] = datetime.datetime.now().isoformat()
@@ -101,11 +101,11 @@ class Command(HTMLScraper):
 
             record = {}
             for i, c in enumerate(row):
-                if i+1 in headers:
+                if i + 1 in headers:
                     v = c.value
                     if v in ["", ".", "N/A", "0", 0]:
                         v = None
-                    record[headers[i+1]] = v
+                    record[headers[i + 1]] = v
 
             org_id = self.get_org_id(record)
             org_types = self.get_org_types(record)
@@ -173,7 +173,7 @@ class Command(HTMLScraper):
                 header_names.append(self.slugify("{} {}".format(overtitle if overtitle else "", title)))
 
         return dict(zip(
-            [c.column for c in row if c.value], # header column numbers
+            [c.column for c in row if c.value],  # header column numbers
             header_names
         ))
 

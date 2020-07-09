@@ -51,8 +51,12 @@ class Command(CSVScraper):
 
         if record.get('local-authority-type'):
             org_types.append(
-                self.add_org_type(LA_TYPES.get(record.get(
-                "local-authority-type"), record.get("local-authority-type")))
+                self.add_org_type(
+                    LA_TYPES.get(
+                        record.get("local-authority-type"),
+                        record.get("local-authority-type")
+                    )
+                )
             )
         org_ids = [self.get_org_id(record)]
 

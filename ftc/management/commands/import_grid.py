@@ -52,7 +52,7 @@ It includes cross-linkages to a range of other identifier sources.''',
 
         download_page = self.session.get(link)
         zip_link = download_page.html.xpath('//a[text()="Download"]/@href')[0]
-        
+
         response = self.session.get(zip_link)
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
@@ -87,7 +87,7 @@ It includes cross-linkages to a range of other identifier sources.''',
 
         parent = None
         for r in record.get("relationships", [{}]):
-            if r.get("type")=="Parent":
+            if r.get("type") == "Parent":
                 parent = self.org_id_prefix + "-" + r.get("id")
 
         orgtype = record.get("types", [])[0] if record.get("types", []) else "Education"

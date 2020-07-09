@@ -1,8 +1,7 @@
 import csv
-import datetime
 import io
 
-from ftc.management.commands._base_scraper import AREA_TYPES, CSVScraper
+from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import OrganisationLink, Source
 
 
@@ -150,7 +149,7 @@ class Command(CSVScraper):
                 }
             ],
             "_parse_row": lambda row: {
-                "org_id_a": "GB-CHC-{}".format(row["transferor_regno"].strip()) if row["transferor_subno"].strip()=="0" else None,
+                "org_id_a": "GB-CHC-{}".format(row["transferor_regno"].strip()) if row["transferor_subno"].strip() == "0" else None,
                 "org_id_b": "GB-CHC-{}".format(row["transferee_regno"].strip()) if row["transferee_subno"].strip() == "0" else None,
                 "description": "merger"
             }
@@ -197,8 +196,8 @@ class Command(CSVScraper):
 
     def parse_file(self, response, source):
 
-        source = [s for s in self.sources if s['identifier']==source][0]
-        
+        source = [s for s in self.sources if s['identifier'] == source][0]
+
         if source.get('_parse_csv'):
             return getattr(self, source.get('_parse_csv'))(response, source)
 
@@ -211,11 +210,11 @@ class Command(CSVScraper):
                 if row.get("org_id_a") and row.get("org_id_b"):
                     self.link_records.append(
                         OrganisationLink(
-                            org_id_a = row['org_id_a'],
-                            org_id_b = row['org_id_b'],
-                            spider = self.name,
-                            source = self.source_cache[source['identifier']],
-                            scrape = self.scrape,
+                            org_id_a=row['org_id_a'],
+                            org_id_b=row['org_id_b'],
+                            spider=self.name,
+                            source=self.source_cache[source['identifier']],
+                            scrape=self.scrape,
                         )
                     )
                     self.object_count += 1
@@ -225,12 +224,11 @@ class Command(CSVScraper):
         with io.StringIO(response.text) as a:
             csvreader = csv.DictReader(a)
             for row in csvreader:
-                print(row)
                 if row["Charity Number"].strip() != "":
                     self.link_records.append(
                         OrganisationLink(
-                            org_id_a = "GB-SHPE-{}".format(row["RP Code"].strip()),
-                            org_id_b = "GB-CHC-{}".format(row["Charity Number"].strip()),
+                            org_id_a="GB-SHPE-{}".format(row["RP Code"].strip()),
+                            org_id_b="GB-CHC-{}".format(row["Charity Number"].strip()),
                             spider=self.name,
                             source=self.source_cache[source['identifier']],
                             scrape=self.scrape,

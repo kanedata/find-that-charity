@@ -164,7 +164,6 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
     s.run_es(with_pagination=True, with_aggregation=True)
     page_number = request.GET.get('page')
     page_obj = s.paginator.get_page(page_number)
-    print(page_obj.has_other_pages())
 
     return render(request, 'orgtype.html.j2', {
         "res": page_obj,

@@ -6,9 +6,8 @@ import re
 
 import requests
 import requests_cache
-import titlecase
 import validators
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db import connection
 from django.utils.text import slugify
 
@@ -46,9 +45,10 @@ UPDATE_DOMAINS = """
         'mac.com',
         'waitrose.com',
         'gmail.co.uk'
-    ) 
+    )
         and spider = %(spider_name)s;
     """
+
 
 class BaseScraper(BaseCommand):
 
@@ -203,14 +203,14 @@ class BaseScraper(BaseCommand):
         else:
             # No sources found
             return
-        
+
         for s in sources:
             # fix datetimes
             for f in ['issued', 'modified']:
                 if not s.get(f):
                     s[f] = datetime.datetime.now().strftime("%Y-%m-%d")
             self.source, _ = Source.objects.update_or_create(
-                id = s['identifier'],
+                id=s['identifier'],
                 defaults={
                     'data': s
                 }
@@ -332,7 +332,7 @@ class BaseScraper(BaseCommand):
         new_address = [None for n in range(address_parts)]
         for k, _ in enumerate(new_address):
             if len(address) > k:
-                if k+1 == address_parts:
+                if k + 1 == address_parts:
                     new_address[k] = separator.join(address[k:])
                 else:
                     new_address[k] = address[k]

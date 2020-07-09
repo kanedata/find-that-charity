@@ -1,5 +1,4 @@
 import datetime
-from collections import defaultdict
 
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation
@@ -45,12 +44,12 @@ class Command(CSVScraper):
             if not hasattr(self, 'coynos'):
                 self.coynos = {}
             self.coynos[record['casc_orgid']] = record['ch_orgid']
-            return 
+            return
 
         address = dict(enumerate([v.strip() for v in record["address"].split(",", maxsplit=2)]))
         org_ids = [record["id"]]
         orgtypes = [
-            self.orgtype_cache['community-amateur-sports-club'],            
+            self.orgtype_cache['community-amateur-sports-club'],
             self.orgtype_cache['sports-club'],
         ]
         if record["id"] in self.coynos:

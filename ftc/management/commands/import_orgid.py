@@ -11,7 +11,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("Fetching url")
         r = requests.get(self.start_url)
-        
+
         print("iterating records")
         count = 0
         for record in r.json()['lists']:

@@ -69,14 +69,6 @@ class ScrapeAdmin(SourceAdmin):
     list_filter = ('status', 'spider', )
     search_fields = ()
 
-    # def get_row_css(self, obj, index):
-    #     print(obj.status)
-    #     if obj.status in (obj.ScrapeStatus.ERRORS, obj.ScrapeStatus.FAILED):
-    #         return 'red red%d' % index
-    #     if obj.status in (obj.ScrapeStatus.RUNNING):
-    #         return 'orange orange%d' % index
-    #     return ''
-
 
 admin.site.site_header = "Find that Charity admin"
 admin.site_site_title = admin.site.site_header

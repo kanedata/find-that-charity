@@ -41,17 +41,17 @@ class Command(HTMLScraper):
     orgtypes = ["Registered Provider of Social Housing"]
 
     def parse_file(self, response, source_url):
-        link = [l for l in response.html.links if l.endswith(".xlsx")][0]
+        link = [link for link in response.html.links if link.endswith(".xlsx")][0]
         # self.source["distribution"][0]["downloadURL"] = link
         # self.source["distribution"][0]["accessURL"] = self.start_urls[0]
         # self.source["modified"] = datetime.datetime.now().isoformat()
         r = self.session.get(link)
-        
+
         wb = load_workbook(io.BytesIO(r.content), read_only=True)
         ws = wb['Organisation Advanced Find View']
-        
+
         # self.source["issued"] = wb.properties.modified.isoformat()[0:10]
-        
+
         headers = None
         for k, row in enumerate(ws.rows):
             if not headers:

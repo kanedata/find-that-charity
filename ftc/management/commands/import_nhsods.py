@@ -1,7 +1,6 @@
 import csv
 import datetime
 import io
-import json
 import zipfile
 
 from ftc.management.commands._base_scraper import HTMLScraper
@@ -100,13 +99,12 @@ class Command(HTMLScraper):
         # } for f in self.files]
         # self.source["modified"] = datetime.datetime.now().isoformat()
 
-
     def parse_file(self, response, org_type):
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
             for f in z.infolist():
                 if not f.filename.endswith(".csv"):
                     continue
-                print("Opening: {}".format(f.filename))
+                self.logger.info("Opening: {}".format(f.filename))
                 with z.open(f) as csvfile:
                     reader = csv.DictReader(io.TextIOWrapper(csvfile), fieldnames=self.fields)
                     rowcount = 0

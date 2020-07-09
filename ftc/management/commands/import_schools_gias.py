@@ -2,6 +2,7 @@ import datetime
 import re
 
 from requests_html import HTMLSession
+import requests_cache
 
 from ftc.management.commands._base_scraper import AREA_TYPES, CSVScraper
 from ftc.models import Organisation
@@ -56,7 +57,6 @@ class Command(CSVScraper):
     orgtypes = ['Education']
 
     def set_session(self, install_cache=False):
-        from requests_html import HTMLSession
         if install_cache:
             self.logger.info("Using requests_cache")
             requests_cache.install_cache('http_cache')
@@ -66,10 +66,9 @@ class Command(CSVScraper):
         self.files = {}
         for u in self.start_urls:
             response = self.session.get(u)
-            for l in response.html.links:
-                if self.gias_regex.match(l):
-                    self.files[l] = self.session.get(l)
-
+            for link in response.html.links:
+                if self.gias_regex.match(link):
+                    self.files[link] = self.session.get(link)
 
     def depluralise(self, s):
         if not isinstance(s, str):
@@ -142,8 +141,8 @@ class Command(CSVScraper):
     def get_locations(self, record):
         locations = []
         for f in self.location_fields:
-            code = record.get(f+" (code)", "")
-            name = record.get(f+" (name)", "")
+            code = record.get(f + " (code)", "")
+            name = record.get(f + " (name)", "")
 
             if name == "" and code == "":
                 continue
@@ -156,7 +155,7 @@ class Command(CSVScraper):
 
             locations.append({
                 "id": code,
-                "name": record.get(f+" (name)"),
+                "name": record.get(f + " (name)"),
                 "geoCode": code,
                 "geoCodeType": AREA_TYPES.get(code[0:3], f),
             })
