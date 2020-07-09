@@ -82,7 +82,6 @@ class Command(CSVScraper):
         management.call_command("update_orgids")
 
     def set_session(self, install_cache=False):
-        from requests_html import HTMLSession
         if install_cache:
             self.logger.info("Using requests_cache")
             requests_cache.install_cache('http_cache')
@@ -92,13 +91,13 @@ class Command(CSVScraper):
         self.files = {}
         for u in self.start_urls:
             response = self.session.get(u)
-            for l in response.html.absolute_links:
-                if self.zip_regex.match(l):
-                    self.logger.info("Fetching: {}".format(l))
+            for link in response.html.absolute_links:
+                if self.zip_regex.match(link):
+                    self.logger.info("Fetching: {}".format(link))
                     try:
-                        self.files[l] = self.session.get(l)
+                        self.files[link] = self.session.get(link)
                     except requests.exceptions.ChunkedEncodingError as err:
-                        self.logger.error("Error fetching: {}".format(l))
+                        self.logger.error("Error fetching: {}".format(link))
                         self.logger.error(str(err))
 
     def parse_file(self, response, source_url):
@@ -109,7 +108,6 @@ class Command(CSVScraper):
                 with z.open(f) as csvfile:
                     reader = csv.DictReader(
                         io.TextIOWrapper(csvfile, encoding='latin1'))
-                    rowcount = 0
                     for row in tqdm.tqdm(reader):
                         # We only want data from a subset of companies
                         if row.get("CompanyCategory") not in self.orgtypes:

@@ -1,6 +1,8 @@
 import os
 import re
 
+from requests import Response
+from requests_html import HTMLSession
 import requests_mock
 from django.test import TestCase
 
@@ -18,10 +20,20 @@ class TestImportCompanies(TestCase):
                 "http://download.companieshouse.gov.uk/BasicCompanyData-")
             m.get(matcher, content=a.read())
 
-    def test_import_companies(self):
+    def test_set_session(self):
+        command = Command()
+
+        assert hasattr(command, 'session') is False
+        command.set_session()
+        assert hasattr(command, 'session') is True
+        assert isinstance(command.session, HTMLSession)
+
+    def test_fetch_file(self):
         command = Command()
 
         with requests_mock.Mocker() as m:
             self.mock_csv_downloads(m)
+            command.set_session()
             command.fetch_file()
-            print(command.files)
+            assert len(command.files) == 6
+            assert isinstance(list(command.files.values())[0], Response)

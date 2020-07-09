@@ -1,8 +1,4 @@
-import os
-import re
 from unittest import TestCase
-
-import requests_mock
 
 from ftc.documents import FullOrganisation
 from ftc.models import Organisation
@@ -11,7 +7,7 @@ from ftc.models import Organisation
 
 
 class TestDocuments(TestCase):
-    
+
     def test_fullorganisation_sortname(self):
         names = (
             ('the charity the name', 'charity the name'),
