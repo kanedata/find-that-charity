@@ -134,7 +134,7 @@ class Command(CSVScraper):
         )
 
     def close_spider(self):
-        # super(Command, self).close_spider()
+        super(Command, self).close_spider()
         self.records = None
         self.link_records = None
 
