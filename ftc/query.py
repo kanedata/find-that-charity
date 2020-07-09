@@ -1,7 +1,7 @@
 import copy
 
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Func, Q
+from django.db.models import Count, F, Func
 from elasticsearch_dsl import A
 
 from ftc.documents import DSEPaginator, FullOrganisation
@@ -90,7 +90,7 @@ class OrganisationSearch:
     def set_criteria(self, term=None, base_orgtype=None, other_orgtypes=None, source=None, active=None, domain=None, postcode=None):
         if term and isinstance(term, str):
             self.term = term
-        
+
         for t, k in [
             (base_orgtype, 'base_orgtype'),
             (other_orgtypes, 'other_orgtypes'),
@@ -101,13 +101,13 @@ class OrganisationSearch:
                     setattr(self, k, t.split("+"))
                 elif isinstance(t, list):
                     setattr(self, k, t)
-        
-        if active == True or active == False:
+
+        if active is True or active is False:
             self.active = active
-        
+
         if isinstance(domain, str):
             self.domain = domain
-        
+
         if isinstance(domain, str):
             self.postcode = postcode
 
@@ -218,7 +218,7 @@ class OrganisationSearch:
             db_filter["source__id__in"] = self.source
         if self.term:
             db_filter['name__search'] = self.term
-        if self.active == True or self.active == False:
+        if self.active is True or self.active is False:
             db_filter['active'] = self.active
 
         self.query = Organisation.objects.filter(

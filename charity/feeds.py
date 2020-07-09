@@ -1,11 +1,11 @@
 from django.contrib.syndication.views import Feed
-from django.urls import reverse
 from django.utils.feedgenerator import Atom1Feed
 from requests_html import HTMLSession
 
 from charity.models import CcewDataFile
 
 CCEW_DATA_URL = "http://data.charitycommission.gov.uk/"
+
 
 def fetch_ccew_data():
     session = HTMLSession()

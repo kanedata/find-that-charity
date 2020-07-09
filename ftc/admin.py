@@ -87,4 +87,3 @@ admin.site.register(ftc.OrganisationLink, JSONFieldAdmin)
 admin.site.register(ftc.Source, SourceAdmin)
 admin.site.register(ftc.Scrape, ScrapeAdmin)
 admin.site.register(ftc.OrgidScheme, JSONFieldAdmin)
-

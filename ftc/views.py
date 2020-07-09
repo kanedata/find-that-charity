@@ -1,18 +1,15 @@
 import csv
 
-from django.core.paginator import Paginator
-from django.db.models import Count, F, Func, Q
-from django.forms.models import model_to_dict
+from django.db.models import Count, F, Func
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
 
-from ftc.documents import DSEPaginator, FullOrganisation
+from ftc.documents import FullOrganisation
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
                         Source)
 from ftc.query import OrganisationSearch, random_query
-from reconcile.query import recon_query
 
 
 # site homepage
@@ -26,16 +23,17 @@ def index(request):
     by_orgtype = orgs.annotate(
         orgtype=Func(
             F('organisationType'),
-            function='unnest')
-        ).values('orgtype').annotate(
-            records=Count('*')
-        ).order_by('-records')
+            function='unnest'
+        )
+    ).values('orgtype').annotate(
+        records=Count('*')
+    ).order_by('-records')
     by_source = Source.objects.all().annotate(
         records=Count('organisations')
     ).order_by('-records')
 
     context = dict(
-        examples = {
+        examples={
             'registered-charity-england-and-wales': 'GB-CHC-1177548',
             'registered-charity-scotland': 'GB-SC-SC007427',
             'registered-charity-northern-ireland': 'GB-NIC-104226',
@@ -57,7 +55,7 @@ def org_search(request):
         s.set_criteria(term=request.GET['q'])
     if 'orgtype' in request.GET and request.GET.get('orgtype') != 'all':
         s.set_criteria(base_orgtype=request.GET.get('orgtype'))
-        
+
     s.run_es(with_pagination=True, with_aggregation=False)
     page_number = request.GET.get('page')
     page_obj = s.paginator.get_page(page_number)
@@ -69,23 +67,10 @@ def org_search(request):
     })
 
 
-def search_organisations(criteria, use_pagination=True, search_source='elasticsearch'):
-    if search_source not in ('elasticsearch', 'db'):
-        raise ValueError("Search source must be elasticsearch or db")
-
-    if search_source == 'elasticsearch':
-        query_template, params = recon_query(
-            query,
-            orgtype=orgtype,
-        )
-        q = FullOrganisation.search().from_dict(query_template)
-        result = q.execute(params=params)
-        paginator = DSEPaginator(result, 25)
-
 def get_orgid(request, org_id, filetype="html", preview=False):
     orgs = get_list_or_404(Organisation, linked_orgs__contains=[org_id])
     org = RelatedOrganisation(orgs)
-    if filetype=="json":
+    if filetype == "json":
         return JsonResponse({
             "org": org.to_json()
         })
@@ -97,7 +82,7 @@ def get_orgid(request, org_id, filetype="html", preview=False):
 def get_random_org(request):
     """ Get a random charity record
     """
-    filetype = request.GET.get("filetype", "html")
+    # filetype = request.GET.get("filetype", "html")
     active = request.GET.get("active", False)
     q = FullOrganisation.search().from_dict(random_query(active, "registered-charity"))[0]
     result = q.execute()
@@ -117,8 +102,8 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         query['base_query'] = get_object_or_404(OrganisationType, slug=orgtype)
         query['orgtype'].append(orgtype)
         s.set_criteria(base_orgtype=orgtype)
-        download_url = reverse('orgid_type_download', 
-                                kwargs={'orgtype': orgtype})
+        download_url = reverse('orgid_type_download',
+                               kwargs={'orgtype': orgtype})
     elif source:
         query['base_query'] = get_object_or_404(Source, id=source)
         query['source'].append(source)

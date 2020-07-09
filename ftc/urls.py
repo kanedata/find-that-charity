@@ -19,8 +19,8 @@ from . import views
 
 urlpatterns = [
     path('random', views.get_random_org, name='random_org'),
-    path('type/<slug:orgtype>.csv', views.orgid_type, 
-        {'filetype': 'csv'}, name='orgid_type_download'),
+    path('type/<slug:orgtype>.csv', views.orgid_type,
+         {'filetype': 'csv'}, name='orgid_type_download'),
     path('type/<slug:orgtype>.html', views.orgid_type),
     path('type/<slug:orgtype>', views.orgid_type, name='orgid_type'),
     path('source/<str:source>.csv', views.orgid_type,

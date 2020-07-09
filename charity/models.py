@@ -3,8 +3,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.text import slugify
 
-from ftc.models import Scrape
-
 
 class Charity(models.Model):
     id = models.CharField(max_length=200, primary_key=True)
@@ -29,7 +27,7 @@ class Charity(models.Model):
     spending = models.BigIntegerField(null=True, blank=True)
     latest_fye = models.DateField(null=True, blank=True)
     dual_registered = models.BooleanField(null=True, blank=True)
-    
+
     areas_of_operation = models.ManyToManyField('AreaOfOperation')
     classification = models.ManyToManyField('VocabularyEntries')
 
@@ -121,6 +119,7 @@ class CharityFinancial(models.Model):
     def __str__(self):
         return "{} {}".format(self.charity.name, self.fyend)
 
+
 class CharityRaw(models.Model):
     org_id = models.CharField(max_length=200, db_index=True)
     spider = models.CharField(max_length=200, db_index=True)
@@ -139,6 +138,7 @@ class CharityRaw(models.Model):
     def __str__(self):
         return "{} {}".format(self.spider, self.org_id)
 
+
 class AreaOfOperation(models.Model):
     aootype = models.CharField(max_length=1)
     aookey = models.IntegerField()
@@ -151,7 +151,7 @@ class AreaOfOperation(models.Model):
     ISO3166_1_3 = models.CharField(verbose_name="ISO3166-1 country code (3 character)", max_length=3, null=True, blank=True, db_index=True)
     ISO3166_2_GB = models.CharField(verbose_name="ISO3166-2 region code (GB only)", max_length=6, null=True, blank=True, db_index=True)
     ContinentCode = models.CharField(verbose_name="Continent", max_length=2, null=True, blank=True, db_index=True)
-    
+
     class Meta:
         unique_together = ('aootype', 'aookey',)
         verbose_name = 'Area of operation'
@@ -194,6 +194,7 @@ class VocabularyEntries(models.Model):
             return self.title
         return "[{}] {}".format(self.code, self.title)
 
+
 class CcewDataFile(models.Model):
     title = models.CharField(max_length=500, db_index=True, unique=True)
     url = models.URLField()
@@ -210,10 +211,10 @@ class CcewDataFile(models.Model):
     class Meta:
         verbose_name = 'Charity Commission data file'
         verbose_name_plural = 'Charity Commission data files'
-        
+
 
 class CCEWCharity(models.Model):
-    regno = models.CharField(db_index=True, max_length=255)  #	     integer 	    registered number of a charity
+    regno = models.CharField(db_index=True, max_length=255)  # integer 	    registered number of a charity
     # integer 	    subsidiary number of a charity (may be 0 for main/group charity)
     subno = models.IntegerField(db_index=True)
     # varchar(150) 	main name of the charity
@@ -230,12 +231,12 @@ class CCEWCharity(models.Model):
     nhs = models.CharField(max_length=255, null=True, blank=True)
     # varchar(20) 	Housing Association number
     ha_no = models.CharField(max_length=255, null=True, blank=True)
-    corr = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(70) 	Charity correspondent name
-    add1 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
-    add2 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
-    add3 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
-    add4 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
-    add5 = models.CharField(max_length=255, null=True, blank=True)  #	     varchar(35) 	address line of charity's correspondent
+    corr = models.CharField(max_length=255, null=True, blank=True)  # varchar(70) 	Charity correspondent name
+    add1 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
+    add2 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
+    add3 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
+    add4 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
+    add5 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
     # varchar(8) 	postcode of charity's correspondent
     postcode = models.CharField(max_length=255, null=True, blank=True)
     # varchar(23) 	telephone of charity's correspondent
@@ -272,7 +273,7 @@ class CCEWName(models.Model):
     # integer 	    subsidiary number of a charity (may be 0 for main/group charity)
     subno = models.IntegerField(db_index=True)
     nameno = models.IntegerField()  # integer 	    number identifying a charity name
-    name = models.CharField(max_length=255)   #     varchar(150) 	name of a charity (multiple occurrences possible)
+    name = models.CharField(max_length=255)  # varchar(150) 	name of a charity (multiple occurrences possible)
 
 
 class CCEWRegistration(models.Model):
@@ -280,7 +281,7 @@ class CCEWRegistration(models.Model):
     regno = models.CharField(db_index=True, max_length=255)
     # integer 	    subsidiary number of a charity (may be 0 for main/group charity)
     subno = models.IntegerField(db_index=True)
-    regdate = models.DateField() #    datetime 	    date of registration for a charity
+    regdate = models.DateField()  # datetime 	    date of registration for a charity
     # datetime 	    Removal date of a charity - Blank for Registered Charities
     remdate = models.DateField(null=True, blank=True)
     # varchar(3) 	    Register removal reason code
@@ -290,8 +291,8 @@ class CCEWRegistration(models.Model):
 class CCEWCharityAOO(models.Model):
     # integer 	    registered number of a charity
     regno = models.CharField(db_index=True, max_length=255)
-    aootype = models.CharField(max_length=255) # 	    char(1) 	    A B or D
-    aookey = models.IntegerField() # 	    integer 	    up to three digits
+    aootype = models.CharField(max_length=255)  # char(1) 	    A B or D
+    aookey = models.IntegerField()  # integer 	    up to three digits
     # char(1) 	    Flag: Y or blank
     welsh = models.CharField(max_length=255, null=True, blank=True)
     # integer 	    may be blank. If aootype=D then holds continent; if aootype=B then holds GLA/met county
@@ -312,10 +313,10 @@ class CCEWObjects(models.Model):
 class CCEWFinancial(models.Model):
     # integer 	registered number of a charity
     regno = models.CharField(db_index=True, max_length=255)
-    fystart = models.DateField() # 	datetime 	Charity's financial year start date
+    fystart = models.DateField()  # datetime 	Charity's financial year start date
     # datetime 	Charity's financial year end date
     fyend = models.DateField(db_index=True)
-    income = models.BigIntegerField(null=True, blank=True) # 	integer 	
+    income = models.BigIntegerField(null=True, blank=True)  # integer
     expend = models.BigIntegerField(null=True, blank=True)  # integer
 
 

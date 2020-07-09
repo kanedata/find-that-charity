@@ -1,7 +1,7 @@
 import re
 
 from django.http import JsonResponse
-from django.shortcuts import get_list_or_404, get_object_or_404, render
+from django.shortcuts import render
 
 from ftc.models import Organisation, RelatedOrganisation
 

@@ -1,15 +1,12 @@
-import copy
 import json
-import os
 import urllib.parse
 
 from django.http import Http404, JsonResponse
 from django.shortcuts import reverse
 from django.views.decorators.csrf import csrf_exempt
-from elasticsearch_dsl.query import Match, MultiMatch
 
 from ftc.documents import FullOrganisation
-from ftc.models import Organisation, OrganisationType
+from ftc.models import Organisation
 from reconcile.query import do_extend_query, do_reconcile_query
 
 
@@ -73,6 +70,7 @@ def service_spec(request):
         }
     }
 
+
 @csrf_exempt
 def propose_properties(request):
     type_ = request.GET.get("type", "Organization")
@@ -93,7 +91,7 @@ def suggest(request, orgtype="all"):
     SUGGEST_NAME = 'name_complete'
 
     prefix = request.GET.get("prefix")
-    cursor = request.GET.get("cursor")
+    # cursor = request.GET.get("cursor")
     if not prefix:
         raise Http404("Prefix must be supplied")
     q = FullOrganisation.search()
@@ -119,8 +117,8 @@ def suggest(request, orgtype="all"):
     return JsonResponse({
         "result": [
             {
-                "id": r["_source"]["org_id"], 
-                "name": r["_source"]["name"], 
+                "id": r["_source"]["org_id"],
+                "name": r["_source"]["name"],
                 "url": request.build_absolute_uri(
                     reverse('orgid_html', kwargs={"org_id": r["_source"]["org_id"]})
                 ),

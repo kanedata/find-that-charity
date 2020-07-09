@@ -7,10 +7,9 @@ def bulk_upsert(model, fields, values, by):
     """
     Return the tuple of (inserted, updated) ids
     """
-    result = (None, None)
 
-    def comma_separated(l):
-        return '"' + '", "'.join(l) + '"'
+    def comma_separated(items):
+        return '"' + '", "'.join(items) + '"'
 
     if values:
         stmt = """
@@ -20,7 +19,6 @@ def bulk_upsert(model, fields, values, by):
             DO
             UPDATE SET ({set_fields})=({set_values})
         """
-        table_name = model._meta.db_table
         set_fields = ', '.join([f for f in fields if f != by])
         set_values = ', '.join(['EXCLUDED.{0}'.format(f) for f in fields if f != by])
         values_placeholders = ('%s, ' * len(fields))[:-2]

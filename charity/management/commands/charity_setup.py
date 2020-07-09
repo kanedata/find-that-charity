@@ -5,9 +5,7 @@ import string
 import requests
 from django.core.management.base import BaseCommand
 
-from charity.models import (AreaOfOperation, Charity, CharityFinancial,
-                            CharityName, Vocabulary, VocabularyEntries)
-from ftc.management.commands._base_scraper import CSVScraper
+from charity.models import AreaOfOperation, Vocabulary, VocabularyEntries
 
 
 class Command(BaseCommand):
@@ -19,13 +17,12 @@ class Command(BaseCommand):
         self.fetch_icnptso()
         self.fetch_aoo()
 
-
     def fetch_cc_classifications(self):
         ccew = 'https://github.com/drkane/charity-lookups/raw/master/classification/ccew.csv'
-        
+
         for r in self.get_csv(ccew):
             v, _ = Vocabulary.objects.update_or_create(
-                title="ccew_" + r['category'], 
+                title="ccew_" + r['category'],
                 defaults=dict(single=False)
             )
             VocabularyEntries.objects.update_or_create(
@@ -39,7 +36,7 @@ class Command(BaseCommand):
     def fetch_icnpo(self):
         icnpo = 'https://github.com/drkane/charity-lookups/raw/master/classification/icnpo.csv'
         v, _ = Vocabulary.objects.update_or_create(
-            title="International Classification of Non Profit Organisations (ICNPO)", 
+            title="International Classification of Non Profit Organisations (ICNPO)",
             defaults=dict(single=False)
         )
         icnpo_cats = []
@@ -72,7 +69,7 @@ class Command(BaseCommand):
     def fetch_icnptso(self):
         icnptso = 'https://github.com/drkane/charity-lookups/raw/master/classification/icnptso.csv'
         v, _ = Vocabulary.objects.update_or_create(
-            title="International Classification of Non-profit and Third Sector Organizations (ICNP/TSO)", 
+            title="International Classification of Non-profit and Third Sector Organizations (ICNP/TSO)",
             defaults=dict(single=False)
         )
         cache = {}
@@ -96,8 +93,8 @@ class Command(BaseCommand):
             )
             cache[code] = ve
 
-    def fetch_ntee(self):
-        ntee = 'https://github.com/drkane/charity-lookups/raw/master/classification/ntee.csv'
+    # def fetch_ntee(self):
+    #     ntee = 'https://github.com/drkane/charity-lookups/raw/master/classification/ntee.csv'
 
     def fetch_aoo(self):
         aoo = 'https://github.com/drkane/charity-lookups/raw/master/cc-aoo-gss-iso.csv'
@@ -110,7 +107,7 @@ class Command(BaseCommand):
             if r.get("master"):
                 master = cache[(
                     string.ascii_letters[string.ascii_letters.index(code[0]) + 1],
-                    r["master"], 
+                    r["master"],
                 )]
             for k, v in r.items():
                 if v == "":
@@ -121,7 +118,7 @@ class Command(BaseCommand):
                 defaults={
                     'aooname': r.get("aooname"),
                     'aoosort': r.get("aoosort"),
-                    'welsh': r.get("welsh")=="Y",
+                    'welsh': r.get("welsh") == "Y",
                     'master': master,
                     'GSS': r.get("GSS"),
                     'ISO3166_1': r.get("ISO3166-1"),

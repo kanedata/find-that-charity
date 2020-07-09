@@ -1,6 +1,4 @@
 import datetime
-import operator
-from collections import defaultdict
 
 from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.indexes import GinIndex
@@ -10,32 +8,33 @@ from django.utils.text import slugify
 from django_better_admin_arrayfield.models.fields import ArrayField
 
 IGNORE_DOMAINS = (
-	'gmail.com', 'hotmail.com', 'btinternet.com',
-	'hotmail.co.uk', 'yahoo.co.uk', 'outlook.com',
-	'aol.com', 'btconnect.com', 'yahoo.com',
-	'googlemail.com', 'ntlworld.com',
-	'talktalk.net',
-	'sky.com',
-	'live.co.uk',
-	'ntlworld.com',
-	'tiscali.co.uk',
-	'icloud.com',
-	'btopenworld.com',
-	'blueyonder.co.uk',
-	'virginmedia.com',
-	'nhs.net',
-	'me.com',
-	'msn.com',
-	'talk21.com',
-	'aol.co.uk',
-	'mail.com',
-	'live.com',
-	'virgin.net',
-	'ymail.com',
-	'mac.com',
-	'waitrose.com',
-	'gmail.co.uk'
+    'gmail.com', 'hotmail.com', 'btinternet.com',
+    'hotmail.co.uk', 'yahoo.co.uk', 'outlook.com',
+    'aol.com', 'btconnect.com', 'yahoo.com',
+    'googlemail.com', 'ntlworld.com',
+    'talktalk.net',
+    'sky.com',
+    'live.co.uk',
+    'ntlworld.com',
+    'tiscali.co.uk',
+    'icloud.com',
+    'btopenworld.com',
+    'blueyonder.co.uk',
+    'virginmedia.com',
+    'nhs.net',
+    'me.com',
+    'msn.com',
+    'talk21.com',
+    'aol.co.uk',
+    'mail.com',
+    'live.com',
+    'virgin.net',
+    'ymail.com',
+    'mac.com',
+    'waitrose.com',
+    'gmail.co.uk'
 )
+
 
 class Orgid(str):
 
@@ -53,6 +52,7 @@ class Orgid(str):
         if len(split_orgid) > 2:
             self.scheme = "-".join(split_orgid[:2])
             self.id = "-".join(split_orgid[2:])
+
 
 class OrgidField(models.CharField):
 
@@ -163,8 +163,7 @@ class Organisation(models.Model):
 
     def org_links(self):
         return OrganisationLink.objects.filter(
-            models.Q(org_id_a=self.org_id) |
-            models.Q(org_id_b=self.org_id)
+            models.Q(org_id_a=self.org_id) | models.Q(org_id_b=self.org_id)
         )
 
     def get_priority(self):
@@ -235,6 +234,7 @@ class OrganisationType(models.Model):
     def __str__(self):
         return self.title
 
+
 class OrganisationLink(models.Model):
     org_id_a = OrgidField(max_length=255, db_index=True)
     org_id_b = OrgidField(max_length=255, db_index=True)
@@ -252,6 +252,7 @@ class OrganisationLink(models.Model):
 
     def __str__(self):
         return "From {} to {}".format(self.org_id_a, self.org_id_b)
+
 
 class Source(models.Model):
     id = models.CharField(max_length=200, unique=True,
@@ -272,6 +273,7 @@ class Source(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Scrape(models.Model):
 
@@ -297,6 +299,7 @@ class Scrape(models.Model):
             self.status,
             self.start_time
         )
+
 
 class OrgidScheme(models.Model):
 
@@ -326,6 +329,7 @@ class OrgidScheme(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.code, self.data.get("name", {}).get("en"))
+
 
 class RelatedOrganisation:
 
@@ -448,7 +452,7 @@ class RelatedOrganisation:
         return list(
             set([
                 self.names.get(n.lower().strip(), n)
-                for n in names 
+                for n in names
                 if n.lower().strip() != self.name.lower().strip()
             ])
         )
@@ -500,7 +504,7 @@ class RelatedOrganisation:
         if len(self.orgIDs) > 1:
             if request:
                 obj["sameAs"] = [request.build_absolute_uri(
-                    l) for l in self.sameAs]
+                    id) for id in self.sameAs]
             else:
                 obj["sameAs"] = self.sameAs
         return obj
@@ -514,7 +518,7 @@ class RelatedOrganisation:
             "postalCode",
         ]
         orgtypes = [
-            y for y in 
+            y for y in
             self.get_all('organisationType')
         ]
         orgtypes = [o.title for o in OrganisationType.objects.filter(slug__in=orgtypes)]

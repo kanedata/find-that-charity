@@ -1,27 +1,18 @@
 # -*- coding: utf-8 -*-
-import csv
-import datetime
-import io
 import os
-import pickle
 import re
 import tempfile
 import zipfile
-from collections import defaultdict
 
 import bcp
 import psycopg2
-import redis
 import tqdm
 from django.db import connection
-from django.utils.text import slugify
 
-from charity.management.commands._bulk_upsert import bulk_upsert
 from charity.management.commands._ccew_sql import UPDATE_CCEW
 from charity.models import (
-    AreaOfOperation, CCEWCharity, CCEWCharityAOO, CCEWClass, CCEWFinancial,
-    CCEWMainCharity, CCEWName, CCEWObjects, CCEWPartB, CCEWRegistration,
-    Charity, CharityFinancial, CharityName, CharityRaw)
+    CCEWCharity, CCEWCharityAOO, CCEWClass, CCEWFinancial,
+    CCEWMainCharity, CCEWName, CCEWObjects, CCEWPartB, CCEWRegistration)
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation, OrganisationLink, Scrape
 
@@ -75,73 +66,73 @@ class Command(HTMLScraper):
     }
     ccew_files = {
         'extract_charity': [
-            "regno", #	     integer 	    registered number of a charity
-            "subno", #	     integer 	    subsidiary number of a charity (may be 0 for main/group charity)
-            "name", #	     varchar(150) 	main name of the charity
-            "orgtype", #	 varchar(2) 	R (registered) or RM (removed)
-            "gd", #	         varchar(250) 	Description of Governing Document
-            "aob", #	     varchar(175) 	area of benefit - may not be defined
-            "aob_defined", # char(1) 	    area of benefit defined by Governing Document (T/F)
-            "nhs", #         char(1) 	    NHS charity (T/F)
-            "ha_no", #	     varchar(20) 	Housing Association number
-            "corr", #	     varchar(70) 	Charity correspondent name
-            "add1", #	     varchar(35) 	address line of charity's correspondent
-            "add2", #	     varchar(35) 	address line of charity's correspondent
-            "add3", #	     varchar(35) 	address line of charity's correspondent
-            "add4", #	     varchar(35) 	address line of charity's correspondent
-            "add5", #	     varchar(35) 	address line of charity's correspondent
-            "postcode", #	 varchar(8) 	postcode of charity's correspondent
-            "phone", #	     varchar(23) 	telephone of charity's correspondent
-            "fax", #	     varchar(23) 	fax of charity's correspondent
+            "regno",  # integer      registered number of a charity
+            "subno",  # integer      subsidiary number of a charity (may be 0 for main/group charity)
+            "name",  # varchar(150)  main name of the charity
+            "orgtype",  # varchar(2)  R (registered) or RM (removed)
+            "gd",  # varchar(250)  Description of Governing Document
+            "aob",  # varchar(175)  area of benefit - may not be defined
+            "aob_defined",  # char(1)      area of benefit defined by Governing Document (T/F)
+            "nhs",  # char(1)      NHS charity (T/F)
+            "ha_no",  # varchar(20)  Housing Association number
+            "corr",  # varchar(70)  Charity correspondent name
+            "add1",  # varchar(35)  address line of charity's correspondent
+            "add2",  # varchar(35)  address line of charity's correspondent
+            "add3",  # varchar(35)  address line of charity's correspondent
+            "add4",  # varchar(35)  address line of charity's correspondent
+            "add5",  # varchar(35)  address line of charity's correspondent
+            "postcode",  # varchar(8)  postcode of charity's correspondent
+            "phone",  # varchar(23)  telephone of charity's correspondent
+            "fax",  # varchar(23)  fax of charity's correspondent
         ],
         'extract_main_charity': [
-            "regno", # 	    integer 	    registered number of a charity
-            "coyno", # 	    integer 	    company registration number
-            "trustees", # 	char(1) 	    trustees incorporated (T/F)
-            "fyend", # 	    char(4) 	    Financial year end
-            "welsh", # 	    char(1) 	    requires correspondence in both Welsh & English (T/F)
-            "incomedate", # datetime 	    date for latest gross income (blank if income is an estimate)
-            "income", # 	integer
-            "grouptype", # 	varchar(4) 	    may be blank
-            "email", # 	    varchar(255) 	email address
-            "web", # 	    varchar(255) 	website address
+            "regno",  # integer      registered number of a charity
+            "coyno",  # integer      company registration number
+            "trustees",  # char(1)      trustees incorporated (T/F)
+            "fyend",  # char(4)      Financial year end
+            "welsh",  # char(1)      requires correspondence in both Welsh & English (T/F)
+            "incomedate",  # datetime      date for latest gross income (blank if income is an estimate)
+            "income",  # integer
+            "grouptype",  # varchar(4)      may be blank
+            "email",  # varchar(255)  email address
+            "web",  # varchar(255)  website address
         ],
         'extract_name': [
-            "regno",  # 	integer 	    registered number of a charity
-            "subno",  # 	integer 	    subsidiary number of a charity (may be 0 for main/group charity)
-            "nameno", #  	integer 	    number identifying a charity name
-            "name",   #     varchar(150) 	name of a charity (multiple occurrences possible)
+            "regno",  # integer      registered number of a charity
+            "subno",  # integer      subsidiary number of a charity (may be 0 for main/group charity)
+            "nameno",  # integer      number identifying a charity name
+            "name",   # varchar(150)  name of a charity (multiple occurrences possible)
         ],
         'extract_registration': [
-            "regno", #   	integer 	    registered number of a charity
-            "subno", #   	integer 	    subsidiary number of a charity (may be 0 for main/group charity)
-            "regdate", #    datetime 	    date of registration for a charity
-            "remdate", #    datetime 	    Removal date of a charity - Blank for Registered Charities
-            "remcode", #    varchar(3) 	    Register removal reason code
+            "regno",  # integer      registered number of a charity
+            "subno",  # integer      subsidiary number of a charity (may be 0 for main/group charity)
+            "regdate",  # datetime      date of registration for a charity
+            "remdate",  # datetime      Removal date of a charity - Blank for Registered Charities
+            "remcode",  # varchar(3)      Register removal reason code
         ],
         'extract_charity_aoo': [
-            "regno", # 	    integer 	    registered number of a charity
-            "aootype", # 	char(1) 	    A B or D
-            "aookey", # 	integer 	    up to three digits
-            "welsh", # 	    char(1) 	    Flag: Y or blank
-            "master", # 	integer 	    may be blank. If aootype=D then holds continent; if aootype=B then holds GLA/met county
+            "regno",  # integer      registered number of a charity
+            "aootype",  # char(1)      A B or D
+            "aookey",  # integer      up to three digits
+            "welsh",  # char(1)      Flag: Y or blank
+            "master",  # integer      may be blank. If aootype=D then holds continent; if aootype=B then holds GLA/met county
         ],
         'extract_objects': [
-            "regno",  # 	integer 	    registered number of a charity
-            "subno",  # 	integer 	    subsidiary number of a charity (may be 0 for main/group charity)
-            "seqno",  # 	char(4) 	    sequence number (in practice 0-20)
-            "object", #  	varchar(255) 	Description of objects of a charity
+            "regno",  # integer      registered number of a charity
+            "subno",  # integer      subsidiary number of a charity (may be 0 for main/group charity)
+            "seqno",  # char(4)      sequence number (in practice 0-20)
+            "object",  # varchar(255)  Description of objects of a charity
         ],
         'extract_financial': [
-            "regno", # 	integer 	registered number of a charity
-            "fystart", # 	datetime 	Charity's financial year start date
-            "fyend", # 	datetime 	Charity's financial year end date
-            "income", # 	integer 	
-            "expend", # 	integer
+            "regno",  # integer  registered number of a charity
+            "fystart",  # datetime  Charity's financial year start date
+            "fyend",  # datetime  Charity's financial year end date
+            "income",  # integer
+            "expend",  # integer
         ],
         "extract_class": [
-            "regno", # integer 	registered number of a charity
-            "class", # integer 	classification code for a charity(multiple occurrences possible)
+            "regno",  # integer  registered number of a charity
+            "class",  # integer  classification code for a charity(multiple occurrences possible)
         ],
         "extract_partb": [
             "regno",
@@ -202,16 +193,16 @@ class Command(HTMLScraper):
     ]
 
     def parse_file(self, response, source_urls):
-        for l in response.html.absolute_links:
-            if not self.zip_regex.match(l):
+        for link in response.html.absolute_links:
+            if not self.zip_regex.match(link):
                 continue
-            r = self.session.get(l)
-            self.logger.info("Using file: {}".format(l))
+            r = self.session.get(link)
+            self.logger.info("Using file: {}".format(link))
             self.process_zip(r)
 
     def process_zip(self, response):
         self.logger.info("File size: {}".format(len(response.content)))
-        
+
         with tempfile.TemporaryDirectory() as tmpdirname:
             cczip_name = os.path.join(tmpdirname, 'ccew.zip')
             files = {}
@@ -249,16 +240,16 @@ class Command(HTMLScraper):
                 if not row.get("regno"):
                     continue
                 yield [k] + list(row.values())
-        
+
         with connection.cursor() as cursor:
             bcpreader = bcp.DictReader(bcpfile, fieldnames=fields)
             self.logger.info('Starting table insert [{}]'.format(
                 db_table._meta.db_table))
             db_table.objects.all().delete()
             psycopg2.extras.execute_values(
-                cursor, 
-                """INSERT INTO {} VALUES %s;""".format(db_table._meta.db_table), 
-                get_data(bcpreader), 
+                cursor,
+                """INSERT INTO {} VALUES %s;""".format(db_table._meta.db_table),
+                get_data(bcpreader),
                 page_size=page_size
             )
             self.logger.info('Finished table insert [{}]'.format(

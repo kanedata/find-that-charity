@@ -1,5 +1,4 @@
 import datetime
-import re
 
 from django.db import connection
 from django.templatetags.static import static

@@ -3,8 +3,8 @@ import re
 import titlecase
 
 VOWELS = re.compile("[AEIOUYaeiouy]")
-ORD_NUMBERS_RE = re.compile("([0-9]+(?:st|nd|rd|th))")
-SENTENCE_SPLIT = re.compile("(\. )")
+ORD_NUMBERS_RE = re.compile(r"([0-9]+(?:st|nd|rd|th))")
+SENTENCE_SPLIT = re.compile(r"(\. )")
 
 
 def title_exceptions(word, **kwargs):
@@ -75,16 +75,16 @@ def regex_search(s, regex):
     return re.search(regex, s) is not None
 
 
-def list_to_string(l, sep=", ", final_sep=" and "):
-    if not isinstance(l, list):
-        return l
+def list_to_string(items, sep=", ", final_sep=" and "):
+    if not isinstance(items, list):
+        return items
 
-    if len(l) == 1:
-        return l[0]
-    elif len(l) == 2:
-        return final_sep.join(l)
+    if len(items) == 1:
+        return items[0]
+    elif len(items) == 2:
+        return final_sep.join(items)
     else:
-        return sep.join(l[0:-1]) + final_sep + l[-1]
+        return sep.join(items[0:-1]) + final_sep + items[-1]
 
 
 def url_replace(request, **kwargs):

@@ -8,7 +8,7 @@ from django.db import connection
 
 from charity.management.commands._oscr_sql import UPDATE_OSCR
 from charity.models import CharityRaw
-from ftc.management.commands._base_scraper import AREA_TYPES, CSVScraper
+from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation
 
 
@@ -83,7 +83,7 @@ class Command(CSVScraper):
             org_types.append(self.add_org_type(record.get("Regulatory Type")))
         if record.get("Designated religious body") == "Yes":
             org_types.append(self.add_org_type("Designated religious body"))
-        
+
         if record.get("Constitutional Form") == "SCIO (Scottish Charitable Incorporated Organisation)":
             org_types.append(self.add_org_type("Scottish Charitable Incorporated Organisation"))
         elif record.get("Constitutional Form") == "CIO (Charitable Incorporated Organisation, E&W)":
@@ -124,7 +124,7 @@ class Command(CSVScraper):
                 "dateRegistered": record.get("Registered Date"),
                 "dateRemoved": record.get("Ceased Date"),
                 "active": record.get("Charity Status") != "Removed",
-                "parent": record.get("Parent Charity Name"), # @TODO: More sophisticated getting of parent charities here
+                "parent": record.get("Parent Charity Name"),  # @TODO: More sophisticated getting of parent charities here
                 "orgIDs": org_ids,
                 "scrape": self.scrape,
                 "source": self.source,
