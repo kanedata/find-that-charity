@@ -13,6 +13,7 @@ from django.utils.text import slugify
 
 from ftc.models import (Organisation, OrganisationLink, OrganisationType,
                         OrgidScheme, Scrape, Source)
+from ftc.management.commands._db_logger import ScrapeHandler
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
@@ -64,6 +65,7 @@ class BaseScraper(BaseCommand):
         self.scrape = Scrape(
             status=Scrape.ScrapeStatus.RUNNING,
             spider=self.name,
+            log='',
         )
         self.scrape.save()
         self.object_count = 0
@@ -71,7 +73,15 @@ class BaseScraper(BaseCommand):
         self.orgtype_cache = {}
         self.records = []
         self.link_records = []
+
+        # set up logging
         self.logger = logging.getLogger("ftc.{}".format(self.name))
+        scrape_logger = ScrapeHandler(self.scrape)
+        scrape_log_format = logging.Formatter('{levelname} {asctime} [{name}] {message}', style='{')
+        scrape_logger.setFormatter(scrape_log_format)
+        scrape_logger.setLevel(logging.INFO)
+        self.logger.addHandler(scrape_logger)
+
         self.post_sql = {
             "update_domains": UPDATE_DOMAINS
         }
@@ -90,6 +100,18 @@ class BaseScraper(BaseCommand):
         self.session = requests.Session()
 
     def handle(self, *args, **options):
+        try:
+            self.run_scraper(*args, **options)
+        except Exception as err:
+            self.logger.exception(err)
+            if self.object_count == 0:
+                self.scrape.status = Scrape.ScrapeStatus.FAILED
+            else:
+                self.scrape.status = Scrape.ScrapeStatus.ERRORS
+            self.scrape.save()
+            raise
+
+    def run_scraper(self, *args, **options):
         # set up cache if we're caching
         self.set_session(options.get("cache"))
 
