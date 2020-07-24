@@ -10,6 +10,6 @@ class ScrapeHandler(logging.StreamHandler):
     def emit(self, record):
         msg = self.format(record)
         self.scrape.log += msg + '\n'
-        if record.levelno in (logging.ERROR, logging.CRITICAL):
+        if record.levelno in (logging.WARNING, logging.ERROR, logging.CRITICAL):
             self.scrape.errors += 1
         self.scrape.save()
