@@ -16,6 +16,8 @@ from ftc.management.commands._db_logger import ScrapeHandler
 
 from .models import Organisation, RelatedOrganisation, Scrape
 
+REQUEST_TIMEOUT = 3600
+
 
 class SearchWithTemplate(Search):
     def execute(self, ignore_cache=False, params=None):
@@ -193,7 +195,7 @@ class FullOrganisation(Document):
         if self.django.queryset_pagination and "chunk_size" not in kwargs:
             kwargs["chunk_size"] = self.django.queryset_pagination
         return bulk(
-            client=self._get_connection(), actions=actions, request_timeout=60, **kwargs
+            client=self._get_connection(), actions=actions, request_timeout=REQUEST_TIMEOUT, **kwargs
         )
 
     def _bulk(self, *args, **kwargs):
@@ -241,7 +243,7 @@ class FullOrganisation(Document):
 
         # delete any items where the load_id isn't the current one
         self.logger.info("Deleting previous objects")
-        s = self.search().exclude("term", loadID=self.scrape.id).params(timeout="2h")
+        s = self.search().exclude("term", loadID=self.scrape.id).params(timeout="2h", request_timeout=REQUEST_TIMEOUT)
         try:
             response = s.delete()
         except Exception as err:
