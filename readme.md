@@ -1,13 +1,13 @@
 Find that charity
 ================
 
-Elasticsearch-powered search engine for looking for charities. Allows for:
+Elasticsearch-powered search engine for looking for charities and other non-profit organisations. Allows for:
 
-- importing data from England and Wales, Scotland, and Northern Ireland, ensuring that duplicates
+- importing data nearly 20 sources in the UK, ensuring that duplicates
   are matched to one record.
 - An elasticsearch index that can be queried.
-- [Org-ids](http://org-id.guide/about) are added to charities.
-- Reconciliation API for searching charity, based on an optimised search query.
+- [Org-ids](http://org-id.guide/about) are added to organisations.
+- Reconciliation API for searching organisations, based on an optimised search query.
 - Facility for uploading a CSV of charity names and adding the (best guess) at a
   charity number.
 - HTML pages for searching for a charity
@@ -15,13 +15,19 @@ Elasticsearch-powered search engine for looking for charities. Allows for:
 Installation
 ------------
 
-1. [Clone repository](https://github.com/TechforgoodCAST/find-that-charity)
+1. [Clone repository](https://github.com/drkane/find-that-charity)
 2. Create virtual environment (`python -m venv env`)
 3. Activate virtual environment (`env/bin/activate` or `env/Scripts\activate`)
 4. Install requirements (`pip install -r requirements.txt`)
-5. [Install elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html)
-6. Start elasticsearch
-7. Create elasticsearch index (`python data_import/create_elasticsearch.py`)
+5. [Install postgres](https://www.postgresql.org/download/)
+6. Start postgres
+7. [Install elasticsearch 7](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html) - you may need to increase available memory (see below)
+8. Start elasticsearch
+9. Create `.env` file in root directory. Contents based on `.env.example`.
+10. Import data on charities (`python ./manage.py import_charities`)
+11. Import data on nonprofit companies (`python ./manage.py import_companies`)
+12. Import data on other non-profit organisations (`python ./manage.py import_all`)
+13. Add organisations to elasticsearch index (`python ./manage.py search_index --populate -f`)
 
 Dokku Installation
 ------------------
@@ -34,28 +40,32 @@ SSH into server and run:
 # create app
 dokku apps:create find-that-charity
 
-# add permanent data storage
-dokku storage:mount find-that-charity /var/lib/dokku/data/storage/find-that-charity:/data
+# postgres
+sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git postgres
+dokku postgres:create find-that-charity-db
+dokku postgres:link find-that-charity-db find-that-charity
 
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
 export ELASTICSEARCH_IMAGE="elasticsearch"
-export ELASTICSEARCH_IMAGE_VERSION="2.4"
+export ELASTICSEARCH_IMAGE_VERSION="7.7"
 dokku elasticsearch:create find-that-charity-es
 dokku elasticsearch:link find-that-charity-es find-that-charity
+# configure elasticsearch 7:
+# https://github.com/dokku/dokku-elasticsearch/issues/72#issuecomment-510771763
+
+# setup elasticsearch increased memory (might be needed)
+nano /var/lib/dokku/services/elasticsearch/ftc-es/config/jvm.options
+# replace `-Xms512m` with `-Xms2g`
+# replace `-Xms512m` with `-Xmx2g`
+# restart elasticsearch
+dokku elasticsearch:restart find-that-charity-es
 
 # SSL
 sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
 dokku config:set --no-restart find-that-charity DOKKU_LETSENCRYPT_EMAIL=your@email.tld
 dokku letsencrypt find-that-charity
 dokku letsencrypt:cron-job --add
-
-# create app storage
-mkdir -p /var/lib/dokku/data/storage/ftc-uploads
-chown -R dokku:dokku /var/lib/dokku/data/storage/ftc-uploads
-chown -R 32767:32767 /var/lib/dokku/data/storage/ftc-uploads
-dokku storage:mount find-that-charity /var/lib/dokku/data/storage/ftc-uploads:/app/data
-dokku config:set find-that-charity FOLDER=/app/data
 ```
 
 ### 2. Add as a git remote and push
@@ -73,9 +83,10 @@ On Dokku server run:
 
 ```bash
 # setup and run import
-dokku run find-that-charity python data_import/create_elasticsearch.py
-dokku run find-that-charity python data_import/fetch_data.py --folder '/data'
-dokku run find-that-charity python data_import/import_data.py --folder '/data'
+dokku run find-that-charity python ./manage.py import_charities
+dokku run find-that-charity python ./manage.py import_companies
+dokku run find-that-charity python ./manage.py import_all
+dokku run find-that-charity python ./manage.py search_index --populate -f
 ```
 
 ### 4. Set up scheduled task for running tasks on a regular basis
@@ -86,7 +97,7 @@ On dokku server add a cron file at `/etc/cron.d/find-that-charity`
 nano /etc/cron.d/find-that-charity
 ```
 
-Then paste in the file contents, and press `CTRL+X` then `Y` to save.
+Then paste in the [file contents](crontab), and press `CTRL+X` then `Y` to save.
 
 File contents:
 
@@ -110,13 +121,17 @@ SHELL=/bin/bash
 
 ### PLACE ALL CRON TASKS BELOW
 
-# fetch latest charity data from the regulators
-# run at 2am on the 13th of the month
-0 2 13 * * dokku dokku run find-that-charity python data_import/fetch_data.py --folder '/app/data'
+# import charities
+0 2 * * 5 dokku dokku --rm run ftc python ./manage.py import_charities
+0 4 * * 5 dokku dokku --rm run ftc python ./manage.py search_index --populate -f
 
-# import latest charity data
-# run at 4am on the 13th of the month
-0 4 13 * * dokku dokku run find-that-charity python data_import/import_data.py --folder '/app/data'
+# import companies
+0 2 * * 6 dokku dokku --rm run ftc python ./manage.py import_companies
+0 4 * * 6 dokku dokku --rm run ftc python ./manage.py search_index --populate -f
+
+# import everything else
+0 2 * * 0 dokku dokku --rm run ftc python ./manage.py import_all
+0 4 * * 0 dokku dokku --rm run ftc python ./manage.py search_index --populate -f
 
 ### PLACE ALL CRON TASKS ABOVE, DO NOT REMOVE THE WHITESPACE AFTER THIS LINE
 ```
@@ -127,63 +142,9 @@ Fetching data
 This step fetches data on charities in England, Wales and Scotland. The command
 is run using the following command:
 
-`python data_import/fetch_data.py --oscr <path/to/oscr/zip/file.zip>`
-
-### Office of the Scottish Charity Regulator (OSCR)
-
-OSCR data needs to be manually downloaded from the [OSCR website](https://www.oscr.org.uk/about-charities/search-the-register/charity-register-download)
-in order to accept the terms and conditions. Once downloaded the path needs to
-be passed to `data_import/fetch_data.py` using the `--oscr` flag.
-
-### Charity Commission for England and Wales
-
-Data on charities in England and Wales will be fetched from <http://data.charitycommission.gov.uk/>.
-If a different URL is needed then use the `--ccew` flag.
-
-The latest .ZIP file will be downloaded and unzipped, and the data contained
-will be converted from `.bcp` files to `.csv`.
-
-### Charity Commission for Northern Ireland
-
-Data on charities in Northern Ireland will be fetched from <http://www.charitycommissionni.org.uk/charity-search/> (Open Government Licence)
-If a different URL is needed then pass it to the `--ccni` flag when running `import/fetch_data.py`
-
-The latest .CSV file (updated daily) will be downloaded to /data.
-
-"Other names" for Northern Ireland charities are not contained in the downloadable CSV, but are in the information presented on the CCNI website. The other names are maintained [in this list](https://gist.github.com/BobHarper1/2687545c562b47bc755aef2e9e0de537) which will be downloaded. To use another file, pass url to `--ccni_extra`.
-
-### Dual registered charities
-
-A list of [dual registered charities](https://gist.github.com/drkane/22d62e07346084fafdcc7d9f5e1cd661/raw/bec666d1bc5c6efb8503a90f76ac0c6236ebc183/dual-registered-uk-charities.csv)
-will be downloaded from github. To use another file pass an url to `--dual`.
-
-The list is CSV file with a line per pair of England and Wales/Scottish charities
-in the format:
-
-```csv
-"Scottish Charity Number","E&W Charity Number","Charity Name (E&W)"
-"SC002327","263710","Shelter, National Campaign for Homeless People Limited"
+```sh
+python ./manage.py import_charities
 ```
-
-To add more charities fork the to the [Github gist](https://gist.github.com/drkane/22d62e07346084fafdcc7d9f5e1cd661)
-and add a comment to the original gist.
-
-Postcode data
--------------
-
-You can also add postcode data from <https://github.com/drkane/es-postcodes> to
-allow for geographic-based searching. If you host the postcode elasticsearch
-index on the same host it can be used at the `import_data.py` stage.
-
-Importing data
---------------
-
-Once the data has been fetched the needed files are stored `data/` directory.
-You can then run the `python data_import/import_data.py` script to import it.
-
-By default the script will look for an elasticsearch instance at <localhost:9200>,
-use `python data_import/import_data.py --help` to see the available options. To use the
-postcode elasticsearch index you need to pass `--es-pc-host localhost`.
 
 ### Data model
 
@@ -225,10 +186,10 @@ The data is imported into elasticsearch in the following format:
 Server
 ------
 
-The server uses [bottle](http://bottlepy.org/docs/dev/). Run it with the
+The server uses [django](https://www.djangoproject.com/). Run it with the
 following command:
 
-`python server/server.py --host localhost --port 8080`
+`python ./manage.py runserver`
 
 The server offers the following API endpoints:
 
@@ -254,37 +215,3 @@ Future development:
 
 - upload a CSV file and reconcile each row with a charity
 - allow updating a charity with additional possible names
-=======
-
-
-# Setup steps
-
-## first time setup
-
-```sh
-python manage.py createcachetable
-```
-
-## Import organisations
-
-```sh
-python ./manage.py import_companies
-python ./manage.py import_charities
-python ./manage.py import_all
-```
-
-## Populate the elasticsearch index
-
-run
-
-https://github.com/dokku/dokku-elasticsearch/issues/72 - set up es 7.X
-
-```sh
-python ./manage.py search_index --rebuild --no-count
-
-# or
-
-python ./manage.py search_index --populate --no-count
-```
-
-
