@@ -10,53 +10,98 @@ import ftc.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ftc', '0002_auto_20200624_2135'),
+        ("ftc", "0002_auto_20200624_2135"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organisation',
-            name='alternateName',
-            field=django_better_admin_arrayfield.models.fields.ArrayField(base_field=models.CharField(blank=True, max_length=255), blank=True, null=True, size=None, verbose_name='Other names'),
+            model_name="organisation",
+            name="alternateName",
+            field=django_better_admin_arrayfield.models.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=255),
+                blank=True,
+                null=True,
+                size=None,
+                verbose_name="Other names",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='linked_orgs',
-            field=django_better_admin_arrayfield.models.fields.ArrayField(base_field=models.CharField(blank=True, max_length=100), blank=True, null=True, size=None, verbose_name='Linked organisations'),
+            model_name="organisation",
+            name="linked_orgs",
+            field=django_better_admin_arrayfield.models.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=100),
+                blank=True,
+                null=True,
+                size=None,
+                verbose_name="Linked organisations",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='orgIDs',
-            field=django_better_admin_arrayfield.models.fields.ArrayField(base_field=ftc.models.OrgidField(blank=True, max_length=200), blank=True, null=True, size=None, verbose_name='Other organisation identifiers'),
+            model_name="organisation",
+            name="orgIDs",
+            field=django_better_admin_arrayfield.models.fields.ArrayField(
+                base_field=ftc.models.OrgidField(blank=True, max_length=200),
+                blank=True,
+                null=True,
+                size=None,
+                verbose_name="Other organisation identifiers",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='organisationType',
-            field=django_better_admin_arrayfield.models.fields.ArrayField(base_field=models.CharField(blank=True, max_length=255), blank=True, null=True, size=None, verbose_name='Other organisation types'),
+            model_name="organisation",
+            name="organisationType",
+            field=django_better_admin_arrayfield.models.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=255),
+                blank=True,
+                null=True,
+                size=None,
+                verbose_name="Other organisation types",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='organisationTypePrimary',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organisations', to='ftc.OrganisationType', verbose_name='Primary organisation type'),
+            model_name="organisation",
+            name="organisationTypePrimary",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="organisations",
+                to="ftc.OrganisationType",
+                verbose_name="Primary organisation type",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='scrape',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organisations', to='ftc.Scrape'),
+            model_name="organisation",
+            name="scrape",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="organisations",
+                to="ftc.Scrape",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='source',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organisations', to='ftc.Source'),
+            model_name="organisation",
+            name="source",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="organisations",
+                to="ftc.Source",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisationlink',
-            name='scrape',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organisation_links', to='ftc.Scrape'),
+            model_name="organisationlink",
+            name="scrape",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="organisation_links",
+                to="ftc.Scrape",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisationlink',
-            name='source',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organisation_links', to='ftc.Source'),
+            model_name="organisationlink",
+            name="source",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="organisation_links",
+                to="ftc.Source",
+            ),
         ),
     ]

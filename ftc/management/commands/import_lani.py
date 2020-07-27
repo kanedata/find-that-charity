@@ -6,8 +6,8 @@ from ftc.models import Organisation
 
 
 class Command(CSVScraper):
-    name = 'lani'
-    allowed_domains = ['register.gov.uk']
+    name = "lani"
+    allowed_domains = ["register.gov.uk"]
     start_urls = [
         "https://local-authority-nir.register.gov.uk/records.csv?page-size=5000"
     ]
@@ -35,11 +35,11 @@ class Command(CSVScraper):
             {
                 "downloadURL": "",
                 "accessURL": "https://www.registers.service.gov.uk/registers/local-authority-nir/",
-                "title": "Local authorites in Northern Ireland register"
+                "title": "Local authorites in Northern Ireland register",
             }
         ],
     }
-    orgtypes = ['Local Authority']
+    orgtypes = ["Local Authority"]
 
     def parse_row(self, record):
 
@@ -49,12 +49,12 @@ class Command(CSVScraper):
             self.orgtype_cache["local-authority"],
         ]
 
-        if record.get('local-authority-type'):
+        if record.get("local-authority-type"):
             org_types.append(
                 self.add_org_type(
                     LA_TYPES.get(
                         record.get("local-authority-type"),
-                        record.get("local-authority-type")
+                        record.get("local-authority-type"),
                     )
                 )
             )
@@ -64,34 +64,36 @@ class Command(CSVScraper):
         # @TODO: map local authority code to GSS to add locations
 
         self.records.append(
-            Organisation(**{
-                "org_id": self.get_org_id(record),
-                "name": record.get("name"),
-                "charityNumber": None,
-                "companyNumber": None,
-                "streetAddress": None,
-                "addressLocality": None,
-                "addressRegion": None,
-                "addressCountry": "Northern Ireland",
-                "postalCode": None,
-                "telephone": None,
-                "alternateName": [],
-                "email": None,
-                "description": None,
-                "organisationType": [o.slug for o in org_types],
-                "organisationTypePrimary": org_types[0],
-                "url": record.get("website"),
-                "location": locations,
-                "latestIncome": None,
-                "dateModified": datetime.datetime.now(),
-                "dateRegistered": record.get("start-date"),
-                "dateRemoved": record.get("end-date"),
-                "active": record.get("end-date") is None,
-                "parent": None,
-                "orgIDs": org_ids,
-                "scrape": self.scrape,
-                "source": self.source,
-                "spider": self.name,
-                "org_id_scheme": self.orgid_scheme,
-            })
+            Organisation(
+                **{
+                    "org_id": self.get_org_id(record),
+                    "name": record.get("name"),
+                    "charityNumber": None,
+                    "companyNumber": None,
+                    "streetAddress": None,
+                    "addressLocality": None,
+                    "addressRegion": None,
+                    "addressCountry": "Northern Ireland",
+                    "postalCode": None,
+                    "telephone": None,
+                    "alternateName": [],
+                    "email": None,
+                    "description": None,
+                    "organisationType": [o.slug for o in org_types],
+                    "organisationTypePrimary": org_types[0],
+                    "url": record.get("website"),
+                    "location": locations,
+                    "latestIncome": None,
+                    "dateModified": datetime.datetime.now(),
+                    "dateRegistered": record.get("start-date"),
+                    "dateRemoved": record.get("end-date"),
+                    "active": record.get("end-date") is None,
+                    "parent": None,
+                    "orgIDs": org_ids,
+                    "scrape": self.scrape,
+                    "source": self.source,
+                    "spider": self.name,
+                    "org_id_scheme": self.orgid_scheme,
+                }
+            )
         )

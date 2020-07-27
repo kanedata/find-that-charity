@@ -11,9 +11,15 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 from django.utils.text import slugify
 
-from ftc.models import (Organisation, OrganisationLink, OrganisationType,
-                        OrgidScheme, Scrape, Source)
 from ftc.management.commands._db_logger import ScrapeHandler
+from ftc.models import (
+    Organisation,
+    OrganisationLink,
+    OrganisationType,
+    OrgidScheme,
+    Scrape,
+    Source,
+)
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
@@ -63,9 +69,7 @@ class BaseScraper(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.scrape = Scrape(
-            status=Scrape.ScrapeStatus.RUNNING,
-            spider=self.name,
-            log='',
+            status=Scrape.ScrapeStatus.RUNNING, spider=self.name, log="",
         )
         self.scrape.save()
         self.object_count = 0
@@ -77,26 +81,24 @@ class BaseScraper(BaseCommand):
         # set up logging
         self.logger = logging.getLogger("ftc.{}".format(self.name))
         scrape_logger = ScrapeHandler(self.scrape)
-        scrape_log_format = logging.Formatter('{levelname} {asctime} [{name}] {message}', style='{')
+        scrape_log_format = logging.Formatter(
+            "{levelname} {asctime} [{name}] {message}", style="{"
+        )
         scrape_logger.setFormatter(scrape_log_format)
         scrape_logger.setLevel(logging.INFO)
         self.logger.addHandler(scrape_logger)
 
-        self.post_sql = {
-            "update_domains": UPDATE_DOMAINS
-        }
+        self.post_sql = {"update_domains": UPDATE_DOMAINS}
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--cache',
-            action='store_true',
-            help='Cache request',
+            "--cache", action="store_true", help="Cache request",
         )
 
     def set_session(self, install_cache=False):
         if install_cache:
             self.logger.info("Using requests_cache")
-            requests_cache.install_cache('http_cache')
+            requests_cache.install_cache("http_cache")
         self.session = requests.Session()
 
     def handle(self, *args, **options):
@@ -116,10 +118,9 @@ class BaseScraper(BaseCommand):
         self.set_session(options.get("cache"))
 
         # set up orgidscheme object
-        if hasattr(self, 'org_id_prefix'):
+        if hasattr(self, "org_id_prefix"):
             self.orgid_scheme, _ = OrgidScheme.objects.get_or_create(
-                code=self.org_id_prefix,
-                defaults={'data': {}},
+                code=self.org_id_prefix, defaults={"data": {}},
             )
 
         # save any orgtypes
@@ -143,8 +144,9 @@ class BaseScraper(BaseCommand):
         self.logger.info("Processing files")
         for u, f in self.files.items():
             self.parse_file(f, u)
-        self.logger.info("Files processed. Found {:,.0f} records".format(
-            self.object_count))
+        self.logger.info(
+            "Files processed. Found {:,.0f} records".format(self.object_count)
+        )
 
         # get any link records that need to be created
         self.logger.info("Getting link records")
@@ -158,21 +160,26 @@ class BaseScraper(BaseCommand):
     def close_spider(self):
         self.object_count += len(self.records)
         self.scrape.items = self.object_count
-        results = {
-            "records": self.object_count
-        }
+        results = {"records": self.object_count}
         if self.records:
-            self.logger.info("Saving {:,.0f} organisation records".format(len(self.records)))
+            self.logger.info(
+                "Saving {:,.0f} organisation records".format(len(self.records))
+            )
             Organisation.objects.bulk_create(self.records)
-            self.logger.info("Saved {:,.0f} organisation records".format(len(self.records)))
+            self.logger.info(
+                "Saved {:,.0f} organisation records".format(len(self.records))
+            )
 
         if self.link_records:
-            results['link_records'] = len(self.link_records)
-            self.object_count += results['link_records']
-            self.logger.info("Saving {:,.0f} link records".format(results['link_records']))
+            results["link_records"] = len(self.link_records)
+            self.object_count += results["link_records"]
+            self.logger.info(
+                "Saving {:,.0f} link records".format(results["link_records"])
+            )
             OrganisationLink.objects.bulk_create(self.link_records)
-            self.logger.info("Saved {:,.0f} link records".format(
-                results['link_records']))
+            self.logger.info(
+                "Saved {:,.0f} link records".format(results["link_records"])
+            )
         self.scrape.errors = self.error_count
         self.scrape.result = results
         if self.object_count == 0:
@@ -186,14 +193,10 @@ class BaseScraper(BaseCommand):
         # if we've been successfull then delete previous items
         if self.object_count > 0:
             self.logger.info("Deleting previous records")
-            Organisation.objects.filter(
-                spider__exact=self.name,
-            ).exclude(
+            Organisation.objects.filter(spider__exact=self.name,).exclude(
                 scrape_id=self.scrape.id,
             ).delete()
-            OrganisationLink.objects.filter(
-                spider__exact=self.name,
-            ).exclude(
+            OrganisationLink.objects.filter(spider__exact=self.name,).exclude(
                 scrape_id=self.scrape.id,
             ).delete()
             self.logger.info("Deleted previous records")
@@ -210,17 +213,18 @@ class BaseScraper(BaseCommand):
         if len(self.records) >= self.bulk_limit:
             self.object_count += len(self.records)
             self.logger.info(
-                "Saving {:,.0f} organisation records".format(len(self.records)))
+                "Saving {:,.0f} organisation records".format(len(self.records))
+            )
             Organisation.objects.bulk_create(self.records)
             self.logger.info(
                 "Saved {:,.0f} organisation records ({:,.0f} total)".format(
-                    len(self.records),
-                    self.object_count,
-                ))
+                    len(self.records), self.object_count,
+                )
+            )
             self.records = []
 
     def save_sources(self):
-        if hasattr(self, 'source'):
+        if hasattr(self, "source"):
             sources = [self.source]
         else:
             # No sources found
@@ -228,14 +232,11 @@ class BaseScraper(BaseCommand):
 
         for s in sources:
             # fix datetimes
-            for f in ['issued', 'modified']:
+            for f in ["issued", "modified"]:
                 if not s.get(f):
                     s[f] = datetime.datetime.now().strftime("%Y-%m-%d")
             self.source, _ = Source.objects.update_or_create(
-                id=s['identifier'],
-                defaults={
-                    'data': s
-                }
+                id=s["identifier"], defaults={"data": s}
             )
 
     def fetch_file(self):
@@ -284,7 +285,8 @@ class BaseScraper(BaseCommand):
                 try:
                     if record.get(f):
                         record[f] = datetime.datetime.strptime(
-                            record.get(f).strip(), date_format)
+                            record.get(f).strip(), date_format
+                        )
                 except ValueError:
                     record[f] = None
 
@@ -292,36 +294,36 @@ class BaseScraper(BaseCommand):
             elif f in self.bool_fields:
                 if isinstance(record[f], str):
                     val = record[f].lower().strip()
-                    if val in ['f', 'false', 'no', '0']:
+                    if val in ["f", "false", "no", "0"]:
                         record[f] = False
-                    elif val in ['t', 'true', 'yes', '1']:
+                    elif val in ["t", "true", "yes", "1"]:
                         record[f] = True
 
             # strip string fields
             elif isinstance(record[f], str):
-                record[f] = record[f].strip().replace('\x00', '')
+                record[f] = record[f].strip().replace("\x00", "")
         return record
 
     def slugify(self, value):
         value = value.lower()
         # replace values in brackets
-        value = re.sub(r'\([0-9]+\)', "_", value).strip("_")
+        value = re.sub(r"\([0-9]+\)", "_", value).strip("_")
         # replace any non-alphanumeric characters
-        value = re.sub(r'[^0-9A-Za-z]+', "_", value).strip("_")
+        value = re.sub(r"[^0-9A-Za-z]+", "_", value).strip("_")
         return value
 
     def parse_company_number(self, coyno):
         if not coyno:
             return None
 
-        coyno = coyno.lstrip('0')
+        coyno = coyno.lstrip("0")
 
         coyno = coyno.strip()
         if coyno == "":
             return None
 
         # dummy company number sometimes used
-        if coyno.rjust(8, "0") in ('01234567', '12345678'):
+        if coyno.rjust(8, "0") in ("01234567", "12345678"):
             return None
 
         if coyno.isdigit():
@@ -329,7 +331,9 @@ class BaseScraper(BaseCommand):
 
         return coyno
 
-    def split_address(self, address_str, address_parts=3, separator=", ", get_postcode=True):
+    def split_address(
+        self, address_str, address_parts=3, separator=", ", get_postcode=True
+    ):
         """
         Split an address string into postcode and address parts
         Will produce an array of exactly `address_parts` length, with None
@@ -373,20 +377,41 @@ class BaseScraper(BaseCommand):
         if validators.url("http://%s" % url):
             return "http://%s" % url
 
-        if url in ["n.a", 'non.e', '.0', '-.-', '.none', '.nil', 'N/A', 'TBC',
-                   'under construction', '.n/a', '0.0', '.P', b'', 'no.website']:
+        if url in [
+            "n.a",
+            "non.e",
+            ".0",
+            "-.-",
+            ".none",
+            ".nil",
+            "N/A",
+            "TBC",
+            "under construction",
+            ".n/a",
+            "0.0",
+            ".P",
+            b"",
+            "no.website",
+        ]:
             return None
 
-        for i in ['http;//', 'http//', 'http.//', 'http:\\\\',
-                  'http://http://', 'www://', 'www.http://']:
-            url = url.replace(i, 'http://')
-        url = url.replace('http:/www', 'http://www')
+        for i in [
+            "http;//",
+            "http//",
+            "http.//",
+            "http:\\\\",
+            "http://http://",
+            "www://",
+            "www.http://",
+        ]:
+            url = url.replace(i, "http://")
+        url = url.replace("http:/www", "http://www")
 
-        for i in ['www,', ':www', 'www:', 'www/', 'www\\\\', '.www']:
-            url = url.replace(i, 'www.')
+        for i in ["www,", ":www", "www:", "www/", "www\\\\", ".www"]:
+            url = url.replace(i, "www.")
 
-        url = url.replace(',', '.')
-        url = url.replace('..', '.')
+        url = url.replace(",", ".")
+        url = url.replace("..", ".")
 
         if validators.url(url):
             return url
@@ -405,13 +430,13 @@ class BaseScraper(BaseCommand):
         # check for blank/empty
         # put in all caps
         postcode = postcode.strip().upper()
-        if postcode == '':
+        if postcode == "":
             return None
 
         # replace any non alphanumeric characters
-        postcode = re.sub('[^0-9a-zA-Z]+', '', postcode)
+        postcode = re.sub("[^0-9a-zA-Z]+", "", postcode)
 
-        if postcode == '':
+        if postcode == "":
             return None
 
         # check for nonstandard codes
@@ -431,15 +456,13 @@ class BaseScraper(BaseCommand):
 
     def add_org_type(self, orgtype):
         ot, _ = OrganisationType.objects.get_or_create(
-            slug=slugify(orgtype),
-            defaults=dict(title=orgtype),
+            slug=slugify(orgtype), defaults=dict(title=orgtype),
         )
         self.orgtype_cache[ot.slug] = ot
         return ot
 
 
 class CSVScraper(BaseScraper):
-
     def parse_file(self, response, source_url):
 
         try:
@@ -454,12 +477,12 @@ class CSVScraper(BaseScraper):
 
 
 class HTMLScraper(BaseScraper):
-
     def set_session(self, install_cache=False):
         from requests_html import HTMLSession
+
         if install_cache:
             self.logger.info("Using requests_cache")
-            requests_cache.install_cache('http_cache')
+            requests_cache.install_cache("http_cache")
         self.session = HTMLSession()
 
     def fetch_file(self):

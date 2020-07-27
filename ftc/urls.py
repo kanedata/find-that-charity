@@ -18,17 +18,30 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('random', views.get_random_org, name='random_org'),
-    path('type/<slug:orgtype>.csv', views.orgid_type,
-         {'filetype': 'csv'}, name='orgid_type_download'),
-    path('type/<slug:orgtype>.html', views.orgid_type),
-    path('type/<slug:orgtype>', views.orgid_type, name='orgid_type'),
-    path('source/<str:source>.csv', views.orgid_type,
-         {'filetype': 'csv'}, name='orgid_source_download'),
-    path('source/<str:source>.html', views.orgid_type),
-    path('source/<str:source>', views.orgid_type, name='orgid_source'),
-    path('<path:org_id>.json', views.get_orgid, {"filetype": "json"}),
-    path('<path:org_id>.html', views.get_orgid, {"filetype": "html"}),
-    path('<path:org_id>/preview', views.get_orgid, {"filetype": "html", "preview": True}, name='orgid_html_preview'),
-    path('<path:org_id>', views.get_orgid, {"filetype": "html"}, name='orgid_html'),
+    path("random", views.get_random_org, name="random_org"),
+    path(
+        "type/<slug:orgtype>.csv",
+        views.orgid_type,
+        {"filetype": "csv"},
+        name="orgid_type_download",
+    ),
+    path("type/<slug:orgtype>.html", views.orgid_type),
+    path("type/<slug:orgtype>", views.orgid_type, name="orgid_type"),
+    path(
+        "source/<str:source>.csv",
+        views.orgid_type,
+        {"filetype": "csv"},
+        name="orgid_source_download",
+    ),
+    path("source/<str:source>.html", views.orgid_type),
+    path("source/<str:source>", views.orgid_type, name="orgid_source"),
+    path("<path:org_id>.json", views.get_orgid, {"filetype": "json"}),
+    path("<path:org_id>.html", views.get_orgid, {"filetype": "html"}),
+    path(
+        "<path:org_id>/preview",
+        views.get_orgid,
+        {"filetype": "html", "preview": True},
+        name="orgid_html_preview",
+    ),
+    path("<path:org_id>", views.get_orgid, {"filetype": "html"}, name="orgid_html"),
 ]

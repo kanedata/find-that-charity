@@ -34,8 +34,8 @@ WAL_LAS = {
 
 
 class Command(HTMLScraper):
-    name = 'schools_wales'
-    allowed_domains = ['gov.wales']
+    name = "schools_wales"
+    allowed_domains = ["gov.wales"]
     start_urls = ["https://gov.wales/address-list-schools"]
     org_id_prefix = "GB-WALEDU"
     id_field = "School Number"
@@ -48,19 +48,12 @@ class Command(HTMLScraper):
         "license_name": "Open Government Licence v3.0",
         "issued": "",
         "modified": "",
-        "publisher": {
-            "name": "Welsh Government",
-            "website": "https://gov.wales/",
-        },
+        "publisher": {"name": "Welsh Government", "website": "https://gov.wales/",},
         "distribution": [
-            {
-                "downloadURL": "",
-                "accessURL": "",
-                "title": "Address list of schools"
-            }
+            {"downloadURL": "", "accessURL": "", "title": "Address list of schools"}
         ],
     }
-    orgtypes = ['Education']
+    orgtypes = ["Education"]
 
     def parse_file(self, response, source_url):
         link = list(response.html.find("div.document", first=True).absolute_links)[0]
@@ -71,7 +64,7 @@ class Command(HTMLScraper):
         r = self.session.get(link)
 
         wb = get_data(io.BytesIO(r.content))
-        for sheet in ['Maintained', 'Independent', 'PRU']:
+        for sheet in ["Maintained", "Independent", "PRU"]:
             headers = wb[sheet][0]
             data = wb[sheet][1:]
             for k, row in enumerate(data):
@@ -84,52 +77,62 @@ class Command(HTMLScraper):
 
         record = self.clean_fields(record)
 
-        address4 = ", ".join([
-            record.get("Address {}".format(f))
-            for f in [3, 4]
-            if record.get("Address {}".format(f))
-        ])
+        address4 = ", ".join(
+            [
+                record.get("Address {}".format(f))
+                for f in [3, 4]
+                if record.get("Address {}".format(f))
+            ]
+        )
         org_types = self.get_org_types(record)
 
         if not record.get("School Name") or not record.get("School Number"):
             return
 
         self.records.append(
-            Organisation(**{
-                "org_id": self.get_org_id(record),
-                "name": record.get("School Name"),
-                "charityNumber": None,
-                "companyNumber": None,
-                "streetAddress": record.get("Address 1"),
-                "addressLocality": record.get("Address 2"),
-                "addressRegion": address4,
-                "addressCountry": "Wales",
-                "postalCode": self.parse_postcode(record.get("Postcode")),
-                "telephone": record.get("Phone Number"),
-                "alternateName": [],
-                "email": None,
-                "description": None,
-                "organisationType": [o.slug for o in org_types],
-                "organisationTypePrimary": org_types[0],
-                "url": None,
-                "location": self.get_locations(record),
-                "latestIncome": None,
-                "dateModified": datetime.datetime.now(),
-                "dateRegistered": None,
-                "dateRemoved": None,
-                "active": True,
-                "parent": None,
-                "orgIDs": [self.get_org_id(record)],
-                "scrape": self.scrape,
-                "source": self.source,
-                "spider": self.name,
-                "org_id_scheme": self.orgid_scheme,
-            })
+            Organisation(
+                **{
+                    "org_id": self.get_org_id(record),
+                    "name": record.get("School Name"),
+                    "charityNumber": None,
+                    "companyNumber": None,
+                    "streetAddress": record.get("Address 1"),
+                    "addressLocality": record.get("Address 2"),
+                    "addressRegion": address4,
+                    "addressCountry": "Wales",
+                    "postalCode": self.parse_postcode(record.get("Postcode")),
+                    "telephone": record.get("Phone Number"),
+                    "alternateName": [],
+                    "email": None,
+                    "description": None,
+                    "organisationType": [o.slug for o in org_types],
+                    "organisationTypePrimary": org_types[0],
+                    "url": None,
+                    "location": self.get_locations(record),
+                    "latestIncome": None,
+                    "dateModified": datetime.datetime.now(),
+                    "dateRegistered": None,
+                    "dateRemoved": None,
+                    "active": True,
+                    "parent": None,
+                    "orgIDs": [self.get_org_id(record)],
+                    "scrape": self.scrape,
+                    "source": self.source,
+                    "spider": self.name,
+                    "org_id_scheme": self.orgid_scheme,
+                }
+            )
         )
 
     def get_org_types(self, record):
         org_types = []
-        for f in ["Sector", "Governance - see notes", "Welsh Medium Type - see notes", "School Type", "type"]:
+        for f in [
+            "Sector",
+            "Governance - see notes",
+            "Welsh Medium Type - see notes",
+            "School Type",
+            "type",
+        ]:
             if record.get(f):
                 if record.get(f) == "PRU":
                     org_types.append(self.add_org_type("Pupil Referral Unit"))
@@ -142,10 +145,12 @@ class Command(HTMLScraper):
         locations = []
         if WAL_LAS.get(record.get("Local Authority")):
             code = WAL_LAS.get(record.get("Local Authority"))
-            locations.append({
-                "id": code,
-                "name": record.get("Local Authority"),
-                "geoCode": code,
-                "geoCodeType": AREA_TYPES.get(code[0:3], "Local Authority"),
-            })
+            locations.append(
+                {
+                    "id": code,
+                    "name": record.get("Local Authority"),
+                    "geoCode": code,
+                    "geoCodeType": AREA_TYPES.get(code[0:3], "Local Authority"),
+                }
+            )
         return locations

@@ -6,8 +6,8 @@ from ftc.models import Organisation
 
 
 class Command(CSVScraper):
-    name = 'las'
-    allowed_domains = ['register.gov.uk']
+    name = "las"
+    allowed_domains = ["register.gov.uk"]
     start_urls = [
         "https://local-authority-sct.register.gov.uk/records.csv?page-size=5000"
     ]
@@ -27,19 +27,16 @@ class Command(CSVScraper):
         "license_name": "Open Government Licence v3.0",
         "issued": "",
         "modified": "",
-        "publisher": {
-            "name": "Scottish Government",
-            "website": "https://gov.scot/",
-        },
+        "publisher": {"name": "Scottish Government", "website": "https://gov.scot/",},
         "distribution": [
             {
                 "downloadURL": "",
                 "accessURL": "https://www.registers.service.gov.uk/registers/local-authority-sct/",
-                "title": "Local authorites in Scotland register"
+                "title": "Local authorites in Scotland register",
             }
         ],
     }
-    orgtypes = ['Local Authority']
+    orgtypes = ["Local Authority"]
 
     def parse_row(self, record):
 
@@ -49,10 +46,14 @@ class Command(CSVScraper):
             self.orgtype_cache["local-authority"],
         ]
 
-        if record.get('local-authority-type'):
+        if record.get("local-authority-type"):
             org_types.append(
-                self.add_org_type(LA_TYPES.get(record.get(
-                    "local-authority-type"), record.get("local-authority-type")))
+                self.add_org_type(
+                    LA_TYPES.get(
+                        record.get("local-authority-type"),
+                        record.get("local-authority-type"),
+                    )
+                )
             )
         org_ids = [self.get_org_id(record)]
 
@@ -60,34 +61,36 @@ class Command(CSVScraper):
         # @TODO: map local authority code to GSS to add locations
 
         self.records.append(
-            Organisation(**{
-                "org_id": self.get_org_id(record),
-                "name": record.get("official-name"),
-                "charityNumber": None,
-                "companyNumber": None,
-                "streetAddress": None,
-                "addressLocality": None,
-                "addressRegion": None,
-                "addressCountry": "Scotland",
-                "postalCode": None,
-                "telephone": None,
-                "alternateName": [],
-                "email": None,
-                "description": None,
-                "organisationType": [o.slug for o in org_types],
-                "organisationTypePrimary": org_types[0],
-                "url": None,
-                "location": locations,
-                "latestIncome": None,
-                "dateModified": datetime.datetime.now(),
-                "dateRegistered": record.get("start-date"),
-                "dateRemoved": record.get("end-date"),
-                "active": record.get("end-date") is None,
-                "parent": None,
-                "orgIDs": org_ids,
-                "scrape": self.scrape,
-                "source": self.source,
-                "spider": self.name,
-                "org_id_scheme": self.orgid_scheme,
-            })
+            Organisation(
+                **{
+                    "org_id": self.get_org_id(record),
+                    "name": record.get("official-name"),
+                    "charityNumber": None,
+                    "companyNumber": None,
+                    "streetAddress": None,
+                    "addressLocality": None,
+                    "addressRegion": None,
+                    "addressCountry": "Scotland",
+                    "postalCode": None,
+                    "telephone": None,
+                    "alternateName": [],
+                    "email": None,
+                    "description": None,
+                    "organisationType": [o.slug for o in org_types],
+                    "organisationTypePrimary": org_types[0],
+                    "url": None,
+                    "location": locations,
+                    "latestIncome": None,
+                    "dateModified": datetime.datetime.now(),
+                    "dateRegistered": record.get("start-date"),
+                    "dateRemoved": record.get("end-date"),
+                    "active": record.get("end-date") is None,
+                    "parent": None,
+                    "orgIDs": org_ids,
+                    "scrape": self.scrape,
+                    "source": self.source,
+                    "spider": self.name,
+                    "org_id_scheme": self.orgid_scheme,
+                }
+            )
         )

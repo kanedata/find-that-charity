@@ -63,7 +63,7 @@ class Command(BaseCommand):
             update ftc_organisation 
             set linked_orgs = string_to_array(org_id, '')
             where linked_orgs is null;
-        """
+        """,
     }
 
     def __init__(self, *args, **kwargs):

@@ -5,9 +5,9 @@ from ftc.models import Organisation
 
 
 class Command(CSVScraper):
-    help = 'Import Government Organisations Register'
-    name = 'gor'
-    allowed_domains = ['register.gov.uk']
+    help = "Import Government Organisations Register"
+    name = "gor"
+    allowed_domains = ["register.gov.uk"]
     start_urls = [
         "https://government-organisation.register.gov.uk/records.csv?page-size=5000"
     ]
@@ -35,11 +35,11 @@ class Command(CSVScraper):
             {
                 "downloadURL": "",
                 "accessURL": "https://www.registers.service.gov.uk/registers/government-organisation/",
-                "title": "Government organisations on GOV.UK register"
+                "title": "Government organisations on GOV.UK register",
             }
         ],
     }
-    orgtypes = ['Government Organisation']
+    orgtypes = ["Government Organisation"]
 
     def parse_row(self, record):
 
@@ -61,7 +61,9 @@ class Command(CSVScraper):
                     "email": None,
                     "description": None,
                     "organisationType": list(self.orgtype_cache.keys()),
-                    "organisationTypePrimary": self.orgtype_cache["government-organisation"],
+                    "organisationTypePrimary": self.orgtype_cache[
+                        "government-organisation"
+                    ],
                     "url": record.get("website"),
                     "location": [],
                     "latestIncome": None,

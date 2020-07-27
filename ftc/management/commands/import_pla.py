@@ -5,8 +5,8 @@ from ftc.models import Organisation
 
 
 class Command(CSVScraper):
-    name = 'pla'
-    allowed_domains = ['register.gov.uk']
+    name = "pla"
+    allowed_domains = ["register.gov.uk"]
     start_urls = [
         "https://principal-local-authority.register.gov.uk/records.csv?page-size=5000"
     ]
@@ -26,20 +26,17 @@ class Command(CSVScraper):
         "license_name": "Open Government Licence v3.0",
         "issued": "",
         "modified": "",
-        "publisher": {
-            "name": "Welsh Government",
-            "website": "https://gov.wales/",
-        },
+        "publisher": {"name": "Welsh Government", "website": "https://gov.wales/",},
         "distribution": [
             {
                 "downloadURL": "",
                 "accessURL": "https://www.registers.service.gov.uk/registers/principal-local-authority/",
-                "title": "Principal local authorities in Wales register"
+                "title": "Principal local authorities in Wales register",
             }
         ],
     }
     orgtypes = [
-        'Local Authority',
+        "Local Authority",
         "Principal Local Authority (Wales)",
     ]
 
@@ -52,34 +49,36 @@ class Command(CSVScraper):
         # @TODO: map local authority code to GSS to add locations
 
         self.records.append(
-            Organisation(**{
-                "org_id": self.get_org_id(record),
-                "name": record.get("official-name"),
-                "charityNumber": None,
-                "companyNumber": None,
-                "streetAddress": None,
-                "addressLocality": None,
-                "addressRegion": None,
-                "addressCountry": "Wales",
-                "postalCode": None,
-                "telephone": None,
-                "alternateName": [],
-                "email": None,
-                "description": None,
-                "organisationType": list(self.orgtype_cache.keys()),
-                "organisationTypePrimary": self.orgtype_cache['local-authority'],
-                "url": None,
-                "location": locations,
-                "latestIncome": None,
-                "dateModified": datetime.datetime.now(),
-                "dateRegistered": record.get("start-date"),
-                "dateRemoved": record.get("end-date"),
-                "active": record.get("end-date") is None,
-                "parent": None,
-                "orgIDs": org_ids,
-                "scrape": self.scrape,
-                "source": self.source,
-                "spider": self.name,
-                "org_id_scheme": self.orgid_scheme,
-            })
+            Organisation(
+                **{
+                    "org_id": self.get_org_id(record),
+                    "name": record.get("official-name"),
+                    "charityNumber": None,
+                    "companyNumber": None,
+                    "streetAddress": None,
+                    "addressLocality": None,
+                    "addressRegion": None,
+                    "addressCountry": "Wales",
+                    "postalCode": None,
+                    "telephone": None,
+                    "alternateName": [],
+                    "email": None,
+                    "description": None,
+                    "organisationType": list(self.orgtype_cache.keys()),
+                    "organisationTypePrimary": self.orgtype_cache["local-authority"],
+                    "url": None,
+                    "location": locations,
+                    "latestIncome": None,
+                    "dateModified": datetime.datetime.now(),
+                    "dateRegistered": record.get("start-date"),
+                    "dateRemoved": record.get("end-date"),
+                    "active": record.get("end-date") is None,
+                    "parent": None,
+                    "orgIDs": org_ids,
+                    "scrape": self.scrape,
+                    "source": self.source,
+                    "spider": self.name,
+                    "org_id_scheme": self.orgid_scheme,
+                }
+            )
         )

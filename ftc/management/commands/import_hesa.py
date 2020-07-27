@@ -5,8 +5,8 @@ from ftc.models import Organisation
 
 
 class Command(HTMLScraper):
-    name = 'hesa'
-    allowed_domains = ['hesa.ac.uk']
+    name = "hesa"
+    allowed_domains = ["hesa.ac.uk"]
     start_urls = [
         "https://www.hesa.ac.uk/support/providers",
     ]
@@ -19,19 +19,16 @@ class Command(HTMLScraper):
         "license_name": "Creative Commons Attribution 4.0 International Licence",
         "issued": "",
         "modified": "",
-        "publisher": {
-            "name": "HESA",
-            "website": "https://www.hesa.ac.uk/",
-        },
+        "publisher": {"name": "HESA", "website": "https://www.hesa.ac.uk/",},
         "distribution": [
             {
                 "downloadURL": "",
                 "accessURL": "",
-                "title": "HESA - Higher education providers"
+                "title": "HESA - Higher education providers",
             }
         ],
     }
-    orgtypes = ['Higher Education']
+    orgtypes = ["Higher Education"]
     hesa_org_types = {
         "HEI": "University",
         "FEC": "Further Education College",
@@ -56,34 +53,36 @@ class Command(HTMLScraper):
             ]
 
             self.records.append(
-                Organisation(**{
-                    "org_id": "-".join([self.org_id_prefix, str(cells[1])]),
-                    "name": cells[2].strip(),
-                    "charityNumber": None,
-                    "companyNumber": None,
-                    "streetAddress": None,
-                    "addressLocality": None,
-                    "addressRegion": None,
-                    "addressCountry": None,
-                    "postalCode": None,
-                    "telephone": None,
-                    "alternateName": [],
-                    "email": None,
-                    "description": None,
-                    "organisationType": [o.slug for o in org_types],
-                    "organisationTypePrimary": org_types[0],
-                    "url": None,
-                    "location": [],
-                    "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
-                    "dateRegistered": None,
-                    "dateRemoved": None,
-                    "active": True,
-                    "parent": None,
-                    "orgIDs": orgids,
-                    "scrape": self.scrape,
-                    "source": self.source,
-                    "spider": self.name,
-                    "org_id_scheme": self.orgid_scheme,
-                })
+                Organisation(
+                    **{
+                        "org_id": "-".join([self.org_id_prefix, str(cells[1])]),
+                        "name": cells[2].strip(),
+                        "charityNumber": None,
+                        "companyNumber": None,
+                        "streetAddress": None,
+                        "addressLocality": None,
+                        "addressRegion": None,
+                        "addressCountry": None,
+                        "postalCode": None,
+                        "telephone": None,
+                        "alternateName": [],
+                        "email": None,
+                        "description": None,
+                        "organisationType": [o.slug for o in org_types],
+                        "organisationTypePrimary": org_types[0],
+                        "url": None,
+                        "location": [],
+                        "latestIncome": None,
+                        "dateModified": datetime.datetime.now(),
+                        "dateRegistered": None,
+                        "dateRemoved": None,
+                        "active": True,
+                        "parent": None,
+                        "orgIDs": orgids,
+                        "scrape": self.scrape,
+                        "source": self.source,
+                        "spider": self.name,
+                        "org_id_scheme": self.orgid_scheme,
+                    }
+                )
             )

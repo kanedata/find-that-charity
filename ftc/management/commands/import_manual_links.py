@@ -7,8 +7,8 @@ from ftc.models import OrganisationLink, Source
 
 # Look up manual links held in charity-lookups repository
 class Command(CSVScraper):
-    name = 'manual_links'
-    allowed_domains = ['raw.githubusercontent.com']
+    name = "manual_links"
+    allowed_domains = ["raw.githubusercontent.com"]
 
     sources = [
         {
@@ -27,13 +27,13 @@ class Command(CSVScraper):
                 {
                     "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/university-charity-number.csv",
                     "accessURL": "https://github.com/drkane/charity-lookups/blob/master/university-charity-number.csv",
-                    "title": "University Charity Numbers"
+                    "title": "University Charity Numbers",
                 }
             ],
             "_parse_row": lambda row: {
                 "org_id_a": "GB-HESA-{}".format(row["HESA ID"]),
-                "org_id_b": row["OrgID"]
-            }
+                "org_id_b": row["OrgID"],
+            },
         },
         {
             "title": "Dual Registered UK Charities",
@@ -51,13 +51,13 @@ class Command(CSVScraper):
                 {
                     "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/dual-registered-uk-charities.csv",
                     "accessURL": "https://github.com/drkane/charity-lookups/blob/master/dual-registered-uk-charities.csv",
-                    "title": "Dual Registered UK Charities"
+                    "title": "Dual Registered UK Charities",
                 }
             ],
             "_parse_row": lambda row: {
                 "org_id_a": "GB-SC-{}".format(row["Scottish Charity Number"].strip()),
                 "org_id_b": "GB-CHC-{}".format(row["E&W Charity Number"].strip()),
-            }
+            },
         },
         {
             "title": "Registered housing providers",
@@ -75,7 +75,7 @@ class Command(CSVScraper):
                 {
                     "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/rsp-charity-number.csv",
                     "accessURL": "https://github.com/drkane/charity-lookups/blob/master/rsp-charity-number.csv",
-                    "title": "Registered housing providers"
+                    "title": "Registered housing providers",
                 }
             ],
             "_parse_csv": "rsp_charity_company_csv",
@@ -97,13 +97,13 @@ class Command(CSVScraper):
                 {
                     "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/university-royal-charters.csv",
                     "accessURL": "https://github.com/drkane/charity-lookups/blob/master/university-royal-charters.csv",
-                    "title": "University Royal Charters"
+                    "title": "University Royal Charters",
                 }
             ],
             "_parse_row": lambda row: {
                 "org_id_a": "GB-EDU-{}".format(row["URN"].strip()),
                 "org_id_b": "GB-COH-{}".format(row["CompanyNumber"].strip()),
-            }
+            },
         },
         {
             "title": "Independent Schools Charity Numbers",
@@ -121,13 +121,15 @@ class Command(CSVScraper):
                 {
                     "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/independent-schools-ew.csv",
                     "accessURL": "https://github.com/drkane/charity-lookups/blob/master/independent-schools-ew.csv",
-                    "title": "Independent Schools Charity Numbers"
+                    "title": "Independent Schools Charity Numbers",
                 }
             ],
             "_parse_row": lambda row: {
                 "org_id_a": "GB-EDU-{}".format(row["URN"].strip()),
-                "org_id_b": "GB-CHC-{}".format(row["charity_number"].strip()) if row["charity_number"].strip() else None,
-            }
+                "org_id_b": "GB-CHC-{}".format(row["charity_number"].strip())
+                if row["charity_number"].strip()
+                else None,
+            },
         },
         {
             "title": "Register of Mergers",
@@ -145,14 +147,18 @@ class Command(CSVScraper):
                 {
                     "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/ccew-register-of-mergers.csv",
                     "accessURL": "https://github.com/drkane/charity-lookups/blob/master/ccew-register-of-mergers.csv",
-                    "title": "Register of Mergers"
+                    "title": "Register of Mergers",
                 }
             ],
             "_parse_row": lambda row: {
-                "org_id_a": "GB-CHC-{}".format(row["transferor_regno"].strip()) if row["transferor_subno"].strip() == "0" else None,
-                "org_id_b": "GB-CHC-{}".format(row["transferee_regno"].strip()) if row["transferee_subno"].strip() == "0" else None,
-                "description": "merger"
-            }
+                "org_id_a": "GB-CHC-{}".format(row["transferor_regno"].strip())
+                if row["transferor_subno"].strip() == "0"
+                else None,
+                "org_id_b": "GB-CHC-{}".format(row["transferee_regno"].strip())
+                if row["transferee_subno"].strip() == "0"
+                else None,
+                "description": "merger",
+            },
         },
         {
             "title": "CIO Company Numbers",
@@ -170,13 +176,17 @@ class Command(CSVScraper):
                 {
                     "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/cio_company_numbers.csv",
                     "accessURL": "https://github.com/drkane/charity-lookups/blob/master/cio_company_numbers.csv",
-                    "title": "CIO Company Numbers"
+                    "title": "CIO Company Numbers",
                 }
             ],
             "_parse_row": lambda row: {
-                "org_id_a": "GB-COH-{}".format(row["company_number"].strip()) if row["company_number"].strip() else None,
-                "org_id_b": "GB-CHC-{}".format(row["charity_number"].strip()) if row["charity_number"].strip() else None,
-            }
+                "org_id_a": "GB-COH-{}".format(row["company_number"].strip())
+                if row["company_number"].strip()
+                else None,
+                "org_id_b": "GB-CHC-{}".format(row["charity_number"].strip())
+                if row["charity_number"].strip()
+                else None,
+            },
         },
     ]
 
@@ -184,22 +194,22 @@ class Command(CSVScraper):
         self.files = {}
         self.source_cache = {}
         for s in self.sources:
-            self.source_cache[s['identifier']], _ = Source.objects.get_or_create(
-                id=s['identifier'],
+            self.source_cache[s["identifier"]], _ = Source.objects.get_or_create(
+                id=s["identifier"],
                 defaults={
-                    'data': {k: v for k, v in s.items() if not k.startswith("_")}
+                    "data": {k: v for k, v in s.items() if not k.startswith("_")}
                 },
             )
             r = self.session.get(s["distribution"][0]["downloadURL"])
-            r.encoding = s.get('_encoding', 'utf8')
-            self.files[s['identifier']] = r
+            r.encoding = s.get("_encoding", "utf8")
+            self.files[s["identifier"]] = r
 
     def parse_file(self, response, source):
 
-        source = [s for s in self.sources if s['identifier'] == source][0]
+        source = [s for s in self.sources if s["identifier"] == source][0]
 
-        if source.get('_parse_csv'):
-            return getattr(self, source.get('_parse_csv'))(response, source)
+        if source.get("_parse_csv"):
+            return getattr(self, source.get("_parse_csv"))(response, source)
 
         with io.StringIO(response.text) as a:
             csvreader = csv.DictReader(a)
@@ -210,10 +220,10 @@ class Command(CSVScraper):
                 if row.get("org_id_a") and row.get("org_id_b"):
                     self.link_records.append(
                         OrganisationLink(
-                            org_id_a=row['org_id_a'],
-                            org_id_b=row['org_id_b'],
+                            org_id_a=row["org_id_a"],
+                            org_id_b=row["org_id_b"],
                             spider=self.name,
-                            source=self.source_cache[source['identifier']],
+                            source=self.source_cache[source["identifier"]],
                             scrape=self.scrape,
                         )
                     )
@@ -230,7 +240,7 @@ class Command(CSVScraper):
                             org_id_a="GB-SHPE-{}".format(row["RP Code"].strip()),
                             org_id_b="GB-CHC-{}".format(row["Charity Number"].strip()),
                             spider=self.name,
-                            source=self.source_cache[source['identifier']],
+                            source=self.source_cache[source["identifier"]],
                             scrape=self.scrape,
                         )
                     )
@@ -239,10 +249,9 @@ class Command(CSVScraper):
                     self.link_records.append(
                         OrganisationLink(
                             org_id_a="GB-SHPE-{}".format(row["RP Code"].strip()),
-                            org_id_b="GB-COH-{}".format(
-                                row["Company Number"].strip()),
+                            org_id_b="GB-COH-{}".format(row["Company Number"].strip()),
                             spider=self.name,
-                            source=self.source_cache[source['identifier']],
+                            source=self.source_cache[source["identifier"]],
                             scrape=self.scrape,
                         )
                     )

@@ -8,36 +8,42 @@ from django.utils.text import slugify
 from django_better_admin_arrayfield.models.fields import ArrayField
 
 IGNORE_DOMAINS = (
-    'gmail.com', 'hotmail.com', 'btinternet.com',
-    'hotmail.co.uk', 'yahoo.co.uk', 'outlook.com',
-    'aol.com', 'btconnect.com', 'yahoo.com',
-    'googlemail.com', 'ntlworld.com',
-    'talktalk.net',
-    'sky.com',
-    'live.co.uk',
-    'ntlworld.com',
-    'tiscali.co.uk',
-    'icloud.com',
-    'btopenworld.com',
-    'blueyonder.co.uk',
-    'virginmedia.com',
-    'nhs.net',
-    'me.com',
-    'msn.com',
-    'talk21.com',
-    'aol.co.uk',
-    'mail.com',
-    'live.com',
-    'virgin.net',
-    'ymail.com',
-    'mac.com',
-    'waitrose.com',
-    'gmail.co.uk'
+    "gmail.com",
+    "hotmail.com",
+    "btinternet.com",
+    "hotmail.co.uk",
+    "yahoo.co.uk",
+    "outlook.com",
+    "aol.com",
+    "btconnect.com",
+    "yahoo.com",
+    "googlemail.com",
+    "ntlworld.com",
+    "talktalk.net",
+    "sky.com",
+    "live.co.uk",
+    "ntlworld.com",
+    "tiscali.co.uk",
+    "icloud.com",
+    "btopenworld.com",
+    "blueyonder.co.uk",
+    "virginmedia.com",
+    "nhs.net",
+    "me.com",
+    "msn.com",
+    "talk21.com",
+    "aol.co.uk",
+    "mail.com",
+    "live.com",
+    "virgin.net",
+    "ymail.com",
+    "mac.com",
+    "waitrose.com",
+    "gmail.co.uk",
 )
 
 
 class Orgid(str):
-
     def __new__(cls, content):
         instance = super().__new__(cls, content)
         instance._split_orgid(content)
@@ -59,7 +65,7 @@ class OrgidField(models.CharField):
     description = "An orgid based on the format here: http://org-id.guide/about"
 
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 200
+        kwargs["max_length"] = 200
         super().__init__(*args, **kwargs)
 
     def from_db_value(self, value, expression, connection):
@@ -98,59 +104,91 @@ class Organisation(models.Model):
         null=True,
         verbose_name="Other names",
     )
-    charityNumber = models.CharField(max_length=255, null=True, blank=True, verbose_name="Charity number")
-    companyNumber = models.CharField(max_length=255, null=True, blank=True, verbose_name="Company number")
-    streetAddress = models.CharField(max_length=255, null=True, blank=True, verbose_name="Address: street")
-    addressLocality = models.CharField(max_length=255, null=True, blank=True, verbose_name="Address: locality")
-    addressRegion = models.CharField(max_length=255, null=True, blank=True, verbose_name="Address: region")
-    addressCountry = models.CharField(max_length=255, null=True, blank=True, verbose_name="Address: country")
-    postalCode = models.CharField(max_length=255, null=True, blank=True, verbose_name="Postcode")
-    telephone = models.CharField(max_length=255, null=True, blank=True, verbose_name="Telephone")
-    email = models.CharField(max_length=255, null=True, blank=True, verbose_name="Email address")
+    charityNumber = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Charity number"
+    )
+    companyNumber = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Company number"
+    )
+    streetAddress = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Address: street"
+    )
+    addressLocality = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Address: locality"
+    )
+    addressRegion = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Address: region"
+    )
+    addressCountry = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Address: country"
+    )
+    postalCode = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Postcode"
+    )
+    telephone = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Telephone"
+    )
+    email = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="Email address"
+    )
     description = models.TextField(null=True, blank=True, verbose_name="Description")
     url = models.URLField(null=True, blank=True, verbose_name="Website address")
-    domain = models.CharField(max_length=255, null=True, blank=True, db_index=True, verbose_name="Website domain")
-    latestIncome = models.BigIntegerField(null=True, blank=True, verbose_name="Latest income")
-    latestIncomeDate = models.DateField(null=True, blank=True, verbose_name="Latest financial year end")
-    dateRegistered = models.DateField(null=True, blank=True, verbose_name="Date registered")
+    domain = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        db_index=True,
+        verbose_name="Website domain",
+    )
+    latestIncome = models.BigIntegerField(
+        null=True, blank=True, verbose_name="Latest income"
+    )
+    latestIncomeDate = models.DateField(
+        null=True, blank=True, verbose_name="Latest financial year end"
+    )
+    dateRegistered = models.DateField(
+        null=True, blank=True, verbose_name="Date registered"
+    )
     dateRemoved = models.DateField(null=True, blank=True, verbose_name="Date removed")
     active = models.BooleanField(null=True, blank=True, verbose_name="Active")
-    status = models.CharField(max_length=200, null=True, blank=True, verbose_name="Status")
-    parent = models.CharField(max_length=200, null=True, blank=True, verbose_name="Parent organisation")
-    dateModified = models.DateTimeField(auto_now=True, verbose_name="Date record was last modified")
+    status = models.CharField(
+        max_length=200, null=True, blank=True, verbose_name="Status"
+    )
+    parent = models.CharField(
+        max_length=200, null=True, blank=True, verbose_name="Parent organisation"
+    )
+    dateModified = models.DateTimeField(
+        auto_now=True, verbose_name="Date record was last modified"
+    )
     source = models.ForeignKey(
-        'Source',
-        related_name='organisations',
-        on_delete=models.CASCADE,
+        "Source", related_name="organisations", on_delete=models.CASCADE,
     )
     organisationType = ArrayField(
         models.CharField(max_length=255, blank=True),
         blank=True,
         null=True,
-        verbose_name="Other organisation types"
+        verbose_name="Other organisation types",
     )
     organisationTypePrimary = models.ForeignKey(
-        'OrganisationType',
+        "OrganisationType",
         on_delete=models.CASCADE,
         related_name="organisations",
-        verbose_name="Primary organisation type"
+        verbose_name="Primary organisation type",
     )
     scrape = models.ForeignKey(
-        'Scrape',
-        related_name='organisations',
-        on_delete=models.CASCADE,
+        "Scrape", related_name="organisations", on_delete=models.CASCADE,
     )
     spider = models.CharField(max_length=200, db_index=True)
     location = JSONField(null=True, blank=True)
     org_id_scheme = models.ForeignKey(
-        'OrgidScheme',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
+        "OrgidScheme", on_delete=models.CASCADE, blank=True, null=True,
     )
 
     class Meta:
-        unique_together = ('org_id', 'scrape',)
+        unique_together = (
+            "org_id",
+            "scrape",
+        )
         indexes = [
             GinIndex(fields=["orgIDs"]),
             GinIndex(fields=["linked_orgs"]),
@@ -159,7 +197,7 @@ class Organisation(models.Model):
         ]
 
     def __str__(self):
-        return '%s %s' % (self.organisationTypePrimary.title, self.org_id)
+        return "%s %s" % (self.organisationTypePrimary.title, self.org_id)
 
     def org_links(self):
         return OrganisationLink.objects.filter(
@@ -187,14 +225,9 @@ class Organisation(models.Model):
 
     @classmethod
     def get_fields_as_properties(cls):
-        internal_fields = [
-            "scrape", "spider", "id"
-        ]
+        internal_fields = ["scrape", "spider", "id"]
         return [
-            {
-                "id": f.name,
-                "name": f.verbose_name,
-            }
+            {"id": f.name, "name": f.verbose_name,}
             for f in cls._meta.get_fields()
             if f.name not in internal_fields
         ]
@@ -240,14 +273,10 @@ class OrganisationLink(models.Model):
     org_id_b = OrgidField(max_length=255, db_index=True)
     spider = models.CharField(max_length=200, db_index=True)
     source = models.ForeignKey(
-        'Source',
-        related_name='organisation_links',
-        on_delete=models.CASCADE,
+        "Source", related_name="organisation_links", on_delete=models.CASCADE,
     )
     scrape = models.ForeignKey(
-        'Scrape',
-        related_name='organisation_links',
-        on_delete=models.CASCADE,
+        "Scrape", related_name="organisation_links", on_delete=models.CASCADE,
     )
 
     def __str__(self):
@@ -255,8 +284,7 @@ class OrganisationLink(models.Model):
 
 
 class Source(models.Model):
-    id = models.CharField(max_length=200, unique=True,
-                          db_index=True, primary_key=True)
+    id = models.CharField(max_length=200, unique=True, db_index=True, primary_key=True)
     data = JSONField()
 
     @property
@@ -265,7 +293,7 @@ class Source(models.Model):
 
     @property
     def publisher(self):
-        return self.data.get('publisher', {}).get('name')
+        return self.data.get("publisher", {}).get("name")
 
     @property
     def slug(self):
@@ -276,28 +304,32 @@ class Source(models.Model):
 
 
 class Scrape(models.Model):
-
     class ScrapeStatus(models.TextChoices):
-        RUNNING = 'running', 'In progress'
-        SUCCESS = 'success', 'Finished successfully'
-        ERRORS = 'errors', 'Finished with errors'
-        FAILED = 'failed', 'Failed to complete'
+        RUNNING = "running", "In progress"
+        SUCCESS = "success", "Finished successfully"
+        ERRORS = "errors", "Finished with errors"
+        FAILED = "failed", "Failed to complete"
 
     spider = models.CharField(max_length=200)
-    result = JSONField(null=True, blank=True)
-    start_time = models.DateTimeField(auto_now_add=True)
-    finish_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    log = models.TextField(null=True, blank=True)
-    items = models.IntegerField(default=0)
-    errors = models.IntegerField(default=0)
-    status = models.CharField(max_length=50, null=True,
-                              blank=True, choices=ScrapeStatus.choices)
+    result = JSONField(null=True, blank=True, editable=False)
+    start_time = models.DateTimeField(auto_now_add=True, editable=False)
+    finish_time = models.DateTimeField(
+        auto_now=True, null=True, blank=True, editable=False
+    )
+    log = models.TextField(null=True, blank=True, editable=False)
+    items = models.IntegerField(default=0, editable=False)
+    errors = models.IntegerField(default=0, editable=False)
+    status = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        choices=ScrapeStatus.choices,
+        editable=False,
+    )
 
     def __str__(self):
         return "{} [{}] {:%Y-%m-%d %H:%M}".format(
-            self.spider,
-            self.status,
-            self.start_time
+            self.spider, self.status, self.start_time
         )
 
 
@@ -335,15 +367,21 @@ class RelatedOrganisation:
 
     EXTERNAL_LINKS = {
         "GB-CHC": [
-            ["http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber={}&SubsidiaryNumber=0&Ref=CO",
-             "Charity Commission England and Wales"],
-            ["http://beta.charitycommission.gov.uk/charity-details/?regid={}&subid=0",
-             "Charity Commission England and Wales (beta)"],
+            [
+                "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber={}&SubsidiaryNumber=0&Ref=CO",
+                "Charity Commission England and Wales",
+            ],
+            [
+                "http://beta.charitycommission.gov.uk/charity-details/?regid={}&subid=0",
+                "Charity Commission England and Wales (beta)",
+            ],
             ["https://charitybase.uk/charities/{}", "CharityBase"],
             ["http://opencharities.org/charities/{}", "OpenCharities"],
             ["http://www.guidestar.org.uk/summary.aspx?CCReg={}", "GuideStar"],
-            ["http://www.charitychoice.co.uk/charities/search?t=qsearch&q={}",
-             "Charities Direct"],
+            [
+                "http://www.charitychoice.co.uk/charities/search?t=qsearch&q={}",
+                "Charities Direct",
+            ],
             ["https://olib.uk/charity/html/{}", "CharityData by Olly Benson"],
         ],
         "GB-COH": [
@@ -351,47 +389,67 @@ class RelatedOrganisation:
             ["https://opencorporates.com/companies/gb/{}", "Opencorporates"],
         ],
         "GB-NIC": [
-            ["http://www.charitycommissionni.org.uk/charity-details/?regid={}&subid=0",
-             "Charity Commission Northern Ireland"],
+            [
+                "http://www.charitycommissionni.org.uk/charity-details/?regid={}&subid=0",
+                "Charity Commission Northern Ireland",
+            ],
         ],
         "GB-SC": [
-            ["https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={}",
-             "Office of Scottish Charity Regulator"],
+            [
+                "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={}",
+                "Office of Scottish Charity Regulator",
+            ],
         ],
         "GB-EDU": [
-            ["https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{}",
-             "Get information about schools"],
+            [
+                "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{}",
+                "Get information about schools",
+            ],
         ],
         "GB-UKPRN": [
-            ["https://www.ukrlp.co.uk/ukrlp/ukrlp_provider.page_pls_provDetails?x=&pn_p_id={}&pv_status=VERIFIED&pv_vis_code=L",
-             "UK Register of Learning Providers"],
+            [
+                "https://www.ukrlp.co.uk/ukrlp/ukrlp_provider.page_pls_provDetails?x=&pn_p_id={}&pv_status=VERIFIED&pv_vis_code=L",
+                "UK Register of Learning Providers",
+            ],
         ],
         "GB-NHS": [
             ["https://odsportal.hscic.gov.uk/Organisation/Details/{}", "NHS Digital"],
         ],
         "GB-LAE": [
-            ["https://www.registers.service.gov.uk/registers/local-authority-eng/records/{}",
-             "Local authorities in England"],
+            [
+                "https://www.registers.service.gov.uk/registers/local-authority-eng/records/{}",
+                "Local authorities in England",
+            ],
         ],
         "GB-LAN": [
-            ["https://www.registers.service.gov.uk/registers/local-authority-nir/records/{}",
-             "Local authorities in Northern Ireland"],
+            [
+                "https://www.registers.service.gov.uk/registers/local-authority-nir/records/{}",
+                "Local authorities in Northern Ireland",
+            ],
         ],
         "GB-LAS": [
-            ["https://www.registers.service.gov.uk/registers/local-authority-sct/records/{}",
-             "Local authorities in Scotland"],
+            [
+                "https://www.registers.service.gov.uk/registers/local-authority-sct/records/{}",
+                "Local authorities in Scotland",
+            ],
         ],
         "GB-PLA": [
-            ["https://www.registers.service.gov.uk/registers/principal-local-authority/records/{}",
-             "Principal Local authorities in Wales"],
+            [
+                "https://www.registers.service.gov.uk/registers/principal-local-authority/records/{}",
+                "Principal Local authorities in Wales",
+            ],
         ],
         "GB-GOR": [
-            ["https://www.registers.service.gov.uk/registers/government-organisation/records/{}",
-             "Government organisations on GOV.UK"],
+            [
+                "https://www.registers.service.gov.uk/registers/government-organisation/records/{}",
+                "Government organisations on GOV.UK",
+            ],
         ],
         "XI-GRID": [
-            ["https://www.grid.ac/institutes/{}",
-             "Global Research Identifier Database"],
+            [
+                "https://www.grid.ac/institutes/{}",
+                "Global Research Identifier Database",
+            ],
         ],
     }
 
@@ -412,8 +470,7 @@ class RelatedOrganisation:
 
     @classmethod
     def from_orgid(cls, org_id):
-        orgs = Organisation.objects.filter(
-            linked_orgs__contains=[org_id])
+        orgs = Organisation.objects.filter(linked_orgs__contains=[org_id])
         return cls(orgs)
 
     def __getattr__(self, key, *args):
@@ -454,11 +511,13 @@ class RelatedOrganisation:
     def get_alternateNames(self):
         names = self.get_all("all_names")
         return list(
-            set([
-                self.names.get(n.lower().strip(), n)
-                for n in names
-                if n.lower().strip() != self.name.lower().strip()
-            ])
+            set(
+                [
+                    self.names.get(n.lower().strip(), n)
+                    for n in names
+                    if n.lower().strip() != self.name.lower().strip()
+                ]
+            )
         )
 
     def prioritise_orgs(self, orgs):
@@ -468,20 +527,18 @@ class RelatedOrganisation:
 
     def get_links(self):
         if self.url:
-            yield (self.url, 'Organisation Website')
+            yield (self.url, "Organisation Website")
         for o in self.orgIDs:
             links = self.EXTERNAL_LINKS.get(o.scheme, [])
             for link in links:
-                yield (
-                    link[0].format(o.id),
-                    link[1]
-                )
+                yield (link[0].format(o.id), link[1])
 
     @property
     def sameAs(self):
         return [
-            reverse('orgid_html', kwargs=dict(org_id=o))
-            for o in self.orgIDs if o != self.org_id
+            reverse("orgid_html", kwargs=dict(org_id=o))
+            for o in self.orgIDs
+            if o != self.org_id
         ]
 
     def schema_dot_org(self, request=None):
@@ -495,20 +552,18 @@ class RelatedOrganisation:
         }
 
         if self.first("url"):
-            obj['url'] = self.first("url").get("value")
+            obj["url"] = self.first("url").get("value")
         if self.first("description"):
-            obj['description'] = self.first("description").get("value")
+            obj["description"] = self.first("description").get("value")
         if self.alternateName:
-            obj['alternateName'] = self.alternateName
+            obj["alternateName"] = self.alternateName
         if self.dateRegistered:
             obj["foundingDate"] = self.dateRegistered.isoformat()
         if not self.active and self.first("dateRemoved"):
-            obj["dissolutionDate"] = self.first(
-                "dateRemoved").get("value").isoformat()
+            obj["dissolutionDate"] = self.first("dateRemoved").get("value").isoformat()
         if len(self.orgIDs) > 1:
             if request:
-                obj["sameAs"] = [request.build_absolute_uri(
-                    id) for id in self.sameAs]
+                obj["sameAs"] = [request.build_absolute_uri(id) for id in self.sameAs]
             else:
                 obj["sameAs"] = self.sameAs
         return obj
@@ -521,10 +576,7 @@ class RelatedOrganisation:
             "addressCountry",
             "postalCode",
         ]
-        orgtypes = [
-            y for y in
-            self.get_all('organisationType')
-        ]
+        orgtypes = [y for y in self.get_all("organisationType")]
         orgtypes = [o.title for o in OrganisationType.objects.filter(slug__in=orgtypes)]
 
         if charity:
@@ -538,38 +590,40 @@ class RelatedOrganisation:
             for o in self.orgIDs:
                 if o.startswith("GB-CHC-"):
                     ccew_number = o.replace("GB-CHC-", "")
-                    ccew_link = self.EXTERNAL_LINKS['GB-CHC'][1][0].format(ccew_number)
+                    ccew_link = self.EXTERNAL_LINKS["GB-CHC"][1][0].format(ccew_number)
                 elif o.startswith("GB-NIC-"):
                     ccni_number = o.replace("GB-NIC-", "")
-                    ccni_link = self.EXTERNAL_LINKS['GB-NIC'][0][0].format(
-                        ccni_number)
+                    ccni_link = self.EXTERNAL_LINKS["GB-NIC"][0][0].format(ccni_number)
                 elif o.startswith("GB-SC-"):
                     oscr_number = o.replace("GB-SC-", "")
-                    oscr_link = self.EXTERNAL_LINKS['GB-SC'][0][0].format(
-                        oscr_number)
+                    oscr_link = self.EXTERNAL_LINKS["GB-SC"][0][0].format(oscr_number)
                 elif o.startswith("GB-COH-"):
-                    company_numbers.append({
-                        "number": o.replace("GB-COH-", ""),
-                        "url": self.EXTERNAL_LINKS['GB-COH'][0][0].format(o.replace("GB-COH-", "")),
-                        "source": self.source.id
-                    })
+                    company_numbers.append(
+                        {
+                            "number": o.replace("GB-COH-", ""),
+                            "url": self.EXTERNAL_LINKS["GB-COH"][0][0].format(
+                                o.replace("GB-COH-", "")
+                            ),
+                            "source": self.source.id,
+                        }
+                    )
             names = []
             names_seen = set()
             for r in self.records:
                 if r.name not in names_seen:
-                    names.append({
-                        'name': r.name,
-                        'type': "registered name",
-                        'source': r.source.id,
-                    })
+                    names.append(
+                        {
+                            "name": r.name,
+                            "type": "registered name",
+                            "source": r.source.id,
+                        }
+                    )
                     names_seen.add(r.name)
                 for n in r.alternateName:
                     if n not in names_seen:
-                        names.append({
-                            'name': n,
-                            'type': "other name",
-                            'source': r.source.id,
-                        })
+                        names.append(
+                            {"name": n, "type": "other name", "source": r.source.id,}
+                        )
                         names_seen.add(n)
 
             return {
@@ -582,7 +636,7 @@ class RelatedOrganisation:
                 "geo": {
                     "areas": [],
                     "postcode": self.postalCode,
-                    "location": self.location
+                    "location": self.location,
                 },
                 "url": self.url,
                 "domain": "centre404.org.uk",
@@ -621,8 +675,6 @@ class RelatedOrganisation:
             "id": self.org_id,
             "location": self.location,
             "address": {
-                k: getattr(self, k)
-                for k in address_fields
-                if getattr(self, k, None)
-            }
+                k: getattr(self, k) for k in address_fields if getattr(self, k, None)
+            },
         }

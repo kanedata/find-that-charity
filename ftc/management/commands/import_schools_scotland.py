@@ -44,10 +44,11 @@ SCOT_LAS = {
 
 
 class Command(HTMLScraper):
-    name = 'schools_scotland'
-    allowed_domains = ['gov.scot']
+    name = "schools_scotland"
+    allowed_domains = ["gov.scot"]
     start_urls = [
-        "http://www.gov.scot/Topics/Statistics/Browse/School-Education/Datasets/contactdetails"]
+        "http://www.gov.scot/Topics/Statistics/Browse/School-Education/Datasets/contactdetails"
+    ]
     skip_rows = 5
     org_id_prefix = "GB-SCOTEDU"
     id_field = "seedcode"
@@ -64,25 +65,24 @@ class Command(HTMLScraper):
             "website": "https://www.gov.scot/",
         },
         "distribution": [
-            {
-                "downloadURL": "",
-                "accessURL": "",
-                "title": "School Contact Details"
-            }
+            {"downloadURL": "", "accessURL": "", "title": "School Contact Details"}
         ],
     }
-    orgtypes = ['Education']
+    orgtypes = ["Education"]
 
     def parse_file(self, response, source_url):
         link = [
-            link for link in response.html.absolute_links if link.endswith(".xlsx")][0]
+            link for link in response.html.absolute_links if link.endswith(".xlsx")
+        ][0]
         # self.source["distribution"][0]["downloadURL"] = link
         # self.source["distribution"][0]["accessURL"] = self.start_urls[0]
         # self.source["modified"] = datetime.datetime.now().isoformat()
         r = self.session.get(link)
 
         wb = load_workbook(io.BytesIO(r.content), read_only=True)
-        latest_sheet = wb[sorted([s for s in wb.sheetnames if s.startswith("Open at")])[-1]]
+        latest_sheet = wb[
+            sorted([s for s in wb.sheetnames if s.startswith("Open at")])[-1]
+        ]
 
         # self.source["issued"] = wb.properties.modified.isoformat()[0:10]
 
@@ -135,9 +135,7 @@ class Command(HTMLScraper):
                     dateRemoved=None,
                     active=True,
                     parent=None,
-                    orgIDs=[
-                        org_id
-                    ],
+                    orgIDs=[org_id],
                     scrape=self.scrape,
                     source=self.source,
                     spider=self.name,
@@ -170,32 +168,41 @@ class Command(HTMLScraper):
                     else:
                         overtitle = None
 
-                header_names.append(self.slugify("{} {}".format(overtitle if overtitle else "", title)))
+                header_names.append(
+                    self.slugify("{} {}".format(overtitle if overtitle else "", title))
+                )
 
-        return dict(zip(
-            [c.column for c in row if c.value],  # header column numbers
-            header_names
-        ))
+        return dict(
+            zip(
+                [c.column for c in row if c.value],  # header column numbers
+                header_names,
+            )
+        )
 
     def get_org_types(self, record):
         org_types = [
             self.orgtype_cache["education"],
             self.add_org_type(record.get("centre_type") + " School"),
         ]
-        for f in ["school_type_primary", "school_type_secondary", "school_type_special"]:
+        for f in [
+            "school_type_primary",
+            "school_type_secondary",
+            "school_type_special",
+        ]:
             if record.get(f):
-                org_types.append(self.add_org_type(
-                    record[f] + " School"))
+                org_types.append(self.add_org_type(record[f] + " School"))
         return org_types
 
     def get_locations(self, record):
         locations = []
         if SCOT_LAS.get(record.get("la_name")):
             code = SCOT_LAS.get(record.get("la_name"))
-            locations.append({
-                "id": code,
-                "name": record.get("la_name"),
-                "geoCode": code,
-                "geoCodeType": AREA_TYPES.get(code[0:3], "Local Authority"),
-            })
+            locations.append(
+                {
+                    "id": code,
+                    "name": record.get("la_name"),
+                    "geoCode": code,
+                    "geoCodeType": AREA_TYPES.get(code[0:3], "Local Authority"),
+                }
+            )
         return locations

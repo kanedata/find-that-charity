@@ -1,8 +1,8 @@
 import datetime
 import re
 
-from requests_html import HTMLSession
 import requests_cache
+from requests_html import HTMLSession
 
 from ftc.management.commands._base_scraper import AREA_TYPES, CSVScraper
 from ftc.models import Organisation
@@ -21,8 +21,8 @@ REGION_CONVERT = {
 
 
 class Command(CSVScraper):
-    name = 'schools_gias'
-    allowed_domains = ['service.gov.uk', 'ea-edubase-api-prod.azurewebsites.net']
+    name = "schools_gias"
+    allowed_domains = ["service.gov.uk", "ea-edubase-api-prod.azurewebsites.net"]
     start_urls = [
         "https://get-information-schools.service.gov.uk/Downloads",
     ]
@@ -41,25 +41,30 @@ class Command(CSVScraper):
             "website": "https://www.gov.uk/government/organisations/department-for-education",
         },
         "distribution": [
-            {
-                "downloadURL": "",
-                "accessURL": "",
-                "title": "Establishment fields CSV"
-            }
+            {"downloadURL": "", "accessURL": "", "title": "Establishment fields CSV"}
         ],
     }
 
     date_format = "%d-%m-%Y"
-    gias_regex = re.compile(r"https?://ea-edubase-api-prod.azurewebsites.net/edubase/downloads/public/edubasealldata[0-9]{8}\.csv")
+    gias_regex = re.compile(
+        r"https?://ea-edubase-api-prod.azurewebsites.net/edubase/downloads/public/edubasealldata[0-9]{8}\.csv"
+    )
     date_fields = ["OpenDate", "CloseDate"]
-    location_fields = ["GOR", "DistrictAdministrative", "AdministrativeWard",
-                       "ParliamentaryConstituency", "UrbanRural", "MSOA", "LSOA"]
-    orgtypes = ['Education']
+    location_fields = [
+        "GOR",
+        "DistrictAdministrative",
+        "AdministrativeWard",
+        "ParliamentaryConstituency",
+        "UrbanRural",
+        "MSOA",
+        "LSOA",
+    ]
+    orgtypes = ["Education"]
 
     def set_session(self, install_cache=False):
         if install_cache:
             self.logger.info("Using requests_cache")
-            requests_cache.install_cache('http_cache')
+            requests_cache.install_cache("http_cache")
         self.session = HTMLSession()
 
     def fetch_file(self):
@@ -73,7 +78,7 @@ class Command(CSVScraper):
     def depluralise(self, s):
         if not isinstance(s, str):
             return s
-        if s == 'Other types':
+        if s == "Other types":
             return "Other school"
         if s.endswith("ies"):
             return s[:-3] + "y"
@@ -87,10 +92,12 @@ class Command(CSVScraper):
 
         org_types = [
             self.orgtype_cache["education"],
-            self.add_org_type(self.depluralise(
-                record.get("EstablishmentTypeGroup (name)"))),
-            self.add_org_type(self.depluralise(
-                record.get("TypeOfEstablishment (name)"))),
+            self.add_org_type(
+                self.depluralise(record.get("EstablishmentTypeGroup (name)"))
+            ),
+            self.add_org_type(
+                self.depluralise(record.get("TypeOfEstablishment (name)"))
+            ),
         ]
 
         self.records.append(
@@ -131,10 +138,12 @@ class Command(CSVScraper):
         if record.get("UKPRN"):
             org_ids.append("GB-UKPRN-{}".format(record.get("UKPRN")))
         if record.get("EstablishmentNumber") and record.get("LA (code)"):
-            org_ids.append("GB-LAESTAB-{}/{}".format(
-                record.get("LA (code)").rjust(3, "0"),
-                record.get("EstablishmentNumber").rjust(4, "0"),
-            ))
+            org_ids.append(
+                "GB-LAESTAB-{}/{}".format(
+                    record.get("LA (code)").rjust(3, "0"),
+                    record.get("EstablishmentNumber").rjust(4, "0"),
+                )
+            )
 
         return org_ids
 
@@ -153,11 +162,13 @@ class Command(CSVScraper):
             if code == "":
                 code = name
 
-            locations.append({
-                "id": code,
-                "name": record.get(f + " (name)"),
-                "geoCode": code,
-                "geoCodeType": AREA_TYPES.get(code[0:3], f),
-            })
+            locations.append(
+                {
+                    "id": code,
+                    "name": record.get(f + " (name)"),
+                    "geoCode": code,
+                    "geoCodeType": AREA_TYPES.get(code[0:3], f),
+                }
+            )
 
         return locations

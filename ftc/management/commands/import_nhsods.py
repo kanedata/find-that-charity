@@ -8,9 +8,11 @@ from ftc.models import Organisation
 
 
 class Command(HTMLScraper):
-    name = 'nhsods'
-    allowed_domains = ['nhs.uk']
-    start_urls = ['https://digital.nhs.uk/services/organisation-data-service/data-downloads']
+    name = "nhsods"
+    allowed_domains = ["nhs.uk"]
+    start_urls = [
+        "https://digital.nhs.uk/services/organisation-data-service/data-downloads"
+    ]
     org_id_prefix = "GB-NHS"
     id_field = "Code"
     date_fields = ["Open Date", "Close Date", "Join Parent Date", "Left Parent Date"]
@@ -23,35 +25,56 @@ class Command(HTMLScraper):
         "license_name": "Open Government Licence v3.0",
         "issued": "",
         "modified": "",
-        "publisher": {
-            "name": "NHS Digital",
-            "website": "https://digital.nhs.uk/",
-        },
+        "publisher": {"name": "NHS Digital", "website": "https://digital.nhs.uk/",},
         "distribution": [
             {
                 "downloadURL": "",
                 "accessURL": "http://www.charitycommissionni.org.uk/charity-search/",
-                "title": "Charity Commission for Northern Ireland charity search"
+                "title": "Charity Commission for Northern Ireland charity search",
             }
         ],
     }
     zipfiles = [
         # {"org_type": "NHS England Commissioning and Government Office Regions", "url": "https://files.digital.nhs.uk/assets/ods/current/eauth.zip"},
-        {"org_type": "Special Health Authorities", "url": "https://files.digital.nhs.uk/assets/ods/current/espha.zip"},
-        {"org_type": "Commissioning Support Units", "url": "https://files.digital.nhs.uk/assets/ods/current/ecsu.zip"},
+        {
+            "org_type": "Special Health Authorities",
+            "url": "https://files.digital.nhs.uk/assets/ods/current/espha.zip",
+        },
+        {
+            "org_type": "Commissioning Support Units",
+            "url": "https://files.digital.nhs.uk/assets/ods/current/ecsu.zip",
+        },
         # {"org_type": "Commissioning Support Units sites", "url": "https://files.digital.nhs.uk/assets/ods/current/ecsusite.zip"},
         # {"org_type": "Executive Agency Programme", "url": "https://files.digital.nhs.uk/assets/ods/current/eother.zip"},
-        {"org_type": "NHS Support Agencies and Shared Services", "url": "https://files.digital.nhs.uk/assets/ods/current/ensa.zip"},
-        {"org_type": "GP practices", "url": "https://files.digital.nhs.uk/assets/ods/current/epraccur.zip"},
-        {"org_type": "Clinical Commissioning Groups", "url": "https://files.digital.nhs.uk/assets/ods/current/eccg.zip"},
+        {
+            "org_type": "NHS Support Agencies and Shared Services",
+            "url": "https://files.digital.nhs.uk/assets/ods/current/ensa.zip",
+        },
+        {
+            "org_type": "GP practices",
+            "url": "https://files.digital.nhs.uk/assets/ods/current/epraccur.zip",
+        },
+        {
+            "org_type": "Clinical Commissioning Groups",
+            "url": "https://files.digital.nhs.uk/assets/ods/current/eccg.zip",
+        },
         # {"org_type": "Clinical Commissioning Group sites", "url": "https://files.digital.nhs.uk/assets/ods/current/eccgsite.zip"},
-        {"org_type": "NHS Trusts", "url": "https://files.digital.nhs.uk/assets/ods/current/etr.zip"},
+        {
+            "org_type": "NHS Trusts",
+            "url": "https://files.digital.nhs.uk/assets/ods/current/etr.zip",
+        },
         # {"org_type": "NHS Trust sites", "url": "https://files.digital.nhs.uk/assets/ods/current/ets.zip"},
         # {"org_type": "NHS Trusts and sites", "url": "https://files.digital.nhs.uk/assets/ods/current/etrust.zip"},
-        {"org_type": "Care Trusts", "url": "https://files.digital.nhs.uk/assets/ods/current/ect.zip"},
+        {
+            "org_type": "Care Trusts",
+            "url": "https://files.digital.nhs.uk/assets/ods/current/ect.zip",
+        },
         # {"org_type": "Care Trust sites", "url": "https://files.digital.nhs.uk/assets/ods/current/ectsite.zip"},
         # {"org_type": "Care Trusts and sites", "url": "https://files.digital.nhs.uk/assets/ods/current/ecare.zip"},
-        {"org_type": "Welsh Local Health Boards", "url": "https://files.digital.nhs.uk/assets/ods/current/wlhb.zip"},
+        {
+            "org_type": "Welsh Local Health Boards",
+            "url": "https://files.digital.nhs.uk/assets/ods/current/wlhb.zip",
+        },
         # {"org_type": "Welsh Local Health Board sites", "url": "https://files.digital.nhs.uk/assets/ods/current/wlhbsite.zip"},
         # {"org_type": "Welsh Local Health Boards and sites", "url": "https://files.digital.nhs.uk/assets/ods/current/whbs.zip"},
     ]
@@ -84,13 +107,13 @@ class Command(HTMLScraper):
         "column-26",
         "column-27",
     ]
-    orgtypes = ['Health']
+    orgtypes = ["Health", "NHS"]
 
     def fetch_file(self):
         self.files = {}
         for u in self.zipfiles:
-            r = self.session.get(u['url'])
-            self.files[u['org_type']] = r
+            r = self.session.get(u["url"])
+            self.files[u["org_type"]] = r
 
         # self.source["distribution"] = [{
         #     "downloadURL": f["url"],
@@ -106,7 +129,9 @@ class Command(HTMLScraper):
                     continue
                 self.logger.info("Opening: {}".format(f.filename))
                 with z.open(f) as csvfile:
-                    reader = csv.DictReader(io.TextIOWrapper(csvfile), fieldnames=self.fields)
+                    reader = csv.DictReader(
+                        io.TextIOWrapper(csvfile), fieldnames=self.fields
+                    )
                     rowcount = 0
                     for row in reader:
                         rowcount += 1
@@ -118,7 +143,8 @@ class Command(HTMLScraper):
         record = self.clean_fields(record)
 
         org_types = [
-            self.orgtype_cache['health']
+            self.orgtype_cache["health"],
+            self.orgtype_cache["nhs"],
         ]
         if org_type:
             o = self.add_org_type(org_type)
@@ -137,39 +163,43 @@ class Command(HTMLScraper):
                 address["streetAddress"] = record.get("Address Line 2")
         if record.get("Address Line 4"):
             if address["addressLocality"]:
-                address["addressLocality"] += ", {}".format(record.get("Address Line 4"))
+                address["addressLocality"] += ", {}".format(
+                    record.get("Address Line 4")
+                )
             else:
                 address["addressLocality"] = record.get("Address Line 4")
 
         self.records.append(
-            Organisation(**{
-                "org_id": self.get_org_id(record),
-                "name": record.get("Name"),
-                "charityNumber": None,
-                "companyNumber": None,
-                "streetAddress": address["streetAddress"],
-                "addressLocality": address["addressLocality"],
-                "addressRegion": address["addressRegion"],
-                "addressCountry": address["addressCountry"],
-                "postalCode": record.get("Postcode"),
-                "telephone": record.get("Contact Telephone Number"),
-                "alternateName": [],
-                "email": None,
-                "description": None,
-                "organisationType": [o.slug for o in org_types],
-                "organisationTypePrimary": org_types[0],
-                "url": None,
-                "location": [],
-                "latestIncome": None,
-                "dateModified": datetime.datetime.now(),
-                "dateRegistered": record.get("Open Date"),
-                "dateRemoved": record.get("Close Date"),
-                "active": record.get("Close Date") is None,
-                "parent": record.get("Parent Organisation Code"),
-                "orgIDs": [self.get_org_id(record)],
-                "scrape": self.scrape,
-                "source": self.source,
-                "spider": self.name,
-                "org_id_scheme": self.orgid_scheme,
-            })
+            Organisation(
+                **{
+                    "org_id": self.get_org_id(record),
+                    "name": record.get("Name"),
+                    "charityNumber": None,
+                    "companyNumber": None,
+                    "streetAddress": address["streetAddress"],
+                    "addressLocality": address["addressLocality"],
+                    "addressRegion": address["addressRegion"],
+                    "addressCountry": address["addressCountry"],
+                    "postalCode": record.get("Postcode"),
+                    "telephone": record.get("Contact Telephone Number"),
+                    "alternateName": [],
+                    "email": None,
+                    "description": None,
+                    "organisationType": [o.slug for o in org_types],
+                    "organisationTypePrimary": org_types[0],
+                    "url": None,
+                    "location": [],
+                    "latestIncome": None,
+                    "dateModified": datetime.datetime.now(),
+                    "dateRegistered": record.get("Open Date"),
+                    "dateRemoved": record.get("Close Date"),
+                    "active": record.get("Close Date") is None,
+                    "parent": record.get("Parent Organisation Code"),
+                    "orgIDs": [self.get_org_id(record)],
+                    "scrape": self.scrape,
+                    "source": self.source,
+                    "spider": self.name,
+                    "org_id_scheme": self.orgid_scheme,
+                }
+            )
         )

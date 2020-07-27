@@ -10,143 +10,215 @@ import ftc.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ftc', '0001_initial'),
+        ("ftc", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organisation',
-            name='active',
-            field=models.BooleanField(blank=True, null=True, verbose_name='Active'),
+            model_name="organisation",
+            name="active",
+            field=models.BooleanField(blank=True, null=True, verbose_name="Active"),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='addressCountry',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Address: country'),
+            model_name="organisation",
+            name="addressCountry",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Address: country"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='addressLocality',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Address: locality'),
+            model_name="organisation",
+            name="addressLocality",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Address: locality"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='addressRegion',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Address: region'),
+            model_name="organisation",
+            name="addressRegion",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Address: region"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='alternateName',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=255), blank=True, null=True, size=None, verbose_name='Other names'),
+            model_name="organisation",
+            name="alternateName",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=255),
+                blank=True,
+                null=True,
+                size=None,
+                verbose_name="Other names",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='charityNumber',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Charity number'),
+            model_name="organisation",
+            name="charityNumber",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Charity number"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='companyNumber',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Company number'),
+            model_name="organisation",
+            name="companyNumber",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Company number"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='dateModified',
-            field=models.DateTimeField(auto_now=True, verbose_name='Date record was last modified'),
+            model_name="organisation",
+            name="dateModified",
+            field=models.DateTimeField(
+                auto_now=True, verbose_name="Date record was last modified"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='dateRegistered',
-            field=models.DateField(blank=True, null=True, verbose_name='Date registered'),
+            model_name="organisation",
+            name="dateRegistered",
+            field=models.DateField(
+                blank=True, null=True, verbose_name="Date registered"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='dateRemoved',
-            field=models.DateField(blank=True, null=True, verbose_name='Date removed'),
+            model_name="organisation",
+            name="dateRemoved",
+            field=models.DateField(blank=True, null=True, verbose_name="Date removed"),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='description',
-            field=models.TextField(blank=True, null=True, verbose_name='Description'),
+            model_name="organisation",
+            name="description",
+            field=models.TextField(blank=True, null=True, verbose_name="Description"),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='domain',
-            field=models.CharField(blank=True, db_index=True, max_length=255, null=True, verbose_name='Website domain'),
+            model_name="organisation",
+            name="domain",
+            field=models.CharField(
+                blank=True,
+                db_index=True,
+                max_length=255,
+                null=True,
+                verbose_name="Website domain",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='email',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Email address'),
+            model_name="organisation",
+            name="email",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Email address"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='latestIncome',
-            field=models.BigIntegerField(blank=True, null=True, verbose_name='Latest income'),
+            model_name="organisation",
+            name="latestIncome",
+            field=models.BigIntegerField(
+                blank=True, null=True, verbose_name="Latest income"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='latestIncomeDate',
-            field=models.DateField(blank=True, null=True, verbose_name='Latest financial year end'),
+            model_name="organisation",
+            name="latestIncomeDate",
+            field=models.DateField(
+                blank=True, null=True, verbose_name="Latest financial year end"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='linked_orgs',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=100), blank=True, null=True, size=None, verbose_name='Linked organisations'),
+            model_name="organisation",
+            name="linked_orgs",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=100),
+                blank=True,
+                null=True,
+                size=None,
+                verbose_name="Linked organisations",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='name',
-            field=models.CharField(max_length=255, verbose_name='Name'),
+            model_name="organisation",
+            name="name",
+            field=models.CharField(max_length=255, verbose_name="Name"),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='orgIDs',
-            field=django.contrib.postgres.fields.ArrayField(base_field=ftc.models.OrgidField(blank=True, max_length=200), blank=True, null=True, size=None, verbose_name='Other organisation identifiers'),
+            model_name="organisation",
+            name="orgIDs",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=ftc.models.OrgidField(blank=True, max_length=200),
+                blank=True,
+                null=True,
+                size=None,
+                verbose_name="Other organisation identifiers",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='org_id',
-            field=ftc.models.OrgidField(db_index=True, max_length=200, verbose_name='Organisation Identifier'),
+            model_name="organisation",
+            name="org_id",
+            field=ftc.models.OrgidField(
+                db_index=True, max_length=200, verbose_name="Organisation Identifier"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='organisationType',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=255), blank=True, null=True, size=None, verbose_name='Primary organisation type'),
+            model_name="organisation",
+            name="organisationType",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=255),
+                blank=True,
+                null=True,
+                size=None,
+                verbose_name="Primary organisation type",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='organisationTypePrimary',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organisations', to='ftc.OrganisationType', verbose_name='Other organisation types'),
+            model_name="organisation",
+            name="organisationTypePrimary",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="organisations",
+                to="ftc.OrganisationType",
+                verbose_name="Other organisation types",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='parent',
-            field=models.CharField(blank=True, max_length=200, null=True, verbose_name='Parent organisation'),
+            model_name="organisation",
+            name="parent",
+            field=models.CharField(
+                blank=True,
+                max_length=200,
+                null=True,
+                verbose_name="Parent organisation",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='postalCode',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Postcode'),
+            model_name="organisation",
+            name="postalCode",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Postcode"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='status',
-            field=models.CharField(blank=True, max_length=200, null=True, verbose_name='Status'),
+            model_name="organisation",
+            name="status",
+            field=models.CharField(
+                blank=True, max_length=200, null=True, verbose_name="Status"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='streetAddress',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Address: street'),
+            model_name="organisation",
+            name="streetAddress",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Address: street"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='telephone',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Telephone'),
+            model_name="organisation",
+            name="telephone",
+            field=models.CharField(
+                blank=True, max_length=255, null=True, verbose_name="Telephone"
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='url',
-            field=models.URLField(blank=True, null=True, verbose_name='Website address'),
+            model_name="organisation",
+            name="url",
+            field=models.URLField(
+                blank=True, null=True, verbose_name="Website address"
+            ),
         ),
     ]

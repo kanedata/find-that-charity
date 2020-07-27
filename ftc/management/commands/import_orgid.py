@@ -6,7 +6,7 @@ from ftc.models import OrgidScheme
 
 class Command(BaseCommand):
 
-    start_url = 'http://org-id.guide/download.json'
+    start_url = "http://org-id.guide/download.json"
 
     def handle(self, *args, **options):
         print("Fetching url")
@@ -14,10 +14,9 @@ class Command(BaseCommand):
 
         print("iterating records")
         count = 0
-        for record in r.json()['lists']:
+        for record in r.json()["lists"]:
             obj, created = OrgidScheme.objects.get_or_create(
-                code=record['code'],
-                defaults={'data': record},
+                code=record["code"], defaults={"data": record},
             )
             count += 1
         print("Saved {:,.0f} records".format(count))

@@ -5,8 +5,8 @@ from ftc.models import Organisation
 
 
 class Command(CSVScraper):
-    name = 'casc'
-    allowed_domains = ['raw.githubusercontent.com']
+    name = "casc"
+    allowed_domains = ["raw.githubusercontent.com"]
     start_urls = [
         "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/master/casc_company_house.csv",
         "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/master/cascs.csv",
@@ -29,62 +29,64 @@ class Command(CSVScraper):
             {
                 "downloadURL": "https://github.com/threesixtygiving/cascs",
                 "accessURL": "https://www.gov.uk/government/publications/community-amateur-sports-clubs-casc-registered-with-hmrc--2",
-                "title": "Government organisations on GOV.UK register"
+                "title": "Government organisations on GOV.UK register",
             }
         ],
     }
-    orgtypes = [
-        "Community Amateur Sports Club", "Sports Club", "Registered Company"
-    ]
+    orgtypes = ["Community Amateur Sports Club", "Sports Club", "Registered Company"]
 
     def parse_row(self, record):
 
         record = self.clean_fields(record)
         if "casc_orgid" in record.keys():
-            if not hasattr(self, 'coynos'):
+            if not hasattr(self, "coynos"):
                 self.coynos = {}
-            self.coynos[record['casc_orgid']] = record['ch_orgid']
+            self.coynos[record["casc_orgid"]] = record["ch_orgid"]
             return
 
-        address = dict(enumerate([v.strip() for v in record["address"].split(",", maxsplit=2)]))
+        address = dict(
+            enumerate([v.strip() for v in record["address"].split(",", maxsplit=2)])
+        )
         org_ids = [record["id"]]
         orgtypes = [
-            self.orgtype_cache['community-amateur-sports-club'],
-            self.orgtype_cache['sports-club'],
+            self.orgtype_cache["community-amateur-sports-club"],
+            self.orgtype_cache["sports-club"],
         ]
         if record["id"] in self.coynos:
-            org_ids.append(self.coynos[record['id']])
-            orgtypes.append(self.orgtype_cache['registered-company'])
+            org_ids.append(self.coynos[record["id"]])
+            orgtypes.append(self.orgtype_cache["registered-company"])
 
         self.records.append(
-            Organisation(**{
-                "org_id": record["id"],
-                "name": record["name"],
-                "charityNumber": None,
-                "companyNumber": None,
-                "streetAddress": address.get(0),
-                "addressLocality": address.get(1),
-                "addressRegion": address.get(2),
-                "addressCountry": None,
-                "postalCode": self.parse_postcode(record['postcode']),
-                "telephone": None,
-                "alternateName": [],
-                "email": None,
-                "description": None,
-                "organisationType": [o.slug for o in orgtypes],
-                "organisationTypePrimary": orgtypes[0],
-                "url": None,
-                "location": [],
-                "latestIncome": None,
-                "dateModified": datetime.datetime.now(),
-                "dateRegistered": None,
-                "dateRemoved": None,
-                "active": True,
-                "parent": None,
-                "orgIDs": org_ids,
-                "scrape": self.scrape,
-                "source": self.source,
-                "spider": self.name,
-                "org_id_scheme": self.orgid_scheme,
-            })
+            Organisation(
+                **{
+                    "org_id": record["id"],
+                    "name": record["name"],
+                    "charityNumber": None,
+                    "companyNumber": None,
+                    "streetAddress": address.get(0),
+                    "addressLocality": address.get(1),
+                    "addressRegion": address.get(2),
+                    "addressCountry": None,
+                    "postalCode": self.parse_postcode(record["postcode"]),
+                    "telephone": None,
+                    "alternateName": [],
+                    "email": None,
+                    "description": None,
+                    "organisationType": [o.slug for o in orgtypes],
+                    "organisationTypePrimary": orgtypes[0],
+                    "url": None,
+                    "location": [],
+                    "latestIncome": None,
+                    "dateModified": datetime.datetime.now(),
+                    "dateRegistered": None,
+                    "dateRemoved": None,
+                    "active": True,
+                    "parent": None,
+                    "orgIDs": org_ids,
+                    "scrape": self.scrape,
+                    "source": self.source,
+                    "spider": self.name,
+                    "org_id_scheme": self.orgid_scheme,
+                }
+            )
         )
