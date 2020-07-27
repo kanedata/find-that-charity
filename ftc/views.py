@@ -76,7 +76,7 @@ def get_orgid(request, org_id, filetype="html", preview=False):
     org = RelatedOrganisation(orgs)
     if filetype == "json":
         return JsonResponse({"org": org.to_json()})
-    return render(request, "org.html.j2", {"org": org,})
+    return render(request, "org.html.j2", {"org": org})
 
 
 def get_random_org(request):

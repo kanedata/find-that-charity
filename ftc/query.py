@@ -175,11 +175,11 @@ class OrganisationSearch:
 
         if with_aggregation:
             self.aggregation["by_source"] = [
-                {"source": b["key"], "records": b["doc_count"],}
+                {"source": b["key"], "records": b["doc_count"]}
                 for b in self.query.aggregations["by_source"]["buckets"]
             ]
             self.aggregation["by_orgtype"] = [
-                {"orgtype": b["key"], "records": b["doc_count"],}
+                {"orgtype": b["key"], "records": b["doc_count"]}
                 for b in self.query.aggregations["by_orgtype"]["buckets"]
             ]
 

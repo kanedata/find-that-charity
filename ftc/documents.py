@@ -30,7 +30,7 @@ class SearchWithTemplate(Search):
 
             if params:
                 search_body = es.render_search_template(
-                    body={"source": self.to_dict(), "params": params,},
+                    body={"source": self.to_dict(), "params": params},
                 )["template_output"]
             else:
                 search_body = self.to_dict()

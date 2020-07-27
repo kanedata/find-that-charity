@@ -227,7 +227,7 @@ class Organisation(models.Model):
     def get_fields_as_properties(cls):
         internal_fields = ["scrape", "spider", "id"]
         return [
-            {"id": f.name, "name": f.verbose_name,}
+            {"id": f.name, "name": f.verbose_name}
             for f in cls._meta.get_fields()
             if f.name not in internal_fields
         ]
@@ -622,7 +622,7 @@ class RelatedOrganisation:
                 for n in r.alternateName:
                     if n not in names_seen:
                         names.append(
-                            {"name": n, "type": "other name", "source": r.source.id,}
+                            {"name": n, "type": "other name", "source": r.source.id}
                         )
                         names_seen.add(n)
 
