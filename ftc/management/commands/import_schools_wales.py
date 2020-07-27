@@ -91,7 +91,7 @@ class Command(HTMLScraper):
         ])
         org_types = self.get_org_types(record)
 
-        if not record.get("School Name"):
+        if not record.get("School Name") or not record.get("School Number"):
             return
 
         self.records.append(
