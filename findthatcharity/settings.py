@@ -35,11 +35,11 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(";") if os.environ.get('AL
 # Application definition
 
 INSTALLED_APPS = [
-    'django_elasticsearch_dsl',
     'ftc.apps.FtcConfig',
     'charity.apps.CharityConfig',
     'reconcile.apps.ReconcileConfig',
     'addtocsv.apps.AddtocsvConfig',
+    'django_elasticsearch_dsl',
     'django.contrib.postgres',
     'django.contrib.admin',
     'django.contrib.auth',

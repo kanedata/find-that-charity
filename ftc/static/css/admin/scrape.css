@@ -1,4 +1,5 @@
-#scrape_form #id_log {
+#scrape_form #id_log,
+#scrape_form div.field-log .readonly {
     background-color: black;
     color: lightblue;
     font-family: consolas, monospace;
@@ -7,4 +8,5 @@
     white-space: pre;
     width: calc(100% - 190px);
     line-height: 1.4em;
+    padding: 8px;
 }

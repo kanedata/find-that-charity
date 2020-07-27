@@ -26,10 +26,18 @@ class JSONFieldAdmin(admin.ModelAdmin, DynamicArrayMixin):
 
 
 class OrganisationAdmin(JSONFieldAdmin):
-    list_display = ('org_id', 'name', 'source_', 'scrape_', 'organisation_type',
-                    'active', 'dateRegistered', 'dateRemoved')
-    list_filter = ('active', 'source', 'organisationTypePrimary')
-    search_fields = ['name']
+    list_display = (
+        "org_id",
+        "name",
+        "source_",
+        "scrape_",
+        "organisation_type",
+        "active",
+        "dateRegistered",
+        "dateRemoved",
+    )
+    list_filter = ("active", "source", "organisationTypePrimary")
+    search_fields = ["name"]
 
     def source_(self, obj):
         link = reverse("admin:ftc_source_change", args=[obj.source.id])
@@ -40,9 +48,13 @@ class OrganisationAdmin(JSONFieldAdmin):
         return mark_safe('<a href="%s">%s</a>' % (link, str(obj.scrape)))
 
     def organisation_type(self, obj):
-        link = reverse("admin:ftc_organisationtype_change",
-                       args=[obj.organisationTypePrimary.slug])
-        return mark_safe('<a href="%s">%s</a>' % (link, str(obj.organisationTypePrimary)))
+        link = reverse(
+            "admin:ftc_organisationtype_change", args=[obj.organisationTypePrimary.slug]
+        )
+        return mark_safe(
+            '<a href="%s">%s</a>' % (link, str(obj.organisationTypePrimary))
+        )
+
     # inlines = [CharityFinancialInline, CharityNameInline]
 
     # def view_on_site(self, obj):
@@ -52,8 +64,8 @@ class OrganisationAdmin(JSONFieldAdmin):
 
 
 class SourceAdmin(JSONFieldAdmin):
-    list_display = ('id', 'publisher', 'title', 'item_count', 'link_count')
-    search_fields = ('title', )
+    list_display = ("id", "publisher", "title", "item_count", "link_count")
+    search_fields = ("title",)
     list_filter = ()
 
     def item_count(self, obj):
@@ -64,15 +76,34 @@ class SourceAdmin(JSONFieldAdmin):
 
 
 class ScrapeAdmin(SourceAdmin):
-    list_display = ('id', 'spider', 'start_time', 'finish_time',
-                    'errors', 'status', 'item_count', 'link_count', )
-    list_filter = ('status', 'spider', )
+    list_display = (
+        "id",
+        "spider",
+        "start_time",
+        "finish_time",
+        "status",
+        "errors",
+        "items",
+        "item_count",
+        "link_count",
+    )
+    list_filter = (
+        "status",
+        "spider",
+    )
     search_fields = ()
+    readonly_fields = [
+        "start_time",
+        "finish_time",
+        "log",
+        "result",
+        "items",
+        "errors",
+        "status",
+    ]
 
     class Media:
-        css = {
-            'all': ('css/admin/scrape.css',)
-        }
+        css = {"all": ("css/admin/scrape.css",)}
 
 
 admin.site.site_header = "Find that Charity admin"
