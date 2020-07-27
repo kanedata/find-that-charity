@@ -69,6 +69,11 @@ class ScrapeAdmin(SourceAdmin):
     list_filter = ('status', 'spider', )
     search_fields = ()
 
+    class Media:
+        css = {
+            'all': ('css/admin/scrape.css',)
+        }
+
 
 admin.site.site_header = "Find that Charity admin"
 admin.site_site_title = admin.site.site_header

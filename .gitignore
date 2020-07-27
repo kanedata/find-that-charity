@@ -5,8 +5,7 @@ data/
 !ftc/tests/data/*.zip
 
 # djangofiles
-static/
-
+/static/
 
 # python files
 __pycache__/
