@@ -362,6 +362,10 @@ class RelatedOrganisation:
             ["https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{}",
              "Get information about schools"],
         ],
+        "GB-UKPRN": [
+            ["https://www.ukrlp.co.uk/ukrlp/ukrlp_provider.page_pls_provDetails?x=&pn_p_id={}&pv_status=VERIFIED&pv_vis_code=L",
+             "UK Register of Learning Providers"],
+        ],
         "GB-NHS": [
             ["https://odsportal.hscic.gov.uk/Organisation/Details/{}", "NHS Digital"],
         ],
