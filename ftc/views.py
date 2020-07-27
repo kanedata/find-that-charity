@@ -7,7 +7,8 @@ from django.urls import reverse
 from django.views.decorators.cache import cache_page
 
 from ftc.documents import FullOrganisation
-from ftc.models import Organisation, OrganisationType, RelatedOrganisation, Source
+from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
+                        Source)
 from ftc.query import OrganisationSearch, random_query
 
 

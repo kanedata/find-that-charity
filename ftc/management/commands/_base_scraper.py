@@ -12,14 +12,8 @@ from django.db import connection
 from django.utils.text import slugify
 
 from ftc.management.commands._db_logger import ScrapeHandler
-from ftc.models import (
-    Organisation,
-    OrganisationLink,
-    OrganisationType,
-    OrgidScheme,
-    Scrape,
-    Source,
-)
+from ftc.models import (Organisation, OrganisationLink, OrganisationType,
+                        OrgidScheme, Scrape, Source)
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
