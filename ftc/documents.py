@@ -164,7 +164,7 @@ class FullOrganisation(Document):
         Return the queryset that should be indexed by this doc type.
         """
         return (
-            self.django.model.objects.filter(linked_orgs__isnull=False).order_by("linked_orgs")[:10]
+            self.django.model.objects.filter(linked_orgs__isnull=False).order_by("linked_orgs")
         )
 
     def get_indexing_queryset(self):
