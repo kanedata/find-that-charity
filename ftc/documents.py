@@ -6,7 +6,7 @@ from math import ceil
 import tqdm
 from django.core.paginator import EmptyPage, Page, PageNotAnInteger, Paginator
 from django.utils.translation import gettext_lazy as _
-from django_elasticsearch_dsl import Document, fields
+from django_elasticsearch_dsl import Document, fields, Index
 from django_elasticsearch_dsl.registries import registry
 from django_elasticsearch_dsl.search import Search
 from elasticsearch.helpers import bulk
@@ -243,6 +243,7 @@ class FullOrganisation(Document):
 
         # delete any items where the load_id isn't the current one
         self.logger.info("Deleting previous objects")
+        Index(self._get_index()).refresh()
         s = self.search().exclude("term", loadID=self.scrape.id).params(timeout="2h", request_timeout=REQUEST_TIMEOUT)
         try:
             response = s.delete()
@@ -265,6 +266,10 @@ class FullOrganisation(Document):
         self.scrape_logger.setFormatter(scrape_log_format)
         self.scrape_logger.setLevel(logging.INFO)
         self.logger.addHandler(self.scrape_logger)
+
+        # hook into elasticsearch logger too
+        es_logger = logging.getLogger("elasticsearch")
+        es_logger.addHandler(self.scrape_logger)
 
     class Django:
         model = Organisation  # The model associated with this Document
