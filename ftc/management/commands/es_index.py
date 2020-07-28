@@ -91,9 +91,6 @@ class Command(BaseScraper):
         doc.update(qs, parallel=parallel)
         self.logger.info("Indexing objects - done")
 
-        # refresh the index
-        es.indices.refresh(index=next_index)
-
         # alias the index to the proper name
         self.logger.info("Reset aliases")
         es.indices.update_aliases(body={
