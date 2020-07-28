@@ -13,8 +13,6 @@ from elasticsearch_dsl.connections import get_connection
 
 from .models import Organisation, RelatedOrganisation
 
-REQUEST_TIMEOUT = 3600
-
 
 class SearchWithTemplate(Search):
     def execute(self, ignore_cache=False, params=None):
@@ -188,7 +186,7 @@ class FullOrganisation(Document):
         if self.django.queryset_pagination and "chunk_size" not in kwargs:
             kwargs["chunk_size"] = self.django.queryset_pagination
         return bulk(
-            client=self._get_connection(), actions=actions, request_timeout=REQUEST_TIMEOUT, **kwargs
+            client=self._get_connection(), actions=actions, **kwargs
         )
 
     class Django:

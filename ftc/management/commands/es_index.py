@@ -8,6 +8,7 @@ from ftc.documents import FullOrganisation
 
 ALIAS = 'full-organisation-load'
 PATTERN = ALIAS + '-*'
+REQUEST_TIMEOUT = 3600
 
 
 class FullOrganisationAlias(FullOrganisation):
@@ -88,7 +89,7 @@ class Command(BaseScraper):
             "(parallel)" if parallel else "")
         )
         qs = doc.get_indexing_queryset()
-        doc.update(qs, parallel=parallel)
+        doc.update(qs, parallel=parallel, request_timeout=REQUEST_TIMEOUT)
         self.logger.info("Indexing objects - done")
 
         # alias the index to the proper name
