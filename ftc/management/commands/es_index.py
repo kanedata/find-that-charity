@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.core import management
 
 from ftc.management.commands._base_scraper import BaseScraper
 from ftc.documents import FullOrganisation
@@ -60,6 +61,9 @@ class Command(BaseScraper):
         # setup logging to capture elasticsearch output
         self.logging_setup()
 
+        # run the update_orgids scraper
+        management.call_command("update_orgids")
+
         # create new index
         next_index = PATTERN.replace('*', str(self.scrape.id))
         self.logger.info("New index name: {}".format(next_index))
@@ -89,8 +93,16 @@ class Command(BaseScraper):
             "(parallel)" if parallel else "")
         )
         qs = doc.get_indexing_queryset()
-        doc.update(qs, parallel=parallel, request_timeout=REQUEST_TIMEOUT)
+        result = doc.update(qs, parallel=parallel, request_timeout=REQUEST_TIMEOUT)
+        self.scrape.items = result[0]
+        self.scrape.results = {
+            "records_indexed": result[0],
+            "errors": result[1],
+        }
         self.logger.info("Indexing objects - done")
+
+        if not result[0] or result[1]:
+            raise Exception("Organisations were not indexed")
 
         # alias the index to the proper name
         self.logger.info("Reset aliases")
@@ -116,3 +128,7 @@ class Command(BaseScraper):
         # hook into elasticsearch logger too
         es_logger = logging.getLogger("elasticsearch")
         es_logger.addHandler(self.scrape_logger)
+
+        # hook into the update_orgids logger
+        uo_logger = logging.getLogger("ftc.management.commands.update_orgids")
+        uo_logger.addHandler(self.scrape_logger)

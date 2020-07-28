@@ -455,23 +455,57 @@ class RelatedOrganisation:
 
     def __init__(self, orgs):
         self.records = self.prioritise_orgs(orgs)
-        self.setNames()
-        self.orgIDs = list(set(self.get_all("orgIDs")))
-        self.alternateName = self.get_alternateNames()
-        self.name = self.names.get(self.records[0].name.lower(), self.records[0].name)
-        self.sources = list(self.get_all("source"))
-
-        self.org_links = []
-        for o in self.records:
-            self.org_links.extend(o.org_links())
-        self.org_links = list(set(self.org_links))
-        self.sources.extend(list(set([o.source for o in self.org_links])))
-        self.sources = list(set(self.sources))
 
     @classmethod
     def from_orgid(cls, org_id):
         orgs = Organisation.objects.filter(linked_orgs__contains=[org_id])
         return cls(orgs)
+
+    @property
+    def orgIDs(self):
+        return list(set(self.get_all("orgIDs")))
+
+    @property
+    def names(self):
+        names = {}
+        for r in self.records:
+            for n in r.all_names:
+                if n not in names or not n.isupper() or not n.islower():
+                    names[n.lower().strip()] = n
+        return names
+
+    @property
+    def alternateName(self):
+        names = self.get_all("all_names")
+        return list(
+            set(
+                [
+                    self.names.get(n.lower().strip(), n)
+                    for n in names
+                    if n.lower().strip() != self.name.lower().strip()
+                ]
+            )
+        )
+
+    @property
+    def name(self):
+        return self.names.get(
+            self.records[0].name.lower(),
+            self.records[0].name
+        )
+
+    @property
+    def sources(self):
+        sources = list(self.get_all("source"))
+        sources.extend([o.source for o in self.org_links])
+        return list(set(sources))
+
+    @property
+    def org_links(self):
+        org_links = []
+        for o in self.records:
+            org_links.extend(o.org_links())
+        return list(set(self.org_links))
 
     def __getattr__(self, key, *args):
         return getattr(self.records[0], key, *args)
@@ -500,25 +534,6 @@ class RelatedOrganisation:
                 if v not in seen:
                     yield v
                 seen.add(v)
-
-    def setNames(self):
-        self.names = {}
-        for r in self.records:
-            for n in r.all_names:
-                if n not in self.names or not n.isupper() or not n.islower():
-                    self.names[n.lower().strip()] = n
-
-    def get_alternateNames(self):
-        names = self.get_all("all_names")
-        return list(
-            set(
-                [
-                    self.names.get(n.lower().strip(), n)
-                    for n in names
-                    if n.lower().strip() != self.name.lower().strip()
-                ]
-            )
-        )
 
     def prioritise_orgs(self, orgs):
         # Decide what order a list of organisations should go in,

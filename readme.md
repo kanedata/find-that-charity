@@ -48,7 +48,7 @@ dokku postgres:link find-that-charity-db find-that-charity
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
 export ELASTICSEARCH_IMAGE="elasticsearch"
-export ELASTICSEARCH_IMAGE_VERSION="7.7"
+export ELASTICSEARCH_IMAGE_VERSION="7.7.1"
 dokku elasticsearch:create find-that-charity-es
 dokku elasticsearch:link find-that-charity-es find-that-charity
 # configure elasticsearch 7:

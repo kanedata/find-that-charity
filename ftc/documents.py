@@ -154,7 +154,7 @@ class FullOrganisation(Document):
         return instance.latestIncome
 
     def prepare_source(self, instance):
-        return [s.id for s in instance.sources]
+        return list(instance.get_all("source_id"))
 
     def prepare_org_id(self, instance):
         return str(instance.org_id)
@@ -164,9 +164,7 @@ class FullOrganisation(Document):
         Return the queryset that should be indexed by this doc type.
         """
         return (
-            self.django.model.objects.order_by("linked_orgs")
-            .prefetch_related("organisationTypePrimary")
-            .prefetch_related("source")
+            self.django.model.objects.filter(linked_orgs__isnull=False).order_by("linked_orgs")[:10]
         )
 
     def get_indexing_queryset(self):
