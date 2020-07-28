@@ -9,4 +9,5 @@
     width: calc(100% - 190px);
     line-height: 1.4em;
     padding: 8px;
+    max-height: 500px;
 }

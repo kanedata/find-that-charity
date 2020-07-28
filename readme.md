@@ -27,7 +27,7 @@ Installation
 10. Import data on charities (`python ./manage.py import_charities`)
 11. Import data on nonprofit companies (`python ./manage.py import_companies`)
 12. Import data on other non-profit organisations (`python ./manage.py import_all`)
-13. Add organisations to elasticsearch index (`python ./manage.py search_index --populate -f`)
+13. Add organisations to elasticsearch index (`python ./manage.py es_index`) - (Don't use the default `search_index` command as this won't setup aliases correctly)
 
 Dokku Installation
 ------------------
@@ -86,7 +86,7 @@ On Dokku server run:
 dokku run find-that-charity python ./manage.py import_charities
 dokku run find-that-charity python ./manage.py import_companies
 dokku run find-that-charity python ./manage.py import_all
-dokku run find-that-charity python ./manage.py search_index --populate -f
+dokku run find-that-charity python ./manage.py es_index
 ```
 
 ### 4. Set up scheduled task for running tasks on a regular basis
@@ -123,15 +123,15 @@ SHELL=/bin/bash
 
 # import charities
 0 2 * * 5 dokku dokku --rm run ftc python ./manage.py import_charities
-0 4 * * 5 dokku dokku --rm run ftc python ./manage.py search_index --populate -f
+0 4 * * 5 dokku dokku --rm run ftc python ./manage.py es_index
 
 # import companies
 0 2 * * 6 dokku dokku --rm run ftc python ./manage.py import_companies
-0 4 * * 6 dokku dokku --rm run ftc python ./manage.py search_index --populate -f
+0 4 * * 6 dokku dokku --rm run ftc python ./manage.py es_index
 
 # import everything else
 0 2 * * 0 dokku dokku --rm run ftc python ./manage.py import_all
-0 4 * * 0 dokku dokku --rm run ftc python ./manage.py search_index --populate -f
+0 4 * * 0 dokku dokku --rm run ftc python ./manage.py es_index
 
 ### PLACE ALL CRON TASKS ABOVE, DO NOT REMOVE THE WHITESPACE AFTER THIS LINE
 ```

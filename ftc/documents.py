@@ -1,4 +1,3 @@
-import logging
 import re
 from itertools import groupby
 from math import ceil
@@ -6,15 +5,13 @@ from math import ceil
 import tqdm
 from django.core.paginator import EmptyPage, Page, PageNotAnInteger, Paginator
 from django.utils.translation import gettext_lazy as _
-from django_elasticsearch_dsl import Document, fields, Index
+from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 from django_elasticsearch_dsl.search import Search
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl.connections import get_connection
 
-from ftc.management.commands._db_logger import ScrapeHandler
-
-from .models import Organisation, RelatedOrganisation, Scrape
+from .models import Organisation, RelatedOrganisation
 
 REQUEST_TIMEOUT = 3600
 
@@ -104,7 +101,6 @@ class FullOrganisation(Document):
     source = fields.KeywordField()
     domain = fields.KeywordField()
     latestIncome = fields.IntegerField()
-    loadID = fields.IntegerField()
 
     @classmethod
     def search(cls, using=None, index=None):
@@ -165,9 +161,6 @@ class FullOrganisation(Document):
     def prepare_org_id(self, instance):
         return str(instance.org_id)
 
-    def prepare_loadID(self, instance):
-        return self.scrape.id
-
     def get_queryset(self):
         """
         Return the queryset that should be indexed by this doc type.
@@ -197,79 +190,6 @@ class FullOrganisation(Document):
         return bulk(
             client=self._get_connection(), actions=actions, request_timeout=REQUEST_TIMEOUT, **kwargs
         )
-
-    def _bulk(self, *args, **kwargs):
-        """Helper for switching between normal and parallel bulk operation"""
-        # add instance id to the records
-        self.scrape = Scrape(
-            spider="es_load", status=Scrape.ScrapeStatus.RUNNING, log="",
-        )
-        self.scrape.save()
-        self.logging_setup()
-        self.logger.info("Indexing objects")
-
-        # run bulk
-        try:
-            parallel = kwargs.pop("parallel", False)
-            self.logger.info(
-                "Indexing {:,.0f} '{}' objects {}".format(
-                    self.get_queryset().count(),
-                    self.django.model.__name__,
-                    "(parallel)" if parallel else "",
-                )
-            )
-            if parallel:
-                res = self.parallel_bulk(*args, **kwargs)
-            else:
-                res = self.bulk(*args, **kwargs)
-            self.scrape.items = res[0]
-            self.logger.info(
-                "Indexed {:,.0f} '{}' objects".format(
-                    res[0], self.django.model.__name__,
-                )
-            )
-            if isinstance(res[1], int):
-                self.scrape.errors = res[1]
-            else:
-                self.scrape.errors = len(res[1])
-        except Exception as err:
-            self.logger.exception(err)
-            self.scrape_logger.teardown()
-            raise
-
-        # save the scrape object
-        self.logger.info("Indexing objects finished")
-        self.scrape_logger.teardown()
-
-        # delete any items where the load_id isn't the current one
-        self.logger.info("Deleting previous objects")
-        Index(self._get_index()).refresh()
-        s = self.search().exclude("term", loadID=self.scrape.id).params(timeout="2h", request_timeout=REQUEST_TIMEOUT)
-        try:
-            response = s.delete()
-        except Exception as err:
-            self.logger.exception(err)
-            self.scrape_logger.teardown()
-            raise
-        self.logger.info("Deleted {:,.0f} previous objects".format(response["deleted"]))
-
-        return res
-
-    def logging_setup(self):
-
-        # set up logging
-        self.logger = logging.getLogger("es_load")
-        self.scrape_logger = ScrapeHandler(self.scrape)
-        scrape_log_format = logging.Formatter(
-            "{levelname} {asctime} [{name}] {message}", style="{"
-        )
-        self.scrape_logger.setFormatter(scrape_log_format)
-        self.scrape_logger.setLevel(logging.INFO)
-        self.logger.addHandler(self.scrape_logger)
-
-        # hook into elasticsearch logger too
-        es_logger = logging.getLogger("elasticsearch")
-        es_logger.addHandler(self.scrape_logger)
 
     class Django:
         model = Organisation  # The model associated with this Document

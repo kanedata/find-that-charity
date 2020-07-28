@@ -74,13 +74,13 @@ class BaseScraper(BaseCommand):
 
         # set up logging
         self.logger = logging.getLogger("ftc.{}".format(self.name))
-        scrape_logger = ScrapeHandler(self.scrape)
+        self.scrape_logger = ScrapeHandler(self.scrape)
         scrape_log_format = logging.Formatter(
             "{levelname} {asctime} [{name}] {message}", style="{"
         )
-        scrape_logger.setFormatter(scrape_log_format)
-        scrape_logger.setLevel(logging.INFO)
-        self.logger.addHandler(scrape_logger)
+        self.scrape_logger.setFormatter(scrape_log_format)
+        self.scrape_logger.setLevel(logging.INFO)
+        self.logger.addHandler(self.scrape_logger)
 
         self.post_sql = {"update_domains": UPDATE_DOMAINS}
 
@@ -100,11 +100,7 @@ class BaseScraper(BaseCommand):
             self.run_scraper(*args, **options)
         except Exception as err:
             self.logger.exception(err)
-            if self.object_count == 0:
-                self.scrape.status = Scrape.ScrapeStatus.FAILED
-            else:
-                self.scrape.status = Scrape.ScrapeStatus.ERRORS
-            self.scrape.save()
+            self.scrape_logger.teardown()
             raise
 
     def run_scraper(self, *args, **options):
@@ -176,13 +172,7 @@ class BaseScraper(BaseCommand):
             )
         self.scrape.errors = self.error_count
         self.scrape.result = results
-        if self.object_count == 0:
-            self.scrape.status = Scrape.ScrapeStatus.FAILED
-        elif self.error_count > 0:
-            self.scrape.status = Scrape.ScrapeStatus.ERRORS
-        else:
-            self.scrape.status = Scrape.ScrapeStatus.SUCCESS
-        self.scrape.save()
+        self.scrape_logger.teardown()
 
         # if we've been successfull then delete previous items
         if self.object_count > 0:
