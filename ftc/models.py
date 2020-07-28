@@ -505,7 +505,7 @@ class RelatedOrganisation:
         org_links = []
         for o in self.records:
             org_links.extend(o.org_links())
-        return list(set(self.org_links))
+        return list(set(org_links))
 
     def __getattr__(self, key, *args):
         return getattr(self.records[0], key, *args)
