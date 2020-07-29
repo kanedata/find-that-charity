@@ -391,22 +391,6 @@ class Organisation(models.Model):
                     continue
                 yield v.get("geoCode")
 
-    def geoJson(self):
-        GEOJSON_URL = 'https://findthatpostcode.uk/areas/{}.geojson'
-        features = []
-        for geocode in self.geoCodes():
-            r = requests.get(GEOJSON_URL.format(geocode))
-            if r.status_code == requests.codes.ok:
-                features.extend(r.json().get("features", []))
-        return features
-
-    def geoPoint(self):
-        GEOPOINT_URL = 'https://findthatpostcode.uk/postcodes/{}.json'
-        if self.postalCode:
-            r = requests.get(GEOPOINT_URL.format(self.postalCode))
-            if r.status_code == requests.codes.ok:
-                return r.json().get("data", {}).get("attributes", {}).get("location")
-
 
 class OrganisationType(models.Model):
     slug = models.SlugField(max_length=255, editable=False, primary_key=True)
