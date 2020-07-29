@@ -39,19 +39,19 @@
             {% endif %}
             {% if v.startswith("GB-CHC-") %}
               <p>
-                <strong class="is-size-7">CCEW Charity number</strong><br>
+                <strong class="is-size-7"><abbr title="Charity Commission for England and Wales">CCEW</abbr> Charity number</strong><br>
                 <a class="link dark-blue underline-hover f4" href="http://beta.charitycommission.gov.uk/charity-details/?regid={{ v.replace('GB-CHC-', '') }}&subid=0" target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
               </p>
             {% endif %}
             {% if v.startswith("GB-NIC-") %}
               <p>
-                <strong class="is-size-7">CCNI Charity number</strong><br>
+                <strong class="is-size-7"><abbr title="Charity Commission for Northern Ireland">CCNI</abbr> Charity number</strong><br>
                 <a class="link dark-blue underline-hover f4" href="http://www.charitycommissionni.org.uk/charity-details/?regid={{ v.replace('GB-NIC-', '').replace('NIC', '')}}&subid=0" target="_blank">{{ v.replace('GB-NIC-', '') }}</a>
               </p>
             {% endif %}
             {% if v.startswith("GB-SC-") %}
               <p>
-                <strong class="is-size-7">OSCR Charity number</strong><br>
+                <strong class="is-size-7"><abbr title="Scottish Charity Regulator">OSCR</abbr> Charity number</strong><br>
                 <a class="link dark-blue underline-hover f4" href="https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={{ v.replace('GB-SC-', '') }}" target="_blank">{{ v.replace('GB-SC-', '') }}</a>
               </p>
             {% endif %}

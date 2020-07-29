@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.indexes import GinIndex
@@ -6,6 +7,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django_better_admin_arrayfield.models.fields import ArrayField
+import requests
 
 IGNORE_DOMAINS = (
     "gmail.com",
@@ -371,6 +373,39 @@ class Organisation(models.Model):
         if not self.url.startswith("http") and not self.url.startswith("//"):
             return "http://" + self.url
         return self.url
+
+    def geoCodes(self):
+
+        special_cases = {
+            'K02000001': ['E92000001', 'N92000002', 'S92000003', 'W92000004'],  # United Kingdom
+            'K03000001': ['E92000001', 'S92000003', 'W92000004'],  # Great Britain
+            'K04000001': ['E92000001', 'W92000004'],  # England and Wales
+        }
+
+        for v in self.location:
+            if v.get("geoCode") and re.match("[ENWSK][0-9]{8}", v.get("geoCode")):
+                # special case for combinations of countries
+                if v['geoCode'] in special_cases:
+                    for a in special_cases[v['geoCode']]:
+                        yield a
+                    continue
+                yield v.get("geoCode")
+
+    def geoJson(self):
+        GEOJSON_URL = 'https://findthatpostcode.uk/areas/{}.geojson'
+        features = []
+        for geocode in self.geoCodes():
+            r = requests.get(GEOJSON_URL.format(geocode))
+            if r.status_code == requests.codes.ok:
+                features.extend(r.json().get("features", []))
+        return features
+
+    def geoPoint(self):
+        GEOPOINT_URL = 'https://findthatpostcode.uk/postcodes/{}.json'
+        if self.postalCode:
+            r = requests.get(GEOPOINT_URL.format(self.postalCode))
+            if r.status_code == requests.codes.ok:
+                return r.json().get("data", {}).get("attributes", {}).get("location")
 
 
 class OrganisationType(models.Model):

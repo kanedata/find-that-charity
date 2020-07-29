@@ -24,6 +24,12 @@
 
 {% block headscripts %}
 {{ super() }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
 <script type="application/ld+json">
 {{ org.schema_dot_org(request)|tojson(indent=4) }}
 </script>
@@ -90,13 +96,13 @@
   </div>
 
   <div class="w-100 flex flex-wrap">
-    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    <div class="w-100 f5 pr3 pb3">
     {{ org_record(org, {}, request) }}
     </div>
   </div>
 
   {% if related_orgs.records|length > 1 %}
-  <h4 class="f5 f4-ns mb3 mt0 normal">
+  <h4 class="f5 f4-ns mb3 mt0 normal measure">
     This organisation is based on records from {{ related_orgs.sources|map(attribute="publisher")|unique|list|list_to_string }}:
   </h4>
   {% endif %}
@@ -133,6 +139,43 @@
   {% if org.location|length or org.postalCode %}
   <article class="message is-info">
     <h4 class="ma0 pa0">Locations</h4>
+    <p class="f6 gray">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>
+    <div id="locationmap" class="h5"></div>
+    <script>
+      function addNamePopup(feature, layer) {
+          if (feature.properties && feature.properties.name) {
+              layer.bindPopup(feature.properties.name);
+          }
+      }
+      const GEOJSON = {{ org.geoJson()|tojson }};
+      const GEOPOINT = {{ org.geoPoint()|tojson }};
+      var bounds = L.latLngBounds(
+        L.latLng(49.8647440573549, -8.649995833304311),
+        L.latLng(60.86078239016185, 1.763705609663519),
+      );
+      const TILES = 'https://stamen-tiles-{s}.a.ssl.fastly.net/{style}/{z}/{x}/{y}.png';
+      if(GEOJSON || GEOPOINT){
+        var map = L.map('locationmap').setView([51.505, -0.09], 13);
+        L.tileLayer(TILES, {style: 'toner'}).addTo(map);
+
+        if(GEOJSON){
+          var layer = L.geoJSON(GEOJSON, {
+            onEachFeature: function(feature, layer) {
+              if (feature.properties && feature.properties.name) {
+                  layer.bindPopup(feature.properties.name);
+              }
+            }
+          }).addTo(map);
+          bounds = layer.getBounds();
+        }
+        if(GEOPOINT){
+          var point = L.latLng(GEOPOINT.lat, GEOPOINT.lon);
+          var marker = L.marker(point).addTo(map);
+          bounds.extend(point);
+        }
+        map.fitBounds(bounds);
+      }
+    </script>
     <div class="message-body">
       <ul class="mb4 mt2 list mh0 pa0 f5">
       {% for v in org.location %}
@@ -144,7 +187,7 @@
         </li>
         {% else %}
         <li class="w-100 mb2">
-          {{ v.name|titlecase }} {% if v.geoCode %}({{ v.geoCode }}){% endif %}
+          {{ v.name|titlecase }} {% if v.geoCode %}(<code>{{ v.geoCode }}</code>){% endif %}
           {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
           {# {{ show_sources(v) }} #}
         </li>
