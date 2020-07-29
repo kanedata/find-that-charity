@@ -72,11 +72,15 @@ def org_search(request):
 
 
 def get_orgid(request, org_id, filetype="html", preview=False):
-    orgs = get_list_or_404(Organisation, linked_orgs__contains=[org_id])
-    org = RelatedOrganisation(orgs)
+    org = get_object_or_404(Organisation, org_id=org_id)
+    related_orgs = get_list_or_404(Organisation, linked_orgs__contains=[org_id])
+    related_orgs = RelatedOrganisation(related_orgs)
     if filetype == "json":
         return JsonResponse({"org": org.to_json()})
-    return render(request, "org.html.j2", {"org": org})
+    return render(request, "orgid.html.j2", {
+        "org": org,
+        "related_orgs": related_orgs,
+    })
 
 
 def get_random_org(request):

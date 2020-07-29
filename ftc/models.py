@@ -43,6 +43,94 @@ IGNORE_DOMAINS = (
 )
 
 
+EXTERNAL_LINKS = {
+    "GB-CHC": [
+        [
+            "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber={}&SubsidiaryNumber=0&Ref=CO",
+            "Charity Commission England and Wales",
+        ],
+        [
+            "http://beta.charitycommission.gov.uk/charity-details/?regid={}&subid=0",
+            "Charity Commission England and Wales (beta)",
+        ],
+        ["https://charitybase.uk/charities/{}", "CharityBase"],
+        ["http://opencharities.org/charities/{}", "OpenCharities"],
+        ["http://www.guidestar.org.uk/summary.aspx?CCReg={}", "GuideStar"],
+        [
+            "http://www.charitychoice.co.uk/charities/search?t=qsearch&q={}",
+            "Charities Direct",
+        ],
+    ],
+    "GB-COH": [
+        ["https://beta.companieshouse.gov.uk/company/{}", "Companies House"],
+        ["https://opencorporates.com/companies/gb/{}", "Opencorporates"],
+    ],
+    "GB-NIC": [
+        [
+            "http://www.charitycommissionni.org.uk/charity-details/?regid={}&subid=0",
+            "Charity Commission Northern Ireland",
+        ],
+    ],
+    "GB-SC": [
+        [
+            "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={}",
+            "Office of Scottish Charity Regulator",
+        ],
+    ],
+    "GB-EDU": [
+        [
+            "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{}",
+            "Get information about schools",
+        ],
+    ],
+    "GB-UKPRN": [
+        [
+            "https://www.ukrlp.co.uk/ukrlp/ukrlp_provider.page_pls_provDetails?x=&pn_p_id={}&pv_status=VERIFIED&pv_vis_code=L",
+            "UK Register of Learning Providers",
+        ],
+    ],
+    "GB-NHS": [
+        ["https://odsportal.hscic.gov.uk/Organisation/Details/{}", "NHS Digital"],
+    ],
+    "GB-LAE": [
+        [
+            "https://www.registers.service.gov.uk/registers/local-authority-eng/records/{}",
+            "Local authorities in England",
+        ],
+    ],
+    "GB-LAN": [
+        [
+            "https://www.registers.service.gov.uk/registers/local-authority-nir/records/{}",
+            "Local authorities in Northern Ireland",
+        ],
+    ],
+    "GB-LAS": [
+        [
+            "https://www.registers.service.gov.uk/registers/local-authority-sct/records/{}",
+            "Local authorities in Scotland",
+        ],
+    ],
+    "GB-PLA": [
+        [
+            "https://www.registers.service.gov.uk/registers/principal-local-authority/records/{}",
+            "Principal Local authorities in Wales",
+        ],
+    ],
+    "GB-GOR": [
+        [
+            "https://www.registers.service.gov.uk/registers/government-organisation/records/{}",
+            "Government organisations on GOV.UK",
+        ],
+    ],
+    "XI-GRID": [
+        [
+            "https://www.grid.ac/institutes/{}",
+            "Global Research Identifier Database",
+        ],
+    ],
+}
+
+
 class Orgid(str):
     def __new__(cls, content):
         instance = super().__new__(cls, content)
@@ -199,6 +287,7 @@ class Organisation(models.Model):
     def __str__(self):
         return "%s %s" % (self.organisationTypePrimary.title, self.org_id)
 
+    @property
     def org_links(self):
         return OrganisationLink.objects.filter(
             models.Q(org_id_a=self.org_id) | models.Q(org_id_b=self.org_id)
@@ -231,6 +320,57 @@ class Organisation(models.Model):
             for f in cls._meta.get_fields()
             if f.name not in internal_fields
         ]
+
+    def schema_dot_org(self, request=None):
+        """Return a schema.org Organisation object representing this organisation"""
+
+        obj = {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": self.name,
+            "identifier": self.org_id,
+        }
+
+        if self.url:
+            obj["url"] = self.url
+        if self.description:
+            obj["description"] = self.description
+        if self.alternateName:
+            obj["alternateName"] = self.alternateName
+        if self.dateRegistered:
+            obj["foundingDate"] = self.dateRegistered.isoformat()
+        if not self.active and self.dateRemoved:
+            obj["dissolutionDate"] = self.dateRemoved.isoformat()
+        if len(self.orgIDs) > 1:
+            if request:
+                obj["sameAs"] = [request.build_absolute_uri(id) for id in self.sameAs]
+            else:
+                obj["sameAs"] = self.sameAs
+        return obj
+
+    def get_links(self):
+        if self.url:
+            yield (self.cleanUrl, "Organisation Website")
+        for o in self.orgIDs:
+            links = EXTERNAL_LINKS.get(o.scheme, [])
+            for link in links:
+                yield (link[0].format(o.id), link[1])
+
+    @property
+    def sameAs(self):
+        return [
+            reverse("orgid_html", kwargs=dict(org_id=o))
+            for o in self.orgIDs
+            if o != self.org_id
+        ]
+
+    @property
+    def cleanUrl(self):
+        if not self.url:
+            return None
+        if not self.url.startswith("http") and not self.url.startswith("//"):
+            return "http://" + self.url
+        return self.url
 
 
 class OrganisationType(models.Model):
@@ -365,94 +505,6 @@ class OrgidScheme(models.Model):
 
 class RelatedOrganisation:
 
-    EXTERNAL_LINKS = {
-        "GB-CHC": [
-            [
-                "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber={}&SubsidiaryNumber=0&Ref=CO",
-                "Charity Commission England and Wales",
-            ],
-            [
-                "http://beta.charitycommission.gov.uk/charity-details/?regid={}&subid=0",
-                "Charity Commission England and Wales (beta)",
-            ],
-            ["https://charitybase.uk/charities/{}", "CharityBase"],
-            ["http://opencharities.org/charities/{}", "OpenCharities"],
-            ["http://www.guidestar.org.uk/summary.aspx?CCReg={}", "GuideStar"],
-            [
-                "http://www.charitychoice.co.uk/charities/search?t=qsearch&q={}",
-                "Charities Direct",
-            ],
-            ["https://olib.uk/charity/html/{}", "CharityData by Olly Benson"],
-        ],
-        "GB-COH": [
-            ["https://beta.companieshouse.gov.uk/company/{}", "Companies House"],
-            ["https://opencorporates.com/companies/gb/{}", "Opencorporates"],
-        ],
-        "GB-NIC": [
-            [
-                "http://www.charitycommissionni.org.uk/charity-details/?regid={}&subid=0",
-                "Charity Commission Northern Ireland",
-            ],
-        ],
-        "GB-SC": [
-            [
-                "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={}",
-                "Office of Scottish Charity Regulator",
-            ],
-        ],
-        "GB-EDU": [
-            [
-                "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{}",
-                "Get information about schools",
-            ],
-        ],
-        "GB-UKPRN": [
-            [
-                "https://www.ukrlp.co.uk/ukrlp/ukrlp_provider.page_pls_provDetails?x=&pn_p_id={}&pv_status=VERIFIED&pv_vis_code=L",
-                "UK Register of Learning Providers",
-            ],
-        ],
-        "GB-NHS": [
-            ["https://odsportal.hscic.gov.uk/Organisation/Details/{}", "NHS Digital"],
-        ],
-        "GB-LAE": [
-            [
-                "https://www.registers.service.gov.uk/registers/local-authority-eng/records/{}",
-                "Local authorities in England",
-            ],
-        ],
-        "GB-LAN": [
-            [
-                "https://www.registers.service.gov.uk/registers/local-authority-nir/records/{}",
-                "Local authorities in Northern Ireland",
-            ],
-        ],
-        "GB-LAS": [
-            [
-                "https://www.registers.service.gov.uk/registers/local-authority-sct/records/{}",
-                "Local authorities in Scotland",
-            ],
-        ],
-        "GB-PLA": [
-            [
-                "https://www.registers.service.gov.uk/registers/principal-local-authority/records/{}",
-                "Principal Local authorities in Wales",
-            ],
-        ],
-        "GB-GOR": [
-            [
-                "https://www.registers.service.gov.uk/registers/government-organisation/records/{}",
-                "Government organisations on GOV.UK",
-            ],
-        ],
-        "XI-GRID": [
-            [
-                "https://www.grid.ac/institutes/{}",
-                "Global Research Identifier Database",
-            ],
-        ],
-    }
-
     def __init__(self, orgs):
         self.records = self.prioritise_orgs(orgs)
 
@@ -504,7 +556,7 @@ class RelatedOrganisation:
     def org_links(self):
         org_links = []
         for o in self.records:
-            org_links.extend(o.org_links())
+            org_links.extend(o.org_links)
         return list(set(org_links))
 
     def __getattr__(self, key, *args):
@@ -541,12 +593,12 @@ class RelatedOrganisation:
         return sorted(orgs, key=lambda o: o.get_priority())
 
     def get_links(self):
-        if self.url:
-            yield (self.url, "Organisation Website")
-        for o in self.orgIDs:
-            links = self.EXTERNAL_LINKS.get(o.scheme, [])
-            for link in links:
-                yield (link[0].format(o.id), link[1])
+        links_seen = set()
+        for r in self.records:
+            for link in r.get_links():
+                if link[1] not in links_seen:
+                    yield link
+                links_seen.add(link[1])
 
     @property
     def sameAs(self):
@@ -605,18 +657,18 @@ class RelatedOrganisation:
             for o in self.orgIDs:
                 if o.startswith("GB-CHC-"):
                     ccew_number = o.replace("GB-CHC-", "")
-                    ccew_link = self.EXTERNAL_LINKS["GB-CHC"][1][0].format(ccew_number)
+                    ccew_link = EXTERNAL_LINKS["GB-CHC"][1][0].format(ccew_number)
                 elif o.startswith("GB-NIC-"):
                     ccni_number = o.replace("GB-NIC-", "")
-                    ccni_link = self.EXTERNAL_LINKS["GB-NIC"][0][0].format(ccni_number)
+                    ccni_link = EXTERNAL_LINKS["GB-NIC"][0][0].format(ccni_number)
                 elif o.startswith("GB-SC-"):
                     oscr_number = o.replace("GB-SC-", "")
-                    oscr_link = self.EXTERNAL_LINKS["GB-SC"][0][0].format(oscr_number)
+                    oscr_link = EXTERNAL_LINKS["GB-SC"][0][0].format(oscr_number)
                 elif o.startswith("GB-COH-"):
                     company_numbers.append(
                         {
                             "number": o.replace("GB-COH-", ""),
-                            "url": self.EXTERNAL_LINKS["GB-COH"][0][0].format(
+                            "url": EXTERNAL_LINKS["GB-COH"][0][0].format(
                                 o.replace("GB-COH-", "")
                             ),
                             "source": self.source.id,

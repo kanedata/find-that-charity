@@ -88,7 +88,7 @@
           {% if record.url %}
           <p>
             <strong class="is-size-7">Website</strong><br>
-            <a href="{{ record.url }}" class="link underline-hover blue">{{ record.url|replace("http://", "")|replace("https://", "") }}</a>
+            <a href="{{ record.cleanUrl }}" class="link underline-hover blue">{{ record.url|replace("http://", "")|replace("https://", "") }}</a>
           </p>
           {% endif %}
           {% if record.domain %}
