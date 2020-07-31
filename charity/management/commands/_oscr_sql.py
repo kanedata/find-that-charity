@@ -72,7 +72,7 @@ where cc.spider = 'oscr'
     and cc.data->>'Year End' is not null
 on conflict (charity_id, fyend) do update
 set income = EXCLUDED.income,
-    inc_total = EXCLUDED.inc_total
+    inc_total = EXCLUDED.inc_total,
     inc_other = EXCLUDED.inc_other,
     inc_invest = EXCLUDED.inc_invest,
     inc_char = EXCLUDED.inc_char,

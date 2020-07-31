@@ -73,6 +73,8 @@ class CharityFinancial(models.Model):
         BASIC = 'basic', 'Basic'
         CONSOLIDATED = 'consolidated', 'Consolidated'
         CHARITY = 'charity', 'Charity'
+        BASIC_OSCR = 'basic_oscr', 'Basic (OSCR)'
+        DETAILED_OSCR = 'detailed_oscr', 'Detailed (OSCR)'
 
     charity = models.ForeignKey(
         'Charity',
