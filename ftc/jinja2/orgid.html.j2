@@ -89,7 +89,7 @@
         </p>
         <p class="pa0 mt0 mb2">
           <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.scheme }}</span> gives the scheme for this identifier 
-          (<a href="http://org-id.guide/list/{{ org.org_id.scheme }}" class="link blue underline" target="_blank">{{ orgidschemes[org.org_id.scheme].data.name.en }}</a>), while <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.id }}</span>
+          {% if orgidschemes[org.org_id.scheme].data %}(<a href="http://org-id.guide/list/{{ org.org_id.scheme }}" class="link blue underline" target="_blank">{{ orgidschemes[org.org_id.scheme].data.name.en }}</a>){% endif %}, while <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.id }}</span>
           is the identifier for this organisation within the scheme.
         </p>
       </div>
