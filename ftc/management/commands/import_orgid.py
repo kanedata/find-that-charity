@@ -15,7 +15,7 @@ class Command(BaseCommand):
         print("iterating records")
         count = 0
         for record in r.json()["lists"]:
-            obj, created = OrgidScheme.objects.get_or_create(
+            obj, created = OrgidScheme.objects.update_or_create(
                 code=record["code"], defaults={"data": record},
             )
             count += 1
