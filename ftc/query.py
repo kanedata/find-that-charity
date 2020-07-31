@@ -159,6 +159,7 @@ class OrganisationSearch:
             FullOrganisation.search()
             .from_dict(self.es_query["inline"])
             .params(track_total_hits=True)
+            .index(FullOrganisation._default_index())
         )
         if sort_by:
             q = q.sort(sort_by)
