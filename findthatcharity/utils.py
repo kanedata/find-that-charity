@@ -1,10 +1,13 @@
 import re
 
 import titlecase
+import inflect
 
 VOWELS = re.compile("[AEIOUYaeiouy]")
 ORD_NUMBERS_RE = re.compile(r"([0-9]+(?:st|nd|rd|th))")
 SENTENCE_SPLIT = re.compile(r"(\. )")
+
+p = inflect.engine()
 
 
 def title_exceptions(word, **kwargs):
@@ -102,3 +105,11 @@ def url_remove(request, fields):
         if field in dict_:
             del dict_[field]
     return request.build_absolute_uri(request.path) + '?' + dict_.urlencode()
+
+
+def pluralise(text, count=1, number_format=":,.0f", text_format="{count} {text}"):
+    count_str = ("{" + number_format + "}").format(count)
+    return text_format.format(
+        count=count_str,
+        text=p.plural(text, count)
+    )

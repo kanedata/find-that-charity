@@ -626,6 +626,14 @@ class RelatedOrganisation:
             if o != self.org_id
         ]
 
+    @property
+    def activeRecords(self):
+        return [r for r in self.records if r.active]
+
+    @property
+    def inactiveRecords(self):
+        return [r for r in self.records if not r.active]
+
     def schema_dot_org(self, request=None):
         """Return a schema.org Organisation object representing this organisation"""
 

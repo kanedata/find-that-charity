@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Archivo:400,700|Raleway:400,700|Material+Icons">
     <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
     <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
+    <link rel="stylesheet" href="{{ static('css/style.css') }}" />
     {% block headscripts %}
     {% endblock %}
     {% if ga_tracking %}
@@ -19,7 +20,7 @@
         gtag('config', '{{ ga_tracking }}');
     </script>
     {% endif %}
-    <title>{{ (title or default_title)|striptags }}</title>
+    <title>{{ (title or default_title)|striptags }}{% block title %}{% endblock %}</title>
   </head>
   <body class="home w-100 sans-serif near-black base-font bg-wavy">
     <header class="body header-font normal ph3 ph5-ns pt3 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">

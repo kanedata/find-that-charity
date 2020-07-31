@@ -1,23 +1,31 @@
-{% from 'components/org_id.html.j2' import orgid_link %}
+{% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
 
-{% macro org_record(record, sources, request) %}
+{% macro org_record(record, sources, request, small=false) %}
       <div class="br2 b--light-gray ba bw1 h-100 {% if not record.active %}silver bg-washed-yellow{% endif %}">
-        <header class="bb b--light-gray bw1 pa3">
-          <h3 class="ma0 pa0 header-font tracked-tight">
-            {{ record.name|titlecase }}
+        <header class="{% if not small %}bb b--light-gray bw1{% endif %} pa3">
+          <h3 class="ma0 pa0 header-font tracked-tight {% if not record.active %}normal{% endif %}">
+            <a href="{{ url('orgid_html', kwargs={'org_id': record.org_id}) }}" class="link near-black underline-hover">{{ record.name|titlecase }}</a>
             {% if not record.active %}<span class="normal red">(inactive)</span>{% endif %}
+            {% if small %}
+              <ul class="list ma0 pa0">
+              {% for orgid in record.orgIDs %}
+                <li class="">{{orgid_link(orgid, request)}}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
           </h3>
           <div class="card-header-title is-block tracked-tight f6">
             <span class="dib">Organisation record from </span>
             {% if record.source %}
             <a href="#data-source-{{ record.source.id }}" class="link b blue dib">
-              {{ record.source.title }}
+              {{ record.source.publisher }}
             </a><br>
             {# <i class="gray">Last updated {{ "{:%d %B %Y}".format(record.source.data.modified) }}</i> #}
             <i class="gray">Last updated {{ record.source.data.modified }}</i>
             {% endif %}
           </div>
         </header>
+        {% if not small %}
         <div class="pa3 f6">
           <div class="w-100">
             {% if record.active %}
@@ -25,9 +33,9 @@
             {% else %}
             <span class="pv1 ph2 br1 bg-red white dib mr2 mb2 link">Inactive</span>
             {% endif %}
-            <span class="pv1 ph2 br1 bg-light-gray near-black dib mr2 mb2">{{ record.organisationTypePrimary.title }}</span>
+            {{ orgtype_link(record.organisationTypePrimary) }}
             {% for t in record.organisationType if t != record.organisationTypePrimary.slug %}
-            <span class="pv1 ph2 br1 bg-light-gray near-black dib mr2 mb2">{{ orgtypes[t].title }}</span>
+            {{ orgtype_link(orgtypes[t]) }}
             {% endfor %}
           </div>
           {% for v in record.orgIDs %}
@@ -107,6 +115,7 @@
           </p>
           {% endif %}
         </div>
+        {% endif %}
       </div>
       <br>
       {# {% if charity["geo"]["location"] %}
