@@ -50,6 +50,11 @@ def index(request):
     return render(request, "index.html.j2", context)
 
 
+def about(request):
+    context = {}
+    return render(request, "about.html.j2", context)
+
+
 def org_search(request):
 
     s = OrganisationSearch()

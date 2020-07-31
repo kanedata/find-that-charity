@@ -26,6 +26,7 @@ import reconcile.urls
 urlpatterns = [
     path('admin/', admin.site.urls, name='about'),
     path('', ftc.views.index, name='index'),
+    path('about', ftc.views.about, name='about'),
     path('addtocsv', addtocsv.views.index, name='csvtool'),
     path('orgid/', include(ftc.urls)),
     path('charity/', include(charity.urls)),
