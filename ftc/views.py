@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
+from django.conf import settings
 
 from ftc.documents import FullOrganisation
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
@@ -81,8 +82,9 @@ def get_orgid(request, org_id, filetype="html", preview=False):
     related_orgs = get_list_or_404(Organisation, linked_orgs__contains=[org_id])
     related_orgs = RelatedOrganisation(related_orgs)
 
-    template = "charity.html.j2" if charity else "orgid.html.j2"
     template = "orgid.html.j2"
+    if settings.DEBUG:
+        template = "charity.html.j2" if charity else "orgid.html.j2"
 
     return render(request, template, {
         "org": org,
