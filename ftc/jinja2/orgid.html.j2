@@ -118,6 +118,8 @@
 {% endblock %}
 
 {% block content %}
+
+{% block organisation_links %}
 <div class="w-100 w-80-ns fl">
   
   <div class="mv3 measure">
@@ -141,7 +143,9 @@
   {% endif %}
 
 </div>
+{% endblock %}
 
+{% block external_links %}
 <div class="w-100 w-20-l fl">
 
   {% set links = org.get_links()|list %}
@@ -166,7 +170,11 @@
   {% endif %}
 
 </div>
+{% endblock %}
+
 <div class="w-100 w-80-l fl">
+
+  {% block organisation_details %}
   <section class="measure-wide f5" id="organisation-details">
     {% if org.description %}
     <h4>Description</h4>
@@ -252,19 +260,30 @@
     </p>
     {% endif %}
   </section>
+  {% endblock %}
 
 </div>
 
 
 <div class="w-100 w-20-l fl">
   
+  {% block location %}
   {% if org.location|length or org.postalCode %}
   <article class="message is-info">
     <h4 class="ma0 pa0">Locations</h4>
     <p class="f6 gray">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>
     <div id="locationmap" class="h5"></div>
-    <div class="message-body">
-      <ul class="mb4 mt2 list mh0 pa0 f5">
+    {% if org.postalCode %}
+    <div class="mv3">
+      <h5 class="ma0 pa0">Postcode</h5>
+      <p class="f6 ma0 pa0">
+        {{ org.postalCode }}
+      </p>
+    </div>
+    {% endif %}
+    <div class="mv3">
+      <h5 class="ma0 pa0">Locations</h5>
+      <ul class="mv0 list mh0 pa0 f6">
       {% for v in org.location %}
         {% if v.geoCode and v.geoCode|regex_search("[ENWSK][0-9]{8}") %}
         <li class="w-100 mb2">
@@ -284,6 +303,7 @@
     </div>
   </article>
   {% endif %}
+  {% endblock %}
   
   {# {% if org.parent.keys()|length %}
   <article class="message is-info">
@@ -318,6 +338,7 @@
 </div>
 
 
+{% block related_orgs %}
 {% if related_orgs.records|length > 1 %}
 <section class="w-100 cf fl mv4" id="linked-records">
   <h3 class="mb3 mt0">
@@ -329,15 +350,18 @@
   <p class="measure">
     The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, request, large=true) }}.
   </p>
-  {% if related_orgs.activeRecords %}
   <div class="w-100 flex flex-wrap">
+    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(org, {}, request, small=true, this_record=true) }}
+    </div>
+    {% if related_orgs.activeRecords %}
     {% for record in related_orgs.activeRecords if record.org_id != org.org_id %}
     <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
     {{ org_record(record, {}, request, small=true) }}
     </div>
     {% endfor %}
+    {% endif %}
   </div>
-  {% endif %}
 
   {% if related_orgs.activeRecords %}
   <div class="w-100 flex flex-wrap">
@@ -351,11 +375,14 @@
 
 </section>
 {% endif %}
+{% endblock %}
 
+{% block data_sources %}
 <section class="w-100 cf fl mv4" id="data-sources">
   <h3 class="ma0 pa0">Data sources</h3>
   {% for s in related_orgs.sources %}
   {{ data_source(s, related_orgs, request) }}
   {% endfor %}
 </section>
+{% endblock %}
 {% endblock %}

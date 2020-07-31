@@ -1,10 +1,11 @@
 {% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
 
-{% macro org_record(record, sources, request, small=false) %}
+{% macro org_record(record, sources, request, small=false, this_record=false) %}
       <div class="br2 b--light-gray ba bw1 h-100 {% if not record.active %}silver bg-washed-yellow{% endif %}">
         <header class="{% if not small %}bb b--light-gray bw1{% endif %} pa3">
           <h3 class="ma0 pa0 header-font tracked-tight {% if not record.active %}normal{% endif %}">
             <a href="{{ url('orgid_html', kwargs={'org_id': record.org_id}) }}" class="link near-black underline-hover">{{ record.name|titlecase }}</a>
+            {% if this_record %}<span class="normal">(this record)</span>{% endif %}
             {% if not record.active %}<span class="normal red">(inactive)</span>{% endif %}
             {% if small %}
               <ul class="list ma0 pa0">

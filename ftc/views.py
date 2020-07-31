@@ -9,6 +9,7 @@ from django.views.decorators.cache import cache_page
 from ftc.documents import FullOrganisation
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
                         Source)
+from charity.models import Charity
 from ftc.query import OrganisationSearch, random_query
 
 
@@ -73,13 +74,20 @@ def org_search(request):
 
 def get_orgid(request, org_id, filetype="html", preview=False):
     org = get_object_or_404(Organisation, org_id=org_id)
-    related_orgs = get_list_or_404(Organisation, linked_orgs__contains=[org_id])
-    related_orgs = RelatedOrganisation(related_orgs)
     if filetype == "json":
         return JsonResponse({"org": org.to_json()})
-    return render(request, "orgid.html.j2", {
+
+    charity = Charity.objects.filter(id=org_id).first()
+    related_orgs = get_list_or_404(Organisation, linked_orgs__contains=[org_id])
+    related_orgs = RelatedOrganisation(related_orgs)
+
+    template = "charity.html.j2" if charity else "orgid.html.j2"
+    template = "orgid.html.j2"
+
+    return render(request, template, {
         "org": org,
         "related_orgs": related_orgs,
+        "charity": charity,
     })
 
 

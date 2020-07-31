@@ -1,6 +1,7 @@
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.forms.models import model_to_dict
 from django.utils.text import slugify
 
 
@@ -36,6 +37,17 @@ class Charity(models.Model):
 
     def __str__(self):
         return "{} [{}]".format(self.name, self.id)
+
+    def financial_json(self):
+        return [
+            {
+                **model_to_dict(f),
+                'exp_gen': f.exp_gen,
+                'reserves_months': f.reserves_months,
+                'fyend': f.fyend.isoformat(),
+                'fystart': f.fystart.isoformat(),
+            } for f in self.financial.order_by('fyend').all()
+        ]
 
 
 class CharityName(models.Model):
@@ -118,6 +130,17 @@ class CharityFinancial(models.Model):
 
     def __str__(self):
         return "{} {}".format(self.charity.name, self.fyend)
+
+    @property
+    def exp_gen(self):
+        """Expenditure on generating funds"""
+        if self.exp_total:
+            return self.exp_total - (self.exp_other + self.exp_gov + self.exp_charble)
+
+    @property
+    def reserves_months(self):
+        if self.exp_total and self.reserves:
+            return (self.reserves / self.exp_total) * 12
 
 
 class CharityRaw(models.Model):
