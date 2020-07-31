@@ -20,7 +20,7 @@ class Command(CSVScraper):
             "issued": "",
             "modified": "",
             "publisher": {
-                "name": "David Kane",
+                "name": "Find that Charity",
                 "website": "https://github.com/drkane/charity-lookups",
             },
             "distribution": [
@@ -44,7 +44,7 @@ class Command(CSVScraper):
             "issued": "",
             "modified": "",
             "publisher": {
-                "name": "David Kane",
+                "name": "Find that Charity",
                 "website": "https://github.com/drkane/charity-lookups",
             },
             "distribution": [
@@ -60,6 +60,30 @@ class Command(CSVScraper):
             },
         },
         {
+            "title": "Charity Reregistrations",
+            "description": "A list of charities registered in England & Wales that have been re-registered under a new charity number",
+            "identifier": "reregistrations",
+            "license": "",
+            "license_name": "",
+            "issued": "",
+            "modified": "",
+            "publisher": {
+                "name": "Find that Charity",
+                "website": "https://github.com/drkane/charity-lookups",
+            },
+            "distribution": [
+                {
+                    "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/charity-reregistrations.csv",
+                    "accessURL": "https://github.com/drkane/charity-lookups/blob/master/charity-reregistrations.csv",
+                    "title": "Charity Reregistrations",
+                }
+            ],
+            "_parse_row": lambda row: {
+                "org_id_a": "GB-CHC-{}".format(row["Old charity number"].strip()),
+                "org_id_b": "GB-CHC-{}".format(row["New charity number"].strip()),
+            },
+        },
+        {
             "title": "Registered housing providers",
             "description": "A list of charity numbers and company numbers found for registered housing providers",
             "identifier": "rsp_charity_company",
@@ -68,7 +92,7 @@ class Command(CSVScraper):
             "issued": "",
             "modified": "",
             "publisher": {
-                "name": "David Kane",
+                "name": "Find that Charity",
                 "website": "https://github.com/drkane/charity-lookups",
             },
             "distribution": [
@@ -90,7 +114,7 @@ class Command(CSVScraper):
             "issued": "",
             "modified": "",
             "publisher": {
-                "name": "David Kane",
+                "name": "Find that Charity",
                 "website": "https://github.com/drkane/charity-lookups",
             },
             "distribution": [
@@ -114,7 +138,7 @@ class Command(CSVScraper):
             "issued": "",
             "modified": "",
             "publisher": {
-                "name": "David Kane",
+                "name": "Find that Charity",
                 "website": "https://github.com/drkane/charity-lookups",
             },
             "distribution": [
@@ -169,7 +193,7 @@ class Command(CSVScraper):
             "issued": "",
             "modified": "",
             "publisher": {
-                "name": "David Kane",
+                "name": "Find that Charity",
                 "website": "https://github.com/drkane/charity-lookups",
             },
             "distribution": [
