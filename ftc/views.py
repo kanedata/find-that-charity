@@ -2,7 +2,7 @@ import csv
 
 from django.db.models import Count, F, Func
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_list_or_404, get_object_or_404, render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
 from django.conf import settings
@@ -84,7 +84,9 @@ def get_orgid(request, org_id, filetype="html", preview=False):
         return JsonResponse({"org": org.to_json()})
 
     charity = Charity.objects.filter(id=org_id).first()
-    related_orgs = get_list_or_404(Organisation, linked_orgs__contains=[org_id])
+    related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
+    if not related_orgs:
+        related_orgs = [org]
     related_orgs = RelatedOrganisation(related_orgs)
 
     template = "orgid.html.j2"

@@ -33,6 +33,7 @@
       {% endfor %}
       </ul>
       {% endif %}
+      {% if org %}
       {% for r in org.records if r.source == source %}
         {% if loop.first %}
         <p class="mt1 mb0 pa0 f6"><strong>Source for records: </strong></p>
@@ -57,6 +58,7 @@
         </ul>
         {% endif %}
       {% endfor %}
+      {% endif %}
     </p>
   </div>
 {% endmacro %}

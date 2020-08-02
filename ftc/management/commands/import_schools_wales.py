@@ -48,7 +48,7 @@ class Command(HTMLScraper):
         "license_name": "Open Government Licence v3.0",
         "issued": "",
         "modified": "",
-        "publisher": {"name": "Welsh Government", "website": "https://gov.wales/",},
+        "publisher": {"name": "Welsh Government", "website": "https://gov.wales/"},
         "distribution": [
             {"downloadURL": "", "accessURL": "", "title": "Address list of schools"}
         ],
@@ -58,9 +58,7 @@ class Command(HTMLScraper):
     def parse_file(self, response, source_url):
         link = list(response.html.find("div.document", first=True).absolute_links)[0]
         self.logger.info("Using url {}".format(link))
-        # self.source["distribution"][0]["downloadURL"] = link
-        # self.source["distribution"][0]["accessURL"] = self.start_urls[0]
-        # self.source["modified"] = datetime.datetime.now().isoformat()
+        self.set_download_url(link)
         r = self.session.get(link)
 
         wb = get_data(io.BytesIO(r.content))

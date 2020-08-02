@@ -70,9 +70,11 @@ class Command(CSVScraper):
     def fetch_file(self):
         self.files = {}
         for u in self.start_urls:
+            self.set_access_url(u)
             response = self.session.get(u)
             for link in response.html.links:
                 if self.gias_regex.match(link):
+                    self.set_download_url(link)
                     self.files[link] = self.session.get(link)
 
     def depluralise(self, s):

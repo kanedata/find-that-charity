@@ -2,9 +2,10 @@ import csv
 import datetime
 import io
 import zipfile
+import copy
 
 from ftc.management.commands._base_scraper import HTMLScraper
-from ftc.models import Organisation
+from ftc.models import Organisation, Source
 
 
 class Command(HTMLScraper):
@@ -17,7 +18,7 @@ class Command(HTMLScraper):
     id_field = "Code"
     date_fields = ["Open Date", "Close Date", "Join Parent Date", "Left Parent Date"]
     date_format = "%Y%m%d"
-    source = {
+    source_template = {
         "title": "NHS Organisation Data Service downloads",
         "description": "",
         "identifier": "nhsods",
@@ -25,58 +26,106 @@ class Command(HTMLScraper):
         "license_name": "Open Government Licence v3.0",
         "issued": "",
         "modified": "",
-        "publisher": {"name": "NHS Digital", "website": "https://digital.nhs.uk/",},
+        "publisher": {"name": "NHS Digital", "website": "https://digital.nhs.uk/"},
         "distribution": [
             {
                 "downloadURL": "",
-                "accessURL": "http://www.charitycommissionni.org.uk/charity-search/",
-                "title": "Charity Commission for Northern Ireland charity search",
+                "accessURL": "",
+                "title": "",
             }
         ],
     }
     zipfiles = [
-        # {"org_type": "NHS England Commissioning and Government Office Regions", "url": "https://files.digital.nhs.uk/assets/ods/current/eauth.zip"},
+        # {
+        #   "org_type": "NHS England Commissioning and Government Office Regions",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/eauth.zip",
+        #   "id": "eauth",
+        # },
         {
             "org_type": "Special Health Authorities",
             "url": "https://files.digital.nhs.uk/assets/ods/current/espha.zip",
+            "id": "espha",
         },
         {
             "org_type": "Commissioning Support Units",
             "url": "https://files.digital.nhs.uk/assets/ods/current/ecsu.zip",
+            "id": "ecsu",
         },
-        # {"org_type": "Commissioning Support Units sites", "url": "https://files.digital.nhs.uk/assets/ods/current/ecsusite.zip"},
-        # {"org_type": "Executive Agency Programme", "url": "https://files.digital.nhs.uk/assets/ods/current/eother.zip"},
+        # {
+        #   "org_type": "Commissioning Support Units sites",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/ecsusite.zip",
+        #   "id": "ecsusite",
+        # },
+        # {
+        #   "org_type": "Executive Agency Programme",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/eother.zip",
+        #   "id": "eother",
+        # },
         {
             "org_type": "NHS Support Agencies and Shared Services",
             "url": "https://files.digital.nhs.uk/assets/ods/current/ensa.zip",
+            "id": "ensa",
         },
         {
             "org_type": "GP practices",
             "url": "https://files.digital.nhs.uk/assets/ods/current/epraccur.zip",
+            "id": "epraccur",
         },
         {
             "org_type": "Clinical Commissioning Groups",
             "url": "https://files.digital.nhs.uk/assets/ods/current/eccg.zip",
+            "id": "eccg",
         },
-        # {"org_type": "Clinical Commissioning Group sites", "url": "https://files.digital.nhs.uk/assets/ods/current/eccgsite.zip"},
+        # {
+        #   "org_type": "Clinical Commissioning Group sites",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/eccgsite.zip"
+        #   "id": "eccgsite",
+        # },
         {
             "org_type": "NHS Trusts",
             "url": "https://files.digital.nhs.uk/assets/ods/current/etr.zip",
+            "id": "etr",
         },
-        # {"org_type": "NHS Trust sites", "url": "https://files.digital.nhs.uk/assets/ods/current/ets.zip"},
-        # {"org_type": "NHS Trusts and sites", "url": "https://files.digital.nhs.uk/assets/ods/current/etrust.zip"},
+        # {
+        #   "org_type": "NHS Trust sites",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/ets.zip"
+        #   "id": "ets",
+        # },
+        # {
+        #   "org_type": "NHS Trusts and sites",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/etrust.zip"
+        #   "id": "etrust",
+        # },
         {
             "org_type": "Care Trusts",
             "url": "https://files.digital.nhs.uk/assets/ods/current/ect.zip",
+            "id": "ect",
         },
-        # {"org_type": "Care Trust sites", "url": "https://files.digital.nhs.uk/assets/ods/current/ectsite.zip"},
-        # {"org_type": "Care Trusts and sites", "url": "https://files.digital.nhs.uk/assets/ods/current/ecare.zip"},
+        # {
+        #   "org_type": "Care Trust sites",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/ectsite.zip"
+        #   "id": "ectsite",
+        # },
+        # {
+        #   "org_type": "Care Trusts and sites",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/ecare.zip"
+        #   "id": "ecare",
+        # },
         {
             "org_type": "Welsh Local Health Boards",
             "url": "https://files.digital.nhs.uk/assets/ods/current/wlhb.zip",
+            "id": "wlhb",
         },
-        # {"org_type": "Welsh Local Health Board sites", "url": "https://files.digital.nhs.uk/assets/ods/current/wlhbsite.zip"},
-        # {"org_type": "Welsh Local Health Boards and sites", "url": "https://files.digital.nhs.uk/assets/ods/current/whbs.zip"},
+        # {
+        #   "org_type": "Welsh Local Health Board sites",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/wlhbsite.zip"
+        #   "id": "wlhbsite",
+        # },
+        # {
+        #   "org_type": "Welsh Local Health Boards and sites",
+        #   "url": "https://files.digital.nhs.uk/assets/ods/current/whbs.zip"
+        #   "id": "whbs",
+        # },
     ]
     fields = [
         "Code",
@@ -111,16 +160,23 @@ class Command(HTMLScraper):
 
     def fetch_file(self):
         self.files = {}
+        self.sources = {}
         for u in self.zipfiles:
             r = self.session.get(u["url"])
             self.files[u["org_type"]] = r
 
-        # self.source["distribution"] = [{
-        #     "downloadURL": f["url"],
-        #     "accessURL": self.start_urls[0],
-        #     "title": "NHS Digital Organisation Data Service - {}".format(f["org_type"])
-        # } for f in self.files]
-        # self.source["modified"] = datetime.datetime.now().isoformat()
+            source = copy.deepcopy(self.source_template)
+            source['distribution'] = [{
+                "downloadURL": u["url"],
+                "accessURL": self.start_urls[0],
+                "title": "NHS Digital Organisation Data Service - {}".format(u["org_type"])
+            }]
+            source['title'] = "NHS Digital Organisation Data Service - {}".format(u["org_type"])
+            source["modified"] = datetime.datetime.now().isoformat()
+            self.sources[u["org_type"]], _ = Source.objects.update_or_create(
+                id=f"{source['identifier']}-{u['id']}",
+                defaults={"data": source}
+            )
 
     def parse_file(self, response, org_type):
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
@@ -197,7 +253,7 @@ class Command(HTMLScraper):
                     "parent": record.get("Parent Organisation Code"),
                     "orgIDs": [self.get_org_id(record)],
                     "scrape": self.scrape,
-                    "source": self.source,
+                    "source": self.sources[org_type],
                     "spider": self.name,
                     "org_id_scheme": self.orgid_scheme,
                 }

@@ -223,9 +223,20 @@ class BaseScraper(BaseCommand):
                 id=s["identifier"], defaults={"data": s}
             )
 
+    def set_access_url(self, url, overwrite=False):
+        if not self.source.data['distribution'][0]['accessURL'] or overwrite:
+            self.source.data['distribution'][0]['accessURL'] = url
+            self.source.save()
+
+    def set_download_url(self, url, overwrite=False):
+        if not self.source.data['distribution'][0]['downloadURL'] or overwrite:
+            self.source.data['distribution'][0]['downloadURL'] = url
+            self.source.save()
+
     def fetch_file(self):
         self.files = {}
         for u in self.start_urls:
+            self.set_download_url(u)
             r = self.session.get(u)
             self.files[u] = r
 
@@ -473,6 +484,7 @@ class HTMLScraper(BaseScraper):
         self.files = {}
         for u in self.start_urls:
             r = self.session.get(u)
+            self.set_access_url(u)
             self.files[u] = r
 
     def parse_file(self, response, source_url):

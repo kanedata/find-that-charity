@@ -1,6 +1,7 @@
 import datetime
 
 from django.db import connection
+from django.db.models import Count
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.text import slugify
@@ -20,7 +21,12 @@ def environment(**options):
     if OrganisationType._meta.db_table in connection.introspection.table_names():
         orgtypes = {o.slug: o for o in OrganisationType.objects.all()}
     if Source._meta.db_table in connection.introspection.table_names():
-        sources = {s.id: s for s in Source.objects.all()}
+        sources = {
+            s.id: s
+            for s in Source.objects.all()
+            .annotate(records=Count("organisations"))
+            .order_by("-records")
+        }
     if OrgidScheme._meta.db_table in connection.introspection.table_names():
         orgidschemes = {s.code: s for s in OrgidScheme.objects.all()}
 

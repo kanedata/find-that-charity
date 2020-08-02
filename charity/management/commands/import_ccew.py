@@ -196,6 +196,7 @@ class Command(HTMLScraper):
         for link in response.html.absolute_links:
             if not self.zip_regex.match(link):
                 continue
+            self.set_download_url(link)
             r = self.session.get(link)
             self.logger.info("Using file: {}".format(link))
             self.process_zip(r)

@@ -19,7 +19,7 @@ class Command(HTMLScraper):
         "license_name": "Creative Commons Attribution 4.0 International Licence",
         "issued": "",
         "modified": "",
-        "publisher": {"name": "HESA", "website": "https://www.hesa.ac.uk/",},
+        "publisher": {"name": "HESA", "website": "https://www.hesa.ac.uk/"},
         "distribution": [
             {
                 "downloadURL": "",
@@ -36,6 +36,7 @@ class Command(HTMLScraper):
     }
 
     def parse_file(self, response, source_url):
+        self.set_download_url(source_url)
 
         for row in response.html.find("table#heps-table tbody tr"):
             cells = [c.text for c in row.find("td")]

@@ -74,9 +74,7 @@ class Command(HTMLScraper):
         link = [
             link for link in response.html.absolute_links if link.endswith(".xlsx")
         ][0]
-        # self.source["distribution"][0]["downloadURL"] = link
-        # self.source["distribution"][0]["accessURL"] = self.start_urls[0]
-        # self.source["modified"] = datetime.datetime.now().isoformat()
+        self.set_download_url(link)
         r = self.session.get(link)
 
         wb = load_workbook(io.BytesIO(r.content), read_only=True)

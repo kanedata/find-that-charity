@@ -1,5 +1,6 @@
 import csv
 import io
+import datetime
 
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import OrganisationLink, Source
@@ -218,10 +219,13 @@ class Command(CSVScraper):
         self.files = {}
         self.source_cache = {}
         for s in self.sources:
-            self.source_cache[s["identifier"]], _ = Source.objects.get_or_create(
+            self.source_cache[s["identifier"]], _ = Source.objects.update_or_create(
                 id=s["identifier"],
                 defaults={
-                    "data": {k: v for k, v in s.items() if not k.startswith("_")}
+                    "data": {
+                        **{k: v for k, v in s.items() if not k.startswith("_")},
+                        "modified": datetime.datetime.now().isoformat()
+                    }
                 },
             )
             r = self.session.get(s["distribution"][0]["downloadURL"])
