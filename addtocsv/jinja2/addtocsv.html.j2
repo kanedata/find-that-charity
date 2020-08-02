@@ -50,13 +50,13 @@
       </div>
     </div>
 
-    <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-select-postcode-field">
+    <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-select-identifier-field">
       <h3 class="pa0 ma0 dib">
         Step 2: 
-        <span class="normal">Select postcode field</span>
+        <span class="normal">Select organisation identifier field</span>
       </h3>
       <span class="fr contents-top" v-if="stage > 1">
-        <a href="#" id="reset-select-postcode-field" class="stage-reset link f6 blue underline dim" v-on:click.prevent="column_to_use = null">Change field</a>
+        <a href="#" id="reset-select-identifier-field" class="stage-reset link f6 blue underline dim" v-on:click.prevent="column_to_use = null">Change field</a>
         <span class="dib code pa1 bg-light-gray lh-solid" id="column-name-desc">[[column_to_use]]</span>
         <input class="dn" type="text" name="column_name" id="column_name" :value="column_to_use">
       </span>
@@ -65,7 +65,7 @@
           <ul class="list pa0 ma0">
             <li v-for="f in field_select" class="mb2">
                 <label class="pointer">
-                    <input type="radio" name="postcode_field" :value=[[f.name]] v-on:click.prevent="column_to_use = f.name" />
+                    <input type="radio" name="identifier_field" :value=[[f.name]] v-on:click.prevent="column_to_use = f.name" />
                     <span class="code pa1 bg-light-gray underline-hover">[[f.name]]</span>
                     <ul class="list pa0 ma0">
                         <li class="dib mr2 gray mt1 f6 tl truncate mw5" v-for="v in f.example_values">[[v]]</li>
@@ -97,7 +97,7 @@
         
         <div class="contents mv4">
             <input class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns ml4-l" type="submit" 
-                   value="Add data to CSV" id='fetch_postcodes' v-on:click.prevent="getResults" />
+                   value="Add data to CSV" id='fetch_identifiers' v-on:click.prevent="getResults" />
             <div id="result" v-if="progress !== null">
                 <p class="pa0 mv3 mh2" id="result-text">Creating file…</p>
                 <div id="progress-bar" class="bg-light-blue h2 mt4 mh2">
@@ -114,23 +114,12 @@
 
 <div class="content w-100 w-30-l fl-l pa3 bg-light-gray f5" id="privacy">
   <h3 class="pa0 ma0 header-font">Privacy</h3>
-  <p class="">Your file will not leave your own computer and no data from it is directly sent to findthatcharity.</p>
-  <p class="">
-    To protect your privacy this script does not send the organisation identifiers found in your file.
-    Instead a code is created based on the organisation identifier, and this code
-    is sent to findthatcharity.
-  </p>
-  <p>
-    This code will correspond to a number of different organisation identifiers (around 30),
-    and all organisation identifiers that match this code are sent back to the browser to be matched.
-  </p>
-  <p>
-    This provides some level of privacy protection, but in some circumstances it could still be possible to make a reasonable guess
-    as to the organisation identifier used in the file by looking at the codes requested.
-  </p>
-  <p class="b">Therefore it is recommended
-    that you think carefully before using this tool with any personal or sensitive data.
-  </p>
+  <p>Your file will not leave your computer, but the organsiation identifiers from
+    the column you select will be sent to the findthatcharity server in order to 
+    retrieve the information. No other data is sent to the server.</p>
+  <p>It could therefore be possible to reconstruct the organisations contained
+    in your file. <strong>You should think carefully before using this tool
+    for any personal or sensitive information.</strong></p>
 </div>
 {% endblock %}
 

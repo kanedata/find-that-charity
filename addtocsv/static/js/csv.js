@@ -130,7 +130,7 @@ var app = new Vue({
                             new_data[row[component.column_to_use]]
                         ))
                     }),
-                    component.csv.name.replace(".csv", "-geo.csv")
+                    component.csv.name.replace(".csv", "-org.csv")
                 ));
         },
     },
