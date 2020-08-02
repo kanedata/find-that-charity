@@ -38,19 +38,19 @@ SSH into server and run:
 
 ```bash
 # create app
-dokku apps:create find-that-charity
+dokku apps:create ftc
 
 # postgres
 sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git postgres
-dokku postgres:create find-that-charity-db
-dokku postgres:link find-that-charity-db find-that-charity
+dokku postgres:create ftc-db
+dokku postgres:link ftc-db ftc
 
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
 export ELASTICSEARCH_IMAGE="elasticsearch"
 export ELASTICSEARCH_IMAGE_VERSION="7.7.1"
-dokku elasticsearch:create find-that-charity-es
-dokku elasticsearch:link find-that-charity-es find-that-charity
+dokku elasticsearch:create ftc-es
+dokku elasticsearch:link ftc-es ftc
 # configure elasticsearch 7:
 # https://github.com/dokku/dokku-elasticsearch/issues/72#issuecomment-510771763
 
@@ -59,12 +59,12 @@ nano /var/lib/dokku/services/elasticsearch/ftc-es/config/jvm.options
 # replace `-Xms512m` with `-Xms2g`
 # replace `-Xms512m` with `-Xmx2g`
 # restart elasticsearch
-dokku elasticsearch:restart find-that-charity-es
+dokku elasticsearch:restart ftc-es
 
 # SSL
 sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
-dokku config:set --no-restart find-that-charity DOKKU_LETSENCRYPT_EMAIL=your@email.tld
-dokku letsencrypt find-that-charity
+dokku config:set --no-restart ftc DOKKU_LETSENCRYPT_EMAIL=your@email.tld
+dokku letsencrypt ftc
 dokku letsencrypt:cron-job --add
 ```
 
@@ -73,7 +73,7 @@ dokku letsencrypt:cron-job --add
 On local machine:
 
 ```bash
-git remote add dokku dokku@SERVER_HOST:find-that-charity
+git remote add dokku dokku@SERVER_HOST:ftc
 git push dokku master
 ```
 
@@ -83,18 +83,18 @@ On Dokku server run:
 
 ```bash
 # setup and run import
-dokku run find-that-charity python ./manage.py import_charities
-dokku run find-that-charity python ./manage.py import_companies
-dokku run find-that-charity python ./manage.py import_all
-dokku run find-that-charity python ./manage.py es_index
+dokku run ftc python ./manage.py import_charities
+dokku run ftc python ./manage.py import_companies
+dokku run ftc python ./manage.py import_all
+dokku run ftc python ./manage.py es_index
 ```
 
 ### 4. Set up scheduled task for running tasks on a regular basis
 
-On dokku server add a cron file at `/etc/cron.d/find-that-charity`
+On dokku server add a cron file at `/etc/cron.d/ftc`
 
 ```bash
-nano /etc/cron.d/find-that-charity
+nano /etc/cron.d/ftc
 ```
 
 Then paste in the [file contents](crontab), and press `CTRL+X` then `Y` to save.
@@ -121,17 +121,17 @@ SHELL=/bin/bash
 
 ### PLACE ALL CRON TASKS BELOW
 
-# import charities
+# import everything else - every night
+0 1 * * * dokku dokku --rm run ftc python ./manage.py import_all
+
+# import charities - Friday night
 0 2 * * 5 dokku dokku --rm run ftc python ./manage.py import_charities
-0 4 * * 5 dokku dokku --rm run ftc python ./manage.py es_index
 
-# import companies
+# import companies - Saturday night
 0 2 * * 6 dokku dokku --rm run ftc python ./manage.py import_companies
-0 4 * * 6 dokku dokku --rm run ftc python ./manage.py es_index
 
-# import everything else
-0 2 * * 0 dokku dokku --rm run ftc python ./manage.py import_all
-0 4 * * 0 dokku dokku --rm run ftc python ./manage.py es_index
+# regenerate the elasticsearch index - every night
+0 4 * * * dokku dokku --rm run ftc python ./manage.py es_index
 
 ### PLACE ALL CRON TASKS ABOVE, DO NOT REMOVE THE WHITESPACE AFTER THIS LINE
 ```
