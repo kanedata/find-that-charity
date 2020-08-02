@@ -458,7 +458,7 @@ class Source(models.Model):
         return self.id
 
     def __str__(self):
-        return self.title
+        return self.publisher + " (" + self.title + ")"
 
 
 class Scrape(models.Model):
