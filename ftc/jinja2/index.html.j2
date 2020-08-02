@@ -56,7 +56,7 @@
     <div class="mv5 cf">
         <h3>Types of organisation available</h3>
         <div class="">
-            {% for ot in by_orgtype if orgtypes[ot.orgtype].is_keytype() %}
+            {% for ot in by_orgtype if orgtypes[ot.orgtype] and orgtypes[ot.orgtype].is_keytype() %}
             <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
                 <a href="{{ url('orgid_type', kwargs=dict(orgtype=orgtypes[ot.orgtype].slug)) }}"
                     class="link near-black underline-hover pa2 dib fl">{{ orgtypes[ot.orgtype].title }}</a>
