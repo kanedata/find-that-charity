@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.postgres.fields import JSONField
+from django.db import models
 from django.urls import resolve, reverse
 from django.utils.text import slugify
 from prettyjson.widgets import PrettyJSONWidget
@@ -10,7 +10,7 @@ from charity import models as charity
 class JSONFieldAdmin(admin.ModelAdmin):
     list_per_page = 20
     formfield_overrides = {
-        JSONField: {"widget": PrettyJSONWidget(attrs={"initial": "parsed"})}
+        models.JSONField: {"widget": PrettyJSONWidget(attrs={"initial": "parsed"})}
     }
 
 

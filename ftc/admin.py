@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.postgres.fields import JSONField
+from django.db import models
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
@@ -11,7 +11,7 @@ from ftc import models as ftc
 class JSONFieldAdmin(admin.ModelAdmin, DynamicArrayMixin):
     list_per_page = 20
     formfield_overrides = {
-        JSONField: {"widget": PrettyJSONWidget(attrs={"initial": "parsed"})}
+        models.JSONField: {"widget": PrettyJSONWidget(attrs={"initial": "parsed"})}
     }
 
 

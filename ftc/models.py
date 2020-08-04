@@ -1,7 +1,6 @@
 import datetime
 import re
 
-from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.urls import reverse
@@ -268,7 +267,7 @@ class Organisation(models.Model):
         "Scrape", related_name="organisations", on_delete=models.CASCADE,
     )
     spider = models.CharField(max_length=200, db_index=True)
-    location = JSONField(null=True, blank=True)
+    location = models.JSONField(null=True, blank=True)
     org_id_scheme = models.ForeignKey(
         "OrgidScheme", on_delete=models.CASCADE, blank=True, null=True,
     )
@@ -443,7 +442,7 @@ class OrganisationLink(models.Model):
 
 class Source(models.Model):
     id = models.CharField(max_length=200, unique=True, db_index=True, primary_key=True)
-    data = JSONField()
+    data = models.JSONField()
 
     @property
     def title(self):
@@ -469,7 +468,7 @@ class Scrape(models.Model):
         FAILED = "failed", "Failed to complete"
 
     spider = models.CharField(max_length=200)
-    result = JSONField(null=True, blank=True, editable=False)
+    result = models.JSONField(null=True, blank=True, editable=False)
     start_time = models.DateTimeField(auto_now_add=True, editable=False)
     finish_time = models.DateTimeField(
         auto_now=True, null=True, blank=True, editable=False
@@ -507,7 +506,7 @@ class OrgidScheme(models.Model):
     ]
 
     code = models.CharField(max_length=200, primary_key=True, db_index=True)
-    data = JSONField()
+    data = models.JSONField()
     priority = models.IntegerField(null=True, blank=True)
 
     def save(self, *args, **kwargs):

@@ -28,6 +28,9 @@
           <a href="{{ url('about') }}" class="white logo underline double underline-yellow">About</a>
             | <a href="{{ url('about') }}#data-sources" class="white logo underline double underline-yellow">Data sources</a>
             | <a href="{{ url('about') }}#privacy" class="white logo underline double underline-yellow">Privacy</a>
+          {% if request.user.is_superuser %}
+            | <a href="{{ url('admin:index') }}" class="white logo underline double underline-yellow">Admin</a>
+          {% endif %}
       </div>
       <h1 class="{% if frontpage %}f-subheadline-ns{% endif %} tracked-tight f1 lh-title mv0 logo normal">
         <a href="{{ url('index') }}" class="link moon-gray underline-yellow underline">

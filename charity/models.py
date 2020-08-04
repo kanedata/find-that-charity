@@ -1,4 +1,3 @@
-from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.forms.models import model_to_dict
@@ -152,7 +151,7 @@ class CharityRaw(models.Model):
         'ftc.Scrape',
         on_delete=models.CASCADE,
     )
-    data = JSONField(
+    data = models.JSONField(
         encoder=DjangoJSONEncoder
     )
 
