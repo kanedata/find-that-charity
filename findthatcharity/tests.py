@@ -41,6 +41,7 @@ class IndexViewTests(django.test.TestCase):
 
     def setUp(self):
         ot = OrganisationType.objects.create(title='Registered Charity')
+        ot2 = OrganisationType.objects.create(title='Registered Charity (England and Wales)')
         s = Source.objects.create(id="ts", data={
             "title": "Test source",
             "publisher": {
@@ -64,7 +65,7 @@ class IndexViewTests(django.test.TestCase):
             organisationTypePrimary=ot,
             source=s,
             scrape=scrape,
-            organisationType=[ot.slug],
+            organisationType=[ot.slug, ot2.slug],
         )
 
     def test_index(self):
@@ -73,6 +74,8 @@ class IndexViewTests(django.test.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Find that Charity", html=True)
         self.assertContains(response, "contains information about 1 ")
+        self.assertContains(response, "Registered Charity (England and Wales)")
+        self.assertContains(response, "Source Publisher")
 
     def test_about(self):
 

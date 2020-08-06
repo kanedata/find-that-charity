@@ -1,6 +1,7 @@
 {% set frontpage = false %}
 {% extends 'base.html.j2' %}
 
+{% set sources = get_sources() %}
 {% from 'components/data_source.html.j2' import get_filetype %}
 
 {% block content %}

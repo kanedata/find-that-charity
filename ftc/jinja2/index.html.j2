@@ -1,5 +1,8 @@
 {% set frontpage = true %}
 {% extends 'base.html.j2' %}
+
+{% set sources = get_sources() %}
+{% set orgtypes = get_orgtypes() %}
 {% from 'components/org_id.html.j2' import orgid_link %}
 
 {% block content %}
@@ -11,7 +14,7 @@
     <section class="w-100 cf mv3">
         <h3 class="w-100 pa0 mv2 f2">Find charities</h3>
         <img class="shadow-3 w-100 w5-ns fr-ns mw-100 ma3-ns" src="{{ static('images/fp-charity-example.png') }}" />
-        <p>Find that Charity contains information about {{ "{:,.0f}".format((by_orgtype|selectattr('orgtype', 'equalto', 'registered-charity')|first).records) }} 
+        <p>Find that Charity contains information about {{ "{:,.0f}".format((orgtypes.values()|selectattr('slug', 'equalto', 'registered-charity')|first).records) }} 
         UK charities.</p>
         <p>The data comes from the three main regulators of charities in the UK.</p>
         <p>Each charity has its own page 
@@ -56,10 +59,10 @@
     <div class="mv5 cf">
         <h3>Types of organisation available</h3>
         <div class="">
-            {% for ot in by_orgtype if orgtypes[ot.orgtype] and orgtypes[ot.orgtype].is_keytype() %}
+            {% for slug, ot in orgtypes.items() if ot.is_keytype() %}
             <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
-                <a href="{{ url('orgid_type', kwargs=dict(orgtype=orgtypes[ot.orgtype].slug)) }}"
-                    class="link near-black underline-hover pa2 dib fl">{{ orgtypes[ot.orgtype].title }}</a>
+                <a href="{{ url('orgid_type', kwargs=dict(orgtype=ot.slug)) }}"
+                    class="link near-black underline-hover pa2 dib fl">{{ ot.title }}</a>
                 <span class="pa2 bg-blue white fl">{{ "{:,.0f}".format(ot.records) }}</span>
             </div>
             {% endfor %}
@@ -68,7 +71,7 @@
     <div class="mv5 cf">
         <h3>Data sources</h3>
         <div class="">
-            {% for pub, items in by_source|groupby('publisher') %}
+            {% for pub, items in sources.values()|groupby('publisher') %}
             {% for s in items if s.records > 0 %}
             <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
                 <a href="{{ url('orgid_source', kwargs=dict(source=s.id)) }}"

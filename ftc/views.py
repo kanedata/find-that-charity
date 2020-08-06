@@ -1,7 +1,5 @@
 import csv
 
-from django.core.cache import cache
-from django.db.models import Count, F, Func
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -19,37 +17,17 @@ def index(request):
     if "q" in request.GET:
         return org_search(request)
 
-    cache_key = 'homepage_context'
-    context = cache.get(cache_key)
-
-    if not context:
-
-        by_orgtype = (
-            Organisation.objects.annotate(orgtype=Func(F("organisationType"), function="unnest"))
-            .values("orgtype")
-            .annotate(records=Count("*"))
-            .order_by("-records")
-        )
-        by_source = (
-            Source.objects.all()
-            .annotate(records=Count("organisations"))
-            .order_by("-records")
-        )
-
-        context = dict(
-            examples={
-                "registered-charity-england-and-wales": "GB-CHC-1177548",
-                "registered-charity-scotland": "GB-SC-SC007427",
-                "registered-charity-northern-ireland": "GB-NIC-104226",
-                "community-interest-company": "GB-COH-08255580",
-                "local-authority": "GB-LAE-IPS",
-                "universities": "GB-EDU-133808",
-            },
-            term="",
-            by_orgtype=by_orgtype,
-            by_source=by_source,
-        )
-        cache.set(cache_key, context, 60 * 60)
+    context = dict(
+        examples={
+            "registered-charity-england-and-wales": "GB-CHC-1177548",
+            "registered-charity-scotland": "GB-SC-SC007427",
+            "registered-charity-northern-ireland": "GB-NIC-104226",
+            "community-interest-company": "GB-COH-08255580",
+            "local-authority": "GB-LAE-IPS",
+            "universities": "GB-EDU-133808",
+        },
+        term="",
+    )
     return render(request, "index.html.j2", context)
 
 
