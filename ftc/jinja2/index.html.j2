@@ -10,7 +10,7 @@
     </div>
     <section class="w-100 cf mv3">
         <h3 class="w-100 pa0 mv2 f2">Find charities</h3>
-        <img class="fr shadow-3 w5 ma3" src="{{ static('images/fp-charity-example.png') }}" />
+        <img class="shadow-3 w-100 w5-ns fr-ns mw-100 ma3-ns" src="{{ static('images/fp-charity-example.png') }}" />
         <p>Find that Charity contains information about {{ "{:,.0f}".format((by_orgtype|selectattr('orgtype', 'equalto', 'registered-charity')|first).records) }} 
         UK charities.</p>
         <p>The data comes from the three main regulators of charities in the UK.</p>
@@ -20,7 +20,7 @@
     </section>
     <section class="w-100 cf mv3">
         <h3 class="w-100 pa0 mv2 f2">Find other non profit organisations</h3>
-        <img class="fr shadow-3 w5 ma3" src="{{ static('images/fp-nonprofit-example.png') }}" />
+        <img class="shadow-3 w-100 w5-ns fr-ns mw-100 ma3-ns" src="{{ static('images/fp-nonprofit-example.png') }}" />
         <p>You can also explore other UK non-profit organisations, such as:</p>
         <ul class="list">
             <li><a href="{{ url('orgid_type', kwargs=dict(orgtype='community-interest-company')) }}"
