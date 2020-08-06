@@ -24,10 +24,8 @@ def index(request):
 
     if not context:
 
-        orgs = Organisation.objects
-
         by_orgtype = (
-            orgs.annotate(orgtype=Func(F("organisationType"), function="unnest"))
+            Organisation.objects.annotate(orgtype=Func(F("organisationType"), function="unnest"))
             .values("orgtype")
             .annotate(records=Count("*"))
             .order_by("-records")

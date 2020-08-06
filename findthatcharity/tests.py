@@ -1,11 +1,15 @@
-from unittest import TestCase
+import unittest
+import datetime
+
+import django.test
+from django.urls import reverse
+from django.utils import timezone
 
 from findthatcharity.utils import to_titlecase, list_to_string
+from ftc.models import Organisation, Source, OrganisationType, Scrape
 
-# from django.test import TestCase
 
-
-class TestUtils(TestCase):
+class TestUtils(unittest.TestCase):
 
     def test_to_titlecase(self):
         names = (
@@ -31,3 +35,48 @@ class TestUtils(TestCase):
                               final_sep=" et ") == 'item1, item2 et item3'
         assert list_to_string(['item1', 'item2', 'item3'],
                               sep="; ", final_sep=" et ") == 'item1; item2 et item3'
+
+
+class IndexViewTests(django.test.TestCase):
+
+    def setUp(self):
+        ot = OrganisationType.objects.create(title='Registered Charity')
+        s = Source.objects.create(id="ts", data={
+            "title": "Test source",
+            "publisher": {
+                "name": "Source publisher",
+            }
+        })
+        scrape = Scrape.objects.create(
+            status=Scrape.ScrapeStatus.SUCCESS,
+            spider='test',
+            errors=0,
+            items=1,
+            log="",
+            start_time=timezone.now() - datetime.timedelta(minutes=10),
+            finish_time=timezone.now() - datetime.timedelta(minutes=5),
+        )
+        Organisation.objects.create(
+            org_id='XX-XXX-1234',
+            description='Test description',
+            name='Test organisation',
+            active=True,
+            organisationTypePrimary=ot,
+            source=s,
+            scrape=scrape,
+            organisationType=[ot.slug],
+        )
+
+    def test_index(self):
+
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Find that Charity", html=True)
+        self.assertContains(response, "contains information about 1 ")
+
+    def test_about(self):
+
+        response = self.client.get(reverse('about'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Find that Charity", html=True)
+        self.assertContains(response, "Source publisher", html=True)
