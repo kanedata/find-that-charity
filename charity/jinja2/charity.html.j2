@@ -153,7 +153,7 @@
 
 
 {% block location %}
-{% if org.location|length or org.postalCode or charity.geographical_spread %}
+{% if org.location or org.postalCode or charity.geographical_spread %}
 <article class="message is-info">
 <h4 class="ma0 pa0">Locations</h4>
 <p class="f6 gray">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>

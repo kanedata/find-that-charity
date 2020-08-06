@@ -175,8 +175,6 @@ class Organisation(models.Model):
     org_id = OrgidField(db_index=True, verbose_name="Organisation Identifier")
     orgIDs = ArrayField(
         OrgidField(blank=True),
-        blank=True,
-        null=True,
         verbose_name="Other organisation identifiers",
     )
     linked_orgs = ArrayField(
@@ -341,7 +339,7 @@ class Organisation(models.Model):
             obj["foundingDate"] = self.dateRegistered.isoformat()
         if not self.active and self.dateRemoved:
             obj["dissolutionDate"] = self.dateRemoved.isoformat()
-        if len(self.orgIDs) > 1:
+        if self.orgIDs and len(self.orgIDs) > 1:
             if request:
                 obj["sameAs"] = [request.build_absolute_uri(id) for id in self.sameAs]
             else:
@@ -351,6 +349,8 @@ class Organisation(models.Model):
     def get_links(self):
         if self.url:
             yield (self.cleanUrl, "Organisation Website")
+        if not self.orgIDs:
+            return
         for o in self.orgIDs:
             links = EXTERNAL_LINKS.get(o.scheme, [])
             for link in links:

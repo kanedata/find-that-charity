@@ -2,6 +2,9 @@
 {% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
 {% from 'components/org_record.html.j2' import org_record %}
 {% from 'components/data_source.html.j2' import data_source %}
+{% set orgidschemes = get_orgidschemes() %}
+{% set orgtypes = get_orgtypes() %}
+{% set sources = get_sources() %}
 {% set heading = org["name"] %} 
 {% set subtitle = "Org ID: {}{}".format(
     org["id"],
@@ -26,7 +29,7 @@
 
 {% block headscripts %}
 {{ super() }}
-{% if org.location|length or org.postalCode %}
+{% if org.location or org.postalCode %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
    crossorigin=""/>
@@ -41,7 +44,7 @@
 
 {% block bodyscripts %}
 {{ super() }}
-{% if org.location|length or org.postalCode %}
+{% if org.location or org.postalCode %}
 <script>
   const GEOCODES = {{ org.geoCodes()|list|tojson }};
   const POSTCODE = {{ org.postalCode|tojson }};
@@ -89,13 +92,13 @@
         </p>
         <p class="pa0 mt0 mb2">
           <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.scheme }}</span> gives the scheme for this identifier 
-          {% if orgidschemes[org.org_id.scheme].data %}(<a href="http://org-id.guide/list/{{ org.org_id.scheme }}" class="link blue underline" target="_blank">{{ orgidschemes[org.org_id.scheme].data.name.en }}</a>){% endif %}, while <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.id }}</span>
+          {% if org.org_id.scheme in orgidschemes and orgidschemes[org.org_id.scheme].data %}(<a href="http://org-id.guide/list/{{ org.org_id.scheme }}" class="link blue underline" target="_blank">{{ orgidschemes[org.org_id.scheme].data.name.en }}</a>){% endif %}, while <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.id }}</span>
           is the identifier for this organisation within the scheme.
         </p>
       </div>
     </details>
   </div>
-  {% if org.orgIDs|length > 1 %}
+  {% if org.orgIDs and org.orgIDs|length > 1 %}
   <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">The organisation can also be identified by:</h4>
   <div class="mv3 w-100 w-50-l">
     {% for v in org.orgIDs if v != org.org_id %}
@@ -193,7 +196,6 @@
       {% endif %}
     </ul>
     {% endif %}
-    
     {% for v in org.orgIDs %}
       {% if v.startswith("GB-COH-") %}
         <h4>Company number</h4>
@@ -268,7 +270,7 @@
 <div class="w-100 w-20-l fl">
   
   {% block location %}
-  {% if org.location|length or org.postalCode %}
+  {% if org.location or org.postalCode %}
   <article class="message is-info">
     <h4 class="ma0 pa0">Locations</h4>
     <p class="f6 gray">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>
@@ -281,6 +283,7 @@
       </p>
     </div>
     {% endif %}
+    {% if org.location %}
     <div class="mv3">
       <h5 class="ma0 pa0">Locations</h5>
       <ul class="mv0 list mh0 pa0 f6">
@@ -301,6 +304,7 @@
       {% endfor %}
       </ul>
     </div>
+    {% endif %}
   </article>
   {% endif %}
   {% endblock %}
