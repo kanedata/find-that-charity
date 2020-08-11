@@ -1,10 +1,10 @@
 # Find that Charity v4 - tasks todo
 
-- add ccni to charity raw
+- ✔ add ccni to charity raw
 - tests
-- better data source info - download URL, last modified date
-- charity names to proper case
-- elasticsearch indexing needs to be quicker
+- ✔ better data source info - download URL, last modified date
+- ✔ charity names to proper case
+- ✔ elasticsearch indexing needs to be quicker
 
 ## Autocomplete API
 
