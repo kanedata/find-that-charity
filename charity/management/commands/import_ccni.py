@@ -1,6 +1,11 @@
 import datetime
 from collections import defaultdict
 
+import tqdm
+from django.db import connection
+
+from charity.management.commands._ccni_sql import UPDATE_CCNI
+from charity.models import CharityRaw
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation
 
@@ -44,6 +49,10 @@ class Command(CSVScraper):
         "Registered Charity (Northern Ireland)",
     ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.raw_records = []
+
     def parse_row(self, record):
 
         record = self.clean_fields(record)
@@ -67,6 +76,12 @@ class Command(CSVScraper):
             company_type = self.add_org_type("Registered Company")
             org_types.append(company_type)
             org_ids.append("GB-COH-{}".format(coyno))
+
+        self.raw_records.append({
+            **record,
+            "address": ", ".join([a for a in address if a]),
+            "postcode": postcode,
+        })
 
         self.add_org_record(
             Organisation(**{
@@ -113,3 +128,38 @@ class Command(CSVScraper):
             return "NI" + coyno.rjust(6, "0")
 
         return coyno
+
+    def close_spider(self):
+        super(Command, self).close_spider()
+        self.records = None
+        self.link_records = None
+
+        # now start inserting charity records
+        self.logger.info("Inserting CharityRaw records")
+        CharityRaw.objects.bulk_create(self.get_bulk_create())
+        self.logger.info("CharityRaw records inserted")
+
+        self.logger.info("Deleting old CharityRaw records")
+        CharityRaw.objects.filter(
+            spider__exact=self.name,
+        ).exclude(
+            scrape_id=self.scrape.id,
+        ).delete()
+        self.logger.info("Old CharityRaw records deleted")
+
+        # execute SQL statements
+        with connection.cursor() as cursor:
+            for sql_name, sql in UPDATE_CCNI.items():
+                self.logger.info("Starting SQL: {}".format(sql_name))
+                cursor.execute(sql)
+                self.logger.info("Finished SQL: {}".format(sql_name))
+
+    def get_bulk_create(self):
+
+        for record in tqdm.tqdm(self.raw_records):
+            yield CharityRaw(
+                org_id=self.get_org_id(record),
+                data=record,
+                scrape=self.scrape,
+                spider=self.name,
+            )

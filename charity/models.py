@@ -74,6 +74,8 @@ class CharityFinancial(models.Model):
         CHARITY = 'charity', 'Charity'
         BASIC_OSCR = 'basic_oscr', 'Basic (OSCR)'
         DETAILED_OSCR = 'detailed_oscr', 'Detailed (OSCR)'
+        BASIC_CCNI = 'basic_ccni', 'Basic (CCNI)'
+        DETAILED_CCNI = 'detailed_ccni', 'Detailed (CCNI)'
 
     charity = models.ForeignKey(
         'Charity',
