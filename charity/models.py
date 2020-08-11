@@ -44,9 +44,16 @@ class Charity(models.Model):
                 'exp_gen': f.exp_gen,
                 'reserves_months': f.reserves_months,
                 'fyend': f.fyend.isoformat(),
-                'fystart': f.fystart.isoformat(),
+                'fystart': f.fystart.isoformat() if f.fystart else None,
             } for f in self.financial.order_by('fyend').all()
         ]
+
+    @property
+    def has_ccew_partb(self):
+        for f in self.financial.all():
+            if f.has_ccew_partb:
+                return True
+        return False
 
 
 class CharityName(models.Model):
@@ -135,9 +142,16 @@ class CharityFinancial(models.Model):
         return "{} {}".format(self.charity.name, self.fyend)
 
     @property
+    def has_ccew_partb(self):
+        return self.account_type in (
+            CharityFinancial.AccountType.CHARITY,
+            CharityFinancial.AccountType.CONSOLIDATED,
+        )
+
+    @property
     def exp_gen(self):
         """Expenditure on generating funds"""
-        if self.exp_total:
+        if self.exp_total and self.has_ccew_partb:
             return self.exp_total - (self.exp_other + self.exp_gov + self.exp_charble)
 
     @property

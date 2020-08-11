@@ -51,12 +51,13 @@ set "name" = EXCLUDED.name,
 """
 
 UPDATE_CCNI["Insert into charity financial"] = """
-insert into charity_charityfinancial as cf (charity_id, fyend, income, inc_total,
+insert into charity_charityfinancial as cf (charity_id, fyend, income, inc_total, spending,
     exp_total, exp_vol, exp_charble, account_type)
 select cc.org_id as org_id,
     to_date(cc.data->>'Date for financial year ending', 'YYYY-MM-DD') as fyend,
     (cc.data->>'Total income')::int as income,
     (cc.data->>'Total income')::int as inc_total,
+    (cc.data->>'Total spending')::int as spending,
     (cc.data->>'Total spending')::int as exp_total,
     (cc.data->>'Income generation and governance')::int as exp_vol,
     (cc.data->>'Charitable spending')::int as exp_charble,
@@ -67,7 +68,7 @@ where cc.spider = 'ccni'
 on conflict (charity_id, fyend) do update
 set income = EXCLUDED.income,
     inc_total = EXCLUDED.inc_total,
-    inc_other = EXCLUDED.inc_other,
+    spending = EXCLUDED.spending,
     exp_total = EXCLUDED.exp_total,
     exp_vol = EXCLUDED.exp_vol,
     exp_charble = EXCLUDED.exp_charble,

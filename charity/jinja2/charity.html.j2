@@ -94,13 +94,14 @@
         <tr>
           <td>{{ f.fyend }}</td>
           <td>{{ "{:,.0f}".format(f.income) }}</td>
-          <td>{{ "{:,.0f}".format(f.spending) }}</td>
+          <td>{% if f.spending %}{{ "{:,.0f}".format(f.spending) }}{% endif %}</td>
         </tr>
       {% endfor %}
       </table>
       
       <canvas id="financeChart" width="400" height="200" class="measure"></canvas>
 
+      {% if charity.has_ccew_partb %}
       {% for table, fields in partb_tables.items() %}
       <h3>{{table}}</h3>
       <table>
@@ -123,7 +124,7 @@
         {% for f in finances %}
             <tr>
                 <td>{{ f.fyend }}</td>
-                {% if f.account_type != 'basic' %}
+                {% if f.has_ccew_partb %}
                     {% for field in fields %}
                         {% if f[field] %}
                             {% if field == 'reserves_months' %}
@@ -143,6 +144,7 @@
         </tbody>
       </table>
       {% endfor %}
+      {% endif %}
 
       {% endif %}
   </section>
