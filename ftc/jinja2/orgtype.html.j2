@@ -1,4 +1,6 @@
 {% extends 'base.html.j2' %}
+{% set sources = get_sources() %}
+{% set orgtypes = get_orgtypes() %}
 {% set heading = '{}'.format(
     query.base_query.title,
 ) %}
