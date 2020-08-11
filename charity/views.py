@@ -1,9 +1,8 @@
 import re
 
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.http import Http404
 
-from ftc.models import Organisation, RelatedOrganisation
+from ftc.views import get_orgid
 
 
 def get_charity(request, regno, filetype="html", preview=False):
@@ -18,16 +17,8 @@ def get_charity(request, regno, filetype="html", preview=False):
             'GB-NIC-{}'.format(regno),
         ]
     for org_id in org_ids:
-        orgs = list(Organisation.objects.filter(
-            linked_orgs__contains=[org_id]))
-        if orgs:
-            break
-
-    org = RelatedOrganisation(orgs)
-    if filetype == "json":
-        return JsonResponse({
-            "org": org.to_json(charity=True)
-        })
-    return render(request, 'org.html.j2', {
-        "org": org,
-    })
+        try:
+            return get_orgid(request, org_id, filetype, preview)
+        except Http404:
+            continue
+    raise Http404("Charity not found")
