@@ -27,8 +27,8 @@ class TestCase(django.test.TestCase):
             finish_time=timezone.now() - datetime.timedelta(minutes=5),
         )
         Organisation.objects.create(
-            org_id='XX-XXX-1234',
-            orgIDs=['XX-XXX-1234'],
+            org_id='GB-CHC-1234',
+            orgIDs=['GB-CHC-1234'],
             description='Test description',
             name='Test organisation',
             active=True,
