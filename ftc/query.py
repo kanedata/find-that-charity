@@ -165,8 +165,8 @@ class OrganisationSearch:
             q = q.sort(sort_by)
 
         if with_aggregation:
-            by_source = A("terms", field="source")
-            by_orgtype = A("terms", field="organisationType")
+            by_source = A("terms", field="source", size=150)
+            by_orgtype = A("terms", field="organisationType", size=150)
             q.aggs.bucket("by_source", by_source)
             q.aggs.bucket("by_orgtype", by_orgtype)
 
