@@ -80,8 +80,10 @@ class Command(CSVScraper):
     def depluralise(self, s):
         if not isinstance(s, str):
             return s
-        if s == "Other types":
-            return "Other school"
+        if s in ("British schools overseas"):
+            return s
+        if s in ("Miscellaneous", "Other types"):
+            return "Other education"
         if s.endswith("ies"):
             return s[:-3] + "y"
         if s.endswith("s"):
