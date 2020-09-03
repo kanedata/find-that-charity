@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         session = requests_html.HTMLSession()
         r = session.get(CCEW_DATA_URL)
-        for d in r.html.find(".cc-postcontent blockquote"):
+        for d in r.html.find("blockquote.download"):
             for p in d.find("p"):
                 if "Charity register extract" in p.text:
                     links = p.absolute_links

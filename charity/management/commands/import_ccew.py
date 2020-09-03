@@ -9,6 +9,7 @@ import psycopg2
 import tqdm
 from django.db import connection
 
+from charity.feeds import CCEW_DATA_URL
 from charity.management.commands._ccew_sql import UPDATE_CCEW
 from charity.models import (
     CCEWCharity, CCEWCharityAOO, CCEWClass, CCEWFinancial,
@@ -25,7 +26,7 @@ class Command(HTMLScraper):
     }
     allowed_domains = ['charitycommission.gov.uk']
     start_urls = [
-        "http://data.charitycommission.gov.uk/",
+        CCEW_DATA_URL,
         "https://raw.githubusercontent.com/drkane/charity-lookups/master/cc-aoo-gss-iso.csv",
     ]
     org_id_prefix = "GB-CHC"

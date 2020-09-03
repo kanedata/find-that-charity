@@ -4,13 +4,13 @@ from requests_html import HTMLSession
 
 from charity.models import CcewDataFile
 
-CCEW_DATA_URL = "http://data.charitycommission.gov.uk/"
+CCEW_DATA_URL = "https://register-of-charities.charitycommission.gov.uk/register/full-register-download"
 
 
 def fetch_ccew_data():
     session = HTMLSession()
     r = session.get(CCEW_DATA_URL)
-    for d in r.html.find(".cc-postcontent blockquote"):
+    for d in r.html.find("blockquote.download"):
         for p in d.find("p"):
             if "Charity register extract" in p.text:
                 links = p.absolute_links
