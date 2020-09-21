@@ -25,11 +25,11 @@
   <body class="home w-100 sans-serif near-black base-font bg-wavy">
     {% if now.strftime('%Y-%m-%d') < '2021-01-01' %}
     <div class="bg-yellow near-black ph3 ph5-ns pv2 pv3-ns">
-      <strong>Find that charity has changed!</strong> 
+      <strong>Find that Charity has changed!</strong> 
       <a href="{{ url('about') }}#update-2020-09" class="blue underline double">Find out what's new</a>
     </div>
     {% endif %}
-    <header class="body header-font normal ph3 ph5-ns pt3 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
+    <header class="body header-font normal ph3 ph5-ns pt4 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
       <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
           <a href="{{ url('about') }}" class="white logo underline double underline-yellow">About</a>
             | <a href="{{ url('about') }}#data-sources" class="white logo underline double underline-yellow">Data sources</a>
