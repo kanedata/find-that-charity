@@ -49,7 +49,7 @@
             {% if v.startswith("GB-CHC-") %}
               <p>
                 <strong class="is-size-7"><abbr title="Charity Commission for England and Wales">CCEW</abbr> Charity number</strong><br>
-                <a class="link dark-blue underline-hover f4" href="http://beta.charitycommission.gov.uk/charity-details/?regid={{ v.replace('GB-CHC-', '') }}&subid=0" target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
+                <a class="link dark-blue underline-hover f4" href="https://ccew.dkane.net/charity/{{ v.replace('GB-CHC-', '') }}" target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
               </p>
             {% endif %}
             {% if v.startswith("GB-NIC-") %}

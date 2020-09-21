@@ -45,14 +45,7 @@ IGNORE_DOMAINS = (
 
 EXTERNAL_LINKS = {
     "GB-CHC": [
-        [
-            "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber={}&SubsidiaryNumber=0&Ref=CO",
-            "Charity Commission England and Wales",
-        ],
-        [
-            "http://beta.charitycommission.gov.uk/charity-details/?regid={}&subid=0",
-            "Charity Commission England and Wales (beta)",
-        ],
+        ["https://ccew.dkane.net/charity/{}", "Charity Commission England and Wales",],
         ["https://charitybase.uk/charities/{}", "CharityBase"],
         ["http://opencharities.org/charities/{}", "OpenCharities"],
         ["http://www.guidestar.org.uk/summary.aspx?CCReg={}", "GuideStar"],
@@ -123,10 +116,7 @@ EXTERNAL_LINKS = {
         ],
     ],
     "XI-GRID": [
-        [
-            "https://www.grid.ac/institutes/{}",
-            "Global Research Identifier Database",
-        ],
+        ["https://www.grid.ac/institutes/{}", "Global Research Identifier Database",],
     ],
 }
 
@@ -174,8 +164,7 @@ class OrgidField(models.CharField):
 class Organisation(models.Model):
     org_id = OrgidField(db_index=True, verbose_name="Organisation Identifier")
     orgIDs = ArrayField(
-        OrgidField(blank=True),
-        verbose_name="Other organisation identifiers",
+        OrgidField(blank=True), verbose_name="Other organisation identifiers",
     )
     linked_orgs = ArrayField(
         models.CharField(max_length=100, blank=True),
@@ -375,16 +364,21 @@ class Organisation(models.Model):
     def geoCodes(self):
 
         special_cases = {
-            'K02000001': ['E92000001', 'N92000002', 'S92000003', 'W92000004'],  # United Kingdom
-            'K03000001': ['E92000001', 'S92000003', 'W92000004'],  # Great Britain
-            'K04000001': ['E92000001', 'W92000004'],  # England and Wales
+            "K02000001": [
+                "E92000001",
+                "N92000002",
+                "S92000003",
+                "W92000004",
+            ],  # United Kingdom
+            "K03000001": ["E92000001", "S92000003", "W92000004"],  # Great Britain
+            "K04000001": ["E92000001", "W92000004"],  # England and Wales
         }
 
         for v in self.location:
             if v.get("geoCode") and re.match("[ENWSK][0-9]{8}", v.get("geoCode")):
                 # special case for combinations of countries
-                if v['geoCode'] in special_cases:
-                    for a in special_cases[v['geoCode']]:
+                if v["geoCode"] in special_cases:
+                    for a in special_cases[v["geoCode"]]:
                         yield a
                     continue
                 yield v.get("geoCode")
@@ -521,7 +515,6 @@ class OrgidScheme(models.Model):
 
 
 class RelatedOrganisation:
-
     def __init__(self, orgs):
         self.records = self.prioritise_orgs(orgs)
 
@@ -558,10 +551,7 @@ class RelatedOrganisation:
 
     @property
     def name(self):
-        return self.names.get(
-            self.records[0].name.lower(),
-            self.records[0].name
-        )
+        return self.names.get(self.records[0].name.lower(), self.records[0].name)
 
     @property
     def sources(self):
