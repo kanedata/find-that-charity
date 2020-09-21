@@ -18,7 +18,7 @@ def get_charity(request, regno, filetype="html", preview=False):
         ]
     for org_id in org_ids:
         try:
-            return get_orgid(request, org_id, filetype, preview)
+            return get_orgid(request, org_id, filetype, preview, as_charity=True)
         except Http404:
             continue
     raise Http404("Charity not found")

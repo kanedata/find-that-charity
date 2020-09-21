@@ -45,7 +45,8 @@ IGNORE_DOMAINS = (
 
 EXTERNAL_LINKS = {
     "GB-CHC": [
-        ["https://ccew.dkane.net/charity/{}", "Charity Commission England and Wales"],
+        ["https://ccew.dkane.net/charity/{}",
+            "Charity Commission England and Wales"],
         ["https://charitybase.uk/charities/{}", "CharityBase"],
         ["http://opencharities.org/charities/{}", "OpenCharities"],
         ["http://www.guidestar.org.uk/summary.aspx?CCReg={}", "GuideStar"],
@@ -116,7 +117,8 @@ EXTERNAL_LINKS = {
         ],
     ],
     "XI-GRID": [
-        ["https://www.grid.ac/institutes/{}", "Global Research Identifier Database"],
+        ["https://www.grid.ac/institutes/{}",
+            "Global Research Identifier Database"],
     ],
 }
 
@@ -206,8 +208,10 @@ class Organisation(models.Model):
     email = models.CharField(
         max_length=255, null=True, blank=True, verbose_name="Email address"
     )
-    description = models.TextField(null=True, blank=True, verbose_name="Description")
-    url = models.URLField(null=True, blank=True, verbose_name="Website address")
+    description = models.TextField(
+        null=True, blank=True, verbose_name="Description")
+    url = models.URLField(null=True, blank=True,
+                          verbose_name="Website address")
     domain = models.CharField(
         max_length=255,
         null=True,
@@ -224,7 +228,8 @@ class Organisation(models.Model):
     dateRegistered = models.DateField(
         null=True, blank=True, verbose_name="Date registered"
     )
-    dateRemoved = models.DateField(null=True, blank=True, verbose_name="Date removed")
+    dateRemoved = models.DateField(
+        null=True, blank=True, verbose_name="Date removed")
     active = models.BooleanField(null=True, blank=True, verbose_name="Active")
     status = models.CharField(
         max_length=200, null=True, blank=True, verbose_name="Status"
@@ -330,7 +335,8 @@ class Organisation(models.Model):
             obj["dissolutionDate"] = self.dateRemoved.isoformat()
         if self.orgIDs and len(self.orgIDs) > 1:
             if request:
-                obj["sameAs"] = [request.build_absolute_uri(id) for id in self.sameAs]
+                obj["sameAs"] = [request.build_absolute_uri(
+                    id) for id in self.sameAs]
             else:
                 obj["sameAs"] = self.sameAs
         return obj
@@ -370,7 +376,8 @@ class Organisation(models.Model):
                 "S92000003",
                 "W92000004",
             ],  # United Kingdom
-            "K03000001": ["E92000001", "S92000003", "W92000004"],  # Great Britain
+            # Great Britain
+            "K03000001": ["E92000001", "S92000003", "W92000004"],
             "K04000001": ["E92000001", "W92000004"],  # England and Wales
         }
 
@@ -435,7 +442,8 @@ class OrganisationLink(models.Model):
 
 
 class Source(models.Model):
-    id = models.CharField(max_length=200, unique=True, db_index=True, primary_key=True)
+    id = models.CharField(max_length=200, unique=True,
+                          db_index=True, primary_key=True)
     data = models.JSONField()
 
     @property
@@ -642,10 +650,12 @@ class RelatedOrganisation:
         if self.dateRegistered:
             obj["foundingDate"] = self.dateRegistered.isoformat()
         if not self.active and self.first("dateRemoved"):
-            obj["dissolutionDate"] = self.first("dateRemoved").get("value").isoformat()
+            obj["dissolutionDate"] = self.first(
+                "dateRemoved").get("value").isoformat()
         if len(self.orgIDs) > 1:
             if request:
-                obj["sameAs"] = [request.build_absolute_uri(id) for id in self.sameAs]
+                obj["sameAs"] = [request.build_absolute_uri(
+                    id) for id in self.sameAs]
             else:
                 obj["sameAs"] = self.sameAs
         return obj
@@ -659,7 +669,8 @@ class RelatedOrganisation:
             "postalCode",
         ]
         orgtypes = [y for y in self.get_all("organisationType")]
-        orgtypes = [o.title for o in OrganisationType.objects.filter(slug__in=orgtypes)]
+        orgtypes = [o.title for o in OrganisationType.objects.filter(
+            slug__in=orgtypes)]
 
         if charity:
             ccew_number = None
@@ -672,13 +683,16 @@ class RelatedOrganisation:
             for o in self.orgIDs:
                 if o.startswith("GB-CHC-"):
                     ccew_number = o.replace("GB-CHC-", "")
-                    ccew_link = EXTERNAL_LINKS["GB-CHC"][1][0].format(ccew_number)
+                    ccew_link = EXTERNAL_LINKS["GB-CHC"][1][0].format(
+                        ccew_number)
                 elif o.startswith("GB-NIC-"):
                     ccni_number = o.replace("GB-NIC-", "")
-                    ccni_link = EXTERNAL_LINKS["GB-NIC"][0][0].format(ccni_number)
+                    ccni_link = EXTERNAL_LINKS["GB-NIC"][0][0].format(
+                        ccni_number)
                 elif o.startswith("GB-SC-"):
                     oscr_number = o.replace("GB-SC-", "")
-                    oscr_link = EXTERNAL_LINKS["GB-SC"][0][0].format(oscr_number)
+                    oscr_link = EXTERNAL_LINKS["GB-SC"][0][0].format(
+                        oscr_number)
                 elif o.startswith("GB-COH-"):
                     company_numbers.append(
                         {
@@ -721,7 +735,7 @@ class RelatedOrganisation:
                     "location": self.location,
                 },
                 "url": self.url,
-                "domain": "centre404.org.uk",
+                "domain": self.domain,
                 "latest_income": self.latestIncome,
                 "company_number": company_numbers,
                 "parent": self.parent,

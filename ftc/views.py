@@ -1,7 +1,7 @@
 import csv
 
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
@@ -59,10 +59,18 @@ def org_search(request):
     )
 
 
-def get_orgid(request, org_id, filetype="html", preview=False):
-    org = get_object_or_404(Organisation, org_id=org_id)
+def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False):
+    try:
+        org = Organisation.objects.get(org_id=org_id)
+    except Organisation.DoesNotExist:
+        orgs = list(Organisation.objects.filter(orgIDs__contains=[org_id]))
+        if orgs:
+            orgs = RelatedOrganisation(orgs)
+            org = orgs.records[0]
+        else:
+            raise Http404("No Organisation found.")
     if filetype == "json":
-        return JsonResponse({"org": org.to_json()})
+        return JsonResponse(RelatedOrganisation([org]).to_json(as_charity))
 
     charity = Charity.objects.filter(id=org_id).first()
     related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
@@ -77,7 +85,11 @@ def get_orgid(request, org_id, filetype="html", preview=False):
     return render(
         request,
         template,
-        {"org": org, "related_orgs": related_orgs, "charity": charity,},
+        {
+            "org": org,
+            "related_orgs": related_orgs,
+            "charity": charity,
+        },
     )
 
 
