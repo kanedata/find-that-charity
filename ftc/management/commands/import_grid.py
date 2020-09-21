@@ -49,7 +49,9 @@ It includes cross-linkages to a range of other identifier sources.""",
             link = "https:" + link
 
         download_page = self.session.get(link)
-        zip_link = download_page.html.xpath('//a[text()="Download"]/@href')[0]
+        zip_link = download_page.html.find(
+            "a", first=True, containing="Download"
+        ).attrs["href"]
 
         response = self.session.get(zip_link)
 
