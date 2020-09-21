@@ -4,10 +4,9 @@ from ftc.tests import TestCase
 
 
 class CharityViewTests(TestCase):
-
     def test_charity(self):
 
-        response = self.client.get(reverse('charity_html', kwargs={'regno': '1234'}))
+        response = self.client.get(reverse("charity_html", kwargs={"regno": "1234"}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Find that Charity", html=True)
         self.assertContains(response, "Source publisher", html=True)
@@ -17,5 +16,5 @@ class CharityViewTests(TestCase):
 
     def test_organisation_404(self):
 
-        response = self.client.get(reverse('charity_html', kwargs={'regno': '3456'}))
+        response = self.client.get(reverse("charity_html", kwargs={"regno": "3456"}))
         self.assertEqual(response.status_code, 404)

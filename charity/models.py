@@ -28,11 +28,11 @@ class Charity(models.Model):
     latest_fye = models.DateField(null=True, blank=True)
     dual_registered = models.BooleanField(null=True, blank=True)
 
-    areas_of_operation = models.ManyToManyField('AreaOfOperation')
-    classification = models.ManyToManyField('VocabularyEntries')
+    areas_of_operation = models.ManyToManyField("AreaOfOperation")
+    classification = models.ManyToManyField("VocabularyEntries")
 
     class Meta:
-        verbose_name_plural = 'Charities'
+        verbose_name_plural = "Charities"
 
     def __str__(self):
         return "{} [{}]".format(self.name, self.id)
@@ -41,11 +41,12 @@ class Charity(models.Model):
         return [
             {
                 **model_to_dict(f),
-                'exp_gen': f.exp_gen,
-                'reserves_months': f.reserves_months,
-                'fyend': f.fyend.isoformat(),
-                'fystart': f.fystart.isoformat() if f.fystart else None,
-            } for f in self.financial.order_by('fyend').all()
+                "exp_gen": f.exp_gen,
+                "reserves_months": f.reserves_months,
+                "fyend": f.fyend.isoformat(),
+                "fystart": f.fystart.isoformat() if f.fystart else None,
+            }
+            for f in self.financial.order_by("fyend").all()
         ]
 
     @property
@@ -58,36 +59,36 @@ class Charity(models.Model):
 
 class CharityName(models.Model):
     charity = models.ForeignKey(
-        'Charity',
-        on_delete=models.CASCADE,
-        related_name='other_names'
+        "Charity", on_delete=models.CASCADE, related_name="other_names"
     )
     name = models.CharField(max_length=200, db_index=True)
-    normalisedName = models.CharField(max_length=200, db_index=True, blank=True, null=True)
+    normalisedName = models.CharField(
+        max_length=200, db_index=True, blank=True, null=True
+    )
     name_type = models.CharField(max_length=200, db_index=True)
 
     class Meta:
-        unique_together = ('charity', 'name',)
+        unique_together = (
+            "charity",
+            "name",
+        )
 
     def __str__(self):
         return "{} [{}]".format(self.name, self.charity.id)
 
 
 class CharityFinancial(models.Model):
-
     class AccountType(models.TextChoices):
-        BASIC = 'basic', 'Basic'
-        CONSOLIDATED = 'consolidated', 'Consolidated'
-        CHARITY = 'charity', 'Charity'
-        BASIC_OSCR = 'basic_oscr', 'Basic (OSCR)'
-        DETAILED_OSCR = 'detailed_oscr', 'Detailed (OSCR)'
-        BASIC_CCNI = 'basic_ccni', 'Basic (CCNI)'
-        DETAILED_CCNI = 'detailed_ccni', 'Detailed (CCNI)'
+        BASIC = "basic", "Basic"
+        CONSOLIDATED = "consolidated", "Consolidated"
+        CHARITY = "charity", "Charity"
+        BASIC_OSCR = "basic_oscr", "Basic (OSCR)"
+        DETAILED_OSCR = "detailed_oscr", "Detailed (OSCR)"
+        BASIC_CCNI = "basic_ccni", "Basic (CCNI)"
+        DETAILED_CCNI = "detailed_ccni", "Detailed (CCNI)"
 
     charity = models.ForeignKey(
-        'Charity',
-        on_delete=models.CASCADE,
-        related_name='financial'
+        "Charity", on_delete=models.CASCADE, related_name="financial"
     )
     fyend = models.DateField(db_index=True)
     fystart = models.DateField(null=True, blank=True)
@@ -133,10 +134,14 @@ class CharityFinancial(models.Model):
     employees = models.BigIntegerField(null=True, blank=True)
     volunteers = models.BigIntegerField(null=True, blank=True)
     account_type = models.CharField(
-        max_length=50, default=AccountType.BASIC, choices=AccountType.choices)
+        max_length=50, default=AccountType.BASIC, choices=AccountType.choices
+    )
 
     class Meta:
-        unique_together = ('charity', 'fyend',)
+        unique_together = (
+            "charity",
+            "fyend",
+        )
 
     def __str__(self):
         return "{} {}".format(self.charity.name, self.fyend)
@@ -163,17 +168,12 @@ class CharityFinancial(models.Model):
 class CharityRaw(models.Model):
     org_id = models.CharField(max_length=200, db_index=True)
     spider = models.CharField(max_length=200, db_index=True)
-    scrape = models.ForeignKey(
-        'ftc.Scrape',
-        on_delete=models.CASCADE,
-    )
-    data = models.JSONField(
-        encoder=DjangoJSONEncoder
-    )
+    scrape = models.ForeignKey("ftc.Scrape", on_delete=models.CASCADE,)
+    data = models.JSONField(encoder=DjangoJSONEncoder)
 
     class Meta:
-        verbose_name = 'Raw charity data'
-        verbose_name_plural = 'Raw charity data'
+        verbose_name = "Raw charity data"
+        verbose_name_plural = "Raw charity data"
 
     def __str__(self):
         return "{} {}".format(self.spider, self.org_id)
@@ -185,17 +185,52 @@ class AreaOfOperation(models.Model):
     aooname = models.CharField(max_length=200, db_index=True)
     aoosort = models.CharField(max_length=200, db_index=True)
     welsh = models.BooleanField(verbose_name="In Wales")
-    master = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name="Parent area", null=True, blank=True)
-    GSS = models.CharField(verbose_name="ONS Geocode for Local Authority", max_length=10, null=True, blank=True, db_index=True)
-    ISO3166_1 = models.CharField(verbose_name="ISO3166-1 country code (2 character)", max_length=2, null=True, blank=True, db_index=True)
-    ISO3166_1_3 = models.CharField(verbose_name="ISO3166-1 country code (3 character)", max_length=3, null=True, blank=True, db_index=True)
-    ISO3166_2_GB = models.CharField(verbose_name="ISO3166-2 region code (GB only)", max_length=6, null=True, blank=True, db_index=True)
-    ContinentCode = models.CharField(verbose_name="Continent", max_length=2, null=True, blank=True, db_index=True)
+    master = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        verbose_name="Parent area",
+        null=True,
+        blank=True,
+    )
+    GSS = models.CharField(
+        verbose_name="ONS Geocode for Local Authority",
+        max_length=10,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    ISO3166_1 = models.CharField(
+        verbose_name="ISO3166-1 country code (2 character)",
+        max_length=2,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    ISO3166_1_3 = models.CharField(
+        verbose_name="ISO3166-1 country code (3 character)",
+        max_length=3,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    ISO3166_2_GB = models.CharField(
+        verbose_name="ISO3166-2 region code (GB only)",
+        max_length=6,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    ContinentCode = models.CharField(
+        verbose_name="Continent", max_length=2, null=True, blank=True, db_index=True
+    )
 
     class Meta:
-        unique_together = ('aootype', 'aookey',)
-        verbose_name = 'Area of operation'
-        verbose_name_plural = 'Areas of operation'
+        unique_together = (
+            "aootype",
+            "aookey",
+        )
+        verbose_name = "Area of operation"
+        verbose_name_plural = "Areas of operation"
 
     def __str__(self):
         return "{}-{} {}".format(self.aootype, self.aookey, self.aooname)
@@ -209,25 +244,25 @@ class Vocabulary(models.Model):
         return self.title
 
     class Meta:
-        verbose_name = 'Vocabulary'
-        verbose_name_plural = 'Vocabularies'
+        verbose_name = "Vocabulary"
+        verbose_name_plural = "Vocabularies"
 
 
 class VocabularyEntries(models.Model):
     vocabulary = models.ForeignKey(
-        'Vocabulary',
-        on_delete=models.CASCADE,
-        related_name='entries'
+        "Vocabulary", on_delete=models.CASCADE, related_name="entries"
     )
     code = models.CharField(max_length=500, db_index=True)
     title = models.CharField(max_length=500, db_index=True)
-    parent = models.ForeignKey(
-        'self', on_delete=models.CASCADE, null=True, blank=True)
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        unique_together = ('vocabulary', 'code',)
-        verbose_name = 'Vocabulary Entry'
-        verbose_name_plural = 'Vocabulary Entries'
+        unique_together = (
+            "vocabulary",
+            "code",
+        )
+        verbose_name = "Vocabulary Entry"
+        verbose_name_plural = "Vocabulary Entries"
 
     def __str__(self):
         if slugify(self.title) == slugify(self.code):
@@ -249,12 +284,14 @@ class CcewDataFile(models.Model):
         return self.url
 
     class Meta:
-        verbose_name = 'Charity Commission data file'
-        verbose_name_plural = 'Charity Commission data files'
+        verbose_name = "Charity Commission data file"
+        verbose_name_plural = "Charity Commission data files"
 
 
 class CCEWCharity(models.Model):
-    regno = models.CharField(db_index=True, max_length=255)  # integer 	    registered number of a charity
+    regno = models.CharField(
+        db_index=True, max_length=255
+    )  # integer 	    registered number of a charity
     # integer 	    subsidiary number of a charity (may be 0 for main/group charity)
     subno = models.IntegerField(db_index=True)
     # varchar(150) 	main name of the charity
@@ -271,12 +308,24 @@ class CCEWCharity(models.Model):
     nhs = models.CharField(max_length=255, null=True, blank=True)
     # varchar(20) 	Housing Association number
     ha_no = models.CharField(max_length=255, null=True, blank=True)
-    corr = models.CharField(max_length=255, null=True, blank=True)  # varchar(70) 	Charity correspondent name
-    add1 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
-    add2 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
-    add3 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
-    add4 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
-    add5 = models.CharField(max_length=255, null=True, blank=True)  # varchar(35) 	address line of charity's correspondent
+    corr = models.CharField(
+        max_length=255, null=True, blank=True
+    )  # varchar(70) 	Charity correspondent name
+    add1 = models.CharField(
+        max_length=255, null=True, blank=True
+    )  # varchar(35) 	address line of charity's correspondent
+    add2 = models.CharField(
+        max_length=255, null=True, blank=True
+    )  # varchar(35) 	address line of charity's correspondent
+    add3 = models.CharField(
+        max_length=255, null=True, blank=True
+    )  # varchar(35) 	address line of charity's correspondent
+    add4 = models.CharField(
+        max_length=255, null=True, blank=True
+    )  # varchar(35) 	address line of charity's correspondent
+    add5 = models.CharField(
+        max_length=255, null=True, blank=True
+    )  # varchar(35) 	address line of charity's correspondent
     # varchar(8) 	postcode of charity's correspondent
     postcode = models.CharField(max_length=255, null=True, blank=True)
     # varchar(23) 	telephone of charity's correspondent
@@ -313,7 +362,9 @@ class CCEWName(models.Model):
     # integer 	    subsidiary number of a charity (may be 0 for main/group charity)
     subno = models.IntegerField(db_index=True)
     nameno = models.IntegerField()  # integer 	    number identifying a charity name
-    name = models.CharField(max_length=255)  # varchar(150) 	name of a charity (multiple occurrences possible)
+    name = models.CharField(
+        max_length=255
+    )  # varchar(150) 	name of a charity (multiple occurrences possible)
 
 
 class CCEWRegistration(models.Model):
@@ -347,7 +398,7 @@ class CCEWObjects(models.Model):
     # char(4) 	    sequence number (in practice 0-20)
     seqno = models.CharField(db_index=True, max_length=255)
     # varchar(255) 	Description of objects of a charity
-    object_text = models.TextField(db_column='object')
+    object_text = models.TextField(db_column="object")
 
 
 class CCEWFinancial(models.Model):
@@ -364,7 +415,7 @@ class CCEWClass(models.Model):
     # integer 	registered number of a charity
     regno = models.CharField(db_index=True, max_length=255)
     # integer 	classification code for a charity(multiple occurrences possible)
-    classification = models.CharField(db_column='class', max_length=255)
+    classification = models.CharField(db_column="class", max_length=255)
 
 
 class CCEWPartB(models.Model):

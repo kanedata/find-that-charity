@@ -163,8 +163,8 @@ class FullOrganisation(Document):
         """
         Return the queryset that should be indexed by this doc type.
         """
-        return (
-            self.django.model.objects.filter(linked_orgs__isnull=False).order_by("linked_orgs")
+        return self.django.model.objects.filter(linked_orgs__isnull=False).order_by(
+            "linked_orgs"
         )
 
     def get_indexing_queryset(self):
@@ -183,9 +183,7 @@ class FullOrganisation(Document):
     def bulk(self, actions, **kwargs):
         if self.django.queryset_pagination and "chunk_size" not in kwargs:
             kwargs["chunk_size"] = self.django.queryset_pagination
-        return bulk(
-            client=self._get_connection(), actions=actions, **kwargs
-        )
+        return bulk(client=self._get_connection(), actions=actions, **kwargs)
 
     class Django:
         model = Organisation  # The model associated with this Document

@@ -8,13 +8,13 @@ from ftc.views import get_orgid
 def get_charity(request, regno, filetype="html", preview=False):
     regno = regno.strip().upper()
     if regno.startswith("SC"):
-        org_ids = ['GB-SC-{}'.format(regno)]
+        org_ids = ["GB-SC-{}".format(regno)]
     elif regno.startswith("N"):
-        org_ids = ['GB-NIC-{}'.format(re.sub('[^0-9]', '', regno))]
+        org_ids = ["GB-NIC-{}".format(re.sub("[^0-9]", "", regno))]
     else:
         org_ids = [
-            'GB-CHC-{}'.format(regno),
-            'GB-NIC-{}'.format(regno),
+            "GB-CHC-{}".format(regno),
+            "GB-NIC-{}".format(regno),
         ]
     for org_id in org_ids:
         try:

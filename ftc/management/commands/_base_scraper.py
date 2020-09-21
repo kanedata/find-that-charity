@@ -224,13 +224,13 @@ class BaseScraper(BaseCommand):
             )
 
     def set_access_url(self, url, overwrite=False):
-        if not self.source.data['distribution'][0]['accessURL'] or overwrite:
-            self.source.data['distribution'][0]['accessURL'] = url
+        if not self.source.data["distribution"][0]["accessURL"] or overwrite:
+            self.source.data["distribution"][0]["accessURL"] = url
             self.source.save()
 
     def set_download_url(self, url, overwrite=False):
-        if not self.source.data['distribution'][0]['downloadURL'] or overwrite:
-            self.source.data['distribution'][0]['downloadURL'] = url
+        if not self.source.data["distribution"][0]["downloadURL"] or overwrite:
+            self.source.data["distribution"][0]["downloadURL"] = url
             self.source.save()
 
     def fetch_file(self):

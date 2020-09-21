@@ -19,9 +19,9 @@ def bulk_upsert(model, fields, values, by):
             DO
             UPDATE SET ({set_fields})=({set_values})
         """
-        set_fields = ', '.join([f for f in fields if f != by])
-        set_values = ', '.join(['EXCLUDED.{0}'.format(f) for f in fields if f != by])
-        values_placeholders = ('%s, ' * len(fields))[:-2]
+        set_fields = ", ".join([f for f in fields if f != by])
+        set_values = ", ".join(["EXCLUDED.{0}".format(f) for f in fields if f != by])
+        values_placeholders = ("%s, " * len(fields))[:-2]
 
         formatted_sql = stmt.format(
             table=model._meta.db_table,

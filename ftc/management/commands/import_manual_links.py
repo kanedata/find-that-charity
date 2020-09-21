@@ -1,6 +1,6 @@
 import csv
-import io
 import datetime
+import io
 
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import OrganisationLink, Source
@@ -224,7 +224,7 @@ class Command(CSVScraper):
                 defaults={
                     "data": {
                         **{k: v for k, v in s.items() if not k.startswith("_")},
-                        "modified": datetime.datetime.now().isoformat()
+                        "modified": datetime.datetime.now().isoformat(),
                     }
                 },
             )

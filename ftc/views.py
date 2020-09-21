@@ -1,14 +1,14 @@
 import csv
 
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.conf import settings
 
+from charity.models import Charity
 from ftc.documents import FullOrganisation
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
                         Source)
-from charity.models import Charity
 from ftc.query import OrganisationSearch, random_query
 
 
@@ -74,11 +74,11 @@ def get_orgid(request, org_id, filetype="html", preview=False):
     if settings.DEBUG:
         template = "charity.html.j2" if charity else "orgid.html.j2"
 
-    return render(request, template, {
-        "org": org,
-        "related_orgs": related_orgs,
-        "charity": charity,
-    })
+    return render(
+        request,
+        template,
+        {"org": org, "related_orgs": related_orgs, "charity": charity,},
+    )
 
 
 def get_random_org(request):

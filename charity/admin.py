@@ -25,14 +25,30 @@ class CharityNameInline(admin.TabularInline):
 
 
 class CharityAdmin(JSONFieldAdmin):
-    list_display = ('id', 'name', 'postcode', 'source',
-                    'active', 'date_registered', 'date_removed', 'income', 'latest_fye')
-    list_filter = ('active', 'source')
-    search_fields = ['name']
+    list_display = (
+        "id",
+        "name",
+        "postcode",
+        "source",
+        "active",
+        "date_registered",
+        "date_removed",
+        "income",
+        "latest_fye",
+    )
+    list_filter = ("active", "source")
+    search_fields = ["name"]
     inlines = [CharityFinancialInline, CharityNameInline]
 
     def view_on_site(self, obj):
-        return reverse('charity_html', kwargs={'regno': obj.id.replace('GB-CHC-', '').replace('GB-SC-', '').replace('GB-NIC-', '')})
+        return reverse(
+            "charity_html",
+            kwargs={
+                "regno": obj.id.replace("GB-CHC-", "")
+                .replace("GB-SC-", "")
+                .replace("GB-NIC-", "")
+            },
+        )
 
 
 class VocabularyEntriesInline(admin.TabularInline):
@@ -50,19 +66,20 @@ class VocabularyEntriesInline(admin.TabularInline):
         if resolved.args:
             return self.parent_model.objects.get(pk=resolved.args[0])
         if resolved.kwargs:
-            return self.parent_model.objects.get(pk=resolved.kwargs.get('object_id'))
+            return self.parent_model.objects.get(pk=resolved.kwargs.get("object_id"))
         return None
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "parent":
             vocab = self.get_parent_object_from_request(request)
             kwargs["queryset"] = charity.VocabularyEntries.objects.filter(
-                vocabulary=vocab)
+                vocabulary=vocab
+            )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class VocabularyAdmin(JSONFieldAdmin):
-    list_display = ('title', 'entries')
+    list_display = ("title", "entries")
     inlines = [VocabularyEntriesInline]
 
     def entries(self, obj):
@@ -70,7 +87,12 @@ class VocabularyAdmin(JSONFieldAdmin):
 
 
 class VocabularyEntriesAdmin(JSONFieldAdmin):
-    list_display = ('code_', 'vocabulary', 'title', 'parent',)
+    list_display = (
+        "code_",
+        "vocabulary",
+        "title",
+        "parent",
+    )
 
     def code_(self, obj):
         if slugify(obj.title) == slugify(obj.code):

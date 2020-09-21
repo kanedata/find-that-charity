@@ -11,8 +11,8 @@ from ftc.models import Organisation
 
 
 class Command(CSVScraper):
-    name = 'ccni'
-    allowed_domains = ['charitycommissionni.org.uk', 'gist.githubusercontent.com']
+    name = "ccni"
+    allowed_domains = ["charitycommissionni.org.uk", "gist.githubusercontent.com"]
     start_urls = [
         "https://gist.githubusercontent.com/BobHarper1/2687545c562b47bc755aef2e9e0de537/raw/ac052c33fd14a08dd4c2a0604b54c50bc1ecc0db/ccni_extra",
         "https://www.charitycommissionni.org.uk/umbraco/api/charityApi/ExportSearchResultsToCsv/?include=Linked&include=Removed",
@@ -22,7 +22,7 @@ class Command(CSVScraper):
     date_fields = ["Date registered", "Date for financial year ending"]
     date_format = {
         "Date registered": "%d/%m/%Y",
-        "Date for financial year ending": "%d %B %Y"
+        "Date for financial year ending": "%d %B %Y",
     }
     source = {
         "title": "Charity Commission for Northern Ireland charity search",
@@ -40,7 +40,7 @@ class Command(CSVScraper):
             {
                 "downloadURL": "",
                 "accessURL": "http://www.charitycommissionni.org.uk/charity-search/",
-                "title": "Charity Commission for Northern Ireland charity search"
+                "title": "Charity Commission for Northern Ireland charity search",
             }
         ],
     }
@@ -60,7 +60,7 @@ class Command(CSVScraper):
         if "Charity_number" in record:
             if not hasattr(self, "extra_names"):
                 self.extra_names = defaultdict(list)
-            self.extra_names[record['Charity_number']].append(record['Other_names'])
+            self.extra_names[record["Charity_number"]].append(record["Other_names"])
             return
 
         address, postcode = self.split_address(record.get("Public address", ""))
@@ -77,43 +77,51 @@ class Command(CSVScraper):
             org_types.append(company_type)
             org_ids.append("GB-COH-{}".format(coyno))
 
-        self.raw_records.append({
-            **record,
-            "address": ", ".join([a for a in address if a]),
-            "postcode": postcode,
-        })
+        self.raw_records.append(
+            {
+                **record,
+                "address": ", ".join([a for a in address if a]),
+                "postcode": postcode,
+            }
+        )
 
         self.add_org_record(
-            Organisation(**{
-                "org_id": self.get_org_id(record),
-                "name": record.get("Charity name").replace("`", "'"),
-                "charityNumber": "NIC{}".format(record.get(self.id_field)),
-                "companyNumber": coyno,
-                "streetAddress": address[0],
-                "addressLocality": address[1],
-                "addressRegion": address[2],
-                "addressCountry": "Northern Ireland",
-                "postalCode": postcode,
-                "telephone": record.get("Telephone"),
-                "alternateName": self.extra_names.get(record.get(self.id_field), []),
-                "email": record.get("Email"),
-                "description": None,
-                "organisationType": [o.slug for o in org_types],
-                "organisationTypePrimary": self.orgtype_cache['registered-charity'],
-                "url": self.parse_url(record.get("Website")),
-                "location": [],
-                "latestIncome": int(record["Total income"]) if record.get("Total income") else None,
-                "dateModified": datetime.datetime.now(),
-                "dateRegistered": record.get("Date registered"),
-                "dateRemoved": None,
-                "active": record.get("Status") != "Removed",
-                "parent": None,
-                "orgIDs": org_ids,
-                "scrape": self.scrape,
-                "source": self.source,
-                "spider": self.name,
-                "org_id_scheme": self.orgid_scheme,
-            })
+            Organisation(
+                **{
+                    "org_id": self.get_org_id(record),
+                    "name": record.get("Charity name").replace("`", "'"),
+                    "charityNumber": "NIC{}".format(record.get(self.id_field)),
+                    "companyNumber": coyno,
+                    "streetAddress": address[0],
+                    "addressLocality": address[1],
+                    "addressRegion": address[2],
+                    "addressCountry": "Northern Ireland",
+                    "postalCode": postcode,
+                    "telephone": record.get("Telephone"),
+                    "alternateName": self.extra_names.get(
+                        record.get(self.id_field), []
+                    ),
+                    "email": record.get("Email"),
+                    "description": None,
+                    "organisationType": [o.slug for o in org_types],
+                    "organisationTypePrimary": self.orgtype_cache["registered-charity"],
+                    "url": self.parse_url(record.get("Website")),
+                    "location": [],
+                    "latestIncome": int(record["Total income"])
+                    if record.get("Total income")
+                    else None,
+                    "dateModified": datetime.datetime.now(),
+                    "dateRegistered": record.get("Date registered"),
+                    "dateRemoved": None,
+                    "active": record.get("Status") != "Removed",
+                    "parent": None,
+                    "orgIDs": org_ids,
+                    "scrape": self.scrape,
+                    "source": self.source,
+                    "spider": self.name,
+                    "org_id_scheme": self.orgid_scheme,
+                }
+            )
         )
 
     def parse_company_number(self, coyno):
@@ -140,9 +148,7 @@ class Command(CSVScraper):
         self.logger.info("CharityRaw records inserted")
 
         self.logger.info("Deleting old CharityRaw records")
-        CharityRaw.objects.filter(
-            spider__exact=self.name,
-        ).exclude(
+        CharityRaw.objects.filter(spider__exact=self.name,).exclude(
             scrape_id=self.scrape.id,
         ).delete()
         self.logger.info("Old CharityRaw records deleted")

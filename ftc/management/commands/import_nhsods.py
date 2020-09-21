@@ -1,8 +1,8 @@
+import copy
 import csv
 import datetime
 import io
 import zipfile
-import copy
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation, Source
@@ -27,13 +27,7 @@ class Command(HTMLScraper):
         "issued": "",
         "modified": "",
         "publisher": {"name": "NHS Digital", "website": "https://digital.nhs.uk/"},
-        "distribution": [
-            {
-                "downloadURL": "",
-                "accessURL": "",
-                "title": "",
-            }
-        ],
+        "distribution": [{"downloadURL": "", "accessURL": "", "title": "",}],
     }
     zipfiles = [
         # {
@@ -166,16 +160,21 @@ class Command(HTMLScraper):
             self.files[u["org_type"]] = r
 
             source = copy.deepcopy(self.source_template)
-            source['distribution'] = [{
-                "downloadURL": u["url"],
-                "accessURL": self.start_urls[0],
-                "title": "NHS Digital Organisation Data Service - {}".format(u["org_type"])
-            }]
-            source['title'] = "NHS Digital Organisation Data Service - {}".format(u["org_type"])
+            source["distribution"] = [
+                {
+                    "downloadURL": u["url"],
+                    "accessURL": self.start_urls[0],
+                    "title": "NHS Digital Organisation Data Service - {}".format(
+                        u["org_type"]
+                    ),
+                }
+            ]
+            source["title"] = "NHS Digital Organisation Data Service - {}".format(
+                u["org_type"]
+            )
             source["modified"] = datetime.datetime.now().isoformat()
             self.sources[u["org_type"]], _ = Source.objects.update_or_create(
-                id=f"{source['identifier']}-{u['id']}",
-                defaults={"data": source}
+                id=f"{source['identifier']}-{u['id']}", defaults={"data": source}
             )
 
     def parse_file(self, response, org_type):

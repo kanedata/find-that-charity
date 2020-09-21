@@ -17,10 +17,7 @@ def fetch_ccew_data():
                 for link in links:
                     f, created = CcewDataFile.objects.update_or_create(
                         title=d.find("h4", first=True).text,
-                        defaults=dict(
-                            url=link,
-                            description=p.text
-                        )
+                        defaults=dict(url=link, description=p.text),
                     )
 
 
@@ -31,7 +28,7 @@ class CcewDataFeedRSS(Feed):
 
     def items(self):
         fetch_ccew_data()
-        return CcewDataFile.objects.order_by('-first_added')[:10]
+        return CcewDataFile.objects.order_by("-first_added")[:10]
 
     def item_title(self, item):
         return item.title

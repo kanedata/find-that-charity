@@ -1,6 +1,8 @@
 UPDATE_CCNI = {}
 
-UPDATE_CCNI['Insert into charity table'] = """
+UPDATE_CCNI[
+    "Insert into charity table"
+] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
     postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
     company_number, activities, source, first_added, last_updated, income, spending, latest_fye, dual_registered)
@@ -50,7 +52,9 @@ set "name" = EXCLUDED.name,
     latest_fye = EXCLUDED.latest_fye;
 """
 
-UPDATE_CCNI["Insert into charity financial"] = """
+UPDATE_CCNI[
+    "Insert into charity financial"
+] = """
 insert into charity_charityfinancial as cf (charity_id, fyend, income, inc_total, spending,
     exp_total, exp_vol, exp_charble, account_type)
 select cc.org_id as org_id,
@@ -76,7 +80,9 @@ set income = EXCLUDED.income,
 """
 
 
-UPDATE_CCNI["Add vocabulary records"] = """
+UPDATE_CCNI[
+    "Add vocabulary records"
+] = """
 insert into charity_vocabulary (title, single)
 select field, false
 from (
@@ -102,7 +108,9 @@ group by field
 on conflict (title) do nothing;
 """
 
-UPDATE_CCNI["Add vocabulary entries"] = """
+UPDATE_CCNI[
+    "Add vocabulary entries"
+] = """
 insert into charity_vocabularyentries (code, title, vocabulary_id)
 select regexp_replace(lower(value), '[^a-z]+', '-', 'g'),  value, v.id
 from (
@@ -134,7 +142,9 @@ order by id, records
 on conflict (code, vocabulary_id) do nothing;
 """
 
-UPDATE_CCNI["Add charity classification"] = """
+UPDATE_CCNI[
+    "Add charity classification"
+] = """
 insert into charity_charity_classification (charity_id, vocabularyentries_id)
 select a.org_id as "charity_id",
     ve.id as "vocabularyentries_id"

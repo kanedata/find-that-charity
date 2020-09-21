@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('charity', '0007_auto_20200731_1726'),
+        ("charity", "0007_auto_20200731_1726"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='charityraw',
-            name='data',
-            field=models.JSONField(encoder=django.core.serializers.json.DjangoJSONEncoder),
+            model_name="charityraw",
+            name="data",
+            field=models.JSONField(
+                encoder=django.core.serializers.json.DjangoJSONEncoder
+            ),
         ),
     ]

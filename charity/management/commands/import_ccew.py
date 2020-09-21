@@ -11,20 +11,20 @@ from django.db import connection
 
 from charity.feeds import CCEW_DATA_URL
 from charity.management.commands._ccew_sql import UPDATE_CCEW
-from charity.models import (
-    CCEWCharity, CCEWCharityAOO, CCEWClass, CCEWFinancial,
-    CCEWMainCharity, CCEWName, CCEWObjects, CCEWPartB, CCEWRegistration)
+from charity.models import (CCEWCharity, CCEWCharityAOO, CCEWClass,
+                            CCEWFinancial, CCEWMainCharity, CCEWName,
+                            CCEWObjects, CCEWPartB, CCEWRegistration)
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation, OrganisationLink, Scrape
 
 
 class Command(HTMLScraper):
-    name = 'ccew'
+    name = "ccew"
     custom_settings = {
-        'DOWNLOAD_TIMEOUT': 180 * 3,
-        'REDIS_URL': os.environ.get('REDIS_URL'),
+        "DOWNLOAD_TIMEOUT": 180 * 3,
+        "REDIS_URL": os.environ.get("REDIS_URL"),
     }
-    allowed_domains = ['charitycommission.gov.uk']
+    allowed_domains = ["charitycommission.gov.uk"]
     start_urls = [
         CCEW_DATA_URL,
         "https://raw.githubusercontent.com/drkane/charity-lookups/master/cc-aoo-gss-iso.csv",
@@ -33,7 +33,9 @@ class Command(HTMLScraper):
     id_field = "regno"
     date_fields = []
     date_format = "%Y-%m-%d %H:%M:%S"
-    zip_regex = re.compile(r"http://apps.charitycommission.gov.uk/data/.*?/RegPlusExtract.*?\.zip")
+    zip_regex = re.compile(
+        r"http://apps.charitycommission.gov.uk/data/.*?/RegPlusExtract.*?\.zip"
+    )
     source = {
         "title": "Registered charities in England and Wales",
         "description": "Data download service provided by the Charity Commission",
@@ -50,23 +52,23 @@ class Command(HTMLScraper):
             {
                 "downloadURL": "",
                 "accessURL": "",
-                "title": "Registered charities in England and Wales"
+                "title": "Registered charities in England and Wales",
             }
         ],
     }
     ccew_file_to_object = {
-        'extract_charity': CCEWCharity,
-        'extract_main_charity': CCEWMainCharity,
-        'extract_name': CCEWName,
-        'extract_registration': CCEWRegistration,
-        'extract_charity_aoo': CCEWCharityAOO,
-        'extract_objects': CCEWObjects,
-        'extract_financial': CCEWFinancial,
+        "extract_charity": CCEWCharity,
+        "extract_main_charity": CCEWMainCharity,
+        "extract_name": CCEWName,
+        "extract_registration": CCEWRegistration,
+        "extract_charity_aoo": CCEWCharityAOO,
+        "extract_objects": CCEWObjects,
+        "extract_financial": CCEWFinancial,
         "extract_class": CCEWClass,
         "extract_partb": CCEWPartB,
     }
     ccew_files = {
-        'extract_charity': [
+        "extract_charity": [
             "regno",  # integer      registered number of a charity
             "subno",  # integer      subsidiary number of a charity (may be 0 for main/group charity)
             "name",  # varchar(150)  main name of the charity
@@ -86,7 +88,7 @@ class Command(HTMLScraper):
             "phone",  # varchar(23)  telephone of charity's correspondent
             "fax",  # varchar(23)  fax of charity's correspondent
         ],
-        'extract_main_charity': [
+        "extract_main_charity": [
             "regno",  # integer      registered number of a charity
             "coyno",  # integer      company registration number
             "trustees",  # char(1)      trustees incorporated (T/F)
@@ -98,33 +100,33 @@ class Command(HTMLScraper):
             "email",  # varchar(255)  email address
             "web",  # varchar(255)  website address
         ],
-        'extract_name': [
+        "extract_name": [
             "regno",  # integer      registered number of a charity
             "subno",  # integer      subsidiary number of a charity (may be 0 for main/group charity)
             "nameno",  # integer      number identifying a charity name
-            "name",   # varchar(150)  name of a charity (multiple occurrences possible)
+            "name",  # varchar(150)  name of a charity (multiple occurrences possible)
         ],
-        'extract_registration': [
+        "extract_registration": [
             "regno",  # integer      registered number of a charity
             "subno",  # integer      subsidiary number of a charity (may be 0 for main/group charity)
             "regdate",  # datetime      date of registration for a charity
             "remdate",  # datetime      Removal date of a charity - Blank for Registered Charities
             "remcode",  # varchar(3)      Register removal reason code
         ],
-        'extract_charity_aoo': [
+        "extract_charity_aoo": [
             "regno",  # integer      registered number of a charity
             "aootype",  # char(1)      A B or D
             "aookey",  # integer      up to three digits
             "welsh",  # char(1)      Flag: Y or blank
             "master",  # integer      may be blank. If aootype=D then holds continent; if aootype=B then holds GLA/met county
         ],
-        'extract_objects': [
+        "extract_objects": [
             "regno",  # integer      registered number of a charity
             "subno",  # integer      subsidiary number of a charity (may be 0 for main/group charity)
             "seqno",  # char(4)      sequence number (in practice 0-20)
             "object",  # varchar(255)  Description of objects of a charity
         ],
-        'extract_financial': [
+        "extract_financial": [
             "regno",  # integer  registered number of a charity
             "fystart",  # datetime  Charity's financial year start date
             "fyend",  # datetime  Charity's financial year end date
@@ -206,14 +208,14 @@ class Command(HTMLScraper):
         self.logger.info("File size: {}".format(len(response.content)))
 
         with tempfile.TemporaryDirectory() as tmpdirname:
-            cczip_name = os.path.join(tmpdirname, 'ccew.zip')
+            cczip_name = os.path.join(tmpdirname, "ccew.zip")
             files = {}
 
-            with open(cczip_name, 'wb') as cczip:
+            with open(cczip_name, "wb") as cczip:
                 self.logger.info("Saving ZIP to disk")
                 cczip.write(response.content)
 
-            with zipfile.ZipFile(cczip_name, 'r') as z:
+            with zipfile.ZipFile(cczip_name, "r") as z:
                 for f in z.infolist():
                     filename = f.filename.replace(".bcp", "")
                     filepath = os.path.join(tmpdirname, f.filename)
@@ -225,7 +227,7 @@ class Command(HTMLScraper):
                     files[filename] = filepath
 
             for filename, filepath in files.items():
-                with open(filepath, 'r', encoding='latin1') as bcpfile:
+                with open(filepath, "r", encoding="latin1") as bcpfile:
                     self.logger.info("Processing: {}".format(filename))
                     self.process_bcp(bcpfile, filename)
 
@@ -245,17 +247,19 @@ class Command(HTMLScraper):
 
         with connection.cursor() as cursor:
             bcpreader = bcp.DictReader(bcpfile, fieldnames=fields)
-            self.logger.info('Starting table insert [{}]'.format(
-                db_table._meta.db_table))
+            self.logger.info(
+                "Starting table insert [{}]".format(db_table._meta.db_table)
+            )
             db_table.objects.all().delete()
             psycopg2.extras.execute_values(
                 cursor,
                 """INSERT INTO {} VALUES %s;""".format(db_table._meta.db_table),
                 get_data(bcpreader),
-                page_size=page_size
+                page_size=page_size,
             )
-            self.logger.info('Finished table insert [{}]'.format(
-                db_table._meta.db_table))
+            self.logger.info(
+                "Finished table insert [{}]".format(db_table._meta.db_table)
+            )
 
     def close_spider(self):
 
@@ -263,31 +267,25 @@ class Command(HTMLScraper):
         with connection.cursor() as cursor:
             for sql_name, sql in UPDATE_CCEW.items():
                 self.logger.info("Starting SQL: {}".format(sql_name))
-                cursor.execute(sql.format(
-                    scrape_id=self.scrape.id,
-                    source=self.name,
-                ))
+                cursor.execute(sql.format(scrape_id=self.scrape.id, source=self.name,))
                 self.logger.info("Finished SQL: {}".format(sql_name))
 
         self.object_count = Organisation.objects.filter(
-            spider__exact=self.name,
-            scrape_id=self.scrape.id,
+            spider__exact=self.name, scrape_id=self.scrape.id,
         ).count()
         self.scrape.items = self.object_count
-        results = {
-            "records": self.object_count
-        }
-        self.logger.info(
-            "Saved {:,.0f} organisation records".format(self.object_count))
+        results = {"records": self.object_count}
+        self.logger.info("Saved {:,.0f} organisation records".format(self.object_count))
 
         link_records_count = OrganisationLink.objects.filter(
-            spider__exact=self.name,
-            scrape_id=self.scrape.id,
+            spider__exact=self.name, scrape_id=self.scrape.id,
         ).count()
         if link_records_count:
-            results['link_records'] = link_records_count
-            self.object_count += results['link_records']
-            self.logger.info("Saved {:,.0f} link records".format(results['link_records']))
+            results["link_records"] = link_records_count
+            self.object_count += results["link_records"]
+            self.logger.info(
+                "Saved {:,.0f} link records".format(results["link_records"])
+            )
 
         self.scrape.errors = self.error_count
         self.scrape.result = results
@@ -302,14 +300,10 @@ class Command(HTMLScraper):
         # if we've been successfull then delete previous items
         if self.object_count > 0:
             self.logger.info("Deleting previous records")
-            Organisation.objects.filter(
-                spider__exact=self.name,
-            ).exclude(
+            Organisation.objects.filter(spider__exact=self.name,).exclude(
                 scrape_id=self.scrape.id,
             ).delete()
-            OrganisationLink.objects.filter(
-                spider__exact=self.name,
-            ).exclude(
+            OrganisationLink.objects.filter(spider__exact=self.name,).exclude(
                 scrape_id=self.scrape.id,
             ).delete()
             self.logger.info("Deleted previous records")

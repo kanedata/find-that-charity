@@ -6,19 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('charity', '0001_initial'),
+        ("charity", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CcewDataFile',
+            name="CcewDataFile",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(db_index=True, max_length=500, unique=True)),
-                ('url', models.URLField()),
-                ('description', models.CharField(db_index=True, max_length=500)),
-                ('first_added', models.DateTimeField(auto_now_add=True)),
-                ('last_updated', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(db_index=True, max_length=500, unique=True)),
+                ("url", models.URLField()),
+                ("description", models.CharField(db_index=True, max_length=500)),
+                ("first_added", models.DateTimeField(auto_now_add=True)),
+                ("last_updated", models.DateTimeField(auto_now=True)),
             ],
         ),
     ]

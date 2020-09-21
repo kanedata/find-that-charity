@@ -1,6 +1,8 @@
 UPDATE_OSCR = {}
 
-UPDATE_OSCR['Insert into charity table'] = """
+UPDATE_OSCR[
+    "Insert into charity table"
+] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
     postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
     company_number, activities, source, first_added, last_updated, income, spending, latest_fye, dual_registered)
@@ -50,7 +52,9 @@ set "name" = EXCLUDED.name,
     latest_fye = EXCLUDED.latest_fye;
 """
 
-UPDATE_OSCR["Insert into charity financial"] = """
+UPDATE_OSCR[
+    "Insert into charity financial"
+] = """
 insert into charity_charityfinancial as cf (charity_id, fyend, income, inc_total, inc_other, inc_invest, inc_char, inc_vol, inc_fr,
     exp_total, exp_vol, exp_charble, exp_other, account_type)
 select cc.org_id as org_id,
@@ -85,7 +89,9 @@ set income = EXCLUDED.income,
     account_type = EXCLUDED.account_type;
 """
 
-UPDATE_OSCR["Insert into charity names"] = """
+UPDATE_OSCR[
+    "Insert into charity names"
+] = """
 insert into charity_charityname as cn (charity_id, name, "normalisedName", name_type)
 select cc.org_id as org_id,
     cc.data->>'Charity Name' as "name",
@@ -103,7 +109,9 @@ where cc.spider = 'oscr' and cc.data->>'Known As' is not null
 on conflict (charity_id, name) do nothing;
 """
 
-UPDATE_OSCR["Add vocabulary records"] = """
+UPDATE_OSCR[
+    "Add vocabulary records"
+] = """
 insert into charity_vocabulary (title, single)
 select field, false
 from (
@@ -129,7 +137,9 @@ group by field
 on conflict (title) do nothing;
 """
 
-UPDATE_OSCR["Add vocabulary entries"] = """
+UPDATE_OSCR[
+    "Add vocabulary entries"
+] = """
 insert into charity_vocabularyentries (code, title, vocabulary_id)
 select regexp_replace(lower(value), '[^a-z]+', '-', 'g'),  value, v.id
 from (
@@ -161,7 +171,9 @@ order by id, records
 on conflict (code, vocabulary_id) do nothing;
 """
 
-UPDATE_OSCR["Add charity classification"] = """
+UPDATE_OSCR[
+    "Add charity classification"
+] = """
 insert into charity_charity_classification (charity_id, vocabularyentries_id)
 select a.org_id as "charity_id",
     ve.id as "vocabularyentries_id"

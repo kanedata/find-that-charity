@@ -1,6 +1,8 @@
 UPDATE_CCEW = {}
 
-UPDATE_CCEW['Insert into charity table'] = """
+UPDATE_CCEW[
+    "Insert into charity table"
+] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
     postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
     company_number, source, first_added, last_updated )
@@ -59,7 +61,9 @@ set "name" = EXCLUDED.name,
     last_updated = EXCLUDED.last_updated;
 """
 
-UPDATE_CCEW['Insert into charity financial'] = """
+UPDATE_CCEW[
+    "Insert into charity financial"
+] = """
 insert into charity_charityfinancial as cf (charity_id, fyend, fystart, income, spending, account_type)
 select DISTINCT ON ("org_id", "fyend") a.*
 from (
@@ -79,7 +83,9 @@ set fystart = EXCLUDED.fystart,
     account_type = cf.account_type;
 """
 
-UPDATE_CCEW['Insert partb into charity financial'] = """
+UPDATE_CCEW[
+    "Insert partb into charity financial"
+] = """
 update charity_charityfinancial cf
 set
     inc_leg = a.inc_leg,
@@ -127,7 +133,9 @@ where cf.charity_id = CONCAT('GB-CHC-', a.regno)
     and cf.fyend = a.fyend;
 """
 
-UPDATE_CCEW['Update charity table with latest income'] = """
+UPDATE_CCEW[
+    "Update charity table with latest income"
+] = """
 update charity_charity
 set latest_fye = cf.fyend,
     income = cf.income,
@@ -143,7 +151,9 @@ from (
 where cf.charity_id = charity_charity.id;
 """
 
-UPDATE_CCEW['Insert into charity areas of operation'] = """
+UPDATE_CCEW[
+    "Insert into charity areas of operation"
+] = """
 insert into charity_charity_areas_of_operation as ca (charity_id, areaofoperation_id )
 select CONCAT('GB-CHC-', c.regno) as charity_id,
     aoo.id as "areaofoperation_id"
@@ -154,7 +164,9 @@ from charity_ccewcharityaoo c
 on conflict (charity_id, areaofoperation_id) do nothing;
 """
 
-UPDATE_CCEW['Insert into charity names'] = """
+UPDATE_CCEW[
+    "Insert into charity names"
+] = """
 insert into charity_charityname as cn (charity_id, name, "normalisedName", name_type)
 select CONCAT('GB-CHC-', c.regno) as charity_id,
     c."name",
@@ -169,7 +181,9 @@ from charity_ccewname c
 on conflict (charity_id, name) do nothing;
 """
 
-UPDATE_CCEW['Update charity objects'] = """
+UPDATE_CCEW[
+    "Update charity objects"
+] = """
 update charity_charity
 set activities = "objects"
 from (
@@ -186,7 +200,9 @@ from (
 where charity_charity.id = a.charity_id;
 """
 
-UPDATE_CCEW['Insert into charity classification'] = """
+UPDATE_CCEW[
+    "Insert into charity classification"
+] = """
 insert into charity_charity_classification as ca (charity_id, vocabularyentries_id )
 select org_id,
     ve.id
@@ -203,7 +219,9 @@ where v.title like 'ccew_%'
 on conflict (charity_id, vocabularyentries_id) do nothing;
 """
 
-UPDATE_CCEW['Insert into organisation table'] = r"""
+UPDATE_CCEW[
+    "Insert into organisation table"
+] = r"""
 insert into ftc_organisation (
     org_id, "orgIDs", linked_orgs, name, "alternateName",
     "charityNumber", "companyNumber", "streetAddress", "addressLocality",
@@ -292,7 +310,9 @@ where ot.title = 'Registered Charity'
     and cc.source = '{source}'
 """
 
-UPDATE_CCEW['Insert into organisation link table'] = """
+UPDATE_CCEW[
+    "Insert into organisation link table"
+] = """
 insert into "ftc_organisationlink" (
     org_id_a,
     org_id_b,

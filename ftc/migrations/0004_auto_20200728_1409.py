@@ -7,33 +7,46 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ftc', '0003_auto_20200626_1537'),
+        ("ftc", "0003_auto_20200626_1537"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='scrape',
-            name='errors',
+            model_name="scrape",
+            name="errors",
             field=models.IntegerField(default=0, editable=False),
         ),
         migrations.AlterField(
-            model_name='scrape',
-            name='items',
+            model_name="scrape",
+            name="items",
             field=models.IntegerField(default=0, editable=False),
         ),
         migrations.AlterField(
-            model_name='scrape',
-            name='log',
+            model_name="scrape",
+            name="log",
             field=models.TextField(blank=True, editable=False, null=True),
         ),
         migrations.AlterField(
-            model_name='scrape',
-            name='result',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, editable=False, null=True),
+            model_name="scrape",
+            name="result",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True, editable=False, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='scrape',
-            name='status',
-            field=models.CharField(blank=True, choices=[('running', 'In progress'), ('success', 'Finished successfully'), ('errors', 'Finished with errors'), ('failed', 'Failed to complete')], editable=False, max_length=50, null=True),
+            model_name="scrape",
+            name="status",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("running", "In progress"),
+                    ("success", "Finished successfully"),
+                    ("errors", "Finished with errors"),
+                    ("failed", "Failed to complete"),
+                ],
+                editable=False,
+                max_length=50,
+                null=True,
+            ),
         ),
     ]

@@ -11,7 +11,7 @@ from reconcile.query import do_extend_query, do_reconcile_query
 
 
 @csrf_exempt
-def index(request, orgtype='all'):
+def index(request, orgtype="all"):
 
     queries = request.POST.get("queries", request.GET.get("queries"))
     if queries:
@@ -39,35 +39,36 @@ def service_spec(request):
         "identifierSpace": "http://org-id.guide",
         "schemaSpace": "https://schema.org",
         "view": {
-            "url": urllib.parse.unquote(request.build_absolute_uri(
-                reverse('orgid_html', kwargs={'org_id': '{{id}}'})
-            ))
+            "url": urllib.parse.unquote(
+                request.build_absolute_uri(
+                    reverse("orgid_html", kwargs={"org_id": "{{id}}"})
+                )
+            )
         },
         "preview": {
-            "url": urllib.parse.unquote(request.build_absolute_uri(
-                reverse('orgid_html_preview', kwargs={'org_id': '{{id}}'})
-            )),
+            "url": urllib.parse.unquote(
+                request.build_absolute_uri(
+                    reverse("orgid_html_preview", kwargs={"org_id": "{{id}}"})
+                )
+            ),
             "width": 430,
-            "height": 300
+            "height": 300,
         },
-        "defaultTypes": [{
-            "id": "/Organization",
-            "name": "Organisation",
-        }],
+        "defaultTypes": [{"id": "/Organization", "name": "Organisation",}],
         "extend": {
             "propose_properties": {
-                "service_url": request.build_absolute_uri(reverse('index')),
-                "service_path": reverse('propose_properties'),
+                "service_url": request.build_absolute_uri(reverse("index")),
+                "service_path": reverse("propose_properties"),
             },
-            "property_settings": []
+            "property_settings": [],
         },
         "suggest": {
             "entity": {
-                "service_url": request.build_absolute_uri(reverse('index')),
-                "service_path": reverse('suggest'),
+                "service_url": request.build_absolute_uri(reverse("index")),
+                "service_path": reverse("suggest"),
                 # "flyout_service_path": "/suggest/flyout/${id}"
             }
-        }
+        },
     }
 
 
@@ -79,16 +80,18 @@ def propose_properties(request):
 
     limit = int(request.GET.get("limit", "500"))
 
-    return JsonResponse({
-        "limit": limit,
-        "type": type_,
-        "properties": Organisation.get_fields_as_properties(),
-    })
+    return JsonResponse(
+        {
+            "limit": limit,
+            "type": type_,
+            "properties": Organisation.get_fields_as_properties(),
+        }
+    )
 
 
 @csrf_exempt
 def suggest(request, orgtype="all"):
-    SUGGEST_NAME = 'name_complete'
+    SUGGEST_NAME = "name_complete"
 
     prefix = request.GET.get("prefix")
     # cursor = request.GET.get("cursor")
@@ -96,34 +99,27 @@ def suggest(request, orgtype="all"):
         raise Http404("Prefix must be supplied")
     q = FullOrganisation.search()
 
-    completion = {
-        "field": "complete_names",
-        "fuzzy": {
-            "fuzziness": 1
-        }
-    }
+    completion = {"field": "complete_names", "fuzzy": {"fuzziness": 1}}
     if orgtype and orgtype != "all":
-        completion['contexts'] = dict(
-            organisationType=orgtype.split("+")
-        )
+        completion["contexts"] = dict(organisationType=orgtype.split("+"))
 
-    q = q.suggest(
-        SUGGEST_NAME,
-        prefix,
-        completion=completion
-    ).source(['org_id', 'name', 'organisationType'])
+    q = q.suggest(SUGGEST_NAME, prefix, completion=completion).source(
+        ["org_id", "name", "organisationType"]
+    )
     result = q.execute()
 
-    return JsonResponse({
-        "result": [
-            {
-                "id": r["_source"]["org_id"],
-                "name": r["_source"]["name"],
-                "url": request.build_absolute_uri(
-                    reverse('orgid_html', kwargs={"org_id": r["_source"]["org_id"]})
-                ),
-                "orgtypes": list(r["_source"]["organisationType"]),
-            }
-            for r in result.suggest[SUGGEST_NAME][0]["options"]
-        ]
-    })
+    return JsonResponse(
+        {
+            "result": [
+                {
+                    "id": r["_source"]["org_id"],
+                    "name": r["_source"]["name"],
+                    "url": request.build_absolute_uri(
+                        reverse("orgid_html", kwargs={"org_id": r["_source"]["org_id"]})
+                    ),
+                    "orgtypes": list(r["_source"]["organisationType"]),
+                }
+                for r in result.suggest[SUGGEST_NAME][0]["options"]
+            ]
+        }
+    )

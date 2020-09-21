@@ -6,7 +6,6 @@ from charity.models import CcewDataFile
 
 
 class Command(BaseCommand):
-
     def handle(self, *args, **options):
         session = requests_html.HTMLSession()
         r = session.get(CCEW_DATA_URL)
@@ -17,9 +16,6 @@ class Command(BaseCommand):
                     for link in links:
                         f, created = CcewDataFile.objects.update_or_create(
                             title=d.find("h4", first=True).text,
-                            defaults=dict(
-                                url=link,
-                                description=p.text
-                            )
+                            defaults=dict(url=link, description=p.text),
                         )
                         print("{} ({})".format(f, "created" if created else "updated"))

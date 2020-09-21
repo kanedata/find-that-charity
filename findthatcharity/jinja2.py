@@ -8,21 +8,23 @@ from django.urls import reverse
 from django.utils.text import slugify
 from humanize import naturaldelta
 
-from findthatcharity.utils import (list_to_string, regex_search, to_titlecase,
-                                   url_remove, url_replace, pluralise)
-from ftc.models import OrganisationType, Source, OrgidScheme, Organisation
+from findthatcharity.utils import (list_to_string, pluralise, regex_search,
+                                   to_titlecase, url_remove, url_replace)
+from ftc.models import Organisation, OrganisationType, OrgidScheme, Source
 from jinja2 import Environment
 
 
 def get_orgtypes():
-    cache_key = 'orgtypes'
+    cache_key = "orgtypes"
     value = cache.get(cache_key)
     if value:
         return value
     if OrganisationType._meta.db_table in connection.introspection.table_names():
         by_orgtype = {
-            ot["orgtype"]: ot["records"] for ot in
-            Organisation.objects.annotate(orgtype=Func(F("organisationType"), function="unnest"))
+            ot["orgtype"]: ot["records"]
+            for ot in Organisation.objects.annotate(
+                orgtype=Func(F("organisationType"), function="unnest")
+            )
             .values("orgtype")
             .annotate(records=Count("*"))
             .order_by("-records")
@@ -31,7 +33,9 @@ def get_orgtypes():
         for o in OrganisationType.objects.all():
             o.records = by_orgtype.get(o.slug, 0)
             value[o.slug] = o
-        value = {k: v for k, v in sorted(value.items(), key=lambda item: -item[1].records)}
+        value = {
+            k: v for k, v in sorted(value.items(), key=lambda item: -item[1].records)
+        }
         cache.set(cache_key, value, 60 * 60)
     else:
         value = {}
@@ -39,7 +43,7 @@ def get_orgtypes():
 
 
 def get_sources():
-    cache_key = 'sources'
+    cache_key = "sources"
     value = cache.get(cache_key)
     if value:
         return value
@@ -57,7 +61,7 @@ def get_sources():
 
 
 def get_orgidschemes():
-    cache_key = 'orgidschemes'
+    cache_key = "orgidschemes"
     value = cache.get(cache_key)
     if value:
         return value
@@ -72,23 +76,26 @@ def get_orgidschemes():
 def environment(**options):
     env = Environment(**options)
 
-    env.globals.update({
-        'static': static,
-        'url': reverse,
-        'now': datetime.datetime.now(),
-        'get_orgtypes': get_orgtypes,
-        'get_sources': get_sources,
-        'get_orgidschemes': get_orgidschemes,
-        "url_replace": url_replace,
-        "url_remove": url_remove,
-    })
-    env.filters.update({
-        'regex_search': regex_search,
-        "naturaldelta": lambda x: naturaldelta(
-            x, minimum_unit="milliseconds"),
-        "list_to_string": list_to_string,
-        "slugify": slugify,
-        "titlecase": to_titlecase,
-        "pluralise": pluralise,
-    })
+    env.globals.update(
+        {
+            "static": static,
+            "url": reverse,
+            "now": datetime.datetime.now(),
+            "get_orgtypes": get_orgtypes,
+            "get_sources": get_sources,
+            "get_orgidschemes": get_orgidschemes,
+            "url_replace": url_replace,
+            "url_remove": url_remove,
+        }
+    )
+    env.filters.update(
+        {
+            "regex_search": regex_search,
+            "naturaldelta": lambda x: naturaldelta(x, minimum_unit="milliseconds"),
+            "list_to_string": list_to_string,
+            "slugify": slugify,
+            "titlecase": to_titlecase,
+            "pluralise": pluralise,
+        }
+    )
     return env

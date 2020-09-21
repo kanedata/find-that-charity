@@ -1,7 +1,7 @@
 import re
 
-import titlecase
 import inflect
+import titlecase
 
 VOWELS = re.compile("[AEIOUYaeiouy]")
 ORD_NUMBERS_RE = re.compile(r"([0-9]+(?:st|nd|rd|th))")
@@ -15,19 +15,51 @@ def title_exceptions(word, **kwargs):
     word_test = word.strip("(){}<>.")
 
     # lowercase words
-    if word_test.lower() in ['a', 'an', 'of', 'the', 'is', 'or']:
+    if word_test.lower() in ["a", "an", "of", "the", "is", "or"]:
         return word.lower()
 
     # uppercase words
-    if word_test.upper() in ['UK', 'FM', 'YMCA', 'PTA', 'PTFA',
-                             'NHS', 'CIO', 'U3A', 'RAF', 'PFA', 'ADHD',
-                             'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI',
-                             'AFC', 'CE', 'CIC'
-                             ]:
+    if word_test.upper() in [
+        "UK",
+        "FM",
+        "YMCA",
+        "PTA",
+        "PTFA",
+        "NHS",
+        "CIO",
+        "U3A",
+        "RAF",
+        "PFA",
+        "ADHD",
+        "I",
+        "II",
+        "III",
+        "IV",
+        "V",
+        "VI",
+        "VII",
+        "VIII",
+        "IX",
+        "X",
+        "XI",
+        "AFC",
+        "CE",
+        "CIC",
+    ]:
         return word.upper()
 
     # words with no vowels that aren't all uppercase
-    if word_test.lower() in ['st', 'mr', 'mrs', 'ms', 'ltd', 'dr', 'cwm', 'clwb', 'drs']:
+    if word_test.lower() in [
+        "st",
+        "mr",
+        "mrs",
+        "ms",
+        "ltd",
+        "dr",
+        "cwm",
+        "clwb",
+        "drs",
+    ]:
         return None
 
     # words with number ordinals
@@ -40,10 +72,16 @@ def title_exceptions(word, **kwargs):
         if len(dots) > 1:
             # check for possesive apostrophes
             if s == "'" and dots[-1].upper() == "S":
-                return s.join([titlecase.titlecase(i, title_exceptions) for i in dots[:-1]] + [dots[-1].lower()])
+                return s.join(
+                    [titlecase.titlecase(i, title_exceptions) for i in dots[:-1]]
+                    + [dots[-1].lower()]
+                )
             # check for you're and other contractions
             if word_test.upper() in ["YOU'RE", "DON'T", "HAVEN'T"]:
-                return s.join([titlecase.titlecase(i, title_exceptions) for i in dots[:-1]] + [dots[-1].lower()])
+                return s.join(
+                    [titlecase.titlecase(i, title_exceptions) for i in dots[:-1]]
+                    + [dots[-1].lower()]
+                )
             return s.join([titlecase.titlecase(i, title_exceptions) for i in dots])
 
     # words with no vowels in (treat as acronyms)
@@ -94,7 +132,7 @@ def url_replace(request, **kwargs):
     dict_ = request.GET.copy()
     for field, value in kwargs.items():
         dict_[field] = value
-    return request.build_absolute_uri(request.path) + '?' + dict_.urlencode()
+    return request.build_absolute_uri(request.path) + "?" + dict_.urlencode()
 
 
 def url_remove(request, fields):
@@ -104,12 +142,9 @@ def url_remove(request, fields):
     for field in fields:
         if field in dict_:
             del dict_[field]
-    return request.build_absolute_uri(request.path) + '?' + dict_.urlencode()
+    return request.build_absolute_uri(request.path) + "?" + dict_.urlencode()
 
 
 def pluralise(text, count=1, number_format=":,.0f", text_format="{count} {text}"):
     count_str = ("{" + number_format + "}").format(count)
-    return text_format.format(
-        count=count_str,
-        text=p.plural(text, count)
-    )
+    return text_format.format(count=count_str, text=p.plural(text, count))
