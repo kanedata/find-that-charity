@@ -53,10 +53,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "prettyjson",
     "django_better_admin_arrayfield",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -84,7 +86,7 @@ TEMPLATES = [
     },
     {
         "BACKEND": "django.template.backends.jinja2.Jinja2",
-        "DIRS": [(os.path.join(BASE_DIR, "jinja2")),],
+        "DIRS": [(os.path.join(BASE_DIR, "jinja2"))],
         "APP_DIRS": True,
         "OPTIONS": {
             "environment": "findthatcharity.jinja2.environment",
@@ -120,7 +122,7 @@ CACHES = {
 # Elasticsearch
 
 ELASTICSEARCH_DSL = {
-    "default": {"hosts": os.environ.get("ELASTICSEARCH_URL"),},
+    "default": {"hosts": os.environ.get("ELASTICSEARCH_URL")},
 }
 
 
@@ -131,9 +133,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 
@@ -166,10 +168,12 @@ LOGGING = {
             "format": "{levelname} {asctime} [{name}] {message}",
             "style": "{",
         },
-        "simple": {"format": "{levelname} {message}", "style": "{",},
+        "simple": {"format": "{levelname} {message}", "style": "{"},
     },
     "handlers": {
-        "console": {"class": "logging.StreamHandler", "formatter": "verbose",},
+        "console": {"class": "logging.StreamHandler", "formatter": "verbose"},
     },
-    "root": {"handlers": ["console"], "level": "INFO",},
+    "root": {"handlers": ["console"], "level": "INFO"},
 }
+
+CORS_ALLOW_ALL_ORIGINS = True

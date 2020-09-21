@@ -54,7 +54,7 @@ def service_spec(request):
             "width": 430,
             "height": 300,
         },
-        "defaultTypes": [{"id": "/Organization", "name": "Organisation",}],
+        "defaultTypes": [{"id": "/Organization", "name": "Organisation"}],
         "extend": {
             "propose_properties": {
                 "service_url": request.build_absolute_uri(reverse("index")),
