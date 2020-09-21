@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.urls import path
 
-from . import views
+from . import views, feeds
 
 urlpatterns = [
     path("random", views.get_random_org, name="random_org"),
@@ -35,6 +35,8 @@ urlpatterns = [
     ),
     path("source/<str:source>.html", views.orgid_type),
     path("source/<str:source>", views.orgid_type, name="orgid_source"),
+    path("scrapes/feed.rss", feeds.ScrapesFeedRSS()),
+    path("scrapes/feed.atom", feeds.ScrapesFeedAtom()),
     path("<path:org_id>.json", views.get_orgid, {"filetype": "json"}),
     path("<path:org_id>.html", views.get_orgid, {"filetype": "html"}),
     path(
