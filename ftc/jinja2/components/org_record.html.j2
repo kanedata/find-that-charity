@@ -1,0 +1,150 @@
+{% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
+
+{% macro org_record(record, sources, request, small=false, this_record=false) %}
+      <div class="br2 b--light-gray ba bw1 h-100 {% if not record.active %}silver bg-washed-yellow{% endif %}">
+        <header class="{% if not small %}bb b--light-gray bw1{% endif %} pa3">
+          <h3 class="ma0 pa0 header-font tracked-tight {% if not record.active %}normal{% endif %}">
+            <a href="{{ url('orgid_html', kwargs={'org_id': record.org_id}) }}" class="link near-black underline-hover">{{ record.name|titlecase }}</a>
+            {% if this_record %}<span class="normal">(this record)</span>{% endif %}
+            {% if not record.active %}<span class="normal red">(inactive)</span>{% endif %}
+            {% if small %}
+              <ul class="list ma0 pa0">
+              {% for orgid in record.orgIDs %}
+                <li class="">{{orgid_link(orgid, request)}}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+          </h3>
+          <div class="card-header-title is-block tracked-tight f6">
+            <span class="dib">Organisation record from </span>
+            {% if record.source %}
+            <a href="#data-source-{{ record.source.id }}" class="link b blue dib">
+              {{ record.source.publisher }}
+            </a><br>
+            {# <i class="gray">Last updated {{ "{:%d %B %Y}".format(record.source.data.modified) }}</i> #}
+            <i class="gray">Last updated {{ record.source.data.modified }}</i>
+            {% endif %}
+          </div>
+        </header>
+        {% if not small %}
+        <div class="pa3 f6">
+          <div class="w-100">
+            {% if record.active %}
+            <span class="pv1 ph2 br1 bg-green white dib mr2 mb2 link">Active</span>
+            {% else %}
+            <span class="pv1 ph2 br1 bg-red white dib mr2 mb2 link">Inactive</span>
+            {% endif %}
+            {{ orgtype_link(record.organisationTypePrimary) }}
+            {% for t in record.organisationType if t != record.organisationTypePrimary.slug %}
+            {{ orgtype_link(orgtypes[t]) }}
+            {% endfor %}
+          </div>
+          {% for v in record.orgIDs %}
+            {% if v.startswith("GB-COH-") %}
+              <p>
+                <strong class="is-size-7">Company number</strong><br>
+                <a class="link dark-blue underline-hover f4" href="https://beta.companieshouse.gov.uk/company/{{ v.replace('GB-COH-', '') }}" target="_blank">{{ v.replace('GB-COH-', '') }}</a>
+              </p>
+            {% endif %}
+            {% if v.startswith("GB-CHC-") %}
+              <p>
+                <strong class="is-size-7"><abbr title="Charity Commission for England and Wales">CCEW</abbr> Charity number</strong><br>
+                <a class="link dark-blue underline-hover f4" href="https://ccew.dkane.net/charity/{{ v.replace('GB-CHC-', '') }}" target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
+              </p>
+            {% endif %}
+            {% if v.startswith("GB-NIC-") %}
+              <p>
+                <strong class="is-size-7"><abbr title="Charity Commission for Northern Ireland">CCNI</abbr> Charity number</strong><br>
+                <a class="link dark-blue underline-hover f4" href="http://www.charitycommissionni.org.uk/charity-details/?regid={{ v.replace('GB-NIC-', '').replace('NIC', '')}}&subid=0" target="_blank">{{ v.replace('GB-NIC-', '') }}</a>
+              </p>
+            {% endif %}
+            {% if v.startswith("GB-SC-") %}
+              <p>
+                <strong class="is-size-7"><abbr title="Scottish Charity Regulator">OSCR</abbr> Charity number</strong><br>
+                <a class="link dark-blue underline-hover f4" href="https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={{ v.replace('GB-SC-', '') }}" target="_blank">{{ v.replace('GB-SC-', '') }}</a>
+              </p>
+            {% endif %}
+          {% endfor %}
+          <p>
+            <strong class="is-size-7">
+              Identifiers 
+              <span class="is-size-7">(using <a class="link underline-hover blue" href="http://org-id.guide/about" target="_blank" class="">org-id</a>)</span>
+            </strong><br>
+            <ul class="list ma0 pa0">
+            {% for orgid in record.orgIDs %}
+              <li class="">{{orgid_link(orgid, request)}}</li>
+            {% endfor %}
+            </ul>
+          </p>
+          {% if record.dateRegistered %}
+          <p>
+            <strong class="is-size-7">Registered</strong><br>
+            {{ "{:%d %B %Y}".format(record.dateRegistered) }}
+          </p>
+          {% endif %}
+          {% if record.dateRemoved %}
+          <p>
+            <strong class="is-size-7">Removed</strong><br>
+            {{ "{:%d %B %Y}".format(record.dateRemoved) }}
+          </p>
+          {% endif %}
+          {% if record.postalCode %}
+          <p>
+            <strong class="is-size-7">Postcode</strong><br>
+            <span>{{ record.postalCode }}</span>
+          </p>
+          {% endif %}
+          {% if record.url %}
+          <p>
+            <strong class="is-size-7">Website</strong><br>
+            <a href="{{ record.cleanUrl }}" class="link underline-hover blue">{{ record.url|replace("http://", "")|replace("https://", "") }}</a>
+          </p>
+          {% endif %}
+          {% if record.domain %}
+          <p>
+            <strong class="is-size-7">Domain</strong><br>
+            <code>{{ record.domain }}</code>
+          </p>
+          {% endif %}
+          {% if record.latestIncome %}
+          <p>
+            <strong class="is-size-7">Latest income</strong><br>
+            &pound;{{ "{:,.0f}".format( record.latestIncome )}}
+            {% if record.latestIncomeDate %}
+            {{ record.latestIncomeDate }}
+            {% endif %}
+          </p>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+      <br>
+      {# {% if charity["geo"]["location"] %}
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">Location</p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+            <table class="table">
+              <tbody>
+                {% if charity.get("geo", {}).get("location") %}
+                <tr>
+                  <th>Latitude/longitude</th>
+                  <td>
+                    <a href="#">
+                      {{ charity.get("geo", {}).get("location",{}).get("lat") }},
+                      {{ charity.get("geo", {}).get("location",{}).get("lon") }}
+                    </a>
+                  </td>
+                </tr>
+                {% endif %}
+                <!--<tr><th>Local Authority</th><td>{{ charity.get("geo", {}).get("areas",[]) }}</td></tr>-->
+                <tr><th>Postcode</th><td>{{ charity.get("geo", {}).get("postcode") }}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endif %} #}
+{% endmacro %}

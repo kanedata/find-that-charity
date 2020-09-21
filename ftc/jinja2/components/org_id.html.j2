@@ -1,0 +1,35 @@
+{% macro orgid_classname(large=False) %}
+{% if large %}
+f4 pv1 ph2 br2 mr2 mb2
+{% else %}
+f6 pv0 ph1 br1 mr1 mb1
+{% endif %}
+{% endmacro %}
+
+{% macro orgtype_classname(large=False) %}
+{% if large %}
+f4 pv1 ph2 br2
+{% else %}
+f6 pv1 ph2 br1
+{% endif %}
+{% endmacro %}
+
+{% macro orgid_link(id, request, large=false) %}
+<a href="{{ url('orgid_html', kwargs={'org_id': id}) }}"
+   class="link dib bg-dark-blue white code underline-hover {{orgid_classname(large)}}">{{id}}</a>
+{% endmacro %}
+
+{% macro orgid_connection(id_a, id_b, request, large=false) %}
+<span class="dib bg-dark-blue white code {{orgid_classname(large)}}">
+    <a href="{{ url('orgid_html', kwargs={'org_id': id_a}) }}" class="link di white underline-hover">{{- id_a -}}</a>
+    <span class="bg-lightest-blue dark-blue ph2 dib">to</span> 
+    <a href="{{ url('orgid_html', kwargs={'org_id': id_b}) }}" class="link di white underline-hover">{{- id_b -}}</a>
+</span>
+{% endmacro %}
+
+{% macro orgtype_link(orgtype, large=false) %}
+<a href="{{ url('orgid_type', kwargs={'orgtype': orgtype.slug}) }}"
+   class="link dib bg-light-gray near-black underline-hover {{orgtype_classname(large)}}">
+   {{orgtype.title}}
+</a>
+{% endmacro %}

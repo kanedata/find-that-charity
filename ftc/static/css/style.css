@@ -1,0 +1,9 @@
+.material-icons {
+    font-size: inherit;
+    vertical-align: middle;
+}
+
+.entry-content table th.tl,
+.entry-content table td.tl {
+    text-align: left;
+}

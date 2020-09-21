@@ -1,0 +1,28 @@
+<form method="get" id="search-autocomplete">
+    <div class="cf mt3 flex-l">
+        <input name="q" 
+            id="search-autocomplete-q"
+            class="search-autocomplete f6 f5-l input-reset bl bt bb br br-1 br-0-l b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-50-ns br2-ns br--left-ns" 
+            type="text" 
+            placeholder="Search for a charity name or number"
+            value="{{term}}" autocomplete='off'>
+        <select name="orgtype"
+            id="search-autocomplete-orgtype"
+            autocomplete="off"
+            class="f6 f5-l input-reset bl bt bb br br-0-l b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-30-ns">
+            <option value="all">All organisation types</option>
+            <option disabled>----------</option>
+            {% for o in orgtypes.values()|sort(attribute='title') if o.is_keytype() %}
+                {% if o.slug == selected_org_type -%}
+                <option value="{{ o.slug }}" selected="selected">{{ o.title }}</option>
+                {% else -%}
+                <option value="{{ o.slug }}">{{ o.title }}</option>
+                {%- endif -%}
+            {%- endfor -%}
+        </select>
+        <input type="submit" value="Search" class="f6 f5-l button-reset br bt bb bl bl-0-l b--black-20 fl pv3 tc bg-animate bg-yellow dim near-black pointer w-100 w-20-m w-20-l br2-ns br--right-ns">
+    </div>
+    <div id='autocomplete-results' class="autocomplete-results dn relative w-100 absolute-l w-60-l bg-white">
+        
+    </div>
+</form>

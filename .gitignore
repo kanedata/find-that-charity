@@ -1,11 +1,16 @@
 # data
 
 data/
+!ftc/tests/data/
+!ftc/tests/data/*.zip
 
+# djangofiles
+/static/
 
 # python files
 __pycache__/
 env/
+envd/
 scratchpad/
 .cache
 

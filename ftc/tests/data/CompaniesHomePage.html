@@ -1,0 +1,200 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <title>Companies House</title>
+    <!-- FILE_START::style-links.tmpl -->
+    <link href="http://resources.companieshouse.gov.uk/css/reset.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="http://resources.companieshouse.gov.uk/css/text.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="http://resources.companieshouse.gov.uk/css/960.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="http://resources.companieshouse.gov.uk/css/style-e90.css" rel="stylesheet" type="text/css"
+        media="screen" />
+
+    <style type="text/css">
+        h2 {
+            border: 0px;
+            margin: 10px 0;
+        }
+    </style>
+    <!--[if IE]>
+<style type="text/css">
+form input[type="password"] {
+    padding-right:14px;
+}
+.ui-datepicker-trigger {position:relative; top:-20px;}
+.pseudoLink {
+    margin-right:-20px;
+    margin-left:-20px;
+}
+.positive:link, .positive:visited, input.positive, .disabled:link, .disabled:visited, input.disabled, a.important:link, a.important:visited {border:none;}
+.positive:active, a.important:active {
+    position:inherit;
+    top:0;
+}
+
+
+
+</style>
+<![endif]-->
+    <!--[if lt IE 9]>
+<style type="text/css">
+.header img {margin-bottom:-3px;}
+ul.greenTick {margin-left:0;}
+ul.greenTick li {padding-left:9px; list-style-image: url(/images/greenTick16px.png);}
+</style>
+<![endif]-->
+    <!--[if lt IE 8]>
+<style type="text/css">
+.header img {margin-bottom:-3px;}
+p.companySubheader {padding-bottom:0;}
+img.fieldStatus {position: relative; top: -15px;}
+</style>
+<![endif]-->
+    <!--[if lt IE 7]>
+<script language="JavaScript">
+function correctPNG() // correctly handle PNG transparency in Win IE 5.5 & 6.
+{
+   var arVersion = navigator.appVersion.split("MSIE")
+   var version = parseFloat(arVersion[1])
+   if ((version >= 5.5) && (document.body.filters))
+   {
+      for(var i=0; i<document.images.length; i++)
+      {
+         var img = document.images[i]
+         var imgName = img.src.toUpperCase()
+         if (imgName.substring(imgName.length-3, imgName.length) == "PNG")
+         {
+            var imgID = (img.id) ? "id='" + img.id + "' " : ""
+            var imgClass = (img.className) ? "class='" + img.className + "' " : ""
+            var imgTitle = (img.title) ? "title='" + img.title + "' " : "title='" + img.alt + "' "
+            var imgStyle = "display:inline-block;" + img.style.cssText
+            if (img.align == "left") imgStyle = "float:left;" + imgStyle
+            if (img.align == "right") imgStyle = "float:right;" + imgStyle
+            if (img.parentElement.href) imgStyle = "cursor:hand;" + imgStyle
+            var strNewHTML = "<span " + imgID + imgClass + imgTitle
+            + " style=\"" + "width:" + img.width + "px; height:" + img.height + "px;" + imgStyle + ";"
+            + "filter:progid:DXImageTransform.Microsoft.AlphaImageLoader"
+            + "(src=\'" + img.src + "\', sizingMethod='scale');\"></span>"
+            img.outerHTML = strNewHTML
+            i = i-1
+         }
+      }
+   }
+}
+window.attachEvent("onload", correctPNG);
+</script>
+<![endif]-->
+
+    <!-- FILE_END::style-links.tmpl -->
+</head>
+
+<body>
+    <div id="container">
+        <div class="headerLogo">
+            <div class="container_16">
+                <a href="http://www.companieshouse.gov.uk/"><img
+                        src="http://resources.companieshouse.gov.uk/images/ch_gds_logo_white.png" alt="" /></a>
+            </div>
+            <!--End of class="headerLogo"-->
+        </div>
+
+        <div class="container_16" id="mainContent">
+
+            <h1>Free Company Data Product</h1>
+
+            <div class="grid_8 alpha">
+                <h2>What is it? </h2>
+                <p>The Free Company Data Product is a downloadable data snapshot containing basic company data of live
+                    companies on the register. This snapshot is provided as ZIP files containing data in CSV format and
+                    is split into multiple files for ease of downloading.</p>
+                <p><strong>This snapshot is provided free of charge and will not be supported.</strong></p>
+
+                <h2>When will it be updated?</h2>
+                <p>The latest snapshot will be updated within 5 working days of the previous month end. </p>
+
+                <h2>Additional Information</h2>
+                <p>The contents of the snapshot have been compiled up to the end of the previous month.</p>
+                <p>A list of the data fields contained in the snapshot can be found here <a
+                        href="http://resources.companieshouse.gov.uk/toolsToHelp/pdf/freeDataProductDataset.pdf">PDF</a>.
+                </p>
+                <p>Up-to-date company information can be obtained by following the URI links in the data.
+                    <a href="http://resources.companieshouse.gov.uk/about/miscellaneous/URI.shtml">More details on
+                        URIs</a></p>
+
+                <p>If files are viewed with Microsoft Excel, it is recommended that you use version 2007 or later.</p>
+                <p><a href="http://resources.companieshouse.gov.uk/infoAndGuide/faq/publicDataProduct.shtml">Company
+                        Data Product FAQs</a></p>
+            </div>
+
+            <div class="grid_7 push_1 omega">
+                <h2>How to download Company data</h2>
+                <p>Either download the Company data as one large file or as smaller multiple files (for ease of
+                    downloading).</p>
+                <h2>Company data as one file:</h2>
+                <ul>
+                    <li><a href="BasicCompanyDataAsOneFile-2020-06-01.zip">BasicCompanyDataAsOneFile-2020-06-01.zip
+                            (377Mb)</a></li>
+                </ul>
+                <h2>Company data as multiple files:</h2>
+                <ul>
+
+                    <li><a href="BasicCompanyData-2020-06-01-part1_6.zip">BasicCompanyData-2020-06-01-part1_6.zip
+                            (69Mb)</a></li>
+
+                    <li><a href="BasicCompanyData-2020-06-01-part2_6.zip">BasicCompanyData-2020-06-01-part2_6.zip
+                            (69Mb)</a></li>
+
+                    <li><a href="BasicCompanyData-2020-06-01-part3_6.zip">BasicCompanyData-2020-06-01-part3_6.zip
+                            (70Mb)</a></li>
+
+                    <li><a href="BasicCompanyData-2020-06-01-part4_6.zip">BasicCompanyData-2020-06-01-part4_6.zip
+                            (69Mb)</a></li>
+
+                    <li><a href="BasicCompanyData-2020-06-01-part5_6.zip">BasicCompanyData-2020-06-01-part5_6.zip
+                            (70Mb)</a></li>
+
+                    <li><a href="BasicCompanyData-2020-06-01-part6_6.zip">BasicCompanyData-2020-06-01-part6_6.zip
+                            (28Mb)</a></li>
+
+                </ul>
+                <strong>Last Updated:</strong> 01/06/2020
+            </div>
+        </div>
+        <!--End of div class="container_16" id="mainContent"-->
+
+        <div id="footer">
+            <div class="container_16">
+                <span class="email">
+                    Email <a href="mailto:enquiries@companieshouse.gov.uk" class="smallFont">
+                        <!-- DS:W0011637 -->enquiries@companieshouse.gov.uk
+                        <!-- DE:W0011637 --></a></span>
+
+                <span class="telephone">Telephone +44 (0)303 1234 500 <em>8:30am to 6pm (UK time) Monday to
+                        Friday</em></span>
+            </div>
+        </div>
+    </div>
+    <!--End of div id="container"-->
+
+    <!-- Piwik -->
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://stats.companieshouse.gov.uk/piwik/" : "http://stats.companieshouse.gov.uk/piwik/");
+        document.write(unescape("<script src='" + pkBaseURL + "piwik.js' type='text/javascript'></script%3E"));
+    </script>
+    <script type="text/javascript">
+        try {
+            var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 3);
+            piwikTracker.trackPageView();
+            piwikTracker.enableLinkTracking();
+        }
+        catch (err) { }
+    </script>
+    <noscript>
+        <p><img src="http://stats.companieshouse.gov.uk/piwik/piwik.php?idsite=3" style="border:0" alt="" /></p>
+    </noscript>
+    <!-- End Piwik Tracking Code -->
+</body>
+
+</html>
