@@ -45,7 +45,7 @@ IGNORE_DOMAINS = (
 
 EXTERNAL_LINKS = {
     "GB-CHC": [
-        ["https://ccew.dkane.net/charity/{}", "Charity Commission England and Wales",],
+        ["https://ccew.dkane.net/charity/{}", "Charity Commission England and Wales"],
         ["https://charitybase.uk/charities/{}", "CharityBase"],
         ["http://opencharities.org/charities/{}", "OpenCharities"],
         ["http://www.guidestar.org.uk/summary.aspx?CCReg={}", "GuideStar"],
@@ -116,7 +116,7 @@ EXTERNAL_LINKS = {
         ],
     ],
     "XI-GRID": [
-        ["https://www.grid.ac/institutes/{}", "Global Research Identifier Database",],
+        ["https://www.grid.ac/institutes/{}", "Global Research Identifier Database"],
     ],
 }
 
