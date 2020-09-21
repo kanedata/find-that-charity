@@ -27,7 +27,7 @@ class Command(HTMLScraper):
         "issued": "",
         "modified": "",
         "publisher": {"name": "NHS Digital", "website": "https://digital.nhs.uk/"},
-        "distribution": [{"downloadURL": "", "accessURL": "", "title": "",}],
+        "distribution": [{"downloadURL": "", "accessURL": "", "title": ""}],
     }
     zipfiles = [
         # {
@@ -164,14 +164,10 @@ class Command(HTMLScraper):
                 {
                     "downloadURL": u["url"],
                     "accessURL": self.start_urls[0],
-                    "title": "NHS Digital Organisation Data Service - {}".format(
-                        u["org_type"]
-                    ),
+                    "title": u["org_type"],
                 }
             ]
-            source["title"] = "NHS Digital Organisation Data Service - {}".format(
-                u["org_type"]
-            )
+            source["title"] = u["org_type"]
             source["modified"] = datetime.datetime.now().isoformat()
             self.sources[u["org_type"]], _ = Source.objects.update_or_create(
                 id=f"{source['identifier']}-{u['id']}", defaults={"data": source}
