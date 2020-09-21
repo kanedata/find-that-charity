@@ -13,10 +13,10 @@ class ScrapesFeedRSS(Feed):
         return Scrape.objects.filter(status__in=[Scrape.ScrapeStatus.ERRORS, Scrape.ScrapeStatus.FAILED]).order_by("-start_time")[:10]
 
     def item_title(self, item):
-        return item.spider
+        return "SCRAPER FAILED: " + item.spider
 
     def item_description(self, item):
-        return item.log
+        return "<pre>" + item.log + "</pre>"
 
     def item_pubdate(self, item):
         return item.start_time
