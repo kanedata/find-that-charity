@@ -47,11 +47,11 @@ class Command(HTMLScraper):
     name = "schools_scotland"
     allowed_domains = ["gov.scot"]
     start_urls = [
-        "http://www.gov.scot/Topics/Statistics/Browse/School-Education/Datasets/contactdetails"
+        "https://www.gov.scot/publications/school-contact-details/"
     ]
     skip_rows = 5
     org_id_prefix = "GB-SCOTEDU"
-    id_field = "seedcode"
+    id_field = "seed_code"
     source = {
         "title": "School Contact Details",
         "description": "School contact details as at September 2017 including school names, addresses, pupil rolls, FTE numbers of teachers, urban/rural classification, denomination and proportion of pupils from minority ethnic groups.",
@@ -78,9 +78,7 @@ class Command(HTMLScraper):
         r = self.session.get(link)
 
         wb = load_workbook(io.BytesIO(r.content), read_only=True)
-        latest_sheet = wb[
-            sorted([s for s in wb.sheetnames if s.startswith("Open at")])[-1]
-        ]
+        latest_sheet = wb['Open Schools']
 
         # self.source["issued"] = wb.properties.modified.isoformat()[0:10]
 
@@ -114,18 +112,18 @@ class Command(HTMLScraper):
                     name=record.get("school_name"),
                     charityNumber=None,
                     companyNumber=None,
-                    streetAddress=record.get("address_1"),
-                    addressLocality=record.get("address_2"),
-                    addressRegion=record.get("address_3"),
+                    streetAddress=record.get("address_line1"),
+                    addressLocality=record.get("address_line2"),
+                    addressRegion=record.get("address_line3"),
                     addressCountry="Scotland",
                     postalCode=self.parse_postcode(record.get("post_code")),
-                    telephone=record.get("phone"),
+                    telephone=record.get("phone_number"),
                     alternateName=[],
-                    email=record.get("e_mail"),
+                    email=record.get("email"),
                     description=None,
                     organisationType=[o.slug for o in org_types],
                     organisationTypePrimary=org_types[0],
-                    url=None,
+                    url=record.get("website_address"),
                     location=self.get_locations(record),
                     latestIncome=None,
                     dateModified=datetime.datetime.now(),
