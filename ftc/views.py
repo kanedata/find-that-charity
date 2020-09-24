@@ -79,7 +79,9 @@ def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False)
     related_orgs = RelatedOrganisation(related_orgs)
 
     template = "orgid.html.j2"
-    if settings.DEBUG:
+    if preview:
+        template = "orgid_preview.html.j2"
+    elif settings.DEBUG:
         template = "charity.html.j2" if charity else "orgid.html.j2"
 
     return render(

@@ -1,0 +1,137 @@
+{% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
+{% from 'components/org_record.html.j2' import org_record %}
+{% from 'components/data_source.html.j2' import data_source %}
+{% set orgidschemes = get_orgidschemes() %}
+{% set orgtypes = get_orgtypes() %}
+{% set sources = get_sources() %}
+{% set heading = org["name"] %} 
+{% set subtitle = "Org ID: {}{}".format(
+    org["id"],
+    "" if org.active else " | Inactive"
+) %}
+
+{% set default_title = 'Find that Charity' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Archivo:400,700|Raleway:400,700|Material+Icons">
+    <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
+    <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
+    <link rel="stylesheet" href="{{ static('css/style.css') }}" />
+    {% block headscripts %}
+    {% endblock %}
+    {% if ga_tracking %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', '{{ ga_tracking }}');
+    </script>
+    {% endif %}
+    <title>{{ org.name|titlecase }} | {{default_title}}</title>
+  </head>
+  <body class="home w-100 sans-serif near-black base-font bg-white">
+
+    <header class="body header-font normal pa2 moon-gray bg-wavy">
+      <h1 class="tracked-tight f3 lh-title mv0 logo normal">
+        <a href="{{ url('index') }}" class="link moon-gray underline-yellow underline">
+          {{ default_title }}
+        </a>
+      </h1>
+    </header>
+
+    <main class="pa2 bg-white cf f6">
+      <span class="f5 gray">Organisation record</span>
+      <h2 class="mt0 mb0 f4 lh-title normal w-100">
+          {{ org.name|titlecase }}
+      </h2>
+      <div>{{ orgid_link(org.org_id, request, false) }}</div>
+      <h3 class="mv2 f5 lh-subtitle normal">
+        {% if not org.active %}
+        An <span class="normal red">inactive</span>
+        {% elif org.organisationTypePrimary.title[0]|lower is in (("a", "e", "i", "o", "u")) %}
+        An
+        {% else %}
+        A
+        {% endif %}
+        {{ orgtype_link(org.organisationTypePrimary, large=false) }}based in the UK
+        {%- if org.dateRemoved %}. Removed on {{ "{:%d %B %Y}".format(org.dateRemoved) }}.{% endif %}
+      </h3>
+      {% for v in org.orgIDs %}
+        {% if v.startswith("GB-COH-") %}
+          <p>
+            <strong>Company number</strong>:
+            <a class="link dark-blue underline-hover" href="https://beta.companieshouse.gov.uk/company/{{ v.replace('GB-COH-', '') }}" target="_blank">{{ v.replace('GB-COH-', '') }}</a>
+          </p>
+        {% endif %}
+        {% if v.startswith("GB-CHC-") %}
+          <p>
+            <strong><abbr title="Charity Commission for England and Wales">CCEW</abbr> Charity number</strong>:
+            <a class="link dark-blue underline-hover" href="https://ccew.dkane.net/charity/{{ v.replace('GB-CHC-', '') }}" target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
+          </p>
+        {% endif %}
+        {% if v.startswith("GB-NIC-") %}
+          <p>
+            <strong><abbr title="Charity Commission for Northern Ireland">CCNI</abbr> Charity number</strong>:
+            <a class="link dark-blue underline-hover" href="http://www.charitycommissionni.org.uk/charity-details/?regid={{ v.replace('GB-NIC-', '').replace('NIC', '')}}&subid=0" target="_blank">{{ v.replace('GB-NIC-', '') }}</a>
+          </p>
+        {% endif %}
+        {% if v.startswith("GB-SC-") %}
+          <p>
+            <strong><abbr title="Scottish Charity Regulator">OSCR</abbr> Charity number</strong>:
+            <a class="link dark-blue underline-hover" href="https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={{ v.replace('GB-SC-', '') }}" target="_blank">{{ v.replace('GB-SC-', '') }}</a>
+          </p>
+        {% endif %}
+      {% endfor %}
+      {% if org.dateRegistered %}
+      <p class="">
+        <strong>Registered</strong>:
+        {{ "{:%d %B %Y}".format(org.dateRegistered) }}
+      </p>
+      {% endif %}
+      {% if org.dateRemoved %}
+      <p>
+        <strong>Removed</strong>:
+        {{ "{:%d %B %Y}".format(org.dateRemoved) }}
+      </p>
+      {% endif %}
+      {% if org.postalCode %}
+      <p>
+        <strong>Postcode</strong>:
+        <span>{{ org.postalCode }}</span>
+      </p>
+      {% endif %}
+      {% if org.url %}
+      <p>
+        <strong>Website</strong>:
+        <a href="{{ org.cleanUrl }}" class="link underline-hover blue">{{ org.url|replace("http://", "")|replace("https://", "") }}</a>
+      </p>
+      {% endif %}
+      {% if org.latestIncome %}
+      <p>
+        <strong>Latest income</strong>:
+        &pound;{{ "{:,.0f}".format( org.latestIncome )}}
+        {% if org.latestIncomeDate %}
+        <span class="grey">(on {{ "{:%d %B %Y}".format(org.latestIncomeDate) }})</span>
+        {% endif %}
+      </p>
+      {% endif %}
+      {% if org.alternateName %}
+      <h4 class="mv1">Also known as</h4>
+      <ul class="mv0 pv0">
+        {% for n in org.alternateName[0:10] %}
+        <li>{{ n|titlecase }}</li>
+        {% endfor %}
+        {% if org.alternateName|length > 10 %}
+        <li>...and {{ "{:,.0f}".format(org.alternateName|length - 10) }} other names</li>
+        {% endif %}
+      </ul>
+      {% endif %}
+    </main>
+
+  </body>
+</html>
