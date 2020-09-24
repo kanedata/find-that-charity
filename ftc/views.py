@@ -4,6 +4,7 @@ from django.conf import settings
 from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from charity.models import Charity
 from ftc.documents import FullOrganisation
@@ -59,6 +60,7 @@ def org_search(request):
     )
 
 
+@xframe_options_exempt
 def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False):
     try:
         org = Organisation.objects.get(org_id=org_id)
