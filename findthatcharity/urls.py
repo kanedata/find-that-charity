@@ -15,7 +15,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import RedirectView
 
 import addtocsv.views
 import charity.urls
@@ -31,5 +30,5 @@ urlpatterns = [
     path("orgid/", include(ftc.urls)),
     path("charity/", include(charity.urls)),
     path("reconcile/", include(reconcile.urls)),
-    path("reconcile", RedirectView.as_view(url="/reconcile/")),
+    path("reconcile", reconcile.views.index, {"orgtype": "registered-charity"}),
 ]

@@ -4,6 +4,7 @@ import os
 
 from django.utils.text import slugify
 
+from findthatcharity.utils import to_titlecase
 from ftc.documents import FullOrganisation
 from ftc.models import Organisation
 
@@ -41,18 +42,24 @@ def do_reconcile_query(
     q = FullOrganisation.search().from_dict(query_template)[:limit]
     result = q.execute(params=params)
 
-    return [
-        {
-            "id": o.org_id,
-            "name": "{}{}".format(o.name, "" if o.active else " [INACTIVE]",),
-            "type": "/Organization",
-            "score": o.meta.score,
-            "match": (normalise_name(o.name) == normalise_name(query))
-            and (o.meta.score == result.hits.max_score)
-            and (k == 0),
-        }
-        for k, o in enumerate(result)
-    ]
+    return {
+        "result": [
+            {
+                "id": o.org_id,
+                "name": "{} ({}){}".format(
+                    to_titlecase(o.name),
+                    o.org_id,
+                    "" if o.active else " [INACTIVE]",
+                ),
+                "type": ["/Organization"],
+                "score": o.meta.score,
+                "match": (normalise_name(o.name) == normalise_name(query))
+                and (o.meta.score == result.hits.max_score)
+                and (k == 0),
+            }
+            for k, o in enumerate(result)
+        ]
+    }
 
 
 def do_extend_query(ids, properties):
