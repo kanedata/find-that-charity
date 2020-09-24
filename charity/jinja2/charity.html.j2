@@ -54,6 +54,15 @@
     }
 } %}
 
+{% set classification_titles = {
+  "ccew_activities": "Activities (CCEW)",
+  "ccew_beneficiaries": "Beneficiaries (CCEW)",
+  "ccew_theme": "Theme (CCEW)",
+  "oscr_activities": "Activities (OSCR)",
+  "oscr_beneficiaries": "Beneficiaries (OSCR)",
+  "oscr_purposes": "Purposes (OSCR)",
+} %}
+
 {% block headscripts %}
 {{ super() }}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
@@ -63,22 +72,60 @@
 {{ super() }}
 <script>
     const FINANCES = {{ charity.financial_json()|tojson }};
+    const tab_selectors = document.querySelectorAll('.tabs a');
+    function selectTab(selectedTab){
+      tab_selectors.forEach((tab) => {
+        if(tab.dataset.tabid == selectedTab){
+          document.getElementById(tab.dataset.tabid).style = "display: block";
+          tab.dataset.tabactive = "true";
+          tab.classList.remove("near-black");
+          tab.classList.add("white", "bg-gray");
+        } else {
+          document.getElementById(tab.dataset.tabid).style = "display: none";
+          delete tab.dataset.tabactive;
+          tab.classList.add("near-black");
+          tab.classList.remove("white", "bg-gray");
+        }
+      });
+    }
+
+    tab_selectors.forEach((el) => {
+      el.onclick = function(ev){
+        ev.preventDefault();
+        selectTab(el.dataset.tabid);
+      }
+      if(el.dataset.tabactive){
+        selectTab(el.dataset.tabid);
+      }
+    });
 </script>
 <script src="{{ static('js/charts.js') }}"></script>
 {% endblock %}
 
 {% block organisation_details %}
 
-  <section class="f5" id="charity-details">
+  <nav class="tabs mb4 cf">
+    <ul class="list ma0 pa0">
+      <li class="mr2 fl"><a class="link pa2 bl br bt bw1 white bg-gray" href="#" data-tabid="organisation-details" data-tabactive="true">Organisation details</a></li>
+      <li class="mr2 fl"><a class="link pa2 bl br bt bw1 near-black" href="#" data-tabid="charity-activities">Charity activities</a></li>
+      <li class="mr2 fl"><a class="link pa2 bl br bt bw1 near-black" href="#" data-tabid="charity-financials">Charity financial</a></li>
+    </ul>
+  </nav>
+
+  <section class="f5" id="charity-activities">
       
       {% for c, items in charity.classification.all()|groupby("vocabulary.title") %}
-        <h4>{{ c }}</h4>
+        <h4>{{ classification_titles.get(c, c) }}</h4>
         <ul>
           {% for i in items %}
           <li>{{ i.title }}</li>
           {% endfor %}
         </ul>
       {% endfor %}
+
+  </section>
+
+  <section class="f5" id="charity-financials">
 
       {% if charity.financial.count() %}
       {% set finances = charity.financial.order_by('fyend').all() %}
@@ -179,6 +226,7 @@
 <div class="mv3">
     <h5 class="ma0 pa0">Locations</h5>
     <ul class="mv0 list mh0 pa0 f6">
+    {% if org.location %}
     {% for v in org.location %}
     {% if v.geoCode and v.geoCode|regex_search("[ENWSK][0-9]{8}") %}
     <li class="w-100 mb2">
@@ -194,6 +242,7 @@
     </li>
     {% endif %}
     {% endfor %}
+    {% endif %}
     </ul>
 </div>
 </article>
