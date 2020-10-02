@@ -25,6 +25,11 @@
                                         "match_phrase": {
                                             "name": "{{name}}"
                                         }
+                                    },
+                                    {
+                                        "term": {
+                                            "ids": "{{name}}"
+                                        }
                                     }
                                 ]
                             }

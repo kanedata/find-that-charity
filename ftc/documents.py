@@ -92,6 +92,7 @@ class FullOrganisation(Document):
         ]
     )
     orgIDs = fields.KeywordField()
+    ids = fields.KeywordField()
     alternateName = fields.TextField()
     sortname = fields.KeywordField()
     organisationType = fields.KeywordField()
@@ -130,6 +131,9 @@ class FullOrganisation(Document):
 
     def prepare_orgIDs(self, instance):
         return instance.orgIDs
+
+    def prepare_ids(self, instance):
+        return [o.id for o in instance.orgIDs]
 
     def prepare_alternateName(self, instance):
         return instance.alternateName
