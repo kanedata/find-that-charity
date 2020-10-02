@@ -31,6 +31,7 @@ class Command(BaseScraper):
 
         # download the file
         if options['source'].startswith("http"):
+            self.set_session(False)
             self.logger.info("Downloading from {}".format(options['source']))
             nspl = self.session.get(options['source'])
             nspl_f = io.BytesIO(nspl.content)
