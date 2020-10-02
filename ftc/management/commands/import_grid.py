@@ -86,6 +86,10 @@ It includes cross-linkages to a range of other identifier sources.""",
             if an and an != "":
                 address.append(an)
 
+        postcode = record.get("addresses", [{}])[0].get("postcode")
+        if not postcode or postcode == "":
+            postcode = None
+
         url = record.get("links")[0] if record.get("links") else None
 
         parent = None
@@ -107,7 +111,7 @@ It includes cross-linkages to a range of other identifier sources.""",
                     "addressLocality": record.get("addresses", [{}])[0].get("city"),
                     "addressRegion": record.get("addresses", [{}])[0].get("state"),
                     "addressCountry": record.get("addresses", [{}])[0].get("country"),
-                    "postalCode": record.get("addresses", [{}])[0].get("postcode"),
+                    "postalCode": postcode,
                     "telephone": None,
                     "alternateName": record.get("aliases", [])
                     + record.get("acronyms", []),
