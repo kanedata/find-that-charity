@@ -16,7 +16,8 @@ class Command(BaseCommand):
         count = 0
         for record in r.json()["lists"]:
             obj, created = OrgidScheme.objects.update_or_create(
-                code=record["code"], defaults={"data": record},
+                code=record["code"],
+                defaults={"data": record},
             )
             count += 1
         print("Saved {:,.0f} records".format(count))

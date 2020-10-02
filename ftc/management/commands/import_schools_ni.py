@@ -64,7 +64,10 @@ class Command(HTMLScraper):
         post_params["__EVENTTARGET"] = "ctl00$ContentPlaceHolder1$lvSchools$btnDoExport"
         post_params["__EVENTARGUMENT"] = ""
 
-        r = self.session.post(self.start_urls[0], data=post_params,)
+        r = self.session.post(
+            self.start_urls[0],
+            data=post_params,
+        )
         try:
             csv_text = r.text
         except AttributeError:

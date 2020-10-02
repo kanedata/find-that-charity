@@ -27,7 +27,10 @@ class Command(CSVScraper):
         "license_name": "Open Government Licence v3.0",
         "issued": "",
         "modified": "",
-        "publisher": {"name": "Scottish Government", "website": "https://gov.scot/",},
+        "publisher": {
+            "name": "Scottish Government",
+            "website": "https://gov.scot/",
+        },
         "distribution": [
             {
                 "downloadURL": "",

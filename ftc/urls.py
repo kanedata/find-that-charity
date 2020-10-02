@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.urls import path
 
-from . import views, feeds
+from . import feeds, views
 
 urlpatterns = [
     path("random", views.get_random_org, name="random_org"),

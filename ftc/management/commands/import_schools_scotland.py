@@ -46,9 +46,7 @@ SCOT_LAS = {
 class Command(HTMLScraper):
     name = "schools_scotland"
     allowed_domains = ["gov.scot"]
-    start_urls = [
-        "https://www.gov.scot/publications/school-contact-details/"
-    ]
+    start_urls = ["https://www.gov.scot/publications/school-contact-details/"]
     skip_rows = 5
     org_id_prefix = "GB-SCOTEDU"
     id_field = "seed_code"
@@ -78,7 +76,7 @@ class Command(HTMLScraper):
         r = self.session.get(link)
 
         wb = load_workbook(io.BytesIO(r.content), read_only=True)
-        latest_sheet = wb['Open Schools']
+        latest_sheet = wb["Open Schools"]
 
         # self.source["issued"] = wb.properties.modified.isoformat()[0:10]
 

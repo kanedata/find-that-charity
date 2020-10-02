@@ -285,6 +285,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="organisation", unique_together={("org_id", "scrape")},
+            name="organisation",
+            unique_together={("org_id", "scrape")},
         ),
     ]

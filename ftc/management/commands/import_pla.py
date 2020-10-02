@@ -26,7 +26,10 @@ class Command(CSVScraper):
         "license_name": "Open Government Licence v3.0",
         "issued": "",
         "modified": "",
-        "publisher": {"name": "Welsh Government", "website": "https://gov.wales/",},
+        "publisher": {
+            "name": "Welsh Government",
+            "website": "https://gov.wales/",
+        },
         "distribution": [
             {
                 "downloadURL": "",

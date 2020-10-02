@@ -14,7 +14,12 @@ class TestCase(django.test.TestCase):
         )
         s = Source.objects.create(
             id="ts",
-            data={"title": "Test source", "publisher": {"name": "Source publisher",}},
+            data={
+                "title": "Test source",
+                "publisher": {
+                    "name": "Source publisher",
+                },
+            },
         )
         scrape = Scrape.objects.create(
             status=Scrape.ScrapeStatus.SUCCESS,

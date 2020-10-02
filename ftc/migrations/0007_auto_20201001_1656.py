@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ftc', '0006_auto_20200806_1459'),
+        ("ftc", "0006_auto_20200806_1459"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organisation',
-            name='postalCode',
-            field=models.CharField(blank=True, db_index=True, max_length=255, null=True, verbose_name='Postcode'),
+            model_name="organisation",
+            name="postalCode",
+            field=models.CharField(
+                blank=True,
+                db_index=True,
+                max_length=255,
+                null=True,
+                verbose_name="Postcode",
+            ),
         ),
     ]

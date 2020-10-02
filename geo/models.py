@@ -2,22 +2,36 @@ from django.db import models
 
 
 class Postcode(models.Model):
-
     class UserType(models.IntegerChoices):
-        SMALL = 0, 'Small users'
-        LARGE = 1, 'Large users'
-        __empty__ = 'Unknown'
+        SMALL = 0, "Small users"
+        LARGE = 1, "Large users"
+        __empty__ = "Unknown"
 
     class GridIndex(models.IntegerChoices):
         # Grid reference positional quality indicator
-        BUILDING = 1, 'within the building of the matched address closest to the postcode mean'
-        BUILDING_VISUAL = 2, 'as for status value 1, except by visual inspection of Landline maps (Scotland only)'
-        APPROXIMATE = 3, 'approximate to within 50 metres;'
-        UNIT_MEAN = 4, 'postcode unit mean (mean of matched addresses with the same postcode, but not snapped to a building)'
-        IMPUTED = 5, 'imputed by ONS, by reference to surrounding postcode grid references'
-        SECTOR_MEAN = 6, 'postcode sector mean, (mainly PO Boxes)'
-        TERMINATED = 8, 'postcode terminated prior to Gridlink® initiative, last known ONS postcode grid reference'
-        NOT_AVAILABLE = 9, 'no grid reference available'
+        BUILDING = (
+            1,
+            "within the building of the matched address closest to the postcode mean",
+        )
+        BUILDING_VISUAL = (
+            2,
+            "as for status value 1, except by visual inspection of Landline maps (Scotland only)",
+        )
+        APPROXIMATE = 3, "approximate to within 50 metres;"
+        UNIT_MEAN = (
+            4,
+            "postcode unit mean (mean of matched addresses with the same postcode, but not snapped to a building)",
+        )
+        IMPUTED = (
+            5,
+            "imputed by ONS, by reference to surrounding postcode grid references",
+        )
+        SECTOR_MEAN = 6, "postcode sector mean, (mainly PO Boxes)"
+        TERMINATED = (
+            8,
+            "postcode terminated prior to Gridlink® initiative, last known ONS postcode grid reference",
+        )
+        NOT_AVAILABLE = 9, "no grid reference available"
 
     pcd = models.CharField(max_length=7, unique=True)
     pcd2 = models.CharField(max_length=8, unique=True)

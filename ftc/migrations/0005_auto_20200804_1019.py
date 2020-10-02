@@ -16,7 +16,9 @@ class Migration(migrations.Migration):
             field=models.JSONField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name="orgidscheme", name="data", field=models.JSONField(),
+            model_name="orgidscheme",
+            name="data",
+            field=models.JSONField(),
         ),
         migrations.AlterField(
             model_name="scrape",
@@ -24,6 +26,8 @@ class Migration(migrations.Migration):
             field=models.JSONField(blank=True, editable=False, null=True),
         ),
         migrations.AlterField(
-            model_name="source", name="data", field=models.JSONField(),
+            model_name="source",
+            name="data",
+            field=models.JSONField(),
         ),
     ]

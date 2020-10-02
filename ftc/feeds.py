@@ -6,11 +6,13 @@ from ftc.models import Scrape
 
 class ScrapesFeedRSS(Feed):
     title = "Find that Charity failed scrapes"
-    link = '/admin/ftc/scrape/'
+    link = "/admin/ftc/scrape/"
     description = "RSS feed showing failed scraping from Find that Charity."
 
     def items(self):
-        return Scrape.objects.filter(status__in=[Scrape.ScrapeStatus.ERRORS, Scrape.ScrapeStatus.FAILED]).order_by("-start_time")[:10]
+        return Scrape.objects.filter(
+            status__in=[Scrape.ScrapeStatus.ERRORS, Scrape.ScrapeStatus.FAILED]
+        ).order_by("-start_time")[:10]
 
     def item_title(self, item):
         return "SCRAPER FAILED: " + item.spider
@@ -22,7 +24,7 @@ class ScrapesFeedRSS(Feed):
         return item.start_time
 
     def item_link(self, item):
-        return '/admin/ftc/scrape/{}/change/'.format(item.id)
+        return "/admin/ftc/scrape/{}/change/".format(item.id)
 
 
 class ScrapesFeedAtom(ScrapesFeedRSS):

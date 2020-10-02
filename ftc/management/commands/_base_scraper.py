@@ -63,7 +63,9 @@ class BaseScraper(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.scrape = Scrape(
-            status=Scrape.ScrapeStatus.RUNNING, spider=self.name, log="",
+            status=Scrape.ScrapeStatus.RUNNING,
+            spider=self.name,
+            log="",
         )
         self.scrape.save()
         self.object_count = 0
@@ -86,7 +88,9 @@ class BaseScraper(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--cache", action="store_true", help="Cache request",
+            "--cache",
+            action="store_true",
+            help="Cache request",
         )
 
     def set_session(self, install_cache=False):
@@ -110,7 +114,8 @@ class BaseScraper(BaseCommand):
         # set up orgidscheme object
         if hasattr(self, "org_id_prefix"):
             self.orgid_scheme, _ = OrgidScheme.objects.get_or_create(
-                code=self.org_id_prefix, defaults={"data": {}},
+                code=self.org_id_prefix,
+                defaults={"data": {}},
             )
 
         # save any orgtypes
@@ -202,7 +207,8 @@ class BaseScraper(BaseCommand):
             Organisation.objects.bulk_create(self.records)
             self.logger.info(
                 "Saved {:,.0f} organisation records ({:,.0f} total)".format(
-                    len(self.records), self.object_count,
+                    len(self.records),
+                    self.object_count,
                 )
             )
             self.records = []
@@ -451,7 +457,8 @@ class BaseScraper(BaseCommand):
 
     def add_org_type(self, orgtype):
         ot, _ = OrganisationType.objects.get_or_create(
-            slug=slugify(orgtype), defaults=dict(title=orgtype),
+            slug=slugify(orgtype),
+            defaults=dict(title=orgtype),
         )
         self.orgtype_cache[ot.slug] = ot
         return ot

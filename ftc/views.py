@@ -1,7 +1,7 @@
 import csv
 
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse, Http404
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -98,8 +98,7 @@ def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False)
 
 
 def get_random_org(request):
-    """ Get a random charity record
-    """
+    """Get a random charity record"""
     # filetype = request.GET.get("filetype", "html")
     active = request.GET.get("active", False)
     q = FullOrganisation.search().from_dict(random_query(active, "registered-charity"))[
