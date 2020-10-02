@@ -5,7 +5,7 @@ var bounds = L.latLngBounds(
     L.latLng(49.8647440573549, -8.649995833304311),
     L.latLng(60.86078239016185, 1.763705609663519),
 );
-if (GEOCODES || POSTCODE) {
+if (GEOCODES || (ORG_LAT && ORG_LONG)) {
     var map = L.map('locationmap').setView([51.505, -0.09], 13);
     L.tileLayer(TILES, { style: 'toner' }).addTo(map);
     map.fitBounds(bounds);
@@ -29,18 +29,16 @@ if (GEOCODES || POSTCODE) {
         });
     }
 
-    if (POSTCODE) {
-        fetch(GEOPOINT_URL.replace('{}', POSTCODE))
-            .then(response => response.json())
-            .then(data => {
-                var point = L.latLng([
-                    data.data.attributes.location.lat,
-                    data.data.attributes.location.lon,
-                ]);
-                var marker = L.marker(point).addTo(map);
-                marker.bindPopup(data.data.attributes.pcds);
-                bounds.extend(point);
-                map.fitBounds(bounds);
-            });
+    if (ORG_LAT && ORG_LONG) {
+        var point = L.latLng([
+            ORG_LAT,
+            ORG_LONG,
+        ]);
+        var marker = L.marker(point).addTo(map);
+        if(POSTCODE){
+            marker.bindPopup(POSTCODE);
+        }
+        bounds.extend(point);
+        map.fitBounds(bounds);
     }
 }
