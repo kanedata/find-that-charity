@@ -76,7 +76,7 @@ const updateAutoComplete = (results, el, q) => {
         );
         if(r.orgtypes){
             let orgtype = createEl('span', { classList: 'fr gray i ml1 dib' });
-            orgtype.innerText = orgtypes[r.orgtypes[0]];
+            orgtype.innerText = ORGTYPES[r.orgtypes[0]];
             a.append(orgtype);
         }
         li.append(a);
@@ -97,7 +97,7 @@ const fetchAutocomplete = () => {
         updateAutoComplete([], resultsContainer, v);
         return;
     }
-    const url = new URL(autocomplete_url);
+    const url = new URL(AUTOCOMPLETE_URL);
     url.searchParams.append('prefix', v);
     if (orgtype) {
         url.searchParams.append('orgtype', orgtype);

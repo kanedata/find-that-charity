@@ -5,6 +5,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import reverse
 from django.views.decorators.csrf import csrf_exempt
 
+from findthatcharity.jinja2 import get_orgtypes
 from ftc.documents import FullOrganisation
 from ftc.models import Organisation
 from reconcile.query import do_extend_query, do_reconcile_query
@@ -102,6 +103,11 @@ def suggest(request, orgtype="all"):
     completion = {"field": "complete_names", "fuzzy": {"fuzziness": 1}}
     if orgtype and orgtype != "all":
         completion["contexts"] = dict(organisationType=orgtype.split("+"))
+    else:
+        orgtypes = get_orgtypes()
+        completion["contexts"] = dict(organisationType=[
+            o for o in orgtypes.keys()
+        ])
 
     q = q.suggest(SUGGEST_NAME, prefix, completion=completion).source(
         ["org_id", "name", "organisationType"]

@@ -90,8 +90,8 @@
 
 {% block bodyscripts %}
 <script type="text/javascript">
-    var autocomplete_url = {{ request.build_absolute_uri(url('suggest', kwargs={'orgtype': 'all'}))|tojson }};
-    var orgtypes = {
+    const AUTOCOMPLETE_URL = {{ request.build_absolute_uri(url('suggest', kwargs={'orgtype': 'all'}))|tojson }};
+    var ORGTYPES = {
         {% for o in orgtypes.values() %}{{o.slug|tojson}}: {{o.title|tojson}},
         {% endfor %}
     }
