@@ -64,6 +64,39 @@ class Command(BaseCommand):
             set linked_orgs = string_to_array(org_id, '')
             where linked_orgs is null;
         """,
+        "Remove blank postcodes": """
+            update ftc_organisation
+            set "postalCode" = null
+            where trim("postalCode") = '';
+        """,
+        "Update misformatted postcodes": """
+            update ftc_organisation
+            set "postalCode" = concat_ws(
+                ' ',
+                trim(left(replace("postalCode", ' ', ''), length(replace("postalCode", ' ', ''))-3)),
+                right(replace("postalCode", ' ', ''), 3)
+            )
+            where "postalCode" is not null;
+        """,
+        "Add geodata to organisation records": """
+            update ftc_organisation
+            set geo_oa11 = geo.oa11,
+                geo_cty = geo.cty,
+                geo_ctry = geo.ctry,
+                geo_laua = geo.laua,
+                geo_ward = geo.ward,
+                geo_rgn = geo.rgn,
+                geo_pcon = geo.pcon,
+                geo_ttwa = geo.ttwa,
+                geo_lsoa11 = geo.lsoa11,
+                geo_msoa11 = geo.msoa11,
+                geo_lep1 = geo.lep1,
+                geo_lep2 = geo.lep2,
+                geo_lat = geo.lat,
+                geo_long = geo.long
+            from geo_postcode geo
+            where ftc_organisation."postalCode" = geo.pcds;
+        """,
     }
 
     def __init__(self, *args, **kwargs):

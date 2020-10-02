@@ -1,7 +1,5 @@
 from django.db import models
 
-from ftc.models import OrgidField
-
 
 class Postcode(models.Model):
 
@@ -62,24 +60,3 @@ class Postcode(models.Model):
     imd = models.IntegerField(null=True, blank=True)
     calncv = models.CharField(max_length=9, null=True, blank=True)
     stp = models.CharField(max_length=9, null=True, blank=True)
-
-
-class OrganisationLocation(models.Model):
-
-    organisation_id = models.IntegerField(primary_key=True)
-    org_id = OrgidField(db_index=True, verbose_name="Organisation Identifier")
-    pcds = models.CharField(max_length=8, db_index=True)
-    oa11 = models.CharField(max_length=9, null=True, blank=True)
-    cty = models.CharField(max_length=9, null=True, blank=True)
-    laua = models.CharField(max_length=9, null=True, blank=True)
-    ward = models.CharField(max_length=9, null=True, blank=True)
-    ctry = models.CharField(max_length=9, null=True, blank=True)
-    rgn = models.CharField(max_length=9, null=True, blank=True)
-    pcon = models.CharField(max_length=9, null=True, blank=True)
-    ttwa = models.CharField(max_length=9, null=True, blank=True)
-    lsoa11 = models.CharField(max_length=9, null=True, blank=True)
-    msoa11 = models.CharField(max_length=9, null=True, blank=True)
-    lep1 = models.CharField(max_length=9, null=True, blank=True)
-    lep2 = models.CharField(max_length=9, null=True, blank=True)
-    lat = models.FloatField(null=True, blank=True)
-    long = models.FloatField(null=True, blank=True)
