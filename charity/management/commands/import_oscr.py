@@ -57,16 +57,21 @@ class Command(CSVScraper):
         self.raw_records = []
 
     def parse_file(self, response, source_url):
-        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
-            for f in z.infolist():
-                self.logger.info("Opening: {}".format(f.filename))
-                with z.open(f) as csvfile:
-                    reader = csv.DictReader(io.TextIOWrapper(csvfile, encoding="utf8"))
-                    rowcount = 0
-                    for row in reader:
-                        rowcount += 1
+        try:
+            z = zipfile.ZipFile(io.BytesIO(response.content))
+        except zipfile.BadZipFile:
+            print(response.content[0:1000])
+            raise
+        for f in z.infolist():
+            self.logger.info("Opening: {}".format(f.filename))
+            with z.open(f) as csvfile:
+                reader = csv.DictReader(io.TextIOWrapper(csvfile, encoding="utf8"))
+                rowcount = 0
+                for row in reader:
+                    rowcount += 1
 
-                        self.parse_row(row)
+                    self.parse_row(row)
+        z.close()
 
     def parse_row(self, record):
 
