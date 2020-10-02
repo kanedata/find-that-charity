@@ -76,7 +76,7 @@ class Command(BaseCommand):
             ve, _ = VocabularyEntries.objects.update_or_create(
                 code=code,
                 vocabulary=v,
-                defaults={"title": r.get("Title"), "parent": parent,},
+                defaults={"title": r.get("Title"), "parent": parent},
             )
             cache[code] = ve
 
