@@ -28,7 +28,7 @@ class Command(HTMLScraper):
     allowed_domains = ["charitycommission.gov.uk"]
     start_urls = [
         CCEW_DATA_URL,
-        "https://raw.githubusercontent.com/drkane/charity-lookups/master/cc-aoo-gss-iso.csv",
+        # "https://raw.githubusercontent.com/drkane/charity-lookups/master/cc-aoo-gss-iso.csv",
     ]
     org_id_prefix = "GB-CHC"
     id_field = "regno"
@@ -203,9 +203,9 @@ class Command(HTMLScraper):
                 continue
             self.set_download_url(link)
             self.logger.info("Using file: {}".format(link))
+            zip_found = True
             r = self.session.get(link)
             self.process_zip(r)
-            zip_found = True
             break
 
         if not zip_found:

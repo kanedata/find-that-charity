@@ -6,7 +6,8 @@ UPDATE_CCEW[
 insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
     postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
     company_number, source, first_added, last_updated )
-select CONCAT('GB-CHC-', c.regno) as "id",
+select distinct on(c.regno)
+    CONCAT('GB-CHC-', c.regno) as "id",
     c.name as "name",
     c.gd as "constitution",
     c.aob as "geographical_spread",
@@ -232,11 +233,12 @@ insert into ftc_organisation (
     location, org_id_scheme_id, "organisationTypePrimary_id",
     scrape_id, source_id
 )
-select cc.id as org_id,
-    case when company_number in ('01234567', '12345678') then array[cc.id]
+select distinct on (cc.id)
+    cc.id as org_id,
+    case when company_number in ('01234567', '12345678', '00000000') then array[cc.id]
         when company_number is not null then array[cc.id, CONCAT('GB-COH-', company_number)]
         else array[cc.id] end as "orgIDs",
-    case when company_number in ('01234567', '12345678') then array[cc.id]
+    case when company_number in ('01234567', '12345678', '00000000') then array[cc.id]
         when company_number is not null then array[cc.id, CONCAT('GB-COH-', company_number)]
         else array[cc.id] end as "linked_orgs",
     cc.name,
@@ -326,6 +328,6 @@ select cc.id as org_id_a,
     {scrape_id} as scrape_id,
     cc.source as source_id
 from charity_charity cc
-where company_number not in ('01234567', '12345678')
+where company_number not in ('01234567', '12345678', '00000000')
     and cc.source = '{source}'
 """
