@@ -200,7 +200,7 @@ class Organisation(models.Model):
         max_length=255, null=True, blank=True, verbose_name="Address: country"
     )
     postalCode = models.CharField(
-        max_length=255, null=True, blank=True, verbose_name="Postcode"
+        max_length=255, null=True, blank=True, verbose_name="Postcode", db_index=True
     )
     telephone = models.CharField(
         max_length=255, null=True, blank=True, verbose_name="Telephone"

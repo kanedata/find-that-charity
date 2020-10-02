@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "charity.apps.CharityConfig",
     "reconcile.apps.ReconcileConfig",
     "addtocsv.apps.AddtocsvConfig",
+    "geo.apps.GeoConfig",
     "django_elasticsearch_dsl",
     "django.contrib.postgres",
     "django.contrib.admin",
