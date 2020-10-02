@@ -8,6 +8,7 @@ import bcp
 import psycopg2
 import tqdm
 from django.db import connection
+from django.core.management.base import CommandError
 
 from charity.feeds import CCEW_DATA_URL
 from charity.management.commands._ccew_sql import UPDATE_CCEW
@@ -34,7 +35,7 @@ class Command(HTMLScraper):
     date_fields = []
     date_format = "%Y-%m-%d %H:%M:%S"
     zip_regex = re.compile(
-        r"http://apps.charitycommission.gov.uk/data/.*?/RegPlusExtract.*?\.zip"
+        r".*/RegPlusExtract.*?\.zip.*?"
     )
     source = {
         "title": "Registered charities in England and Wales",
@@ -196,13 +197,19 @@ class Command(HTMLScraper):
     ]
 
     def parse_file(self, response, source_urls):
+        zip_found = False
         for link in response.html.absolute_links:
             if not self.zip_regex.match(link):
                 continue
             self.set_download_url(link)
-            r = self.session.get(link)
             self.logger.info("Using file: {}".format(link))
+            r = self.session.get(link)
             self.process_zip(r)
+            zip_found = True
+            break
+
+        if not zip_found:
+            raise CommandError("No zip file found")
 
     def process_zip(self, response):
         self.logger.info("File size: {}".format(len(response.content)))
