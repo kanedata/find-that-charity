@@ -45,16 +45,18 @@
     </section>
     <section class="w-100 cf mv3">
         <h3 class="w-100 pa0 mv2 f2">Use the data</h3>
-        <p>
-            <a class="underline dark-blue f4" href="{{ url('csvtool') }}">
-                Add data about organisations to a CSV file
-            </a>
-        </p>
-        <p>As an <a class="underline dark-blue f4"
-                href="https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation">OpenRefine
-                reconciliation service</a> via <code>/reconcile</code>.</p>
-        <p>Find a <a class="underline dark-blue f4" href="{{ url('random_org') }}?active=true">random
-                charity</a>.</p>
+        <div class="flex-ns justify-between mt4">
+            <div class="pa3 db shadow-3 w-30-ns w-100">
+                <a class="underline dark-blue f4" href="{{ url('csvtool') }}">
+                    Add data about organisations to a CSV file
+                </a>
+            </div>
+            <div class="pa3 db shadow-3 w-30-ns w-100">As an <a class="underline dark-blue f4"
+                    href="https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation">OpenRefine
+                    reconciliation service</a> via <code>/reconcile</code>.</div>
+            <div class="pa3 db shadow-3 w-30-ns w-100">Find a <a class="underline dark-blue f4" href="{{ url('random_org') }}?active=true">random
+                    charity</a>.</div>
+        </div>
     </section>
     <div class="mv5 cf">
         <h3>Types of organisation available</h3>
