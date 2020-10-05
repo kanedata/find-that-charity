@@ -213,6 +213,30 @@ class Command(CSVScraper):
                 else None,
             },
         },
+        {
+            "title": "GRID Org IDs",
+            "description": "A manually maintained list matching org ids and GRID ids",
+            "identifier": "grid_org_ids",
+            "license": "",
+            "license_name": "",
+            "issued": "",
+            "modified": "",
+            "publisher": {
+                "name": "Find that Charity",
+                "website": "https://github.com/drkane/charity-lookups",
+            },
+            "distribution": [
+                {
+                    "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/grid-lookup.csv",
+                    "accessURL": "https://github.com/drkane/charity-lookups/blob/master/grid-lookup.csv",
+                    "title": "CIO Company Numbers",
+                }
+            ],
+            "_parse_row": lambda row: {
+                "org_id_a": "XI-GRID-{}".format(row["grid_id"].strip()),
+                "org_id_b": row["org_id"].strip(),
+            },
+        },
     ]
 
     def fetch_file(self):
