@@ -1,3 +1,5 @@
+Chart.defaults.global.defaultFontSize = 16;
+
 var financeChart = new Chart('financeChart', {
     type: 'line',
     data: {
@@ -30,7 +32,18 @@ var financeChart = new Chart('financeChart', {
         scales: {
             yAxes: [{
                 ticks: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    callback: function(value, index, values) {
+                        if(value > 1000000){
+                            return "£" + (value / 1000000) + "m";
+                        } else if(value > 1000){
+                            return "£" + (value / 1000) + "k";
+                        }
+                        return '£' + value;
+                    }
+                },
+                gridLines: {
+                    display: false,
                 }
             }],
             xAxes: [{
@@ -38,6 +51,7 @@ var financeChart = new Chart('financeChart', {
                 time: {
                     unit: 'month'
                 },
+                distribution: 'series',
                 gridLines: {
                     display: false,
                 }

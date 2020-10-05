@@ -8,6 +8,11 @@
     text-align: left;
 }
 
+.entry-content table th.tc,
+.entry-content table td.tc {
+    text-align: center;
+}
+
 .flex-grow {
     flex-grow: 1;
 }

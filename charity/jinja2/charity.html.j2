@@ -72,43 +72,20 @@
 {{ super() }}
 <script>
     const FINANCES = {{ charity.financial_json()|tojson }};
-    const tab_selectors = document.querySelectorAll('.tabs a');
-    function selectTab(selectedTab){
-      tab_selectors.forEach((tab) => {
-        if(tab.dataset.tabid == selectedTab){
-          document.getElementById(tab.dataset.tabid).style = "display: block";
-          tab.dataset.tabactive = "true";
-          tab.classList.remove("near-black");
-          tab.classList.add("white", "bg-gray");
-        } else {
-          document.getElementById(tab.dataset.tabid).style = "display: none";
-          delete tab.dataset.tabactive;
-          tab.classList.add("near-black");
-          tab.classList.remove("white", "bg-gray");
-        }
-      });
-    }
-
-    tab_selectors.forEach((el) => {
-      el.onclick = function(ev){
-        ev.preventDefault();
-        selectTab(el.dataset.tabid);
-      }
-      if(el.dataset.tabactive){
-        selectTab(el.dataset.tabid);
-      }
-    });
 </script>
 <script src="{{ static('js/charts.js') }}"></script>
+<script src="{{ static('js/tabs.js') }}"></script>
 {% endblock %}
 
 {% block organisation_details %}
 
   <nav class="tabs mb4 cf">
-    <ul class="list ma0 pa0">
-      <li class="mr2 fl"><a class="link pa2 bl br bt bw1 white bg-gray" href="#" data-tabid="organisation-details" data-tabactive="true">Organisation details</a></li>
-      <li class="mr2 fl"><a class="link pa2 bl br bt bw1 near-black" href="#" data-tabid="charity-activities">Charity activities</a></li>
-      <li class="mr2 fl"><a class="link pa2 bl br bt bw1 near-black" href="#" data-tabid="charity-financials">Charity financial</a></li>
+    <ul class="list ma0 pa0 flex bb bw2 b--gray pb1">
+      <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="organisation-details" data-tabactive="true">Organisation details</a></li>
+      <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="charity-activities">Charity activities</a></li>
+      {% if charity.financial.count() %}
+      <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="charity-financials">Charity financial</a></li>
+      {% endif %}
     </ul>
   </nav>
 
@@ -125,18 +102,41 @@
 
   </section>
 
+  {% if charity.financial.count() %}
   <section class="f5" id="charity-financials">
 
-      {% if charity.financial.count() %}
+    {# {% if charity.has_ccew_partb %}
+    <nav class="tabs mb4 cf">
+      <ul class="list ma0 pa0 flex bb bw2 b--gray pb1">
+        <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="charity-financials" data-tabactive="true">Charity financials</a></li>
+        {% for table, fields in partb_tables.items() %}
+        <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="{{ table|slugify }}">{{ table }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+    {% endif %} #}
+
       {% set finances = charity.financial.order_by('fyend').all() %}
       <h4>Charity financials</h4>
       
-      <table>
+      <div class="w-100 cf" id="charity-financials">
+      <div class="w-100 w-50-ns fl">
+      <table class="table collapse" style="width: inherit;">
         <tr>
           <th>Year ending</th>
           <th>Income (£)</th>
           <th>Spending (£)</th>
         </tr>
+      {% if org.dateRemoved %}
+        <tr>
+          <td colspan="">
+            {{ "{:%d %B %Y}".format(org.dateRemoved) }}
+          </td>
+          <td colspan="2" class="tl">
+            <span class="gray">(Removed from the register)</span>
+          </td>
+        </tr>
+      {% endif %}
       {% for f in finances %}
         <tr>
           <td>{{ f.fyend }}</td>
@@ -144,12 +144,29 @@
           <td>{% if f.spending %}{{ "{:,.0f}".format(f.spending) }}{% endif %}</td>
         </tr>
       {% endfor %}
+      {% if org.dateRegistered %}
+        <tr>
+          <td colspan="">
+            {{ "{:%Y-%m-%d}".format(org.dateRegistered) }}
+          </td>
+          <td colspan="2" class="tl">
+            <span class="gray">(Registered as a charity)</span><br>
+          </td>
+        </tr>
+      {% endif %}
       </table>
+      </div>
       
-      <canvas id="financeChart" width="400" height="200" class="measure"></canvas>
+      <div class="w-100 w-50-ns fl">
+      {% if finances|length > 1 %}
+      <canvas id="financeChart" width="400" height="350" class="measure"></canvas>
+      {% endif %}
+      </div>
+      </div>
 
       {% if charity.has_ccew_partb %}
       {% for table, fields in partb_tables.items() %}
+      <div  id="{{ table|slugify }}">
       <h3>{{table}}</h3>
       <table>
         <thead>
@@ -184,17 +201,18 @@
                         {% endif %}
                     {% endfor %}
                 {% else%}
-                <td class="i gray" colspan='{{ fields|length }}'>No data available</td>
+                <td class="i gray tc" colspan='{{ fields|length }}'>~~ No data available ~~</td>
                 {% endif%}
             </tr>
         {% endfor %}
         </tbody>
       </table>
+      </div>
       {% endfor %}
       {% endif %}
 
-      {% endif %}
   </section>
+  {% endif %}
 
   {{ super() }}
 
