@@ -1,26 +1,30 @@
-<form method="get" id="search-autocomplete">
+<form method="get" id="search-autocomplete" class="">
     <div class="cf mt3 flex-l">
-        <input name="q" 
-            id="search-autocomplete-q"
-            class="search-autocomplete f6 f5-l input-reset bl bt bb br br-1 br-0-l b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-50-ns br2-ns br--left-ns" 
-            type="text" 
-            placeholder="Search for a charity name or number"
-            value="{{term}}" autocomplete='off'>
-        <select name="orgtype"
-            id="search-autocomplete-orgtype"
-            autocomplete="off"
-            class="f6 f5-l input-reset bl bt bb br br-0-l b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-30-ns">
-            <option value="all">All organisation types</option>
-            <option disabled>----------</option>
-            {% for o in orgtypes.values()|sort(attribute='title') if o.is_keytype() %}
-                {% if o.slug == selected_org_type -%}
-                <option value="{{ o.slug }}" selected="selected">{{ o.title }}</option>
-                {% else -%}
-                <option value="{{ o.slug }}">{{ o.title }}</option>
-                {%- endif -%}
-            {%- endfor -%}
-        </select>
-        <input type="submit" value="Search" class="f6 f5-l button-reset br bt bb bl bl-0-l b--black-20 fl pv3 tc bg-animate bg-yellow dim near-black pointer w-100 w-20-m w-20-l br2-ns br--right-ns">
+        <div class="ba br1 b--black-20 inline-flex flex-grow">
+            <input name="q" 
+                id="search-autocomplete-q"
+                {# class="search-autocomplete f6 f5-l input-reset bl bt bb br br-1 br-0-l b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-50-ns br2-ns br--left-ns"  #}
+                class="h-100 input-reset bn pa3 near-black bg-white flex-grow"
+                type="text" 
+                placeholder="Search for a charity name or number"
+                value="{{term}}" autocomplete='off'>
+            <select name="orgtype"
+                id="search-autocomplete-orgtype"
+                class="bn f6 mh2 mw5-l mw4 bg-light-gray br-pill pv1 ph2 mv2"
+                {# class="f6 f5-l bl bt bb br br-0-l b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-30-ns" #}
+                autocomplete="off">
+                <option class="bg-white" value="all">All organisation types</option>
+                <option class="bg-white" disabled>----------</option>
+                {% for o in orgtypes.values()|sort(attribute='title') if o.is_keytype() %}
+                    {% if o.slug == selected_org_type -%}
+                    <option class="bg-white" value="{{ o.slug }}" selected="selected">{{ o.title }}</option>
+                    {% else -%}
+                    <option class="bg-white" value="{{ o.slug }}">{{ o.title }}</option>
+                    {%- endif -%}
+                {%- endfor -%}
+            </select>
+        </div>
+        <input type="submit" value="Search" class="ml2 f6 f5-l button-reset bn fl pv3 ph4 tc bg-animate bg-yellow dim near-black pointer br2-ns br--right-ns">
     </div>
     <div id='autocomplete-results' class="autocomplete-results dn relative w-100 absolute-l w-60-l bg-white">
         
