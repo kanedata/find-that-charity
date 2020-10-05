@@ -419,7 +419,7 @@ class OrganisationType(models.Model):
         super().save(*args, **kwargs)
 
     KEY_TYPES = [
-        # "registered-charity",
+        "registered-charity",
         "registered-charity-england-and-wales",
         "registered-charity-scotland",
         "registered-charity-northern-ireland",
