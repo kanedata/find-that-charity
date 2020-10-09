@@ -108,7 +108,7 @@
       {% if org.url %}
       <p>
         <strong>Website</strong>:
-        <a href="{{ org.cleanUrl }}" class="link underline-hover blue">{{ org.url|replace("http://", "")|replace("https://", "") }}</a>
+        <a href="{{ org.cleanUrl }}" class="link underline-hover blue">{{ org.displayUrl }}</a>
       </p>
       {% endif %}
       {% if org.latestIncome %}

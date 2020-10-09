@@ -268,7 +268,7 @@
     {% if org.url %}
     <h4>Website</h4>
     <p>
-      <a href="{{ org.cleanUrl }}" class="link underline-hover blue">{{ org.url|replace("http://", "")|replace("https://", "") }}</a>
+      <a href="{{ org.cleanUrl }}" class="link underline-hover blue">{{ org.displayUrl }}</a>
     </p>
     {% endif %}
     {% if org.domain %}

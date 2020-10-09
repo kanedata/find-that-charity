@@ -361,7 +361,7 @@ class Organisation(models.Model):
 
     def get_links(self):
         if self.url:
-            yield (self.cleanUrl, "Organisation Website")
+            yield (self.cleanUrl, self.displayUrl)
         if not self.orgIDs:
             return
         for o in self.orgIDs:
@@ -384,6 +384,21 @@ class Organisation(models.Model):
         if not self.url.startswith("http") and not self.url.startswith("//"):
             return "http://" + self.url
         return self.url
+
+    @property
+    def displayUrl(self):
+        if not self.url:
+            return None
+        url = re.sub(
+            r'(https?:)?//',
+            '',
+            self.url
+        )
+        if url.startswith("www."):
+            url = url[4:]
+        if url.endswith("/"):
+            url = url[:-1]
+        return url
 
     def geoCodes(self):
 
