@@ -5,7 +5,7 @@
 {% set orgidschemes = get_orgidschemes() %}
 {% set orgtypes = get_orgtypes() %}
 {% set sources = get_sources() %}
-{% set heading = org["name"] %} 
+{% set heading = "{} | {}".format(org.org_id, org["name"]|titlecase) %} 
 {% set subtitle = "Org ID: {}{}".format(
     org["id"],
     "" if org.active else " | Inactive"
@@ -53,6 +53,25 @@
 </script>
 <script src="{{ static('js/locationmap.js') }}"></script>
 {% endif %}
+<script>
+  // copy text
+  document.querySelectorAll(".copy-text").forEach((el) => {
+    if(el.dataset.target){
+      el.onclick = (ev)=>{
+        ev.preventDefault();
+        navigator.clipboard.writeText(ev.target.dataset.target).then(()=> {
+          const toast = document.createElement("span");
+          toast.classList = ['ml2 pa1 bg-dark-gray white f7 br2']
+          toast.innerText = "Copied!";
+          ev.target.after(toast); 
+          setTimeout(() => {
+              toast.parentNode.removeChild(toast);
+          }, 2000);
+        });
+      };
+    }
+  });
+</script>
 {% endblock %}
 
 {% block header %}
@@ -76,7 +95,10 @@
     The identifier for this organisation record is:
   </h4>
   <div class="mv3 w-100">
-    {{ orgid_link(org.org_id, request, true) }}<br>
+    <div class="mb1">{{ orgid_link(org.org_id, request, true) }}</div>
+    <p class="pa0 mt0 mb1">
+      <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ org.org_id }}">Copy this identifier to your clipboard</a>
+    </p>
     <details class="mb3">
       <summary class="blue link underline-hover f7 pointer">What is an organisation identifier?</summary>
       <div class="f6 measure pl3 bl bw2 b--gray mt1 pv1">
@@ -142,7 +164,8 @@
       {{ "data source"|pluralise(related_orgs.activeRecords|length) }}.
     </p>
     <p>
-      The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, request, large=true) }}.
+      The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, request, large=true) }}.<br>
+      <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ related_orgs.org_id }}">Copy this identifier to your clipboard</a>
     </p>
   </div>
   {% endif %}

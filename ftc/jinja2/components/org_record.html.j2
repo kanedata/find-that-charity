@@ -8,9 +8,9 @@
             {% if this_record %}<span class="normal">(this record)</span>{% endif %}
             {% if not record.active %}<span class="normal red">(inactive)</span>{% endif %}
             {% if small %}
-              <ul class="list ma0 pa0">
+              <ul class="list ma0 pa0 cf">
               {% for orgid in record.orgIDs %}
-                <li class="">{{orgid_link(orgid, request)}}</li>
+                <li class="fl mr1 mb1">{{orgid_link(orgid, request)}}</li>
               {% endfor %}
               </ul>
             {% endif %}

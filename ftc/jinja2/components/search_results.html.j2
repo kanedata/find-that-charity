@@ -31,7 +31,7 @@
         <span class="red tracked-tight lh-copy normal ml2">(Inactive)</span>
         {% endif %}
     </h3>
-    <h4 class="subtitle mt0 mb2 pa0 f5 mid-gray normal">
+    <h4 class="subtitle mt0 mb2 pa0 f4 mid-gray normal">
         {% if result.organisationTypePrimary is string %}
             {% set orgTypePrimary = result.organisationTypePrimary %}
         {% else %}
@@ -40,10 +40,13 @@
         <a class="link mid-gray underline-hover" 
            href="{{ url('orgid_type', kwargs=dict(orgtype=orgTypePrimary)) }}">
            {{ orgtypes[orgTypePrimary].title }}</a>
-        {% for o in result.orgIDs %}
+    </h4>
+    <div class="cf mb2">
+        {{ orgid_link(result.org_id, request, large=True) }}
+        {% for o in result.orgIDs if o != result.org_id %}
         {{ orgid_link(o, request) }}
         {% endfor %}
-    </h4>
+    </div>
     <div class="cf">
         {% for k in result.organisationType if k != result.organisationTypePrimary %}
         <a class="f6 bg-light-gray br1 pv1 ph2 link near-black dib mr2 mb2 fl" href="{{ url('orgid_type', kwargs=dict(orgtype=k)) }}">{{ orgtypes[k].title }}</a>
