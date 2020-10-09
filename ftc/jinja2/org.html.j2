@@ -2,11 +2,16 @@
 {% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
 {% from 'components/org_record.html.j2' import org_record %}
 {% from 'components/data_source.html.j2' import data_source %}
-{% set heading = org["name"] %} 
+{% set orgidschemes = get_orgidschemes() %}
+{% set orgtypes = get_orgtypes() %}
+{% set sources = get_sources() %}
+{% set heading = "{} | {}".format(org.org_id, org["name"]|titlecase) %} 
 {% set subtitle = "Org ID: {}{}".format(
     org["id"],
     "" if org.active else " | Inactive"
 ) %}
+
+{% block title %} | {{ heading }}{% endblock %}
 
 {% macro show_sources(v) %}
 <span class="gray f7 dib">
@@ -24,41 +29,115 @@
 
 {% block headscripts %}
 {{ super() }}
+{% if org.location or org.postalCode %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+{% endif %}
 <script type="application/ld+json">
 {{ org.schema_dot_org(request)|tojson(indent=4) }}
 </script>
 {% endblock %}
 
+{% block bodyscripts %}
+{{ super() }}
+{% if org.location or org.postalCode %}
+<script>
+  const GEOCODES = {{ org.geoCodes()|list|tojson }};
+  const POSTCODE = {{ org.postalCode|tojson }};
+  const ORG_LAT = {{ org.geo_lat|tojson }};
+  const ORG_LONG = {{ org.geo_long|tojson }};
+</script>
+<script src="{{ static('js/locationmap.js') }}"></script>
+{% endif %}
+<script>
+  // copy text
+  document.querySelectorAll(".copy-text").forEach((el) => {
+    if(el.dataset.target){
+      el.onclick = (ev)=>{
+        ev.preventDefault();
+        navigator.clipboard.writeText(ev.target.dataset.target).then(()=> {
+          const toast = document.createElement("span");
+          toast.classList = ['ml2 pa1 bg-dark-gray white f7 br2']
+          toast.innerText = "Copied!";
+          ev.target.after(toast); 
+          setTimeout(() => {
+              toast.parentNode.removeChild(toast);
+          }, 2000);
+        });
+      };
+    }
+  });
+</script>
+{% endblock %}
+
 {% block header %}
-<header class="fl w-100 w-50-l ph3 ph5-ns entry-content lh-copy f4">
-  <h2 class="f2-ns mt4 mb0 f3 lh-title normal">
+<header class="fl w-100 ph3 ph5-ns pt4 entry-content lh-copy f4 {% if not org.active %}dark-gray bg-washed-yellow{% endif %}">
+  <span class="f5 gray">Organisation record</span>
+  <h2 class="f1-ns mt0 mb0 f2 lh-title normal w-100 w-50-l">
       {{ org.name|titlecase }}
   </h2>
-  <h3 class="f3-ns mb4 mt3 f4 lh-subtitle normal">
-    A {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in the UK
+  <h3 class="f3-ns mb4 mt4 f4 lh-subtitle normal">
+    {% if not org.active %}
+    An <span class="normal red">inactive</span>
+    {% elif org.organisationTypePrimary.title[0]|lower is in (("a", "e", "i", "o", "u")) %}
+    An
+    {% else %}
+    A
+    {% endif %}
+    {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in the UK
+    {%- if org.dateRemoved %}. Removed on {{ "{:%d %B %Y}".format(org.dateRemoved) }}.{% endif %}
   </h3>
   <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">
-    The identifier for this organisation is:
+    The identifier for this organisation record is:
   </h4>
   <div class="mv3 w-100">
-    {{ orgid_link(org.org_id, request, true) }}<br>
-    <a href="#" class="blue link underline-hover f7">What is an organisation identifier?</a>
+    <div class="mb1">{{ orgid_link(org.org_id, request, true) }}</div>
+    <p class="pa0 mt0 mb1">
+      <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ org.org_id }}">Copy this identifier to your clipboard</a>
+    </p>
+    <details class="mb3">
+      <summary class="blue link underline-hover f7 pointer">What is an organisation identifier?</summary>
+      <div class="f6 measure pl3 bl bw2 b--gray mt1 pv1">
+        <p class="pa0 mt0 mb1">
+          An organisation identifier is a unique piece of text that definitively identifies an organisation.
+        </p>
+        <p class="pa0 mt0 mb2">
+          Examples include charity numbers and company numbers.
+        </p>
+        <p class="pa0 mt0 mb2">
+          Identifiers are usually assigned by an external body like a regulator.
+        </p>
+        <p class="pa0 mt0 mb2">
+          Findthatcharity uses the <a href="http://org-id.guide/about" class="link blue underline" target="_blank">Org ID</a> scheme to create identifiers.
+        </p>
+        <p class="pa0 mt0 mb2">
+          <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.scheme }}</span> gives the scheme for this identifier 
+          {% if org.org_id.scheme in orgidschemes and orgidschemes[org.org_id.scheme].data %}(<a href="http://org-id.guide/list/{{ org.org_id.scheme }}" class="link blue underline" target="_blank">{{ orgidschemes[org.org_id.scheme].data.name.en }}</a>){% endif %}, while <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.id }}</span>
+          is the identifier for this organisation within the scheme.
+        </p>
+      </div>
+    </details>
   </div>
-  {% if org.orgIDs|length > 1 %}
+  {% if org.orgIDs and org.orgIDs|length > 1 %}
   <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">The organisation can also be identified by:</h4>
-  <div class="mv3 w-100">
+  <div class="mv3 w-100 w-50-l">
     {% for v in org.orgIDs if v != org.org_id %}
     {{ orgid_link(v, request) }}
     {% endfor %}
   </div>
   {% endif %}
-  <div class="mv3 w-100">
+
+  <div class="mv3 w-100 w-50-l">
     {% if org.active %}
     <span class="pv1 ph2 br2 bg-green white dib mr2 mb2">Active</span>
     {% else %}
     <span class="pv1 ph2 br2 bg-dark-red white dib mr2 mb2">Inactive</span>
     {% endif %}
-    {% for ot in org.get_all('organisationType') if ot != org.organisationTypePrimary.slug %}
+    {% for ot in org.organisationType if ot != org.organisationTypePrimary.slug %}
     {{ orgtype_link(orgtypes[ot], large=true) }}
     {% endfor %}
   </div>
@@ -66,52 +145,35 @@
 {% endblock %}
 
 {% block content %}
-<div class="w-100 w-80-l fl">
-  <div class="measure-wide f5">
-    <div class="content">
-      {% set description = org.first("description") %}
-      {% if description %}
-      <h4>Description</h4>
-      <p>
-        {{ description.value|titlecase(sentence=true) }}
-        <span class="gray f7 dib">
-          [Source: 
-          {{ description.orgid }},
-          {{ description.source.title -}}
-          ]
-        </span>
-      </p>
-      {% endif %}
-      {% if org.alternateName %}
-      <h4>Also known as</h4>
-      <ul>
-        {% for n in org.alternateName[0:10] %}
-        <li>{{ n|titlecase }}</li>
-        {% endfor %}
-        {% if org.alternateName|length > 10 %}
-        <li>...and {{ "{:,.0f}".format(org.alternateName|length - 10) }} other names</li>
-        {% endif %}
-      </ul>
-      {% endif %}
-    </div>
+
+{% block organisation_links %}
+<div class="w-100 w-80-ns fl">
+  
+  <div class="mv3 measure">
+    <p>
+      This organisation record is based on data from <a href="#data-source-{{ org.source.id }}" class="link underline-hover blue b">{{ org.source.title }}</a> published by {{ org.source.publisher }}.
+    </p>
   </div>
 
-  {% if org.records|length > 1 %}
-  <h4 class="f5 f4-ns mb3 mt0 normal">
-    This organisation is based on records from {{ org.sources|map(attribute="publisher")|unique|list|list_to_string }}:
-  </h4>
-  {% endif %}
-  <div class="w-100 flex flex-wrap">
-    {% for record in org.records %}
-    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
-    {{ org_record(record, {}, request) }}
-    </div>
-    {% endfor %}
+  {% if related_orgs.records|length > 1 %}
+  <div class="mv3 measure">
+    <p>
+      This organisation record is part of a group of <a href="#linked-records" class="link underline-hover blue">linked records</a> that describe a single organisation.
+      The organisation is linked to {{ "active record"|pluralise(related_orgs.activeRecords|length) }} and 
+      {{ "inactive record"|pluralise(related_orgs.inactiveRecords|length) }}, from 
+      {{ "data source"|pluralise(related_orgs.activeRecords|length) }}.
+    </p>
+    <p>
+      The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, request, large=true) }}.<br>
+      <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ related_orgs.org_id }}">Copy this identifier to your clipboard</a>
+    </p>
   </div>
+  {% endif %}
 
 </div>
+{% endblock %}
 
-
+{% block external_links %}
 <div class="w-100 w-20-l fl">
 
   {% set links = org.get_links()|list %}
@@ -124,20 +186,134 @@
         {# <li class="w-100 mb2"><a class="link dark-blue underline" href="{{ v.value }}" target="_blank">Organisation website</a> {{ show_sources(v) }}</li>
         {% endfor %} #}
         {% for link, text in links %}
-        <li class="w-100 mb2"><a class="link dark-blue underline" href="{{ link }}" target="_blank">{{ text }}</a></li>
+        <li class="w-100 mb2">
+          <a class="link dark-blue underline" href="{{ link }}" target="_blank">
+            {{ text }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+          </a>
+        </li>
         {% endfor %}
       </ul>
     </div>
   </article>
   {% endif %}
+
+</div>
+{% endblock %}
+
+<div class="w-100 w-80-l fl pr3-l">
+
+  {% block organisation_details %}
+  <section class="measure-wide f5" id="organisation-details">
+    {% if org.description %}
+    <h4>Description</h4>
+    <p>
+      {{ org.description|titlecase(sentence=true) }}
+    </p>
+    {% endif %}
+    {% if org.alternateName %}
+    <h4>Also known as</h4>
+    <ul>
+      {% for n in org.alternateName[0:10] %}
+      <li>{{ n|titlecase }}</li>
+      {% endfor %}
+      {% if org.alternateName|length > 10 %}
+      <li>...and {{ "{:,.0f}".format(org.alternateName|length - 10) }} other names</li>
+      {% endif %}
+    </ul>
+    {% endif %}
+    {% for v in org.orgIDs %}
+      {% if v.startswith("GB-COH-") %}
+        <h4>Company number</h4>
+        <p>
+          <a class="link dark-blue underline-hover f4" href="https://beta.companieshouse.gov.uk/company/{{ v.replace('GB-COH-', '') }}" target="_blank">{{ v.replace('GB-COH-', '') }}</a>
+        </p>
+      {% endif %}
+      {% if v.startswith("GB-CHC-") %}
+        <h4><abbr title="Charity Commission for England and Wales">CCEW</abbr> Charity number</h4>
+        <p>
+          <a class="link dark-blue underline-hover f4" href="https://ccew.dkane.net/charity/{{ v.replace('GB-CHC-', '') }}" target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
+        </p>
+      {% endif %}
+      {% if v.startswith("GB-NIC-") %}
+        <h4><abbr title="Charity Commission for Northern Ireland">CCNI</abbr> Charity number</h4>
+        <p>
+          <a class="link dark-blue underline-hover f4" href="http://www.charitycommissionni.org.uk/charity-details/?regid={{ v.replace('GB-NIC-', '').replace('NIC', '')}}&subid=0" target="_blank">{{ v.replace('GB-NIC-', '') }}</a>
+        </p>
+      {% endif %}
+      {% if v.startswith("GB-SC-") %}
+        <h4><abbr title="Scottish Charity Regulator">OSCR</abbr> Charity number</h4>
+        <p>
+          <a class="link dark-blue underline-hover f4" href="https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={{ v.replace('GB-SC-', '') }}" target="_blank">{{ v.replace('GB-SC-', '') }}</a>
+        </p>
+      {% endif %}
+    {% endfor %}
+    {% if org.dateRegistered %}
+    <h4>Registered</h4>
+    <p>
+      {{ "{:%d %B %Y}".format(org.dateRegistered) }}
+    </p>
+    {% endif %}
+    {% if org.dateRemoved %}
+    <h4>Removed</h4>
+    <p>
+      {{ "{:%d %B %Y}".format(org.dateRemoved) }}
+    </p>
+    {% endif %}
+    {% if org.postalCode %}
+    <h4>Postcode</h4>
+    <p>
+      <span>{{ org.postalCode }}</span>
+    </p>
+    {% endif %}
+    {% if org.url %}
+    <h4>Website</h4>
+    <p>
+      <a href="{{ org.cleanUrl }}" class="link underline-hover blue">{{ org.url|replace("http://", "")|replace("https://", "") }}</a>
+    </p>
+    {% endif %}
+    {% if org.domain %}
+    <h4>Domain</h4>
+    <p>
+      <code>{{ org.domain }}</code>
+    </p>
+    {% endif %}
+    {% if org.latestIncome %}
+    <h4>Latest income</h4>
+    <p>
+      &pound;{{ "{:,.0f}".format( org.latestIncome )}}
+      {% if org.latestIncomeDate %}
+      <span class="grey">(on {{ "{:%d %B %Y}".format(org.latestIncomeDate) }})</span>
+      {% endif %}
+    </p>
+    {% endif %}
+  </section>
+  {% endblock %}
+
+</div>
+
+
+<div class="w-100 w-20-l fl">
   
-  {% if org.location %}
+  {% block location %}
+  {% if org.location or org.postalCode %}
   <article class="message is-info">
     <h4 class="ma0 pa0">Locations</h4>
-    <div class="message-body">
-      <ul class="mb4 mt2 list mh0 pa0 f5">
+    <p class="f6 gray">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>
+    <div id="locationmap" class="h5"></div>
+    {% if org.postalCode %}
+    <div class="mv3">
+      <h5 class="ma0 pa0">Postcode</h5>
+      <p class="f6 ma0 pa0">
+        {{ org.postalCode }}
+      </p>
+    </div>
+    {% endif %}
+    {% if org.location %}
+    <div class="mv3">
+      <h5 class="ma0 pa0">Locations</h5>
+      <ul class="mv0 list mh0 pa0 f6">
       {% for v in org.location %}
-        {% if v.geoCode and v.geoCode|regex_search("[ENWS][0-9]{8}") %}
+        {% if v.geoCode and v.geoCode|regex_search("[ENWSK][0-9]{8}") %}
         <li class="w-100 mb2">
           <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ v.geoCode }}.html" target="_blank">{{ v.name|titlecase }}</a>
           {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
@@ -145,7 +321,7 @@
         </li>
         {% else %}
         <li class="w-100 mb2">
-          {{ v.name }}
+          {{ v.name|titlecase }} {% if v.geoCode %}(<code>{{ v.geoCode }}</code>){% endif %}
           {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
           {# {{ show_sources(v) }} #}
         </li>
@@ -153,8 +329,10 @@
       {% endfor %}
       </ul>
     </div>
+    {% endif %}
   </article>
   {% endif %}
+  {% endblock %}
   
   {# {% if org.parent.keys()|length %}
   <article class="message is-info">
@@ -188,11 +366,52 @@
 
 </div>
 
-<div class="w-100 cf fl">
-  <h3 class="ma0 pa0">Data sources</h3>
 
-  {% for s in org.sources %}
-  {{ data_source(s, org, request) }}
+{% block related_orgs %}
+{% if related_orgs.records|length > 1 %}
+<section class="w-100 cf fl mv4" id="linked-records">
+  <h3 class="mb3 mt0">
+    Linked records
+  </h3>
+  <p class="measure">
+    This organisation record is part of a group of linked records that describe a single organisation.
+  </p>
+  <p class="measure">
+    The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, request, large=true) }}.
+  </p>
+  <div class="w-100 flex flex-wrap">
+    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(org, {}, request, small=true, this_record=true) }}
+    </div>
+    {% if related_orgs.activeRecords %}
+    {% for record in related_orgs.activeRecords if record.org_id != org.org_id %}
+    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(record, {}, request, small=true) }}
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  {% if related_orgs.activeRecords %}
+  <div class="w-100 flex flex-wrap">
+    {% for record in related_orgs.inactiveRecords if record.org_id != org.org_id %}
+    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(record, {}, request, small=true) }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</section>
+{% endif %}
+{% endblock %}
+
+{% block data_sources %}
+<section class="w-100 cf fl mv4" id="data-sources">
+  <h3 class="ma0 pa0">Data sources</h3>
+  {% for s in related_orgs.sources %}
+  {{ data_source(s, related_orgs, request) }}
   {% endfor %}
-</div>
+</section>
+{% endblock %}
 {% endblock %}
