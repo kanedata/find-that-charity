@@ -60,7 +60,7 @@ class Command(CSVScraper):
         try:
             z = zipfile.ZipFile(io.BytesIO(response.content))
         except zipfile.BadZipFile:
-            print(response.content[0:1000])
+            self.logger.info(response.content[0:1000])
             raise
         for f in z.infolist():
             self.logger.info("Opening: {}".format(f.filename))
