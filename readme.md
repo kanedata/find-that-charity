@@ -124,10 +124,12 @@ SHELL=/bin/bash
 # import everything else - every night
 0 1 * * * dokku dokku --rm run ftc python ./manage.py import_all
 
-# import charities - Friday night
+# import charities - Thursday night
+# import_oscr is run first because it seems to time out in the middle of the night
+0 20 * * 4 dokku dokku --rm run ftc python ./manage.py import_oscr
 0 2 * * 5 dokku dokku --rm run ftc python ./manage.py import_charities
 
-# import companies - Saturday night
+# import companies - Friday night
 0 2 * * 6 dokku dokku --rm run ftc python ./manage.py import_companies
 
 # regenerate the elasticsearch index - every night
