@@ -253,6 +253,7 @@ class Command(CSVScraper):
                 },
             )
             r = self.session.get(s["distribution"][0]["downloadURL"])
+            r.raise_for_status()
             r.encoding = s.get("_encoding", "utf8")
             self.files[s["identifier"]] = r
 

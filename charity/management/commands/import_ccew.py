@@ -205,6 +205,7 @@ class Command(HTMLScraper):
             self.logger.info("Using file: {}".format(link))
             zip_found = True
             r = self.session.get(link)
+            r.raise_for_status()
             self.process_zip(r)
             break
 

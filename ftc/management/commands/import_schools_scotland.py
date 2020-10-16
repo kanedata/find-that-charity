@@ -74,6 +74,7 @@ class Command(HTMLScraper):
         ][0]
         self.set_download_url(link)
         r = self.session.get(link)
+        r.raise_for_status()
 
         wb = load_workbook(io.BytesIO(r.content), read_only=True)
         latest_sheet = wb["Open Schools"]

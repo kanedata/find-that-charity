@@ -49,11 +49,13 @@ It includes cross-linkages to a range of other identifier sources.""",
             link = "https:" + link
 
         download_page = self.session.get(link)
+        download_page.raise_for_status()
         zip_link = download_page.html.find(
             "a", first=True, containing="Download"
         ).attrs["href"]
 
         response = self.session.get(zip_link)
+        response.raise_for_status()
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
             with z.open("grid.json") as gridjson:

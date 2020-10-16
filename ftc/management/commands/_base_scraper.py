@@ -244,6 +244,7 @@ class BaseScraper(BaseCommand):
         for u in self.start_urls:
             self.set_download_url(u)
             r = self.session.get(u)
+            r.raise_for_status()
             self.files[u] = r
 
     def parse_file(self, response, source_url):
@@ -491,6 +492,7 @@ class HTMLScraper(BaseScraper):
         self.files = {}
         for u in self.start_urls:
             r = self.session.get(u)
+            r.raise_for_status()
             self.set_access_url(u)
             self.files[u] = r
 

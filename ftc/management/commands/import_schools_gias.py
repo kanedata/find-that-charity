@@ -72,10 +72,12 @@ class Command(CSVScraper):
         for u in self.start_urls:
             self.set_access_url(u)
             response = self.session.get(u)
+            response.raise_for_status()
             for link in response.html.links:
                 if self.gias_regex.match(link):
                     self.set_download_url(link)
                     self.files[link] = self.session.get(link)
+                    self.files[link].raise_for_status()
 
     def depluralise(self, s):
         if not isinstance(s, str):

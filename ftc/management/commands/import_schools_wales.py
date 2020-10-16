@@ -60,6 +60,7 @@ class Command(HTMLScraper):
         self.logger.info("Using url {}".format(link))
         self.set_download_url(link)
         r = self.session.get(link)
+        r.raise_for_status()
 
         wb = get_data(io.BytesIO(r.content))
         for sheet in ["Maintained", "Independent", "PRU"]:

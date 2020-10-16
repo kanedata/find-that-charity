@@ -45,6 +45,7 @@ class Command(HTMLScraper):
         link = [link for link in response.html.links if link.endswith(".xlsx")][0]
         self.set_download_url(link)
         r = self.session.get(link)
+        r.raise_for_status()
 
         wb = load_workbook(io.BytesIO(r.content), read_only=True)
         ws = wb["Organisation Advanced Find View"]

@@ -34,6 +34,7 @@ class Command(BaseScraper):
             self.set_session(False)
             self.logger.info("Downloading from {}".format(options["source"]))
             nspl = self.session.get(options["source"])
+            nspl.raise_for_status()
             nspl_f = io.BytesIO(nspl.content)
         else:
             self.logger.info("Opening {}".format(options["source"]))

@@ -157,6 +157,7 @@ class Command(HTMLScraper):
         self.sources = {}
         for u in self.zipfiles:
             r = self.session.get(u["url"])
+            r.raise_for_status()
             self.files[u["org_type"]] = r
 
             source = copy.deepcopy(self.source_template)

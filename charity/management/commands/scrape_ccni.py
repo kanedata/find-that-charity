@@ -30,6 +30,7 @@ class Command(HTMLScraper):
 
     def scrape_charity(self, regno):
         r = self.session.get(self.base_url.format(regno))
+        r.raise_for_status()
 
         details = {}
 

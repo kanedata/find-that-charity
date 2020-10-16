@@ -97,11 +97,13 @@ class Command(CSVScraper):
         self.files = {}
         for u in self.start_urls:
             response = self.session.get(u)
+            response.raise_for_status()
             for link in response.html.absolute_links:
                 if self.zip_regex.match(link):
                     self.logger.info("Fetching: {}".format(link))
                     try:
                         self.files[link] = self.session.get(link)
+                        self.files[link].raise_for_status()
                     except requests.exceptions.ChunkedEncodingError as err:
                         self.logger.error("Error fetching: {}".format(link))
                         self.logger.error(str(err))
