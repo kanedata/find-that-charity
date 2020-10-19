@@ -74,12 +74,11 @@
     const FINANCES = {{ charity.financial_json()|tojson }};
 </script>
 <script src="{{ static('js/charts.js') }}"></script>
-<script src="{{ static('js/tabs.js') }}"></script>
 {% endblock %}
 
 {% block organisation_details %}
 
-  <nav class="tabs mb4 cf">
+  {# <nav class="tabs mb4 cf">
     <ul class="list ma0 pa0 flex bb bw2 b--gray pb1">
       <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="organisation-details" data-tabactive="true">Organisation details</a></li>
       <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="charity-activities">Charity activities</a></li>
@@ -87,9 +86,11 @@
       <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="charity-financials">Charity financial</a></li>
       {% endif %}
     </ul>
-  </nav>
+  </nav> #}
 
-  <section class="f5" id="charity-activities">
+  {{ super() }}
+
+  {% call org_panel("Charity Activities") %}
       
       {% for c, items in charity.classification.all()|groupby("vocabulary.title") %}
         <h4>{{ classification_titles.get(c, c) }}</h4>
@@ -100,10 +101,10 @@
         </ul>
       {% endfor %}
 
-  </section>
+  {% endcall %}
 
   {% if charity.financial.count() %}
-  <section class="f5" id="charity-financials">
+  {% call org_panel("Charity financials") %}
 
     {# {% if charity.has_ccew_partb %}
     <nav class="tabs mb4 cf">
@@ -211,10 +212,8 @@
       {% endfor %}
       {% endif %}
 
-  </section>
+  {% endcall %}
   {% endif %}
-
-  {{ super() }}
 
 {% endblock %}
 

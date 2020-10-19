@@ -1,0 +1,8 @@
+{% macro org_panel(title, class="") %}
+<section class="{{class}} f5 org-panel" id="{{ title|slugify }}">
+    <h4 class="org-panel-title">{{ title }}</h4>
+    <div class="org-panel-contents">
+        {{ caller() }}
+    </div>
+</section>
+{% endmacro %}
