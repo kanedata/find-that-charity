@@ -14,26 +14,15 @@
     {% set subtitle = "Showing all {:,.0f} organisations".format(res.paginator.count) %}
 {% endif %}
 
-{% block headscripts %}
+{#% block headscripts %}
 {{ super() }}
 <script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
 {% endblock headscripts %}
 
 {% block bodyscripts %}
 {{ super() }}
-<script>
-document.querySelectorAll('.js-choices').forEach((el) => {
-    const choices = new Choices(el, {
-        classNames: {
-            containerOuter: 'choices w-100 f6',
-            containerInner: 'choices__inner w-100 pa2 ba bw1 b--gray',
-            inputCloned: 'choices__input choices__input--cloned bn base-font w-100',
-            {# itemSelectable: 'choices__item br-pill bg-light-gray ph2 pv1 dib fl', #}
-        }
-    });
-});
-</script>
-{% endblock bodyscripts %}
+<script src='{{ static("js/choices.js") }}' type="text/javascript"></script>
+{% endblock bodyscripts %#}
 
 {% block content %}
 <main class="">
@@ -73,7 +62,7 @@ document.querySelectorAll('.js-choices').forEach((el) => {
                 Include inactive organisations
             </label>
             <h4 class="ma0 pa0">Related organisation types</h4>
-            <select class="js-choices" multiple>
+            {#<select class="js-choices" multiple>
                 <optgroup label="Main organisation types">
                 {% for t in aggs.by_orgtype if orgtypes[t.orgtype].is_keytype() %}
                     <option value="{{ t.orgtype }}">
@@ -90,7 +79,7 @@ document.querySelectorAll('.js-choices').forEach((el) => {
                     </option>
                 {% endfor %}
                 </optgroup>
-            </select>
+            </select>#}
             <ul class="mb4 mt2 list mh0 pa0 lh-title">
             {% for t in aggs.by_orgtype if orgtypes[t.orgtype].is_keytype() %}
                 <li class="w-100 f4 mb2">
