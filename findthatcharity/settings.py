@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "reconcile.apps.ReconcileConfig",
     "addtocsv.apps.AddtocsvConfig",
     "geo.apps.GeoConfig",
+    "other_data.apps.OtherDataConfig",
     "django_elasticsearch_dsl",
     "django.contrib.postgres",
     "django.contrib.admin",
