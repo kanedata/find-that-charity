@@ -12,6 +12,7 @@ class Command(BaseCommand):
         "lani",
         "las",
         "manual_links",
+        "mutuals",
         "nhsods",
         "pla",
         "rsl",

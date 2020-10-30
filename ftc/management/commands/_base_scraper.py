@@ -60,6 +60,8 @@ class BaseScraper(BaseCommand):
     orgtypes = []
     bulk_limit = 10000
 
+    postcode_regex = re.compile(r'([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.scrape = Scrape(
@@ -351,10 +353,10 @@ class BaseScraper(BaseCommand):
         # we assume the last item is a postcode
         if get_postcode:
             if len(address) > 1:
-                postcode = self.parse_postcode(address[-1])
-                address = address[0:-1]
-            else:
-                return address, None
+                potential_postcode = self.parse_postcode(address[-1])
+                if potential_postcode and self.postcode_regex.match(potential_postcode):
+                    postcode = potential_postcode
+                    address = address[0:-1]
 
         # make a new address list that's exactly the right length
         new_address = [None for n in range(address_parts)]
