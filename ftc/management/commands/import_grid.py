@@ -44,15 +44,9 @@ It includes cross-linkages to a range of other identifier sources.""",
     included_countries = ["GB"]
 
     def parse_file(self, response, source_url):
-        link = response.html.xpath('//a[text()="Download latest release"]/@href')[0]
-        if link.startswith("//"):
-            link = "https:" + link
-
-        download_page = self.session.get(link)
-        download_page.raise_for_status()
-        zip_link = download_page.html.find(
-            "a", first=True, containing="Download"
-        ).attrs["href"]
+        zip_link = response.html.xpath('//a[text()="Download latest release"]/@href')[0]
+        if zip_link.startswith("//"):
+            zip_link = "https:" + zip_link
 
         response = self.session.get(zip_link)
         response.raise_for_status()
