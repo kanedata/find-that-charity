@@ -30,7 +30,7 @@ class Command(CSVScraper):
             {
                 "downloadURL": "https://fcastoragemprprod.blob.core.windows.net/societylist/SocietyList.csv",
                 "accessURL": "https://mutuals.fca.org.uk/",
-                "title": "Download the Register (CSV of basic society details)"
+                "title": "Download the Register (CSV of basic society details)",
             }
         ],
     }
@@ -57,7 +57,9 @@ class Command(CSVScraper):
             if len(add) > 2:
                 if self.postcode_regex.match(" ".join(add[-2:])):
                     postcode = " ".join(add[-2:]).upper()
-                    record["Society Address"] = record["Society Address"].replace(postcode, "")
+                    record["Society Address"] = record["Society Address"].replace(
+                        postcode, ""
+                    )
         address, _ = self.split_address(record["Society Address"], get_postcode=False)
         address = dict(enumerate(address))
         org_ids = [self.get_org_id(record)]
@@ -67,13 +69,16 @@ class Command(CSVScraper):
         ]
         description = ""
         if record.get("Registration Act"):
-            description = "Registered under {}".format(
-                record.get("Registration Act")
-            )
+            description = "Registered under {}".format(record.get("Registration Act"))
 
         # add org ids for companies
-        if record.get("Registered As") in ["Community Benefit Society", "Co-operative Society"]:
-            org_ids.append("GB-COH-RS{}".format(record["Full Registation Number"].zfill(6)))
+        if record.get("Registered As") in [
+            "Community Benefit Society",
+            "Co-operative Society",
+        ]:
+            org_ids.append(
+                "GB-COH-RS{}".format(record["Full Registation Number"].zfill(6))
+            )
 
         org_record = {
             "org_id": self.get_org_id(record),
@@ -105,6 +110,4 @@ class Command(CSVScraper):
             "spider": self.name,
             "org_id_scheme": self.orgid_scheme,
         }
-        self.records.append(
-            Organisation(**org_record)
-        )
+        self.records.append(Organisation(**org_record))

@@ -12,8 +12,14 @@ from django.db import connection
 from django.utils.text import slugify
 
 from ftc.management.commands._db_logger import ScrapeHandler
-from ftc.models import (Organisation, OrganisationLink, OrganisationType,
-                        OrgidScheme, Scrape, Source)
+from ftc.models import (
+    Organisation,
+    OrganisationLink,
+    OrganisationType,
+    OrgidScheme,
+    Scrape,
+    Source,
+)
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
@@ -60,7 +66,9 @@ class BaseScraper(BaseCommand):
     orgtypes = []
     bulk_limit = 10000
 
-    postcode_regex = re.compile(r'([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})')
+    postcode_regex = re.compile(
+        r"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
