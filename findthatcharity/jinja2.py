@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.db.models import Count, F, Func
@@ -86,6 +87,7 @@ def environment(**options):
             "get_orgidschemes": get_orgidschemes,
             "url_replace": url_replace,
             "url_remove": url_remove,
+            "ga_tracking": settings.GOOGLE_ANALYTICS,
         }
     )
     env.filters.update(

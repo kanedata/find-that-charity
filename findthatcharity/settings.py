@@ -36,6 +36,8 @@ ALLOWED_HOSTS = (
     else []
 )
 
+GOOGLE_ANALYTICS = os.environ.get("GOOGLE_ANALYTICS")
+
 # Application definition
 
 INSTALLED_APPS = [

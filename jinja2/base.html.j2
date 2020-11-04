@@ -17,7 +17,7 @@
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-        gtag('config', '{{ ga_tracking }}');
+        gtag('config', {{ ga_tracking|tojson }});
     </script>
     {% endif %}
     <title>{{ (title or default_title)|striptags }}{% block title %}{% endblock %}</title>
