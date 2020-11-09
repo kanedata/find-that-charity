@@ -199,7 +199,7 @@ class Command(HTMLScraper):
     def parse_file(self, response, source_urls):
         zip_found = False
         for link in response.html.absolute_links:
-            if not self.zip_regex.match(link):
+            if ".zip" not in link or "TableBuildScripts" in link:
                 continue
             self.set_download_url(link)
             self.logger.info("Using file: {}".format(link))
