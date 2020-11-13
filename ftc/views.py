@@ -97,6 +97,17 @@ def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False)
     )
 
 
+@xframe_options_exempt
+def get_orgid_canon(request, org_id):
+
+    related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
+    if not related_orgs:
+        raise Http404("No Organisation found.")
+    related_orgs = RelatedOrganisation(related_orgs)
+
+    return JsonResponse(related_orgs.to_json())
+
+
 def get_random_org(request):
     """Get a random charity record"""
     # filetype = request.GET.get("filetype", "html")
