@@ -53,10 +53,17 @@ def do_reconcile_query(
                     o.org_id,
                     "" if o.active else " [INACTIVE]",
                 ),
-                "type": [{
-                    "id": o.organisationTypePrimary,
-                    "name": all_orgtypes[o.organisationTypePrimary].title,
-                }],
+                "type": [
+                    {
+                        "id": o.organisationTypePrimary,
+                        "name": all_orgtypes[o.organisationTypePrimary].title,
+                    }
+                ]
+                + [
+                    {"id": ot, "name": all_orgtypes[ot].title}
+                    for ot in o.organisationType
+                    if ot != o.organisationTypePrimary and ot in all_orgtypes
+                ],
                 "score": o.meta.score,
                 "match": (normalise_name(o.name) == normalise_name(query))
                 and (o.meta.score == result.hits.max_score)

@@ -17,15 +17,9 @@ def index(request, orgtype="all"):
     if orgtype == "all":
         orgtypes = []
     elif isinstance(orgtype, str):
-        orgtypes = [
-            OrganisationType.objects.get(slug=o)
-            for o in orgtype.split("+")
-        ]
+        orgtypes = [OrganisationType.objects.get(slug=o) for o in orgtype.split("+")]
     elif isinstance(orgtype, list):
-        orgtypes = [
-            OrganisationType.objects.get(slug=o)
-            for o in orgtype
-        ]
+        orgtypes = [OrganisationType.objects.get(slug=o) for o in orgtype]
 
     queries = request.POST.get("queries", request.GET.get("queries"))
     if queries:
@@ -52,10 +46,7 @@ def service_spec(request, orgtypes=None):
     if not orgtypes or orgtypes == "all":
         defaultTypes = [{"id": "/Organization", "name": "Organisation"}]
     elif isinstance(orgtypes, list):
-        defaultTypes = [
-            {"id": o.slug, "name": o.title}
-            for o in orgtypes
-        ]
+        defaultTypes = [{"id": o.slug, "name": o.title} for o in orgtypes]
 
     return {
         "name": "Find that Charity Reconciliation API",
@@ -127,9 +118,7 @@ def suggest(request, orgtypes=None):
         completion["contexts"] = dict(organisationType=[o.slug for o in orgtypes])
     else:
         orgtypes = get_orgtypes()
-        completion["contexts"] = dict(organisationType=[
-            o for o in orgtypes.keys()
-        ])
+        completion["contexts"] = dict(organisationType=[o for o in orgtypes.keys()])
 
     q = q.suggest(SUGGEST_NAME, prefix, completion=completion).source(
         ["org_id", "name", "organisationType"]
