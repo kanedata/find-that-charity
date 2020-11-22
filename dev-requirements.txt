@@ -20,8 +20,10 @@ django-better-admin-arrayfield==1.4.0  # via -r requirements.txt
 django-cors-headers==3.5.0  # via -r requirements.txt
 django-elasticsearch-dsl==7.1.4  # via -r requirements.txt
 django-environ==0.4.5     # via -r requirements.txt
+django-filter==2.4.0      # via -r requirements.txt
 django-prettyjson==0.4.1  # via -r requirements.txt
-django==3.1.1             # via -r requirements.txt, django-cors-headers, django-prettyjson
+django==3.1.1             # via -r requirements.txt, django-cors-headers, django-filter, django-prettyjson, djangorestframework
+djangorestframework==3.12.2  # via -r requirements.txt
 elasticsearch-dsl==7.3.0  # via -r requirements.txt, django-elasticsearch-dsl
 elasticsearch==7.10.0     # via -r requirements.txt, elasticsearch-dsl
 et-xmlfile==1.0.1         # via -r requirements.txt, openpyxl

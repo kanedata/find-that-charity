@@ -21,6 +21,7 @@ import charity.urls
 import ftc.urls
 import ftc.views
 import reconcile.urls
+import api.urls
 
 urlpatterns = [
     path("admin/", admin.site.urls, name="about"),
@@ -31,4 +32,5 @@ urlpatterns = [
     path("charity/", include(charity.urls)),
     path("reconcile/", include(reconcile.urls)),
     path("reconcile", reconcile.views.index, {"orgtype": "registered-charity"}),
+    path("api/v1/", include(api.urls)),
 ]

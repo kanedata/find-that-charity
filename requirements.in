@@ -4,6 +4,8 @@ django-cors-headers
 django-elasticsearch-dsl
 django-environ
 django-prettyjson
+django-filter
+djangorestframework
 dj-database-url
 whitenoise
 gunicorn
