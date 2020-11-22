@@ -21,10 +21,6 @@ from ftc.models import Organisation, OrganisationLink, Scrape
 
 class Command(HTMLScraper):
     name = "ccew"
-    custom_settings = {
-        "DOWNLOAD_TIMEOUT": 180 * 3,
-        "REDIS_URL": os.environ.get("REDIS_URL"),
-    }
     allowed_domains = ["charitycommission.gov.uk"]
     start_urls = [
         CCEW_DATA_URL,
