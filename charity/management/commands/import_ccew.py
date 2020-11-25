@@ -30,6 +30,7 @@ class Command(HTMLScraper):
         CCEW_DATA_URL,
         # "https://raw.githubusercontent.com/drkane/charity-lookups/master/cc-aoo-gss-iso.csv",
     ]
+    encoding = "cp858"
     org_id_prefix = "GB-CHC"
     id_field = "regno"
     date_fields = []
@@ -235,7 +236,7 @@ class Command(HTMLScraper):
                     files[filename] = filepath
 
             for filename, filepath in files.items():
-                with open(filepath, "r", encoding="latin1") as bcpfile:
+                with open(filepath, "r", encoding=self.encoding) as bcpfile:
                     self.logger.info("Processing: {}".format(filename))
                     self.process_bcp(bcpfile, filename)
 
@@ -245,6 +246,11 @@ class Command(HTMLScraper):
         db_table = self.ccew_file_to_object.get(filename)
         page_size = 1000
         self.date_fields = [f for f in fields if f.endswith("date")]
+
+        def convert_encoding(row):
+            for k in row:
+                if isinstance(row[k], str):
+                    row[k] = row[k].decode(self.encoding).encode("utf8")
 
         def get_data(bcpreader):
             for k, row in tqdm.tqdm(enumerate(bcpreader)):
