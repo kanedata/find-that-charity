@@ -48,7 +48,7 @@ EXTERNAL_LINKS = {
         ["https://ccew.dkane.net/charity/{}", "Charity Commission England and Wales"],
         ["https://charitybase.uk/charities/{}", "CharityBase"],
         ["http://opencharities.org/charities/{}", "OpenCharities"],
-        ["http://www.guidestar.org.uk/summary.aspx?CCReg={}", "GuideStar"],
+        ["https://givingisgreat.org/charitydetail/?regNo={}", "Giving is Great"],
         [
             "http://www.charitychoice.co.uk/charities/search?t=qsearch&q={}",
             "Charities Direct",
@@ -63,12 +63,14 @@ EXTERNAL_LINKS = {
             "http://www.charitycommissionni.org.uk/charity-details/?regid={}&subid=0",
             "Charity Commission Northern Ireland",
         ],
+        ["https://givingisgreat.org/charitydetail/?regNo={}", "Giving is Great"],
     ],
     "GB-SC": [
         [
             "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={}",
             "Office of Scottish Charity Regulator",
         ],
+        ["https://givingisgreat.org/charitydetail/?regNo={}", "Giving is Great"],
     ],
     "GB-EDU": [
         [
