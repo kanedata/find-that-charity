@@ -83,6 +83,7 @@ On Dokku server run:
 
 ```bash
 # setup and run import
+dokku run ftc python ./manage.py charity_setup
 dokku run ftc python ./manage.py import_charities
 dokku run ftc python ./manage.py import_companies
 dokku run ftc python ./manage.py import_all
