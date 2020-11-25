@@ -4,6 +4,7 @@ import os
 
 from django.utils.text import slugify
 
+from findthatcharity.jinja2 import get_orgtypes
 from findthatcharity.utils import to_titlecase
 from ftc.documents import FullOrganisation
 from ftc.models import Organisation
@@ -14,7 +15,7 @@ with open(os.path.join(os.path.dirname(__file__), "query.json")) as a:
 
 def do_reconcile_query(
     query,
-    orgtype="all",
+    orgtypes="all",
     type="/Organization",
     limit=5,
     properties=[],
@@ -23,8 +24,8 @@ def do_reconcile_query(
     if not query:
         return []
 
-    if not isinstance(orgtype, list) and orgtype != "all":
-        orgtype = orgtype.split("+")
+    if not isinstance(orgtypes, list) and orgtypes != "all":
+        orgtypes = orgtypes.split("+")
 
     def normalise_name(n):
         stopwords = ["the", "of", "in", "uk", "ltd", "limited"]
@@ -35,12 +36,13 @@ def do_reconcile_query(
 
     query_template, params = recon_query(
         query,
-        orgtype=orgtype,
+        orgtypes=orgtypes,
         postcode=properties.get("postalCode"),
         domain=properties.get("domain"),
     )
     q = FullOrganisation.search().from_dict(query_template)[:limit]
     result = q.execute(params=params)
+    all_orgtypes = get_orgtypes()
 
     return {
         "result": [
@@ -51,7 +53,17 @@ def do_reconcile_query(
                     o.org_id,
                     "" if o.active else " [INACTIVE]",
                 ),
-                "type": ["/Organization"],
+                "type": [
+                    {
+                        "id": o.organisationTypePrimary,
+                        "name": all_orgtypes[o.organisationTypePrimary].title,
+                    }
+                ]
+                + [
+                    {"id": ot, "name": all_orgtypes[ot].title}
+                    for ot in o.organisationType
+                    if ot != o.organisationTypePrimary and ot in all_orgtypes
+                ],
                 "score": o.meta.score,
                 "match": (normalise_name(o.name) == normalise_name(query))
                 and (o.meta.score == result.hits.max_score)
@@ -80,7 +92,7 @@ def do_extend_query(ids, properties):
 
 def recon_query(
     term=None,
-    orgtype="all",
+    orgtypes="all",
     other_orgtypes=None,
     postcode=None,
     domain=None,
@@ -117,10 +129,10 @@ def recon_query(
 
     # check for organisation type
     filter_ = []
-    if orgtype and orgtype != "all":
-        if not isinstance(orgtype, list):
-            orgtype = [orgtype]
-        filter_.append({"terms": {"organisationType": orgtype}})
+    if orgtypes and orgtypes != "all":
+        if not isinstance(orgtypes, list):
+            orgtypes = [orgtypes]
+        filter_.append({"terms": {"organisationType": [o.slug for o in orgtypes]}})
 
     # check for source
     if source:

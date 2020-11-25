@@ -37,6 +37,7 @@ urlpatterns = [
     path("source/<str:source>", views.orgid_type, name="orgid_source"),
     path("scrapes/feed.rss", feeds.ScrapesFeedRSS()),
     path("scrapes/feed.atom", feeds.ScrapesFeedAtom()),
+    path("<path:org_id>/canonical.json", views.get_orgid_canon),
     path("<path:org_id>.json", views.get_orgid, {"filetype": "json"}),
     path("<path:org_id>.html", views.get_orgid, {"filetype": "html"}),
     path(

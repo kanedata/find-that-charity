@@ -12,6 +12,7 @@ class Command(BaseCommand):
         "lani",
         "las",
         "manual_links",
+        "mutuals",
         "nhsods",
         "pla",
         "rsl",
@@ -26,5 +27,5 @@ class Command(BaseCommand):
             try:
                 management.call_command("import_{}".format(scraper))
             except Exception:
-                self.stdout.write(self.style.ERROR('Command {} failed'.format(scraper)))
+                self.stdout.write(self.style.ERROR("Command {} failed".format(scraper)))
         management.call_command("update_orgids")
