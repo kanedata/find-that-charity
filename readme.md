@@ -24,10 +24,11 @@ Installation
 7. [Install elasticsearch 7](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html) - you may need to increase available memory (see below)
 8. Start elasticsearch
 9. Create `.env` file in root directory. Contents based on `.env.example`.
-10. Import data on charities (`python ./manage.py import_charities`)
-11. Import data on nonprofit companies (`python ./manage.py import_companies`)
-12. Import data on other non-profit organisations (`python ./manage.py import_all`)
-13. Add organisations to elasticsearch index (`python ./manage.py es_index`) - (Don't use the default `search_index` command as this won't setup aliases correctly)
+10. Create the database tables (`python ./manage.py migrate && python ./manage.py createcachetable`)
+11. Import data on charities (`python ./manage.py import_charities`)
+12. Import data on nonprofit companies (`python ./manage.py import_companies`)
+13. Import data on other non-profit organisations (`python ./manage.py import_all`)
+14. Add organisations to elasticsearch index (`python ./manage.py es_index`) - (Don't use the default `search_index` command as this won't setup aliases correctly)
 
 Dokku Installation
 ------------------
