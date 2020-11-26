@@ -40,8 +40,11 @@ def about(request):
 def org_search(request):
 
     s = OrganisationSearch()
+    term = None
+
     if "q" in request.GET:
-        s.set_criteria(term=request.GET["q"])
+        term = request.GET["q"].strip()
+        s.set_criteria(term=term)
     if "orgtype" in request.GET and request.GET.get("orgtype") != "all":
         s.set_criteria(base_orgtype=request.GET.get("orgtype"))
 
@@ -54,7 +57,7 @@ def org_search(request):
         "search.html.j2",
         {
             "res": page_obj,
-            "term": request.GET.get("q"),
+            "term": term,
             "selected_org_type": request.GET.get("orgtype"),
         },
     )
@@ -128,6 +131,8 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         "include_inactive": False,
     }
     s = OrganisationSearch()
+    term = None
+
     if orgtype:
         query["base_query"] = get_object_or_404(OrganisationType, slug=orgtype)
         query["orgtype"].append(orgtype)
@@ -147,7 +152,8 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
     if "source" in request.GET:
         query["source"].extend(request.GET.getlist("source"))
     if "q" in request.GET:
-        query["q"] = request.GET["q"]
+        term = request.GET["q"].strip()
+        query["q"] = term
         s.set_criteria(term=query["q"])
     if request.GET.get("inactive") == "include_inactive":
         query["include_inactive"] = True
@@ -198,7 +204,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         {
             "res": page_obj,
             "query": query,
-            "term": request.GET.get("q"),
+            "term": term,
             "aggs": {
                 "by_orgtype": s.aggregation.get("by_orgtype"),
                 "by_source": s.aggregation.get("by_source"),
