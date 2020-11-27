@@ -32,7 +32,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: psycopg2 prerequisites
-      run: sudo apt-get install python-dev libpq-dev
+      run: sudo apt-get install libxml2-dev libxslt-dev python-dev libpq-dev
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
