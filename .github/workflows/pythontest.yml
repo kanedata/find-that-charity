@@ -24,6 +24,7 @@ jobs:
     
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost/github_actions
+      SECRET_KEY: 1234567890
 
     steps:
     - uses: actions/checkout@v1
