@@ -13,7 +13,7 @@
                             "dis_max": {
                                 "queries": [
                                     {
-                                        "multi_match": {
+                                        "query_string": {
                                             "query": "{{name}}",
                                             "fields": [
                                                 "name^3",
