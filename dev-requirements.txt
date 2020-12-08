@@ -21,9 +21,9 @@ django-cors-headers==3.5.0  # via -r requirements.txt
 django-elasticsearch-dsl==7.1.4  # via -r requirements.txt
 django-environ==0.4.5     # via -r requirements.txt
 django-filter==2.4.0      # via -r requirements.txt
+django-ninja==0.9.1       # via -r requirements.txt
 django-prettyjson==0.4.1  # via -r requirements.txt
-django==3.1.1             # via -r requirements.txt, django-cors-headers, django-filter, django-prettyjson, djangorestframework
-djangorestframework==3.12.2  # via -r requirements.txt
+django==3.1.1             # via -r requirements.txt, django-cors-headers, django-filter, django-ninja, django-prettyjson
 elasticsearch-dsl==7.3.0  # via -r requirements.txt, django-elasticsearch-dsl
 elasticsearch==7.10.0     # via -r requirements.txt, elasticsearch-dsl
 et-xmlfile==1.0.1         # via -r requirements.txt, openpyxl
@@ -46,6 +46,7 @@ parse==1.15.0             # via -r requirements.txt, requests-html
 pathspec==0.8.1           # via black
 psycopg2==2.8.6           # via -r requirements.txt
 pycodestyle==2.6.0        # via flake8
+pydantic==1.7.3           # via -r requirements.txt, django-ninja
 pyee==7.0.2               # via -r requirements.txt, pyppeteer
 pyexcel-ezodf==0.3.4      # via -r requirements.txt, pyexcel-ods3
 pyexcel-io==0.5.20        # via -r requirements.txt, pyexcel-ods3

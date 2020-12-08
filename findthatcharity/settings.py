@@ -20,6 +20,8 @@ load_dotenv()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+PROJECT_NAME = "Find that Charity"
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -58,7 +60,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "prettyjson",
     "django_better_admin_arrayfield",
-    "rest_framework",
     "django_filters",
     "corsheaders",
 ]
@@ -184,9 +185,3 @@ LOGGING = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
-
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-}

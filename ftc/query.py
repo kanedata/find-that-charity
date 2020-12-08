@@ -1,12 +1,32 @@
 import copy
 
+from django.shortcuts import Http404
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Func
 from elasticsearch_dsl import A
 
 from ftc.documents import DSEPaginator, FullOrganisation
-from ftc.models import Organisation
+from ftc.models import Organisation, RelatedOrganisation
 from reconcile.query import RECONCILE_QUERY
+
+
+def get_organisation(org_id):
+    try:
+        return Organisation.objects.get(org_id=org_id)
+    except Organisation.DoesNotExist:
+        orgs = list(Organisation.objects.filter(orgIDs__contains=[org_id]))
+        if orgs:
+            orgs = RelatedOrganisation(orgs)
+            return orgs.records[0]
+        else:
+            raise Http404("No Organisation found.")
+
+
+def get_linked_organisations(org_id):
+    related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
+    if not related_orgs:
+        raise Http404("No Organisation found.")
+    return RelatedOrganisation(related_orgs)
 
 
 def random_query(active=False, orgtype=None, aggregate=False, source=None):

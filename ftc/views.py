@@ -1,7 +1,7 @@
 import csv
 
 from django.conf import settings
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -10,7 +10,7 @@ from charity.models import Charity
 from ftc.documents import FullOrganisation
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
                         Source)
-from ftc.query import OrganisationSearch, random_query
+from ftc.query import OrganisationSearch, random_query, get_organisation, get_linked_organisations
 
 
 # site homepage
@@ -62,15 +62,7 @@ def org_search(request):
 
 @xframe_options_exempt
 def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False):
-    try:
-        org = Organisation.objects.get(org_id=org_id)
-    except Organisation.DoesNotExist:
-        orgs = list(Organisation.objects.filter(orgIDs__contains=[org_id]))
-        if orgs:
-            orgs = RelatedOrganisation(orgs)
-            org = orgs.records[0]
-        else:
-            raise Http404("No Organisation found.")
+    org = get_organisation(org_id)
     if filetype == "json":
         return JsonResponse(RelatedOrganisation([org]).to_json(as_charity))
 
@@ -99,12 +91,7 @@ def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False)
 
 @xframe_options_exempt
 def get_orgid_canon(request, org_id):
-
-    related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
-    if not related_orgs:
-        raise Http404("No Organisation found.")
-    related_orgs = RelatedOrganisation(related_orgs)
-
+    related_orgs = get_linked_organisations(org_id)
     return JsonResponse(related_orgs.to_json())
 
 

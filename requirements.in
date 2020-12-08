@@ -5,8 +5,8 @@ django-elasticsearch-dsl
 django-environ
 django-prettyjson
 django-filter
-djangorestframework
 dj-database-url
+django-ninja
 whitenoise
 gunicorn
 tqdm
