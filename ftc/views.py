@@ -75,7 +75,7 @@ def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False)
         else:
             raise Http404("No Organisation found.")
     if filetype == "json":
-        return JsonResponse(RelatedOrganisation([org]).to_json(as_charity))
+        return JsonResponse(RelatedOrganisation([org]).to_json(as_charity, request=request))
 
     charity = Charity.objects.filter(id=org_id).first()
     related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
@@ -108,7 +108,7 @@ def get_orgid_canon(request, org_id):
         raise Http404("No Organisation found.")
     related_orgs = RelatedOrganisation(related_orgs)
 
-    return JsonResponse(related_orgs.to_json())
+    return JsonResponse(related_orgs.to_json(request=request))
 
 
 def get_random_org(request):
