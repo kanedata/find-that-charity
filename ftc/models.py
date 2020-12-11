@@ -708,7 +708,6 @@ class RelatedOrganisation:
 
         def build_url(url):
             if request:
-                print(request)
                 return request.build_absolute_uri(url)
             return url
 
