@@ -5,8 +5,9 @@
                 id="search-autocomplete-q"
                 class="h-100 input-reset bn pa3 near-black bg-white flex-grow base-font"
                 type="text" 
-                placeholder="Search for a charity name or number"
-                value="{{term}}" autocomplete='off'>
+                placeholder="Search for a name or number"
+                value="{{ search.term if search and search.term }}" autocomplete='off'>
+            {% if not search %}
             <select name="orgtype"
                 id="search-autocomplete-orgtype"
                 class="bn f6 mh2 mw5-l mw4 bg-light-gray br-pill pv1 ph2 mv2 base-font"
@@ -14,13 +15,10 @@
                 <option class="bg-white" value="all">All organisation types</option>
                 <option class="bg-white" disabled>----------</option>
                 {% for o in orgtypes.values()|sort(attribute='title') if o.is_keytype() %}
-                    {% if o.slug == selected_org_type -%}
-                    <option class="bg-white" value="{{ o.slug }}" selected="selected">{{ o.title }}</option>
-                    {% else -%}
                     <option class="bg-white" value="{{ o.slug }}">{{ o.title }}</option>
-                    {%- endif -%}
                 {%- endfor -%}
             </select>
+            {% endif %}
         </div>
         <input type="submit" value="Search" class="ml2 f6 f5-l button-reset header-font bn fl pv3 ph4 tc bg-animate bg-yellow dim near-black pointer br2-ns br--right-ns">
     </div>

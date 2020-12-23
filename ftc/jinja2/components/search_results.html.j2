@@ -1,22 +1,22 @@
 {% from 'components/org_id.html.j2' import orgid_link %}
 
-{% if res.paginator.count > 0 and term %}
+{% if res.paginator.count > 0 and search.term %}
 <article class="message is-success pa2 bg-washed-green mb4">
     <div class="message-body">
     {% if res.paginator.count == 1 %}
-        1 result found found for "{{term}}"
+        1 result found found for "{{search.term}}"
     {% elif res.has_other_pages() %}
-        {{ "{:,}".format(res.paginator.count) }} results found for "{{term}}".
+        {{ "{:,}".format(res.paginator.count) }} results found for "{{search.term}}".
         Showing results {{ res.start_index() }} to {{ res.end_index() }}.
     {% else %}
-        {{ "{:,}".format(res.paginator.count) }} results found for "{{term}}"
+        {{ "{:,}".format(res.paginator.count) }} results found for "{{search.term}}"
     {% endif %}
     </div>
 </article>
-{% elif term %}
+{% elif search.term %}
 <article class="message is-error pa2 bg-washed-red mb2">
     <div class="message-body">
-        No results found for "{{term}}"
+        No results found for "{{search.term}}"
     </div>
 </article>
 {% endif %}

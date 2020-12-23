@@ -16,7 +16,7 @@ from ftc.query import OrganisationSearch, random_query, get_organisation, get_li
 # site homepage
 def index(request):
     if "q" in request.GET:
-        return org_search(request)
+        return orgid_type(request, filetype=request.GET.get("filetype", "html"))
 
     context = dict(
         examples={
@@ -35,29 +35,6 @@ def index(request):
 def about(request):
     context = {}
     return render(request, "about.html.j2", context)
-
-
-def org_search(request):
-
-    s = OrganisationSearch()
-    if "q" in request.GET:
-        s.set_criteria(term=request.GET["q"])
-    if "orgtype" in request.GET and request.GET.get("orgtype") != "all":
-        s.set_criteria(base_orgtype=request.GET.get("orgtype"))
-
-    s.run_es(with_pagination=True, with_aggregation=False)
-    page_number = request.GET.get("page")
-    page_obj = s.paginator.get_page(page_number)
-
-    return render(
-        request,
-        "search.html.j2",
-        {
-            "res": page_obj,
-            "term": request.GET.get("q"),
-            "selected_org_type": request.GET.get("orgtype"),
-        },
-    )
 
 
 @xframe_options_exempt
@@ -108,41 +85,20 @@ def get_random_org(request):
 
 
 def orgid_type(request, orgtype=None, source=None, filetype="html"):
-    query = {
-        "orgtype": [],
-        "source": [],
-        "q": None,
-        "include_inactive": False,
-    }
+    base_query = None
+    download_url = request.build_absolute_uri() + "&filetype=csv"
     s = OrganisationSearch()
     if orgtype:
-        query["base_query"] = get_object_or_404(OrganisationType, slug=orgtype)
-        query["orgtype"].append(orgtype)
+        base_query = get_object_or_404(OrganisationType, slug=orgtype)
         s.set_criteria(base_orgtype=orgtype)
-        download_url = reverse("orgid_type_download", kwargs={"orgtype": orgtype})
+        download_url = reverse("orgid_type_download", kwargs={"orgtype": orgtype}) + "?" + request.GET.urlencode()
     elif source:
-        query["base_query"] = get_object_or_404(Source, id=source)
-        query["source"].append(source)
-        download_url = reverse("orgid_source_download", kwargs={"source": source})
-    if request.GET:
-        download_url += "?" + request.GET.urlencode()
+        base_query = get_object_or_404(Source, id=source)
+        s.set_criteria(source=source)
+        download_url = reverse("orgid_source_download", kwargs={"source": source}) + "?" + request.GET.urlencode()
 
     # add additional criteria from the get params
-    if "orgtype" in request.GET:
-        query["orgtype"].extend(request.GET.getlist("orgtype"))
-        s.set_criteria(other_orgtypes=request.GET.getlist("orgtype"))
-    if "source" in request.GET:
-        query["source"].extend(request.GET.getlist("source"))
-    if "q" in request.GET:
-        query["q"] = request.GET["q"]
-        s.set_criteria(term=query["q"])
-    if request.GET.get("inactive") == "include_inactive":
-        query["include_inactive"] = True
-
-    # convert query to criteria
-    s.set_criteria(source=query["source"])
-    if not query.get("include_inactive") and filetype != "csv":
-        s.set_criteria(active=True)
+    s.set_criteria_from_request(request)
 
     if filetype == "csv":
         columns = {
@@ -165,7 +121,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         }
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="{}.csv"'.format(
-            query["base_query"].slug
+            base_query.slug if base_query else 'findthatcharity-search-results'
         )
         writer = csv.writer(response)
         writer.writerow(columns.values())
@@ -184,12 +140,8 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         "orgtype.html.j2",
         {
             "res": page_obj,
-            "query": query,
-            "term": request.GET.get("q"),
-            "aggs": {
-                "by_orgtype": s.aggregation.get("by_orgtype"),
-                "by_source": s.aggregation.get("by_source"),
-            },
+            "base_query": base_query,
             "download_url": download_url,
+            "search": s,
         },
     )
