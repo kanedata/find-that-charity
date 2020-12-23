@@ -1,0 +1,18 @@
+{% set links = org.get_links()|list %}
+{% if links %}
+<article class="message is-info">
+    <h4 class="ma0 pa0">More about this organisation</h4>
+    <p class="f6 gray">Find that Charity is not responsible for the content of external websites</p>
+    <div class="message-body">
+        <ul class="mb4 mt2 list mh0 pa0 f5">
+            {% for link, text in links %}
+            <li class="w-100 mb2">
+                <a class="link dark-blue underline" href="{{ link }}" target="_blank">
+                {{ text }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</article>
+{% endif %}

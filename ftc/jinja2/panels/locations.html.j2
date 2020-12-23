@@ -1,0 +1,40 @@
+{% if org.location or org.postalCode %}
+{% call org_panel("Locations") %}
+<div class="w-100 w-30-l fl">
+    <div id="locationmap" class="h5"></div>
+</div>
+<div class="w-100 w-70-l fl ph3 measure">
+    <p class="f6 gray">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>
+    {% if org.postalCode %}
+    <div class="mv3">
+        <h5 class="ma0 pa0">Postcode</h5>
+        <p class="f6 ma0 pa0">
+        {{ org.postalCode }}
+        </p>
+    </div>
+    {% endif %}
+    {% if org.location %}
+    <div class="mv3">
+        <h5 class="ma0 pa0">Locations</h5>
+        <ul class="mv0 list mh0 pa0 f6">
+        {% for v in org.location %}
+        {% if v.geoCode and v.geoCode|regex_search("[ENWSK][0-9]{8}") %}
+        <li class="w-100 mb2">
+            <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ v.geoCode }}.html" target="_blank">{{ v.name|titlecase }}</a>
+            {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
+            {# {{ show_sources(v) }} #}
+        </li>
+        {% else %}
+        <li class="w-100 mb2">
+            {{ v.name|titlecase }} {% if v.geoCode %}(<code>{{ v.geoCode }}</code>){% endif %}
+            {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
+            {# {{ show_sources(v) }} #}
+        </li>
+        {% endif %}
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endcall %}
+{% endif %}

@@ -1,0 +1,84 @@
+{% call org_panel("Organisation details", class="measure-wide") %}
+{% if org.description %}
+<h4>Description</h4>
+<p>
+    {{ org.description|titlecase(sentence=true) }}
+</p>
+{% endif %}
+{% if org.alternateName %}
+<h4>Also known as</h4>
+<ul>
+    {% for n in org.alternateName[0:10] %}
+    <li>{{ n|titlecase }}</li>
+    {% endfor %}
+    {% if org.alternateName|length > 10 %}
+    <li>...and {{ "{:,.0f}".format(org.alternateName|length - 10) }} other names</li>
+    {% endif %}
+</ul>
+{% endif %}
+{% for v in org.orgIDs %}
+    {% if v.startswith("GB-COH-") %}
+    <h4>Company number</h4>
+    <p>
+        <a class="link dark-blue underline-hover f4" href="https://beta.companieshouse.gov.uk/company/{{ v.replace('GB-COH-', '') }}" target="_blank">{{ v.replace('GB-COH-', '') }}</a>
+    </p>
+    {% endif %}
+    {% if v.startswith("GB-CHC-") %}
+    <h4><abbr title="Charity Commission for England and Wales">CCEW</abbr> Charity number</h4>
+    <p>
+        <a class="link dark-blue underline-hover f4" href="https://ccew.dkane.net/charity/{{ v.replace('GB-CHC-', '') }}" target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
+    </p>
+    {% endif %}
+    {% if v.startswith("GB-NIC-") %}
+    <h4><abbr title="Charity Commission for Northern Ireland">CCNI</abbr> Charity number</h4>
+    <p>
+        <a class="link dark-blue underline-hover f4" href="http://www.charitycommissionni.org.uk/charity-details/?regid={{ v.replace('GB-NIC-', '').replace('NIC', '')}}&subid=0" target="_blank">{{ v.replace('GB-NIC-', '') }}</a>
+    </p>
+    {% endif %}
+    {% if v.startswith("GB-SC-") %}
+    <h4><abbr title="Scottish Charity Regulator">OSCR</abbr> Charity number</h4>
+    <p>
+        <a class="link dark-blue underline-hover f4" href="https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={{ v.replace('GB-SC-', '') }}" target="_blank">{{ v.replace('GB-SC-', '') }}</a>
+    </p>
+    {% endif %}
+{% endfor %}
+{% if org.dateRegistered %}
+<h4>Registered</h4>
+<p>
+    {{ "{:%d %B %Y}".format(org.dateRegistered) }}
+</p>
+{% endif %}
+{% if org.dateRemoved %}
+<h4>Removed</h4>
+<p>
+    {{ "{:%d %B %Y}".format(org.dateRemoved) }}
+</p>
+{% endif %}
+{% if org.postalCode %}
+<h4>Postcode</h4>
+<p>
+    <span>{{ org.postalCode }}</span>
+</p>
+{% endif %}
+{% if org.url %}
+<h4>Website</h4>
+<p>
+    <a href="{{ org.cleanUrl }}" class="link underline-hover blue">{{ org.displayUrl }}</a>
+</p>
+{% endif %}
+{% if org.domain %}
+<h4>Domain</h4>
+<p>
+    <code>{{ org.domain }}</code>
+</p>
+{% endif %}
+{% if org.latestIncome %}
+<h4>Latest income</h4>
+<p>
+    &pound;{{ "{:,.0f}".format( org.latestIncome )}}
+    {% if org.latestIncomeDate %}
+    <span class="grey">(on {{ "{:%d %B %Y}".format(org.latestIncomeDate) }})</span>
+    {% endif %}
+</p>
+{% endif %}
+{% endcall %}

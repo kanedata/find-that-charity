@@ -38,7 +38,7 @@ def about(request):
 
 
 @xframe_options_exempt
-def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False):
+def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=False):
     org = get_organisation(org_id)
     if filetype == "json":
         return JsonResponse(RelatedOrganisation([org]).to_json(as_charity))

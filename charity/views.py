@@ -2,7 +2,7 @@ import re
 
 from django.http import Http404
 
-from ftc.views import get_orgid
+from ftc.views import get_org_by_id
 
 
 def get_charity(request, regno, filetype="html", preview=False):
@@ -18,7 +18,7 @@ def get_charity(request, regno, filetype="html", preview=False):
         ]
     for org_id in org_ids:
         try:
-            return get_orgid(request, org_id, filetype, preview, as_charity=True)
+            return get_org_by_id(request, org_id, filetype, preview, as_charity=True)
         except Http404:
             continue
     raise Http404("Charity not found")
