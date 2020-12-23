@@ -11,6 +11,7 @@ from ftc.documents import FullOrganisation
 from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
                         Source)
 from ftc.query import OrganisationSearch, random_query, get_organisation, get_linked_organisations
+from other_data.models import CQCProvider
 
 
 # site homepage
@@ -49,6 +50,8 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
         related_orgs = [org]
     related_orgs = RelatedOrganisation(related_orgs)
 
+    cqc = CQCProvider.objects.filter(org_id=related_orgs.org_id).all()
+
     template = "org.html.j2"
     if preview:
         template = "org_preview.html.j2"
@@ -62,6 +65,7 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
             "org": org,
             "related_orgs": related_orgs,
             "charity": charity,
+            "cqc": cqc,
         },
     )
 

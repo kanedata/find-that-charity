@@ -115,15 +115,15 @@ class Command(HTMLScraper):
 
                 if this_model['CQCProvider']['charity_number']:
                     if this_model['CQCProvider']['charity_number'].upper().startswith("SC"):
-                        this_model['CQCProvider']['org_id'] = "GC-SC-{}".format(
+                        this_model['CQCProvider']['org_id'] = "GB-SC-{}".format(
                             this_model['CQCProvider']['charity_number'].upper()
                         )
                     else:
-                        this_model['CQCProvider']['org_id'] = "GC-CHC-{}".format(
+                        this_model['CQCProvider']['org_id'] = "GB-CHC-{}".format(
                             this_model['CQCProvider']['charity_number']
                         )
                 elif this_model['CQCProvider']['company_number']:
-                    this_model['CQCProvider']['org_id'] = "GC-COH-{}".format(
+                    this_model['CQCProvider']['org_id'] = "GB-COH-{}".format(
                         this_model['CQCProvider']['company_number']
                     )
 
