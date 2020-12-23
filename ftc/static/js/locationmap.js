@@ -7,6 +7,7 @@ var bounds = L.latLngBounds(
 );
 if (GEOCODES || (ORG_LAT && ORG_LONG)) {
     var map = L.map('locationmap').setView([51.505, -0.09], 13);
+    map.scrollWheelZoom.disable();
     L.tileLayer(TILES, { style: 'toner' }).addTo(map);
     map.fitBounds(bounds);
 

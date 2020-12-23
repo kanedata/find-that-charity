@@ -496,6 +496,10 @@ class Source(models.Model):
     def slug(self):
         return self.id
 
+    @property
+    def modified(self):
+        return datetime.datetime.fromisoformat(self.data.get("modified"))
+
     def __str__(self):
         return self.publisher + " (" + self.title + ")"
 

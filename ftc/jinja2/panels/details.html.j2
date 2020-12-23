@@ -1,4 +1,5 @@
-{% call org_panel("Organisation details", class="measure-wide") %}
+{% call org_panel("Organisation details", org) %}
+<div class="measure-wide">
 {% if org.description %}
 <h4>Description</h4>
 <p>
@@ -81,4 +82,5 @@
     {% endif %}
 </p>
 {% endif %}
+</div>
 {% endcall %}

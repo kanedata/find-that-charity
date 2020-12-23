@@ -3,6 +3,15 @@
     vertical-align: middle;
 }
 
+.table-wrapper {
+    overflow-y: auto;
+}
+
+.entry-content table.financial-table {
+    width: inherit;
+    font-variant-numeric: tabular-nums;
+}
+
 .entry-content table th.tl,
 .entry-content table td.tl {
     text-align: left;
@@ -16,6 +25,19 @@
 .flex-grow {
     flex-grow: 1;
 }
+
+/* Sticky positioning */
+.sticky { position: sticky; }
+@media screen and (min-width:30em) {
+  .sticky-ns { position: sticky; }
+}
+@media screen and (min-width:30em) and (max-width:60em) {
+  .sticky-m { position: sticky; }
+}
+@media screen and (min-width:60em) {
+  .sticky-l { position: sticky; }
+}
+
 
 /* choices dropdown */
 .choices {

@@ -42,9 +42,9 @@
            {{ orgtypes[orgTypePrimary].title }}</a>
     </h4>
     <div class="cf mb2">
-        {{ orgid_link(result.org_id, request, large=True) }}
+        {{ orgid_link(result.org_id, large=True) }}
         {% for o in result.orgIDs if o != result.org_id %}
-        {{ orgid_link(o, request) }}
+        {{ orgid_link(o) }}
         {% endfor %}
     </div>
     <div class="cf">

@@ -53,8 +53,8 @@
   const ORG_LONG = {{ org.geo_long|tojson }};
 </script>
 <script src="{{ static('js/locationmap.js') }}"></script>
-<script src="{{ static('js/tabs.js') }}"></script>
 {% endif %}
+<script src="{{ static('js/tabs.js') }}"></script>
 <script>
   // copy text
   document.querySelectorAll(".copy-text").forEach((el) => {
@@ -99,8 +99,8 @@
   {% block organisation_details %}
 
   <nav class="tabs mb4 cf dn" id="org-panel-tabs">
-    <ul class="list ma0 pa0 flex bb bw2 b--gray pb1">
-    </ul>
+    <h4 class="f3 b mt2 mb0">Contents</h4>
+    <ol class="f5"></ol>
   </nav>
 
   {% include 'panels/details.html.j2' %}

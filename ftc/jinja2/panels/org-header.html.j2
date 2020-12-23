@@ -18,7 +18,7 @@
     The identifier for this organisation record is:
   </h4>
   <div class="mv3 w-100">
-    <div class="mb1">{{ orgid_link(org.org_id, request, true) }}</div>
+    <div class="mb1">{{ orgid_link(org.org_id, true) }}</div>
     <p class="pa0 mt0 mb1">
       <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ org.org_id }}">Copy this identifier to your clipboard</a>
     </p>
@@ -49,7 +49,7 @@
   <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">The organisation can also be identified by:</h4>
   <div class="mv3 w-100 w-50-l">
     {% for v in org.orgIDs if v != org.org_id %}
-    {{ orgid_link(v, request) }}
+    {{ orgid_link(v) }}
     {% endfor %}
   </div>
   {% endif %}

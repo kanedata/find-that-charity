@@ -1,64 +1,79 @@
-Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontSize = 14;
+Chart.defaults.global.defaultFontFamily = '"Raleway", sans-serif';
 
-var financeChart = new Chart('financeChart', {
-    type: 'line',
-    data: {
-        labels: FINANCES.map(f => f['fyend']),
-        datasets: [
-            {
-                label: 'Income',
-                data: FINANCES.map(f => f['income']),
-                fill: false,
-                lineTension: 0,
-                borderColor: '#00449e',
-                pointRadius: 1,
-                hitRadius: 5,
-            },
-            {
-                label: 'Spending',
-                data: FINANCES.map(f => f['spending']),
-                fill: false,
-                lineTension: 0,
-                borderColor: '#19a974',
-                pointRadius: 1,
-                hitRadius: 5,
-            }
-        ]
-    },
-    options: {
-        legend: {
-            align: 'end',
+if(FINANCES.filter(f => f['fyend']).length > 1){
+    var datasets = [
+        {
+            label: 'Income',
+            data: FINANCES.map(f => f['income']),
+            fill: false,
+            lineTension: 0,
+            borderColor: '#00449e',
+            pointRadius: 1,
+            hitRadius: 5,
         },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                    callback: function(value, index, values) {
-                        if(value > 1000000){
-                            return "£" + (value / 1000000) + "m";
-                        } else if(value > 1000){
-                            return "£" + (value / 1000) + "k";
-                        }
-                        return '£' + value;
-                    }
-                },
-                gridLines: {
-                    display: false,
-                }
-            }],
-            xAxes: [{
-                type: 'time',
-                time: {
-                    unit: 'month'
-                },
-                distribution: 'series',
-                gridLines: {
-                    display: false,
-                }
-            }]
+        {
+            label: 'Spending',
+            data: FINANCES.map(f => f['spending']),
+            fill: false,
+            lineTension: 0,
+            borderColor: '#19a974',
+            pointRadius: 1,
+            hitRadius: 5,
         }
+    ];
+    if(FINANCES.filter(f => f['funds_total'])){
+        datasets.push({
+            label: 'Funds',
+            data: FINANCES.map(f => f['funds_total']),
+            fill: false,
+            lineTension: 0,
+            borderColor: '#ff6300',
+            pointRadius: 1,
+            hitRadius: 5,
+        })
     }
-});
+    var financeChart = new Chart('financeChart', {
+        type: 'line',
+        data: {
+            labels: FINANCES.map(f => f['fyend']),
+            datasets: datasets
+        },
+        options: {
+            legend: {
+                align: 'end',
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value, index, values) {
+                            if(value > 1000000){
+                                return "£" + (value / 1000000) + "m";
+                            } else if(value > 1000){
+                                return "£" + (value / 1000) + "k";
+                            }
+                            return '£' + value;
+                        }
+                    },
+                    gridLines: {
+                        display: false,
+                    }
+                }],
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'month'
+                    },
+                    distribution: 'series',
+                    gridLines: {
+                        display: false,
+                    }
+                }]
+            }
+        }
+    });
+}
 
 function sparkline(field, el, finances) {
     return new Chart(el, {

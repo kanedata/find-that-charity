@@ -1,0 +1,21 @@
+{% set classification_titles = {
+  "ccew_activities": "Activities (CCEW)",
+  "ccew_beneficiaries": "Beneficiaries (CCEW)",
+  "ccew_theme": "Theme (CCEW)",
+  "oscr_activities": "Activities (OSCR)",
+  "oscr_beneficiaries": "Beneficiaries (OSCR)",
+  "oscr_purposes": "Purposes (OSCR)",
+} %}
+
+{% call org_panel("Charity Activities", org) %}
+    
+    {% for c, items in charity.classification.all()|groupby("vocabulary.title") %}
+    <h4>{{ classification_titles.get(c, c) }}</h4>
+    <ul>
+        {% for i in items %}
+        <li>{{ i.title }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
+{% endcall %}

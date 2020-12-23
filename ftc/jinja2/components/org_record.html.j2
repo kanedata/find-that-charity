@@ -10,7 +10,7 @@
             {% if small %}
               <ul class="list ma0 pa0 cf">
               {% for orgid in record.orgIDs %}
-                <li class="fl mr1 mb1">{{orgid_link(orgid, request)}}</li>
+                <li class="fl mr1 mb1">{{orgid_link(orgid)}}</li>
               {% endfor %}
               </ul>
             {% endif %}
@@ -72,7 +72,7 @@
             </strong><br>
             <ul class="list ma0 pa0">
             {% for orgid in record.orgIDs %}
-              <li class="">{{orgid_link(orgid, request)}}</li>
+              <li class="">{{orgid_link(orgid)}}</li>
             {% endfor %}
             </ul>
           </p>

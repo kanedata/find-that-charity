@@ -13,7 +13,7 @@
         {{ "data source"|pluralise(related_orgs.activeRecords|length) }}.
     </p>
     <p>
-        The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, request, large=true) }}.<br>
+        The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, large=true) }}.<br>
         <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ related_orgs.org_id }}">Copy this identifier to your clipboard</a>
     </p>
 </div>

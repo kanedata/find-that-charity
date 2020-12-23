@@ -6,11 +6,11 @@ f6 pv0 ph1 br1
 {% endif %}
 {% endmacro %}
 
-{% macro orgid_link(id, request, large=false) %}
+{% macro orgid_link(id, large=false) %}
 <a href="{{ url('orgid_html', kwargs={'org_id': id}) }}"
    class="link dib bg-dark-blue white code underline-hover normal {{orgid_classname(large)}}">{{id}}</a>{% endmacro %}
 
-{% macro orgid_connection(id_a, id_b, request, large=false) %}
+{% macro orgid_connection(id_a, id_b, large=false) %}
 <span class="dib bg-dark-blue white code {{orgid_classname(large)}}">
     <a href="{{ url('orgid_html', kwargs={'org_id': id_a}) }}" class="link di white underline-hover">{{- id_a -}}</a>
     <span class="bg-lightest-blue dark-blue ph2 dib">to</span> 

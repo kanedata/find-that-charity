@@ -1,10 +1,10 @@
 {% if related_orgs.records|length > 1 %}
-  {% call org_panel("Linked records") %}
+  {% call org_panel("Linked records", org) %}
     <p class="measure">
       This organisation record is part of a group of linked records that describe a single organisation.
     </p>
     <p class="measure">
-      The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, request, large=true) }}.
+      The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, large=true) }}.
     </p>
     <div class="w-100 flex flex-wrap">
       <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
