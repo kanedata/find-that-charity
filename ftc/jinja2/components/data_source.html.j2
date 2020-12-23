@@ -3,7 +3,7 @@
 
 {% macro data_source(source, org, request) %}
   <div class="mt4 measure-wide bb b--light-gray pb3 bw3">
-    <h4 class="ma0 pa0" id='data-source-{{source.data.identifier}}'><a class="link near-black underline-hover" href="{{ source.data.publisher.website }}">{{ source.data.publisher.name }}</a></h4>
+    <h4 class="ma0 pa0 f4" id='data-source-{{source.data.identifier}}'><a class="link near-black underline-hover" href="{{ source.data.publisher.website }}">{{ source.data.publisher.name }}</a></h4>
     {% if source.data.title != source.data.publisher.name %}
     <h5 class="ma0 pa0 f5 b">{{ source.data.title }}</h5>
     {% endif %}
