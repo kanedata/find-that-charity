@@ -37,7 +37,7 @@ isort==5.6.4              # via -r dev-requirements.in
 jdcal==1.4.1              # via -r requirements.txt, openpyxl
 jinja2==2.11.2            # via -r requirements.txt
 lml==0.0.9                # via -r requirements.txt, pyexcel-io
-lxml==4.6.1               # via -r requirements.txt, pyexcel-ezodf, pyexcel-ods3, pyquery
+lxml==4.6.2               # via -r requirements.txt, pyexcel-ezodf, pyexcel-ods3, pyquery
 markupsafe==1.1.1         # via -r requirements.txt, jinja2
 mccabe==0.6.1             # via flake8
 mypy-extensions==0.4.3    # via black

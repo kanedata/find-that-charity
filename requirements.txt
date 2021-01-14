@@ -33,7 +33,7 @@ inflect==4.1.0            # via -r requirements.in
 jdcal==1.4.1              # via openpyxl
 jinja2==2.11.2            # via -r requirements.in
 lml==0.0.9                # via pyexcel-io
-lxml==4.6.1               # via -r requirements.in, pyexcel-ezodf, pyexcel-ods3, pyquery
+lxml==4.6.2               # via -r requirements.in, pyexcel-ezodf, pyexcel-ods3, pyquery
 markupsafe==1.1.1         # via jinja2
 openpyxl==3.0.3           # via -r requirements.in
 parse==1.15.0             # via requests-html
