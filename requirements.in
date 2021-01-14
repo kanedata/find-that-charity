@@ -24,4 +24,4 @@ titlecase
 psycopg2
 bcp-reader
 PyYAML
-lxml==4.6.1
+lxml==4.6.2
