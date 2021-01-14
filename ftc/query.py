@@ -1,8 +1,8 @@
 import copy
 
-from django.shortcuts import Http404
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Func
+from django.shortcuts import Http404
 from elasticsearch_dsl import A
 
 from ftc.documents import DSEPaginator, FullOrganisation

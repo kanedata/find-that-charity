@@ -1,7 +1,7 @@
 import io
 
-from openpyxl import load_workbook
 import tqdm
+from openpyxl import load_workbook
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from other_data.models import CQCBrand, CQCLocation, CQCProvider
@@ -26,7 +26,7 @@ class Command(HTMLScraper):
         "Provider Latitude",
         "Provider Longitude",
     ]
-    bool_fields = ['Care home?', 'Inherited Rating (Y/N)']
+    bool_fields = ["Care home?", "Inherited Rating (Y/N)"]
     date_format = {
         "DueDate": "%d/%m/%Y %H:%M:%S",
         "DateSubmitted": "%d/%m/%Y %H:%M:%S",
@@ -62,8 +62,8 @@ class Command(HTMLScraper):
             self.cqc_records[m.__name__] = {}
             for k in m._meta.fields:
                 self.field_lookup[k.verbose_name] = {
-                    'model': m.__name__,
-                    'field': k.name,
+                    "model": m.__name__,
+                    "field": k.name,
                 }
 
     def parse_file(self, response, source_url):
@@ -98,44 +98,48 @@ class Command(HTMLScraper):
                     headers = row
                     continue
                 row = self.clean_fields(dict(zip(headers, row)))
-                this_model = {
-                    m.__name__: {} for m in self.models
-                }
+                this_model = {m.__name__: {} for m in self.models}
 
                 for k in row:
                     if k in self.field_lookup:
                         meta = self.field_lookup[k]
-                        this_model[meta['model']][meta['field']] = row[k]
+                        this_model[meta["model"]][meta["field"]] = row[k]
 
                 # add IDs
-                this_model['CQCLocation']['provider_id'] = this_model['CQCProvider']['id']
-                if this_model['CQCBrand']['id'] == '-':
-                    this_model['CQCBrand']['id'] = None
-                this_model['CQCProvider']['brand_id'] = this_model['CQCBrand']['id']
+                this_model["CQCLocation"]["provider_id"] = this_model["CQCProvider"][
+                    "id"
+                ]
+                if this_model["CQCBrand"]["id"] == "-":
+                    this_model["CQCBrand"]["id"] = None
+                this_model["CQCProvider"]["brand_id"] = this_model["CQCBrand"]["id"]
 
-                if this_model['CQCProvider']['charity_number']:
-                    if this_model['CQCProvider']['charity_number'].upper().startswith("SC"):
-                        this_model['CQCProvider']['org_id'] = "GB-SC-{}".format(
-                            this_model['CQCProvider']['charity_number'].upper()
+                if this_model["CQCProvider"]["charity_number"]:
+                    if (
+                        this_model["CQCProvider"]["charity_number"]
+                        .upper()
+                        .startswith("SC")
+                    ):
+                        this_model["CQCProvider"]["org_id"] = "GB-SC-{}".format(
+                            this_model["CQCProvider"]["charity_number"].upper()
                         )
                     else:
-                        this_model['CQCProvider']['org_id'] = "GB-CHC-{}".format(
-                            this_model['CQCProvider']['charity_number']
+                        this_model["CQCProvider"]["org_id"] = "GB-CHC-{}".format(
+                            this_model["CQCProvider"]["charity_number"]
                         )
-                elif this_model['CQCProvider']['company_number']:
-                    this_model['CQCProvider']['org_id'] = "GB-COH-{}".format(
-                        this_model['CQCProvider']['company_number']
+                elif this_model["CQCProvider"]["company_number"]:
+                    this_model["CQCProvider"]["org_id"] = "GB-COH-{}".format(
+                        this_model["CQCProvider"]["company_number"]
                     )
 
                 # add scrape id
-                this_model['CQCLocation']['scrape_id'] = self.scrape.id
-                this_model['CQCProvider']['scrape_id'] = self.scrape.id
-                this_model['CQCBrand']['scrape_id'] = self.scrape.id
+                this_model["CQCLocation"]["scrape_id"] = self.scrape.id
+                this_model["CQCProvider"]["scrape_id"] = self.scrape.id
+                this_model["CQCBrand"]["scrape_id"] = self.scrape.id
 
                 for m in self.models:
-                    if this_model[m.__name__]['id']:
+                    if this_model[m.__name__]["id"]:
                         self.cqc_records[m.__name__][
-                            this_model[m.__name__]['id']
+                            this_model[m.__name__]["id"]
                         ] = this_model[m.__name__]
 
     def bulk_create(self, m):

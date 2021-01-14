@@ -496,6 +496,7 @@ class HTMLScraper(BaseScraper):
             self.logger.info("Using requests_cache")
             requests_cache.install_cache("http_cache")
         from requests_html import HTMLSession
+
         self.session = HTMLSession()
 
     def fetch_file(self):

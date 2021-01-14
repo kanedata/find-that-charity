@@ -1,5 +1,5 @@
-import io
 import csv
+import io
 
 import tqdm
 
@@ -30,7 +30,7 @@ class Command(HTMLScraper):
         "FemaleTopQuartile",
     ]
     date_fields = ["DueDate", "DateSubmitted"]
-    bool_fields = ['SubmittedAfterTheDeadline']
+    bool_fields = ["SubmittedAfterTheDeadline"]
     date_format = {
         "DueDate": "%d/%m/%Y %H:%M:%S",
         "DateSubmitted": "%d/%m/%Y %H:%M:%S",
@@ -95,12 +95,12 @@ class Command(HTMLScraper):
                     if row[k] == c.value:
                         row[k] = c
 
-        if row.get('CompanyNumber'):
-            row['org_id'] = 'GB-COH-{}'.format(row['CompanyNumber'])
+        if row.get("CompanyNumber"):
+            row["org_id"] = "GB-COH-{}".format(row["CompanyNumber"])
         else:
-            row['org_id'] = None
+            row["org_id"] = None
 
-        row['Year'] = year
+        row["Year"] = year
         row["scrape"] = self.scrape
         self.raw_records.append(row)
 

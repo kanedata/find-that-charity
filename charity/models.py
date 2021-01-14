@@ -168,7 +168,10 @@ class CharityFinancial(models.Model):
 class CharityRaw(models.Model):
     org_id = models.CharField(max_length=200, db_index=True)
     spider = models.CharField(max_length=200, db_index=True)
-    scrape = models.ForeignKey("ftc.Scrape", on_delete=models.CASCADE,)
+    scrape = models.ForeignKey(
+        "ftc.Scrape",
+        on_delete=models.CASCADE,
+    )
     data = models.JSONField(encoder=DjangoJSONEncoder)
 
     class Meta:

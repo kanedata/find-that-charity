@@ -7,14 +7,22 @@ import zipfile
 import bcp
 import psycopg2
 import tqdm
-from django.db import connection
 from django.core.management.base import CommandError
+from django.db import connection
 
 from charity.feeds import CCEW_DATA_URL
 from charity.management.commands._ccew_sql import UPDATE_CCEW
-from charity.models import (CCEWCharity, CCEWCharityAOO, CCEWClass,
-                            CCEWFinancial, CCEWMainCharity, CCEWName,
-                            CCEWObjects, CCEWPartB, CCEWRegistration)
+from charity.models import (
+    CCEWCharity,
+    CCEWCharityAOO,
+    CCEWClass,
+    CCEWFinancial,
+    CCEWMainCharity,
+    CCEWName,
+    CCEWObjects,
+    CCEWPartB,
+    CCEWRegistration,
+)
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation, OrganisationLink, Scrape
 
@@ -31,9 +39,7 @@ class Command(HTMLScraper):
     id_field = "regno"
     date_fields = []
     date_format = "%Y-%m-%d %H:%M:%S"
-    zip_regex = re.compile(
-        r".*/RegPlusExtract.*?\.zip.*?"
-    )
+    zip_regex = re.compile(r".*/RegPlusExtract.*?\.zip.*?")
     source = {
         "title": "Registered charities in England and Wales",
         "description": "Data download service provided by the Charity Commission",
@@ -277,18 +283,25 @@ class Command(HTMLScraper):
         with connection.cursor() as cursor:
             for sql_name, sql in UPDATE_CCEW.items():
                 self.logger.info("Starting SQL: {}".format(sql_name))
-                cursor.execute(sql.format(scrape_id=self.scrape.id, source=self.name,))
+                cursor.execute(
+                    sql.format(
+                        scrape_id=self.scrape.id,
+                        source=self.name,
+                    )
+                )
                 self.logger.info("Finished SQL: {}".format(sql_name))
 
         self.object_count = Organisation.objects.filter(
-            spider__exact=self.name, scrape_id=self.scrape.id,
+            spider__exact=self.name,
+            scrape_id=self.scrape.id,
         ).count()
         self.scrape.items = self.object_count
         results = {"records": self.object_count}
         self.logger.info("Saved {:,.0f} organisation records".format(self.object_count))
 
         link_records_count = OrganisationLink.objects.filter(
-            spider__exact=self.name, scrape_id=self.scrape.id,
+            spider__exact=self.name,
+            scrape_id=self.scrape.id,
         ).count()
         if link_records_count:
             results["link_records"] = link_records_count

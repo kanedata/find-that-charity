@@ -93,7 +93,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"unique_together": {("aootype", "aookey")},},
+            options={
+                "unique_together": {("aootype", "aookey")},
+            },
         ),
         migrations.CreateModel(
             name="Vocabulary",
@@ -143,7 +145,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"unique_together": {("vocabulary", "code")},},
+            options={
+                "unique_together": {("vocabulary", "code")},
+            },
         ),
         migrations.CreateModel(
             name="CharityRaw",
@@ -260,7 +264,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"unique_together": {("charity", "name")},},
+            options={
+                "unique_together": {("charity", "name")},
+            },
         ),
         migrations.CreateModel(
             name="CharityFinancial",
@@ -338,6 +344,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"unique_together": {("charity", "fyend")},},
+            options={
+                "unique_together": {("charity", "fyend")},
+            },
         ),
     ]

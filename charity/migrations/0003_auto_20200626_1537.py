@@ -25,7 +25,8 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AlterModelOptions(
-            name="charity", options={"verbose_name_plural": "Charities"},
+            name="charity",
+            options={"verbose_name_plural": "Charities"},
         ),
         migrations.AlterModelOptions(
             name="charityraw",

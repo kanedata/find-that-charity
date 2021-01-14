@@ -8,9 +8,13 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 
 from charity.models import Charity
 from ftc.documents import FullOrganisation
-from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
-                        Source)
-from ftc.query import OrganisationSearch, random_query, get_organisation, get_linked_organisations
+from ftc.models import Organisation, OrganisationType, RelatedOrganisation, Source
+from ftc.query import (
+    OrganisationSearch,
+    get_linked_organisations,
+    get_organisation,
+    random_query,
+)
 from other_data.models import CQCProvider
 
 
@@ -42,7 +46,9 @@ def about(request):
 def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=False):
     org = get_organisation(org_id)
     if filetype == "json":
-        return JsonResponse(RelatedOrganisation([org]).to_json(as_charity, request=request))
+        return JsonResponse(
+            RelatedOrganisation([org]).to_json(as_charity, request=request)
+        )
 
     charity = Charity.objects.filter(id=org_id).first()
     related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
@@ -93,6 +99,7 @@ class Echo:
     """An object that implements just the write method of the file-like
     interface.
     """
+
     def write(self, value):
         """Write the value by returning it, instead of storing in a buffer."""
         return value
@@ -107,11 +114,19 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
     if orgtype:
         base_query = get_object_or_404(OrganisationType, slug=orgtype)
         s.set_criteria(base_orgtype=orgtype)
-        download_url = reverse("orgid_type_download", kwargs={"orgtype": orgtype}) + "?" + request.GET.urlencode()
+        download_url = (
+            reverse("orgid_type_download", kwargs={"orgtype": orgtype})
+            + "?"
+            + request.GET.urlencode()
+        )
     elif source:
         base_query = get_object_or_404(Source, id=source)
         s.set_criteria(source=source)
-        download_url = reverse("orgid_source_download", kwargs={"source": source}) + "?" + request.GET.urlencode()
+        download_url = (
+            reverse("orgid_source_download", kwargs={"source": source})
+            + "?"
+            + request.GET.urlencode()
+        )
 
     # add additional criteria from the get params
     s.set_criteria_from_request(request)
@@ -147,7 +162,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
 
         response = StreamingHttpResponse(stream(), content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="{}.csv"'.format(
-            base_query.slug if base_query else 'findthatcharity-search-results'
+            base_query.slug if base_query else "findthatcharity-search-results"
         )
         return response
 

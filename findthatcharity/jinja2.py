@@ -9,8 +9,14 @@ from django.urls import reverse
 from django.utils.text import slugify
 from humanize import naturaldelta
 
-from findthatcharity.utils import (list_to_string, pluralise, regex_search,
-                                   to_titlecase, url_remove, url_replace)
+from findthatcharity.utils import (
+    list_to_string,
+    pluralise,
+    regex_search,
+    to_titlecase,
+    url_remove,
+    url_replace,
+)
 from ftc.models import Organisation, OrganisationType, OrgidScheme, Source
 from jinja2 import Environment
 

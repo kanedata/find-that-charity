@@ -11,10 +11,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="ccewcharity", name="aob", field=models.TextField(),
+            model_name="ccewcharity",
+            name="aob",
+            field=models.TextField(),
         ),
         migrations.AlterField(
-            model_name="ccewcharity", name="gd", field=models.TextField(),
+            model_name="ccewcharity",
+            name="gd",
+            field=models.TextField(),
         ),
         migrations.AlterField(
             model_name="ccewobjects",
