@@ -27,7 +27,7 @@ jobs:
         pip install -r dev-requirements.txt
     - name: isort
       run: |
-        isort .
+        isort . --check
     - name: black
       run: |
-        black .
+        black . --check

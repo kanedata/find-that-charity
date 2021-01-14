@@ -79,7 +79,7 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
 @xframe_options_exempt
 def get_orgid_canon(request, org_id):
     related_orgs = get_linked_organisations(org_id)
-    return JsonResponse(related_orgs.to_json())
+    return JsonResponse(related_orgs.to_json(request=request))
 
 
 def get_random_org(request):
@@ -109,7 +109,6 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
     base_query = None
     download_url = request.build_absolute_uri() + "&filetype=csv"
     s = OrganisationSearch()
-    term = None
 
     if orgtype:
         base_query = get_object_or_404(OrganisationType, slug=orgtype)

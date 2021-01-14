@@ -1,67 +1,74 @@
 <header class="fl w-100 ph3 ph5-ns pt4 entry-content lh-copy f4 {% if not org.active %}dark-gray bg-washed-yellow{% endif %}">
-  <span class="f5 gray">Organisation record</span>
-  <h2 class="f1-ns mt0 mb0 f2 lh-title normal w-100 w-50-l">
-      {{ org.name|titlecase }}
-  </h2>
-  <h3 class="f3-ns mb4 mt4 f4 lh-subtitle normal">
-    {% if not org.active %}
-    An <span class="normal red">inactive</span>
-    {% elif org.organisationTypePrimary.title[0]|lower is in (("a", "e", "i", "o", "u")) %}
-    An
-    {% else %}
-    A
+  <div class="w-100 w-80-ns fl">
+    <span class="f5 gray">Organisation record</span>
+    <h2 class="f1-ns mt0 mb0 f2 lh-title normal w-100 w-50-l">
+        {{ org.name|titlecase }}
+    </h2>
+    <h3 class="f3-ns mb4 mt4 f4 lh-subtitle normal">
+      {% if not org.active %}
+      An <span class="normal red">inactive</span>
+      {% elif org.organisationTypePrimary.title[0]|lower is in (("a", "e", "i", "o", "u")) %}
+      An
+      {% else %}
+      A
+      {% endif %}
+      {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in the UK
+      {%- if org.dateRemoved %}. Removed on {{ "{:%d %B %Y}".format(org.dateRemoved) }}.{% endif %}
+    </h3>
+    <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">
+      The identifier for this organisation record is:
+    </h4>
+    <div class="mv3 w-100">
+      <div class="mb1">{{ orgid_link(org.org_id, true) }}</div>
+      <p class="pa0 mt0 mb1">
+        <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ org.org_id }}">Copy this identifier to your clipboard</a>
+      </p>
+      <details class="mb3">
+        <summary class="blue link underline-hover f7 pointer">What is an organisation identifier?</summary>
+        <div class="f6 measure pl3 bl bw2 b--gray mt1 pv1">
+          <p class="pa0 mt0 mb1">
+            An organisation identifier is a unique piece of text that definitively identifies an organisation.
+          </p>
+          <p class="pa0 mt0 mb2">
+            Examples include charity numbers and company numbers.
+          </p>
+          <p class="pa0 mt0 mb2">
+            Identifiers are usually assigned by an external body like a regulator.
+          </p>
+          <p class="pa0 mt0 mb2">
+            Findthatcharity uses the <a href="http://org-id.guide/about" class="link blue underline" target="_blank">Org ID</a> scheme to create identifiers.
+          </p>
+          <p class="pa0 mt0 mb2">
+            <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.scheme }}</span> gives the scheme for this identifier 
+            {% if org.org_id.scheme in orgidschemes and orgidschemes[org.org_id.scheme].data %}(<a href="http://org-id.guide/list/{{ org.org_id.scheme }}" class="link blue underline" target="_blank">{{ orgidschemes[org.org_id.scheme].data.name.en }}</a>){% endif %}, while <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.id }}</span>
+            is the identifier for this organisation within the scheme.
+          </p>
+        </div>
+      </details>
+    </div>
+    {% if org.orgIDs and org.orgIDs|length > 1 %}
+    <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">The organisation can also be identified by:</h4>
+    <div class="mv3 w-100 w-50-l">
+      {% for v in org.orgIDs if v != org.org_id %}
+      {{ orgid_link(v) }}
+      {% endfor %}
+    </div>
     {% endif %}
-    {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in the UK
-    {%- if org.dateRemoved %}. Removed on {{ "{:%d %B %Y}".format(org.dateRemoved) }}.{% endif %}
-  </h3>
-  <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">
-    The identifier for this organisation record is:
-  </h4>
-  <div class="mv3 w-100">
-    <div class="mb1">{{ orgid_link(org.org_id, true) }}</div>
-    <p class="pa0 mt0 mb1">
-      <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ org.org_id }}">Copy this identifier to your clipboard</a>
-    </p>
-    <details class="mb3">
-      <summary class="blue link underline-hover f7 pointer">What is an organisation identifier?</summary>
-      <div class="f6 measure pl3 bl bw2 b--gray mt1 pv1">
-        <p class="pa0 mt0 mb1">
-          An organisation identifier is a unique piece of text that definitively identifies an organisation.
-        </p>
-        <p class="pa0 mt0 mb2">
-          Examples include charity numbers and company numbers.
-        </p>
-        <p class="pa0 mt0 mb2">
-          Identifiers are usually assigned by an external body like a regulator.
-        </p>
-        <p class="pa0 mt0 mb2">
-          Findthatcharity uses the <a href="http://org-id.guide/about" class="link blue underline" target="_blank">Org ID</a> scheme to create identifiers.
-        </p>
-        <p class="pa0 mt0 mb2">
-          <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.scheme }}</span> gives the scheme for this identifier 
-          {% if org.org_id.scheme in orgidschemes and orgidschemes[org.org_id.scheme].data %}(<a href="http://org-id.guide/list/{{ org.org_id.scheme }}" class="link blue underline" target="_blank">{{ orgidschemes[org.org_id.scheme].data.name.en }}</a>){% endif %}, while <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.id }}</span>
-          is the identifier for this organisation within the scheme.
-        </p>
-      </div>
-    </details>
-  </div>
-  {% if org.orgIDs and org.orgIDs|length > 1 %}
-  <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">The organisation can also be identified by:</h4>
-  <div class="mv3 w-100 w-50-l">
-    {% for v in org.orgIDs if v != org.org_id %}
-    {{ orgid_link(v) }}
-    {% endfor %}
-  </div>
-  {% endif %}
 
-  <div class="mv3 w-100 w-50-l">
-    {% if org.active %}
-    <span class="pv1 ph2 br2 bg-green white dib mr2 mb2">Active</span>
-    {% else %}
-    <span class="pv1 ph2 br2 bg-dark-red white dib mr2 mb2">Inactive</span>
-    {% endif %}
-    {% for ot in org.organisationType if ot != org.organisationTypePrimary.slug %}
-    {{ orgtype_link(orgtypes[ot], large=true) }}
-    {% endfor %}
+    <div class="mv3 w-100 w-50-l">
+      {% if org.active %}
+      <span class="pv1 ph2 br2 bg-green white dib mr2 mb2">Active</span>
+      {% else %}
+      <span class="pv1 ph2 br2 bg-dark-red white dib mr2 mb2">Inactive</span>
+      {% endif %}
+      {% for ot in org.organisationType if ot != org.organisationTypePrimary.slug %}
+      {{ orgtype_link(orgtypes[ot], large=true) }}
+      {% endfor %}
+    </div>
+  </div>
+  
+  <div class="w-100 w-20-l fl">
+    <a href="{{ url('orgid_json', kwargs={'org_id': org.org_id}) }}"
+       class="link dib bg-dark-green white code underline-hover normal f6 pv0 ph1 br1 fr">Access this data in JSON format</a>
   </div>
 </header>
