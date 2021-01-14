@@ -289,7 +289,7 @@ class BaseScraper(BaseCommand):
                 record[f] = None
 
             # clean date fields
-            elif f in self.date_fields:
+            elif f in self.date_fields and isinstance(record[f], str):
                 date_format = self.date_format
                 if isinstance(date_format, dict):
                     date_format = date_format.get(f, DEFAULT_DATE_FORMAT)
@@ -306,9 +306,9 @@ class BaseScraper(BaseCommand):
             elif f in self.bool_fields:
                 if isinstance(record[f], str):
                     val = record[f].lower().strip()
-                    if val in ["f", "false", "no", "0"]:
+                    if val in ["f", "false", "no", "0", "n"]:
                         record[f] = False
-                    elif val in ["t", "true", "yes", "1"]:
+                    elif val in ["t", "true", "yes", "1", "y"]:
                         record[f] = True
 
             # strip string fields
@@ -491,11 +491,12 @@ class CSVScraper(BaseScraper):
 
 class HTMLScraper(BaseScraper):
     def set_session(self, install_cache=False):
-        from requests_html import HTMLSession
 
         if install_cache:
             self.logger.info("Using requests_cache")
             requests_cache.install_cache("http_cache")
+        from requests_html import HTMLSession
+
         self.session = HTMLSession()
 
     def fetch_file(self):

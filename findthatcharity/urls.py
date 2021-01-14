@@ -21,12 +21,14 @@ import charity.urls
 import ftc.urls
 import ftc.views
 import reconcile.urls
+from api.endpoints import api
 
 urlpatterns = [
     path("admin/", admin.site.urls, name="about"),
     path("", ftc.views.index, name="index"),
     path("about", ftc.views.about, name="about"),
     path("adddata/", addtocsv.views.index, name="csvtool"),
+    path("api/v1/", api.urls),
     path("orgid/", include(ftc.urls)),
     path("charity/", include(charity.urls)),
     path("reconcile/", include(reconcile.urls)),

@@ -1,0 +1,5 @@
+-r requirements.txt
+black
+isort
+flake8
+requests-mock

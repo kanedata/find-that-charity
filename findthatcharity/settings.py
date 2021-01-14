@@ -20,6 +20,8 @@ load_dotenv()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+PROJECT_NAME = "Find that Charity"
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -46,6 +48,8 @@ INSTALLED_APPS = [
     "reconcile.apps.ReconcileConfig",
     "addtocsv.apps.AddtocsvConfig",
     "geo.apps.GeoConfig",
+    "other_data.apps.OtherDataConfig",
+    "api.apps.ApiConfig",
     "django_elasticsearch_dsl",
     "django.contrib.postgres",
     "django.contrib.admin",
@@ -56,6 +60,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "prettyjson",
     "django_better_admin_arrayfield",
+    "django_filters",
     "corsheaders",
 ]
 

@@ -1,0 +1,15 @@
+{% from 'components/org_id.html.j2' import orgid_link %}
+
+{% macro org_panel(title, org) %}
+<section class="{{class}} f5 org-panel mb4 pb4 cf bb b--light-gray bw3" id="{{ title|slugify }}">
+    <div class="w-100 w-30-l fl mb3 sticky-l top-0-l">
+        <h3 class="f5 normal mt2 mb0 gray">{{ org.name|titlecase }}</h3>
+        {{ orgid_link(org.org_id) }}
+        <h4 class="org-panel-title f3 b mt0 mb0">{{ title }}</h4>
+        <a class="blue link underline-hover pointer f7 back-to-contents dn" href="#org-panel-tabs">Back to contents</a>
+    </div>
+    <div class="org-panel-contents w-100 w-70-l fl">
+        {{ caller() }}
+    </div>
+</section>
+{% endmacro %}

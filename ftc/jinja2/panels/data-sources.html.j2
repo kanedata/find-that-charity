@@ -1,0 +1,5 @@
+{% call org_panel("Data sources", org) %}
+{% for s in related_orgs.sources %}
+{{ data_source(s, related_orgs, request) }}
+{% endfor %}
+{% endcall %}

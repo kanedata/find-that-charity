@@ -2,8 +2,8 @@
 {% set sources = get_sources() %}
 {% set orgtypes = get_orgtypes() %}
 {% set heading = '{}'.format(
-    query.base_query.title,
-) %}
+    base_query.title,
+) if base_query else 'Search Results' %}
 {% if res.has_other_pages() %}
     {% set subtitle = "Showing organisation {:,.0f} to {:,.0f} out of {:,.0f}".format(
         res.start_index(),
@@ -14,30 +14,40 @@
     {% set subtitle = "Showing all {:,.0f} organisations".format(res.paginator.count) %}
 {% endif %}
 
+{#% block headscripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
+{% endblock headscripts %}
+
+{% block bodyscripts %}
+{{ super() }}
+<script src='{{ static("js/choices.js") }}' type="text/javascript"></script>
+{% endblock bodyscripts %#}
+
 {% block content %}
 <main class="">
     <form class="" action="{{ url_remove(request, 'q') }}">
         <div class="fl w-100 w-70-l pa2">
-            <div class="cf mb2 flex">
-                <input name="q" class="f6 f5-l input-reset bl bt bb br br-0 b--black-20 fl near-black bg-white pa3 lh-solid w-100 w-80-ns br2-ns br--left-ns" type="text" placeholder="Search these organisations"
-                    value="{{term or ''}}" autocomplete='off'>
-                <input type="submit" value="Search" class="f6 f5-l button-reset br bt bb bl-0 b--black-20 fl pv3 tc bg-animate bg-yellow dim near-black pointer w-100 w-20-m w-20-l br2-ns br--right-ns">
-            </div>
-            {% if query.orgtype or query.source %}
+            {% include 'components/search_form.html.j2' %}
+            {% if search.other_orgtypes or search.source %}
             <div class="w-100">
                 <span class="f6 b mr2">Filters: </span>
-                {% for r in query.orgtype if r in orgtypes and query.base_query.slug != r %}
+                {% if search.other_orgtypes %}
+                {% for r in search.other_orgtypes if r in orgtypes and base_query.slug != r %}
                 <span class="bg-moon-gray b--dark-gray bw0 ba mr2 mb2 dib f6 br3 pv1 ph2">
                     Type: 
                     {{ orgtypes[r].title }}
                 </span>
                 {% endfor %}
-                {% for r in query.source if r in sources and query.base_query.slug != r %}
+                {% endif %}
+                {% if search.source %}
+                {% for r in search.source if r in sources and base_query.slug != r %}
                 <span class="bg-moon-gray b--dark-gray bw0 ba mr2 mb2 dib f6 br3 pv1 ph2">
                     Source: 
                     {{ sources[r].title }}
                 </span>
                 {% endfor %}
+                {% endif %}
                 <a href="{{ url_remove(request, ['orgtype', 'source']) }}" class="f6 link blue underline">Clear filters</a>
             </div>
             {% endif %}
@@ -46,41 +56,10 @@
             </div>
         </div>
         <div class="fl w-100 w-30-l pa2">
+            {% if download_url %}
             <a class="mb3 tr w-100 db b link dark-blue underline-hover" href="{{ download_url }}">Download as CSV</a>
-            <label class="mb3 dib lh-title">
-                <input type='checkbox' class="mr1" name="inactive" value="include_inactive" {% if query.include_inactive %}checked=checked{% endif %} />
-                Include inactive organisations
-            </label>
-            <h4 class="ma0 pa0">Related organisation types</h4>
-            <ul class="mb4 mt2 list mh0 pa0 lh-title">
-            {% for t in aggs.by_orgtype if orgtypes[t.orgtype].is_keytype() %}
-                <li class="w-100 f4 mb2">
-                    <div class="">
-                        <a class="link dark-blue underline-hover mr3" href="{{ url_replace(request, orgtype=t.orgtype) }}">{{ orgtypes[t.orgtype].title }}</a>
-                        <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
-                    </div>
-                </li>
-            {% endfor %}
-            {% for t in aggs.by_orgtype if not orgtypes[t.orgtype].is_keytype() %}
-                <li class="w-100 f5 mb2">
-                    <div class="">
-                        <a class="link dark-blue underline-hover mr3" href="{{ url_replace(request, orgtype=t.orgtype) }}">{{ orgtypes[t.orgtype].title }}</a>
-                        <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
-                    </div>
-                </li>
-            {% endfor %}
-            </ul>
-            <h4 class="ma0 pa0">Data sources</h4>
-            <ul class="mb4 mt2 list mh0 pa0">
-            {% for t in aggs.by_source %}
-                <li class="w-100 f4 mb2">
-                    <div class="lh-title">
-                        <a class="link dark-blue underline-hover mr3 lh-title" href="{{ url_replace(request, source=t.source) }}">{{ sources[t.source].title }}</a>
-                        <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
-                    </div>
-                </li>
-            {% endfor %}
-            </ul>
+            {% endif %}
+            {% include 'components/search_facets.html.j2' %}
         </div>
     </form>
 </main>

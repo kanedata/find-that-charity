@@ -1,22 +1,27 @@
 import csv
 
 from django.conf import settings
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from charity.models import Charity
 from ftc.documents import FullOrganisation
-from ftc.models import (Organisation, OrganisationType, RelatedOrganisation,
-                        Source)
-from ftc.query import OrganisationSearch, random_query
+from ftc.models import Organisation, OrganisationType, RelatedOrganisation, Source
+from ftc.query import (
+    OrganisationSearch,
+    get_linked_organisations,
+    get_organisation,
+    random_query,
+)
+from other_data.models import CQCProvider
 
 
 # site homepage
 def index(request):
     if "q" in request.GET:
-        return org_search(request)
+        return orgid_type(request, filetype=request.GET.get("filetype", "html"))
 
     context = dict(
         examples={
@@ -37,51 +42,21 @@ def about(request):
     return render(request, "about.html.j2", context)
 
 
-def org_search(request):
-
-    s = OrganisationSearch()
-    term = None
-
-    if "q" in request.GET:
-        term = request.GET["q"].strip()
-        s.set_criteria(term=term)
-    if "orgtype" in request.GET and request.GET.get("orgtype") != "all":
-        s.set_criteria(base_orgtype=request.GET.get("orgtype"))
-
-    s.run_es(with_pagination=True, with_aggregation=False)
-    page_number = request.GET.get("page")
-    page_obj = s.paginator.get_page(page_number)
-
-    return render(
-        request,
-        "search.html.j2",
-        {
-            "res": page_obj,
-            "term": term,
-            "selected_org_type": request.GET.get("orgtype"),
-        },
-    )
-
-
 @xframe_options_exempt
-def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False):
-    try:
-        org = Organisation.objects.get(org_id=org_id)
-    except Organisation.DoesNotExist:
-        orgs = list(Organisation.objects.filter(orgIDs__contains=[org_id]))
-        if orgs:
-            orgs = RelatedOrganisation(orgs)
-            org = orgs.records[0]
-        else:
-            raise Http404("No Organisation found.")
+def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=False):
+    org = get_organisation(org_id)
     if filetype == "json":
-        return JsonResponse(RelatedOrganisation([org]).to_json(as_charity, request=request))
+        return JsonResponse(
+            RelatedOrganisation([org]).to_json(as_charity, request=request)
+        )
 
     charity = Charity.objects.filter(id=org_id).first()
     related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
     if not related_orgs:
         related_orgs = [org]
     related_orgs = RelatedOrganisation(related_orgs)
+
+    cqc = CQCProvider.objects.filter(org_id=related_orgs.org_id).all()
 
     template = "org.html.j2"
     if preview:
@@ -96,18 +71,14 @@ def get_orgid(request, org_id, filetype="html", preview=False, as_charity=False)
             "org": org,
             "related_orgs": related_orgs,
             "charity": charity,
+            "cqc": cqc,
         },
     )
 
 
 @xframe_options_exempt
 def get_orgid_canon(request, org_id):
-
-    related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
-    if not related_orgs:
-        raise Http404("No Organisation found.")
-    related_orgs = RelatedOrganisation(related_orgs)
-
+    related_orgs = get_linked_organisations(org_id)
     return JsonResponse(related_orgs.to_json(request=request))
 
 
@@ -123,45 +94,41 @@ def get_random_org(request):
         return JsonResponse(r.__dict__["_d_"])
 
 
+# https://docs.djangoproject.com/en/3.1/howto/outputting-csv/#streaming-csv-files
+class Echo:
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+
 def orgid_type(request, orgtype=None, source=None, filetype="html"):
-    query = {
-        "orgtype": [],
-        "source": [],
-        "q": None,
-        "include_inactive": False,
-    }
+    base_query = None
+    download_url = request.build_absolute_uri() + "&filetype=csv"
     s = OrganisationSearch()
-    term = None
 
     if orgtype:
-        query["base_query"] = get_object_or_404(OrganisationType, slug=orgtype)
-        query["orgtype"].append(orgtype)
+        base_query = get_object_or_404(OrganisationType, slug=orgtype)
         s.set_criteria(base_orgtype=orgtype)
-        download_url = reverse("orgid_type_download", kwargs={"orgtype": orgtype})
+        download_url = (
+            reverse("orgid_type_download", kwargs={"orgtype": orgtype})
+            + "?"
+            + request.GET.urlencode()
+        )
     elif source:
-        query["base_query"] = get_object_or_404(Source, id=source)
-        query["source"].append(source)
-        download_url = reverse("orgid_source_download", kwargs={"source": source})
-    if request.GET:
-        download_url += "?" + request.GET.urlencode()
+        base_query = get_object_or_404(Source, id=source)
+        s.set_criteria(source=source)
+        download_url = (
+            reverse("orgid_source_download", kwargs={"source": source})
+            + "?"
+            + request.GET.urlencode()
+        )
 
     # add additional criteria from the get params
-    if "orgtype" in request.GET:
-        query["orgtype"].extend(request.GET.getlist("orgtype"))
-        s.set_criteria(other_orgtypes=request.GET.getlist("orgtype"))
-    if "source" in request.GET:
-        query["source"].extend(request.GET.getlist("source"))
-    if "q" in request.GET:
-        term = request.GET["q"].strip()
-        query["q"] = term
-        s.set_criteria(term=query["q"])
-    if request.GET.get("inactive") == "include_inactive":
-        query["include_inactive"] = True
-
-    # convert query to criteria
-    s.set_criteria(source=query["source"])
-    if not query.get("include_inactive") and filetype != "csv":
-        s.set_criteria(active=True)
+    s.set_criteria_from_request(request)
 
     if filetype == "csv":
         columns = {
@@ -182,16 +149,20 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
             "organisationTypePrimary__title": "organisationTypePrimary",
             "source": "source",
         }
-        response = HttpResponse(content_type="text/csv")
+
+        def stream():
+            buffer_ = Echo()
+            writer = csv.writer(buffer_)
+            yield writer.writerow(columns.values())
+            s.run_db()
+            res = s.query.values_list(*columns.keys()).order_by("org_id")
+            for r in res:
+                yield writer.writerow(r)
+
+        response = StreamingHttpResponse(stream(), content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="{}.csv"'.format(
-            query["base_query"].slug
+            base_query.slug if base_query else "findthatcharity-search-results"
         )
-        writer = csv.writer(response)
-        writer.writerow(columns.values())
-        s.run_db()
-        res = s.query.values_list(*columns.keys()).order_by("org_id")
-        for r in res:
-            writer.writerow(r)
         return response
 
     s.run_es(with_pagination=True, with_aggregation=True)
@@ -203,12 +174,8 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         "orgtype.html.j2",
         {
             "res": page_obj,
-            "query": query,
-            "term": term,
-            "aggs": {
-                "by_orgtype": s.aggregation.get("by_orgtype"),
-                "by_source": s.aggregation.get("by_source"),
-            },
+            "base_query": base_query,
             "download_url": download_url,
+            "search": s,
         },
     )

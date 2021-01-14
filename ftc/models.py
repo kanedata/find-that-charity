@@ -495,6 +495,10 @@ class Source(models.Model):
     def slug(self):
         return self.id
 
+    @property
+    def modified(self):
+        return datetime.datetime.fromisoformat(self.data.get("modified"))
+
     def __str__(self):
         return self.publisher + " (" + self.title + ")"
 
@@ -813,14 +817,24 @@ class RelatedOrganisation:
             },
             "sources": [s.id for s in self.sources],
             "links": [
-                {"site": "Find that Charity", "url": build_url(reverse('orgid_json', kwargs={'org_id': self.org_id})), "orgid": self.org_id},
-            ] + [
+                {
+                    "site": "Find that Charity",
+                    "url": build_url(
+                        reverse("orgid_json", kwargs={"org_id": self.org_id})
+                    ),
+                    "orgid": self.org_id,
+                },
+            ]
+            + [
                 {"site": link[1], "url": link[0], "orgid": link[2]}
                 for link in self.get_links()
             ],
             "orgIDs": self.orgIDs,
             "linked_records": [
-                {"orgid": orgid, "url": build_url(reverse('orgid_json', kwargs={'org_id': orgid}))}
+                {
+                    "orgid": orgid,
+                    "url": build_url(reverse("orgid_json", kwargs={"org_id": orgid})),
+                }
                 for orgid in self.linked_orgs
             ],
             "dateModified": self.dateModified,

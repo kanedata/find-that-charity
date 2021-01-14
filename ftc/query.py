@@ -2,11 +2,31 @@ import copy
 
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Func
+from django.shortcuts import Http404
 from elasticsearch_dsl import A
 
 from ftc.documents import DSEPaginator, FullOrganisation
-from ftc.models import Organisation
+from ftc.models import Organisation, RelatedOrganisation
 from reconcile.query import RECONCILE_QUERY
+
+
+def get_organisation(org_id):
+    try:
+        return Organisation.objects.get(org_id=org_id)
+    except Organisation.DoesNotExist:
+        orgs = list(Organisation.objects.filter(orgIDs__contains=[org_id]))
+        if orgs:
+            orgs = RelatedOrganisation(orgs)
+            return orgs.records[0]
+        else:
+            raise Http404("No Organisation found.")
+
+
+def get_linked_organisations(org_id):
+    related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
+    if not related_orgs:
+        raise Http404("No Organisation found.")
+    return RelatedOrganisation(related_orgs)
 
 
 def random_query(active=False, orgtype=None, aggregate=False, source=None):
@@ -88,7 +108,10 @@ class OrganisationSearch:
                 if isinstance(t, str) and t != "all":
                     setattr(self, k, t.split("+"))
                 elif isinstance(t, list):
-                    setattr(self, k, t)
+                    values = []
+                    for v in t:
+                        values.extend(v.split("+"))
+                    setattr(self, k, values)
 
         if active is True or active is False:
             self.active = active
@@ -100,7 +123,16 @@ class OrganisationSearch:
             self.postcode = postcode
 
     def set_criteria_from_request(self, request):
-        pass
+        if "orgtype" in request.GET and request.GET.get("orgtype") != "all":
+            self.set_criteria(other_orgtypes=request.GET.getlist("orgtype"))
+        if "source" in request.GET and request.GET.get("source") != "all":
+            self.set_criteria(source=request.GET.getlist("source"))
+        if "q" in request.GET:
+            self.set_criteria(term=request.GET["q"])
+        if request.GET.get("active", "").lower().startswith("t"):
+            self.set_criteria(active=True)
+        elif request.GET.get("active", "").lower().startswith("f"):
+            self.set_criteria(active=False)
 
     def run_es(self, with_pagination=False, with_aggregation=False):
         """
@@ -150,6 +182,12 @@ class OrganisationSearch:
         if self.source:
             filter_.append({"terms": {"source": self.source}})
 
+        # check for active or inactive organisations
+        if self.active is True:
+            filter_.append({"match": {"active": True}})
+        elif self.active is False:
+            filter_.append({"match": {"active": False}})
+
         if filter_:
             self.es_query["inline"]["query"]["function_score"]["query"]["bool"][
                 "filter"
@@ -167,8 +205,10 @@ class OrganisationSearch:
         if with_aggregation:
             by_source = A("terms", field="source", size=150)
             by_orgtype = A("terms", field="organisationType", size=150)
+            by_active = A("terms", field="active", size=150)
             q.aggs.bucket("by_source", by_source)
             q.aggs.bucket("by_orgtype", by_orgtype)
+            q.aggs.bucket("by_active", by_active)
 
         self.query = q.execute(params=params)
         if with_pagination:
@@ -183,6 +223,15 @@ class OrganisationSearch:
                 {"orgtype": b["key"], "records": b["doc_count"]}
                 for b in self.query.aggregations["by_orgtype"]["buckets"]
             ]
+            self.aggregation["by_active"] = {
+                "active": 0,
+                "inactive": 0,
+            }
+            for b in self.query.aggregations["by_active"]["buckets"]:
+                if b["key"]:
+                    self.aggregation["by_active"]["active"] = b["doc_count"]
+                else:
+                    self.aggregation["by_active"]["inactive"] = b["doc_count"]
 
     def run_db(self, with_pagination=False, with_aggregation=False):
         db_filter = {}
@@ -195,9 +244,7 @@ class OrganisationSearch:
         if self.active is True or self.active is False:
             db_filter["active"] = self.active
 
-        self.query = Organisation.objects.filter(
-            **{k: v for k, v in db_filter.items() if v}
-        )
+        self.query = Organisation.objects.filter(**{k: v for k, v in db_filter.items()})
 
         if with_pagination:
             self.paginator = Paginator(

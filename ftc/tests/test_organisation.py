@@ -8,12 +8,28 @@ class TestOrganisation(TestCase):
         urls = (
             # original url, cleanUrl, displayUrl
             ("university.ac.uk", "http://university.ac.uk", "university.ac.uk"),
-            ("http://www.charity.org.uk/", "http://www.charity.org.uk/", "charity.org.uk"),
-            ("https://www.charity.org.uk/", "https://www.charity.org.uk/", "charity.org.uk"),
+            (
+                "http://www.charity.org.uk/",
+                "http://www.charity.org.uk/",
+                "charity.org.uk",
+            ),
+            (
+                "https://www.charity.org.uk/",
+                "https://www.charity.org.uk/",
+                "charity.org.uk",
+            ),
             ("https://charity.org.uk/", "https://charity.org.uk/", "charity.org.uk"),
             ("//charity.org.uk/", "//charity.org.uk/", "charity.org.uk"),
-            ("https://www.charity.org.uk/www.html", "https://www.charity.org.uk/www.html", "charity.org.uk/www.html"),
-            ("www.charity.org.uk/www.html", "http://www.charity.org.uk/www.html", "charity.org.uk/www.html"),
+            (
+                "https://www.charity.org.uk/www.html",
+                "https://www.charity.org.uk/www.html",
+                "charity.org.uk/www.html",
+            ),
+            (
+                "www.charity.org.uk/www.html",
+                "http://www.charity.org.uk/www.html",
+                "charity.org.uk/www.html",
+            ),
         )
         for u in urls:
             o = Organisation(url=u[0])

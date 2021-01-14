@@ -49,7 +49,7 @@
       <h2 class="mt0 mb0 f4 lh-title normal w-100">
           {{ org.name|titlecase }}
       </h2>
-      <div>{{ orgid_link(org.org_id, request, false) }}</div>
+      <div>{{ orgid_link(org.org_id, false) }}</div>
       <h3 class="mv2 f5 lh-subtitle normal">
         {% if not org.active %}
         An <span class="normal red">inactive</span>

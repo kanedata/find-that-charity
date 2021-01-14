@@ -1,0 +1,75 @@
+{% if search.active is not none %}
+<p>
+    Showing only {% if search.active is true %}active{% else %}inactive{% endif %} organisations
+     - <a class="link dark-blue underline-hover mr3" href="{{ url_replace(request, active='all') }}">show all organisations</a>
+</p>
+{% elif search.aggregation.by_active.active and search.aggregation.by_active.inactive %}
+<p>
+    Showing all organisations
+</p>
+<ul class="mb4 mt2 list mh0 pa0 lh-title">
+    <li class="w-100 f4 mb2">
+        <div class="">
+            <a class="link dark-blue underline-hover mr3" href="{{ url_replace(request, active=true) }}">
+                Show only {{ "{:,.0f}".format(search.aggregation.by_active.active) }} active organisations
+            </a>
+        </div>
+    </li>
+    <li class="w-100 f5 mb2">
+        <div class="">
+            <a class="link dark-blue underline-hover mr3" href="{{ url_replace(request, active=false) }}">
+                Show only {{ "{:,.0f}".format(search.aggregation.by_active.inactive) }} inactive organisations
+            </a>
+        </div>
+    </li>
+</ul>
+{% endif %}
+
+<h4 class="ma0 pa0">Organisation types</h4>
+{#<select class="js-choices" multiple>
+    <optgroup label="Main organisation types">
+    {% for t in search.aggregation.by_orgtype if orgtypes[t.orgtype].is_keytype() %}
+        <option value="{{ t.orgtype }}">
+            {{ orgtypes[t.orgtype].title }}
+            <span class="mid-gray">({{ "{:,.0f}".format(t.records) }})</span>
+        </option>
+    {% endfor %}
+    </optgroup>
+    <optgroup label="Other organisation types">
+    {% for t in search.aggregation.by_orgtype if not orgtypes[t.orgtype].is_keytype() %}
+        <option value="{{ t.orgtype }}">
+            {{ orgtypes[t.orgtype].title }}
+            <span class="mid-gray">({{ "{:,.0f}".format(t.records) }})</span>
+        </option>
+    {% endfor %}
+    </optgroup>
+</select>#}
+<ul class="mb4 mt2 list mh0 pa0 lh-title">
+{% for t in search.aggregation.by_orgtype if orgtypes[t.orgtype].is_keytype() %}
+    <li class="w-100 f4 mb2">
+        <div class="">
+            <a class="link dark-blue underline-hover mr3" href="{{ url_replace(request, orgtype=t.orgtype) }}">{{ orgtypes[t.orgtype].title }}</a>
+            <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
+        </div>
+    </li>
+{% endfor %}
+{% for t in search.aggregation.by_orgtype if not orgtypes[t.orgtype].is_keytype() %}
+    <li class="w-100 f5 mb2">
+        <div class="">
+            <a class="link dark-blue underline-hover mr3" href="{{ url_replace(request, orgtype=t.orgtype) }}">{{ orgtypes[t.orgtype].title }}</a>
+            <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
+        </div>
+    </li>
+{% endfor %}
+</ul>
+<h4 class="ma0 pa0">Data sources</h4>
+<ul class="mb4 mt2 list mh0 pa0">
+{% for t in search.aggregation.by_source %}
+    <li class="w-100 f4 mb2">
+        <div class="lh-title">
+            <a class="link dark-blue underline-hover mr3 lh-title" href="{{ url_replace(request, source=t.source) }}">{{ sources[t.source].title }}</a>
+            <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
+        </div>
+    </li>
+{% endfor %}
+</ul>

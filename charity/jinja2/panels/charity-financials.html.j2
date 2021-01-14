@@ -1,0 +1,167 @@
+
+{% set partb_tables = {
+    "Income": {
+        "inc_leg": "Legacies",
+        "inc_end": "Endowment",
+        "inc_vol": "Voluntary income",
+        "inc_fr": "Fundraised income",
+        "inc_char": "Income from charitable Activities",
+        "inc_invest": "Investment income",
+        "inc_other": "Other income",
+        "inc_total": "Total income",
+    },
+    "Spending": {
+        "exp_vol": "Voluntary income costs",
+        "exp_trade": "Fundraising Trading costs",
+        "exp_gen": "Cost of generating funds",
+        "exp_invest": "Investment Management costs",
+        "exp_grant": "Grants to institutions",
+        "exp_charble": "Charitable Activities costs",
+        "exp_gov": "Governance costs",
+        "exp_other": "Other resources expended",
+        "exp_total": "Total Resources expended",
+    },
+    "Other expenditure": {
+        "exp_support": "Support costs",
+        "exp_dep": "Depreciation",
+        "exp_total": "Total Resources expended",
+    },
+    "Assets": {
+        "asset_close": "Total fixed assets",
+        "fixed_assets": "Fixed Investments Assets",
+        "invest_assets": "Current Investment Assets",
+        "cash_assets": "Cash",
+        "current_assets": "Total Current Assets",
+        "credit_1": "Creditors - within one year",
+        "credit_long": "Creditors - Long Term/Provision",
+        "pension_assets": "Pension Assets/Liabilities",
+        "funds_total": "Total Net Assets/Liabilities",
+    },
+    "Funds": {
+        "funds_end": "Endowment funds",
+        "funds_restrict": "Restricted funds",
+        "funds_unrestrict": "Unrestricted funds",
+        "funds_total": "Total funds",
+    },
+    "Reserves": {
+        "reserves": "Reserves (£)",
+        "reserves_months": "Reserves (as months of expenditure)",
+    },
+    "People": {
+        "employees": "Employees",
+        "volunteers": "Volunteers",
+    }
+} %}
+
+{% if charity.financial.count() %}
+  {% call org_panel("Charity financials", org) %}
+
+    {# {% if charity.has_ccew_partb %}
+    <nav class="tabs mb4 cf">
+      <ul class="list ma0 pa0 flex bb bw2 b--gray pb1">
+        <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="charity-financials" data-tabactive="true">Charity financials</a></li>
+        {% for table, fields in partb_tables.items() %}
+        <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="{{ table|slugify }}">{{ table }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+    {% endif %} #}
+
+      {% set finances = charity.financial.order_by('fyend').all() %}
+      
+      <div class="w-100 cf" id="charity-financials">
+      <div class="w-100 w-50-ns fl">
+      <table class="table collapse financial-table">
+        <tr>
+          <th>Year ending</th>
+          <th>Income (£)</th>
+          <th>Spending (£)</th>
+        </tr>
+      {% if org.dateRegistered %}
+        <tr>
+          <td colspan="">
+            {{ "{:%Y-%m-%d}".format(org.dateRegistered) }}
+          </td>
+          <td colspan="2" class="tl">
+            <span class="gray">(Registered as a charity)</span><br>
+          </td>
+        </tr>
+      {% endif %}
+      {% for f in finances|sort(attribute='fyend') %}
+        <tr>
+          <td>{{ f.fyend }}</td>
+          <td>{{ "{:,.0f}".format(f.income) }}</td>
+          <td>{% if f.spending %}{{ "{:,.0f}".format(f.spending) }}{% endif %}</td>
+        </tr>
+      {% endfor %}
+      {% if org.dateRemoved %}
+        <tr>
+          <td colspan="">
+            {{ "{:%d %B %Y}".format(org.dateRemoved) }}
+          </td>
+          <td colspan="2" class="tl">
+            <span class="gray">(Removed from the register)</span>
+          </td>
+        </tr>
+      {% endif %}
+      </table>
+      </div>
+      
+      <div class="w-100 w-50-ns fl">
+      {% if finances|length > 1 %}
+      <canvas id="financeChart" width="400" height="350" class="measure"></canvas>
+      {% endif %}
+      </div>
+      </div>
+
+      {% if charity.has_ccew_partb %}
+      {% for table, fields in partb_tables.items() %}
+      <div  id="{{ table|slugify }}">
+      <h3>{{table}}</h3>
+      <div class="table-wrapper">
+      <table class="financial-table">
+        <thead>
+          <tr>
+            <th rowspan="2" class="sticky left-0 bg-white">Financial year end</th>
+            {% for field in fields %}
+            <th class="bw0">{{ fields[field] }}</th>
+            {% endfor %}
+          </tr>
+          <tr>
+            {% for field in fields %}
+            <th>
+              <canvas id="sparkline-{{field}}" data-field="{{field}}" class="sparkline mw4 fr" width="100" height="30"></canvas>
+            </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+        {% for f in finances %}
+            <tr>
+                <th class="sticky left-0 bg-white">{{ f.fyend }}</th>
+                {% if f.has_ccew_partb %}
+                    {% for field in fields %}
+                        {% if f[field] %}
+                            {% if field == 'reserves_months' %}
+                            <td>{{ "{:,.1f}".format(f[field]) }}</td>
+                            {% else %}
+                            <td>{{ "{:,.0f}".format(f[field]) }}</td>
+                            {% endif %}
+                        {% else %}
+                        <td>-</td>
+                        {% endif %}
+                    {% endfor %}
+                {% else%}
+                <td class="i gray tc" colspan='{{ fields|length }}'>~~ No data available ~~</td>
+                {% endif%}
+            </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+  {% endcall %}
+  {% endif %}
