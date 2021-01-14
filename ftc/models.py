@@ -45,7 +45,10 @@ IGNORE_DOMAINS = (
 
 EXTERNAL_LINKS = {
     "GB-CHC": [
-        ["https://ccew.dkane.net/charity/{}", "Charity Commission England and Wales"],
+        [
+            "https://register-of-charities.charitycommission.gov.uk/charity-details/?regId={}&subId=0",
+            "Charity Commission England and Wales",
+        ],
         ["https://charitybase.uk/charities/{}", "CharityBase"],
         ["http://opencharities.org/charities/{}", "OpenCharities"],
         ["https://givingisgreat.org/charitydetail/?regNo={}", "Giving is Great"],
@@ -363,13 +366,13 @@ class Organisation(models.Model):
 
     def get_links(self):
         if self.url:
-            yield (self.cleanUrl, self.displayUrl)
+            yield (self.cleanUrl, self.displayUrl, self.org_id)
         if not self.orgIDs:
             return
         for o in self.orgIDs:
             links = EXTERNAL_LINKS.get(o.scheme, [])
             for link in links:
-                yield (link[0].format(o.id), link[1])
+                yield (link[0].format(o.id), link[1], o)
 
     @property
     def sameAs(self):
@@ -391,11 +394,7 @@ class Organisation(models.Model):
     def displayUrl(self):
         if not self.url:
             return None
-        url = re.sub(
-            r'(https?:)?//',
-            '',
-            self.url
-        )
+        url = re.sub(r"(https?:)?//", "", self.url)
         if url.startswith("www."):
             url = url[4:]
         if url.endswith("/"):
@@ -700,7 +699,7 @@ class RelatedOrganisation:
                 obj["sameAs"] = self.sameAs
         return obj
 
-    def to_json(self, charity=False):
+    def to_json(self, charity=False, request=None):
         address_fields = [
             "streetAddress",
             "addressLocality",
@@ -711,6 +710,11 @@ class RelatedOrganisation:
         orgtypes = [y for y in self.get_all("organisationType")]
         orgtypes = [o.title for o in OrganisationType.objects.filter(slug__in=orgtypes)]
 
+        def build_url(url):
+            if request:
+                return request.build_absolute_uri(url)
+            return url
+
         if charity:
             ccew_number = None
             ccew_link = None
@@ -719,7 +723,7 @@ class RelatedOrganisation:
             ccni_number = None
             ccni_link = None
             company_numbers = []
-            for o in self.orgIDs:
+            for o in self.linked_orgs:
                 if o.startswith("GB-CHC-"):
                     ccew_number = o.replace("GB-CHC-", "")
                     ccew_link = EXTERNAL_LINKS["GB-CHC"][1][0].format(ccew_number)
@@ -769,8 +773,13 @@ class RelatedOrganisation:
                     "areas": [],
                     "postcode": self.postalCode,
                     "location": self.location,
+                    "address": {
+                        k: getattr(self, k)
+                        for k in address_fields
+                        if getattr(self, k, None)
+                    },
                 },
-                "url": self.url,
+                "url": self.cleanUrl,
                 "domain": self.domain,
                 "latest_income": self.latestIncome,
                 "company_number": company_numbers,
@@ -780,22 +789,19 @@ class RelatedOrganisation:
                 "ccni_link": ccni_link,
                 "date_registered": self.dateRegistered,
                 "date_removed": self.dateRemoved,
-                "org-ids": self.orgIDs,
+                "org-ids": self.linked_orgs,
                 "alt_names": self.alternateName,
                 "last_modified": self.dateModified,
             }
 
         return {
-            "sources": [s.id for s in self.sources],
+            "id": self.org_id,
             "name": self.name,
             "charityNumber": self.charityNumber,
             "companyNumber": self.companyNumber,
-            "telephone": self.telephone,
-            "email": self.email,
             "description": self.description,
-            "url": self.url,
+            "url": self.cleanUrl,
             "latestIncome": self.latestIncome,
-            "dateModified": self.dateModified,
             "dateRegistered": self.dateRegistered,
             "dateRemoved": self.dateRemoved,
             "active": self.active,
@@ -803,10 +809,23 @@ class RelatedOrganisation:
             "organisationType": orgtypes,
             "organisationTypePrimary": self.organisationTypePrimary.title,
             "alternateName": self.alternateName,
-            "orgIDs": self.orgIDs,
-            "id": self.org_id,
+            "telephone": self.telephone,
+            "email": self.email,
             "location": self.location,
             "address": {
                 k: getattr(self, k) for k in address_fields if getattr(self, k, None)
             },
+            "sources": [s.id for s in self.sources],
+            "links": [
+                {"site": "Find that Charity", "url": build_url(reverse('orgid_json', kwargs={'org_id': self.org_id})), "orgid": self.org_id},
+            ] + [
+                {"site": link[1], "url": link[0], "orgid": link[2]}
+                for link in self.get_links()
+            ],
+            "orgIDs": self.orgIDs,
+            "linked_records": [
+                {"orgid": orgid, "url": build_url(reverse('orgid_json', kwargs={'org_id': orgid}))}
+                for orgid in self.linked_orgs
+            ],
+            "dateModified": self.dateModified,
         }

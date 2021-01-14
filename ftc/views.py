@@ -42,7 +42,7 @@ def about(request):
 def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=False):
     org = get_organisation(org_id)
     if filetype == "json":
-        return JsonResponse(RelatedOrganisation([org]).to_json(as_charity))
+        return JsonResponse(RelatedOrganisation([org]).to_json(as_charity, request=request))
 
     charity = Charity.objects.filter(id=org_id).first()
     related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
@@ -102,6 +102,8 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
     base_query = None
     download_url = request.build_absolute_uri() + "&filetype=csv"
     s = OrganisationSearch()
+    term = None
+
     if orgtype:
         base_query = get_object_or_404(OrganisationType, slug=orgtype)
         s.set_criteria(base_orgtype=orgtype)
