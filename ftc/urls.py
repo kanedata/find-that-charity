@@ -20,6 +20,12 @@ from . import feeds, views
 urlpatterns = [
     path("random", views.get_random_org, name="random_org"),
     path(
+        "all.csv",
+        views.orgid_type,
+        {"filetype": "csv"},
+        name="orgid_all_download",
+    ),
+    path(
         "type/<slug:orgtype>.csv",
         views.orgid_type,
         {"filetype": "csv"},

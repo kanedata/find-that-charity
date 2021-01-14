@@ -1,7 +1,7 @@
 import csv
 
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -88,6 +88,16 @@ def get_random_org(request):
         return JsonResponse(r.__dict__["_d_"])
 
 
+# https://docs.djangoproject.com/en/3.1/howto/outputting-csv/#streaming-csv-files
+class Echo:
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+
 def orgid_type(request, orgtype=None, source=None, filetype="html"):
     base_query = None
     download_url = request.build_absolute_uri() + "&filetype=csv"
@@ -123,16 +133,20 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
             "organisationTypePrimary__title": "organisationTypePrimary",
             "source": "source",
         }
-        response = HttpResponse(content_type="text/csv")
+
+        def stream():
+            buffer_ = Echo()
+            writer = csv.writer(buffer_)
+            yield writer.writerow(columns.values())
+            s.run_db()
+            res = s.query.values_list(*columns.keys()).order_by("org_id")
+            for r in res:
+                yield writer.writerow(r)
+
+        response = StreamingHttpResponse(stream(), content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="{}.csv"'.format(
             base_query.slug if base_query else 'findthatcharity-search-results'
         )
-        writer = csv.writer(response)
-        writer.writerow(columns.values())
-        s.run_db()
-        res = s.query.values_list(*columns.keys()).order_by("org_id")
-        for r in res:
-            writer.writerow(r)
         return response
 
     s.run_es(with_pagination=True, with_aggregation=True)
