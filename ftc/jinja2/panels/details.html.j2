@@ -27,7 +27,7 @@
     {% if v.startswith("GB-CHC-") %}
     <h4><abbr title="Charity Commission for England and Wales">CCEW</abbr> Charity number</h4>
     <p>
-        <a class="link dark-blue underline-hover f4" href="https://ccew.dkane.net/charity/{{ v.replace('GB-CHC-', '') }}" target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
+        <a class="link dark-blue underline-hover f4" href="https://register-of-charities.charitycommission.gov.uk/charity-details/?regId={{ v.replace('GB-CHC-', '') }}&subId=0" target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
     </p>
     {% endif %}
     {% if v.startswith("GB-NIC-") %}
