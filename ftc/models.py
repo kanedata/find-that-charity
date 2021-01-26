@@ -407,7 +407,7 @@ class Organisation(models.Model):
             return []
         return sorted(
             self.alternateName,
-            key=lambda x: x[4:] if x.lower().startswith("the ") else x
+            key=lambda x: x[4:] if x.lower().startswith("the ") else x,
         )
 
     def geoCodes(self):
