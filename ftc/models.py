@@ -401,6 +401,15 @@ class Organisation(models.Model):
             url = url[:-1]
         return url
 
+    @property
+    def sortedAlternateName(self):
+        if not self.alternateName:
+            return []
+        return sorted(
+            self.alternateName,
+            key=lambda x: x[4:] if x.lower().startswith("the ") else x
+        )
+
     def geoCodes(self):
 
         special_cases = {

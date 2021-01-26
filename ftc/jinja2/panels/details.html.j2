@@ -6,14 +6,19 @@
     {{ org.description|titlecase(sentence=true) }}
 </p>
 {% endif %}
-{% if org.alternateName %}
+{% if org.sortedAlternateName %}
 <h4>Also known as</h4>
 <ul>
-    {% for n in org.alternateName[0:10] %}
+    {% for n in org.sortedAlternateName[0:10] %}
     <li>{{ n|titlecase }}</li>
     {% endfor %}
-    {% if org.alternateName|length > 10 %}
-    <li>...and {{ "{:,.0f}".format(org.alternateName|length - 10) }} other names</li>
+    {% if org.sortedAlternateName|length > 10 %}
+    <details>
+    <summary class="blue link underline-hover pointer">...and {{ "{:,.0f}".format(org.alternateName|length - 10) }} other names</summary>
+    {% for n in org.sortedAlternateName[10:] %}
+    <li>{{ n|titlecase }}</li>
+    {% endfor %}
+    </details>
     {% endif %}
 </ul>
 {% endif %}
