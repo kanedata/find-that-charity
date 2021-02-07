@@ -1,4 +1,9 @@
 import datetime
+import io
+from collections import defaultdict
+
+from django.utils.text import slugify
+from openpyxl import load_workbook
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation
@@ -36,54 +41,71 @@ class Command(HTMLScraper):
     }
 
     def parse_file(self, response, source_url):
+        files = [link for link in response.html.links if link.endswith(".xlsx")]
         self.set_download_url(source_url)
 
-        for row in response.html.find("table#heps-table tbody tr"):
-            cells = [c.text for c in row.find("td")]
+        records = defaultdict(dict)
+        for link in files:
+            r = self.session.get(link)
+            r.raise_for_status()
 
-            orgids = [
-                "-".join([self.org_id_prefix, str(cells[1])]),
-                "-".join(["GB-UKPRN", str(cells[0])]),
-            ]
+            wb = load_workbook(io.BytesIO(r.content), read_only=True)
+            ws = wb.active
 
-            org_types = [
-                self.orgtype_cache["higher-education"],
-                self.add_org_type(
-                    self.hesa_org_types.get(cells[4].strip(), cells[4].strip())
-                ),
-            ]
+            headers = None
+            for k, row in enumerate(ws.rows):
+                if not headers:
+                    headers = [slugify(c.value) for c in row]
+                else:
+                    record = dict(zip(headers, [c.value for c in row]))
+                    for k, v in record.items():
+                        records[record["instid"]][k] = v
 
-            self.records.append(
-                Organisation(
-                    **{
-                        "org_id": "-".join([self.org_id_prefix, str(cells[1])]),
-                        "name": cells[2].strip(),
-                        "charityNumber": None,
-                        "companyNumber": None,
-                        "streetAddress": None,
-                        "addressLocality": None,
-                        "addressRegion": None,
-                        "addressCountry": None,
-                        "postalCode": None,
-                        "telephone": None,
-                        "alternateName": [],
-                        "email": None,
-                        "description": None,
-                        "organisationType": [o.slug for o in org_types],
-                        "organisationTypePrimary": org_types[0],
-                        "url": None,
-                        "location": [],
-                        "latestIncome": None,
-                        "dateModified": datetime.datetime.now(),
-                        "dateRegistered": None,
-                        "dateRemoved": None,
-                        "active": True,
-                        "parent": None,
-                        "orgIDs": orgids,
-                        "scrape": self.scrape,
-                        "source": self.source,
-                        "spider": self.name,
-                        "org_id_scheme": self.orgid_scheme,
-                    }
-                )
+        for r in records.values():
+            self.parse_row(r)
+
+    def parse_row(self, record):
+
+        orgids = [
+            "-".join([self.org_id_prefix, str(record["instid"])]),
+            "-".join(["GB-UKPRN", str(record["ukprn"])]),
+        ]
+
+        org_types = [
+            self.orgtype_cache["higher-education"],
+        ]
+
+        self.records.append(
+            Organisation(
+                **{
+                    "org_id": orgids[0],
+                    "name": record["provider-name"],
+                    "charityNumber": None,
+                    "companyNumber": None,
+                    "streetAddress": None,
+                    "addressLocality": None,
+                    "addressRegion": None,
+                    "addressCountry": None,
+                    "postalCode": None,
+                    "telephone": None,
+                    "alternateName": [],
+                    "email": None,
+                    "description": None,
+                    "organisationType": [o.slug for o in org_types],
+                    "organisationTypePrimary": org_types[0],
+                    "url": None,
+                    "location": [],
+                    "latestIncome": None,
+                    "dateModified": datetime.datetime.now(),
+                    "dateRegistered": None,
+                    "dateRemoved": None,
+                    "active": True,
+                    "parent": None,
+                    "orgIDs": orgids,
+                    "scrape": self.scrape,
+                    "source": self.source,
+                    "spider": self.name,
+                    "org_id_scheme": self.orgid_scheme,
+                }
             )
+        )
