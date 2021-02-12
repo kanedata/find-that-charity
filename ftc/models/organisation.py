@@ -6,9 +6,9 @@ from django.db import models
 from django.urls import reverse
 from django_better_admin_arrayfield.models.fields import ArrayField
 
+from .organisation_link import OrganisationLink
 from .orgid import OrgidField
 from .orgid_scheme import OrgidScheme
-from .organisation_link import OrganisationLink
 
 EXTERNAL_LINKS = {
     "GB-CHC": [

@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from .organisation import Organisation, EXTERNAL_LINKS
+from .organisation import EXTERNAL_LINKS, Organisation
 from .organisation_type import OrganisationType
 
 
