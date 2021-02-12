@@ -75,7 +75,6 @@ class Command(CSVScraper):
                     "organisationType": [o.slug for o in orgtypes],
                     "organisationTypePrimary": orgtypes[0],
                     "url": None,
-                    "location": [],
                     "latestIncome": None,
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": None,

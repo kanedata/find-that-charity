@@ -106,7 +106,6 @@ class Command(CSVScraper):
                     "organisationType": [o.slug for o in org_types],
                     "organisationTypePrimary": self.orgtype_cache["registered-charity"],
                     "url": self.parse_url(record.get("Website")),
-                    "location": [],
                     "latestIncome": int(record["Total income"])
                     if record.get("Total income")
                     else None,

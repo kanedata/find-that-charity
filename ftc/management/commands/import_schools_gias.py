@@ -124,7 +124,6 @@ class Command(CSVScraper):
                 organisationType=[o.slug for o in org_types],
                 organisationTypePrimary=org_types[1],
                 url=self.parse_url(record.get("SchoolWebsite")),
-                location=self.get_locations(record),
                 latestIncome=None,
                 dateModified=datetime.datetime.now(),
                 dateRegistered=record.get("OpenDate"),
@@ -152,29 +151,3 @@ class Command(CSVScraper):
             )
 
         return org_ids
-
-    def get_locations(self, record):
-        locations = []
-        for f in self.location_fields:
-            code = record.get(f + " (code)", "")
-            name = record.get(f + " (name)", "")
-
-            if name == "" and code == "":
-                continue
-
-            if f == "GOR":
-                code = REGION_CONVERT.get(code, code)
-
-            if code == "":
-                code = name
-
-            locations.append(
-                {
-                    "id": code,
-                    "name": record.get(f + " (name)"),
-                    "geoCode": code,
-                    "geoCodeType": AREA_TYPES.get(code[0:3], f),
-                }
-            )
-
-        return locations

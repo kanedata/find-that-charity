@@ -145,7 +145,6 @@ class Command(CSVScraper):
                     "organisationType": [o.slug for o in org_types],
                     "organisationTypePrimary": org_types[0],
                     "url": self.parse_url(record.get("Website")),
-                    "location": [],
                     "latestIncome": int(record["Most recent year income"])
                     if record.get("Most recent year income")
                     else None,

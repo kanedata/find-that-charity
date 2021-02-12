@@ -193,29 +193,12 @@ class Organisation(models.Model):
         on_delete=models.CASCADE,
     )
     spider = models.CharField(max_length=200, db_index=True)
-    location = models.JSONField(null=True, blank=True)
     org_id_scheme = models.ForeignKey(
         "OrgidScheme",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
-
-    # geography fields
-    geo_oa11 = models.CharField(max_length=9, null=True, blank=True)
-    geo_cty = models.CharField(max_length=9, null=True, blank=True)
-    geo_laua = models.CharField(max_length=9, null=True, blank=True, db_index=True)
-    geo_ward = models.CharField(max_length=9, null=True, blank=True)
-    geo_ctry = models.CharField(max_length=9, null=True, blank=True, db_index=True)
-    geo_rgn = models.CharField(max_length=9, null=True, blank=True, db_index=True)
-    geo_pcon = models.CharField(max_length=9, null=True, blank=True, db_index=True)
-    geo_ttwa = models.CharField(max_length=9, null=True, blank=True)
-    geo_lsoa11 = models.CharField(max_length=9, null=True, blank=True, db_index=True)
-    geo_msoa11 = models.CharField(max_length=9, null=True, blank=True, db_index=True)
-    geo_lep1 = models.CharField(max_length=9, null=True, blank=True)
-    geo_lep2 = models.CharField(max_length=9, null=True, blank=True)
-    geo_lat = models.FloatField(null=True, blank=True)
-    geo_long = models.FloatField(null=True, blank=True)
 
     class Meta:
         unique_together = (

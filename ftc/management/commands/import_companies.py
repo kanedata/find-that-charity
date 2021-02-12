@@ -197,7 +197,6 @@ class Command(CSVScraper):
                         record.get("CompanyCategory")
                     ),
                     "url": None,
-                    "location": [],
                     "latestIncome": None,
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("IncorporationDate"),

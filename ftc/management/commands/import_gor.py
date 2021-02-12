@@ -65,7 +65,6 @@ class Command(CSVScraper):
                         "government-organisation"
                     ],
                     "url": record.get("website"),
-                    "location": [],
                     "latestIncome": None,
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("start-date"),

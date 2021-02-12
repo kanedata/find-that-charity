@@ -230,7 +230,7 @@ insert into ftc_organisation (
     telephone, email, description, url, "latestIncome",
     "latestIncomeDate", "dateRegistered", "dateRemoved", active,
     status, parent, "dateModified", "organisationType", spider,
-    location, org_id_scheme_id, "organisationTypePrimary_id",
+    org_id_scheme_id, "organisationTypePrimary_id",
     scrape_id, source_id
 )
 select distinct on (cc.id)
@@ -277,7 +277,6 @@ select distinct on (cc.id)
             else array[]::text[] end
         as "organisationType",
     cc."source" as spider,
-    l.location as "location",
     case when cc."source" = 'ccew' then 'GB-CHC'
         when cc."source" = 'oscr' then 'GB-SC'
         when cc."source" = 'ccni' then 'GB-NIC'
@@ -295,18 +294,7 @@ from charity_charity cc
         on cc.id = cn.charity_id
     left outer join charity_ccewcharity ccew
         on cc.id = CONCAT('GB-CHC-', ccew.regno)
-            and ccew.subno = '0'
-    left outer join (select charity_id,
-            jsonb_agg(jsonb_build_object(
-                'id', coalesce(ca."GSS", ca."ISO3166_1", ca."ContinentCode"),
-                'name', aooname,
-                'geoCode', coalesce(ca."GSS", ca."ISO3166_1", ca."ContinentCode")
-            )) as "location"
-        from charity_charity_areas_of_operation ccaoo
-            inner join charity_areaofoperation ca
-                on ccaoo.areaofoperation_id = ca.id
-        group by charity_id) as l
-    on l.charity_id = cc.id,
+            and ccew.subno = '0',
     ftc_organisationtype ot
 where ot.title = 'Registered Charity'
     and cc.source = '{source}'

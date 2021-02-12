@@ -240,7 +240,6 @@ class Command(HTMLScraper):
                     "organisationType": [o.slug for o in org_types],
                     "organisationTypePrimary": org_types[0],
                     "url": None,
-                    "location": [],
                     "latestIncome": None,
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("Open Date"),
