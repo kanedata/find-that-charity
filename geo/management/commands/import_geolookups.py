@@ -13,29 +13,29 @@ class Command(BaseScraper):
     name = "geo_lookups"
     bulk_limit = 50000
     GEO_SOURCES = {
-        "la": GeoSource(
-            "https://github.com/drkane/geo-lookups/raw/master/la_all_codes.csv",
-            "la",
-            "LADCD",
-            "LADNM",
-        ),
         "utla": GeoSource(
             "https://github.com/drkane/geo-lookups/raw/master/utla_all_codes.csv",
             "utla",
             "UTLACD",
             "UTLANM",
         ),
-        "lsoa": GeoSource(
-            "https://github.com/drkane/geo-lookups/raw/master/lsoa_la.csv",
-            "lsoa",
-            "LSOA11CD",
-            "LSOA11NM",
+        "la": GeoSource(
+            "https://github.com/drkane/geo-lookups/raw/master/la_all_codes.csv",
+            "la",
+            "LADCD",
+            "LADNM",
         ),
         "msoa": GeoSource(
             "https://github.com/drkane/geo-lookups/raw/master/msoa_la.csv",
             "msoa",
             "MSOA11CD",
             "MSOA11HCLNM",
+        ),
+        "lsoa": GeoSource(
+            "https://github.com/drkane/geo-lookups/raw/master/lsoa_la.csv",
+            "lsoa",
+            "LSOA11CD",
+            "LSOA11NM",
         ),
         "ward": GeoSource(
             "https://github.com/drkane/geo-lookups/raw/master/ward_all_codes.csv",

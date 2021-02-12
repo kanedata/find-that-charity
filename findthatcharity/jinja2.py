@@ -18,6 +18,7 @@ from findthatcharity.utils import (
     url_replace,
 )
 from ftc.models import Organisation, OrganisationType, OrgidScheme, Source
+from geo.models import GeoLookup
 from jinja2 import Environment
 
 
@@ -80,6 +81,10 @@ def get_orgidschemes():
     return value
 
 
+def get_geoname(code):
+    return GeoLookup.objects.get(geoCode=code).name
+
+
 def environment(**options):
     env = Environment(**options)
 
@@ -104,6 +109,7 @@ def environment(**options):
             "slugify": slugify,
             "titlecase": to_titlecase,
             "pluralise": pluralise,
+            "get_geoname": get_geoname,
         }
     )
     return env

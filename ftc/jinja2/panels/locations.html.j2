@@ -1,4 +1,4 @@
-{% if org.location or org.postalCode %}
+{% if org.locations.exists() or org.postalCode %}
 {% call org_panel("Locations", org) %}
 <div class="w-100 w-30-l fl">
     <div id="locationmap" class="h5"></div>
@@ -13,26 +13,30 @@
         </p>
     </div>
     {% endif %}
-    {% if org.location %}
+    {% if org.locations.exists() %}
     <div class="mv3">
         <h5 class="ma0 pa0">Locations</h5>
-        <ul class="mv0 list mh0 pa0 f6">
-        {% for v in org.location %}
-        {% if v.geoCode and v.geoCode|regex_search("[ENWSK][0-9]{8}") %}
-        <li class="w-100 mb2">
-            <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ v.geoCode }}.html" target="_blank">{{ v.name|titlecase }}</a>
-            {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
-            {# {{ show_sources(v) }} #}
-        </li>
-        {% else %}
-        <li class="w-100 mb2">
-            {{ v.name|titlecase }} {% if v.geoCode %}(<code>{{ v.geoCode }}</code>){% endif %}
-            {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
-            {# {{ show_sources(v) }} #}
-        </li>
-        {% endif %}
+        {% for country, areas in org.locations_group().items() %}
+            <ul class="mv0 list mh0 pa0 f6">
+            {% if country != "GB" %}
+                <li><strong>{{ country }}</strong></li>
+            {% else %}
+                {% for l, types in areas.items() %}
+                    {% if l and l|regex_search("[ENWSK][0-9]{8}") %}
+                    <li class="w-100 mb2">
+                        <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ l }}.html" target="_blank">
+                            {{ l|get_geoname }}
+                        </a>: {{ types|list_to_string }}
+                    </li>
+                    {% else %}
+                    <li class="w-100 mb2">
+                        {{ l|get_geoname }} (<code>{{ l }}</code>)
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            </ul>
         {% endfor %}
-        </ul>
     </div>
     {% endif %}
 </div>

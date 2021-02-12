@@ -1,5 +1,6 @@
 import datetime
 import re
+from collections import defaultdict
 
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
@@ -9,6 +10,7 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 from .organisation_link import OrganisationLink
 from .orgid import OrgidField
 from .orgid_scheme import OrgidScheme
+from .organisation_location import OrganisationLocation
 
 EXTERNAL_LINKS = {
     "GB-CHC": [
@@ -351,11 +353,23 @@ class Organisation(models.Model):
             "K04000001": ["E92000001", "W92000004"],  # England and Wales
         }
 
-        for v in self.location:
-            if v.get("geoCode") and re.match("[ENWSK][0-9]{8}", v.get("geoCode")):
+        for v in self.locations.all():
+            if re.match("[ENWSK][0-9]{8}", v.geoCode):
                 # special case for combinations of countries
-                if v["geoCode"] in special_cases:
-                    for a in special_cases[v["geoCode"]]:
+                if v.geoCode in special_cases:
+                    for a in special_cases[v.geoCode]:
                         yield a
                     continue
-                yield v.get("geoCode")
+                yield v.geoCode
+
+    def locations_group(self):
+        locations = defaultdict(lambda: defaultdict(set))
+
+        for v in self.locations.all():
+            print(OrganisationLocation.LocationTypes)
+            location_type = OrganisationLocation.LocationTypes(v.locationType).label
+            if v.geo_laua:
+                locations[v.geo_iso][v.geo_laua].add(location_type)
+            else:
+                locations[v.geo_iso][v.geo_iso].add(location_type)
+        return locations
