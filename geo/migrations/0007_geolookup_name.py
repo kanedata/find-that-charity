@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('geo', '0006_geolookup'),
+        ("geo", "0006_geolookup"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='geolookup',
-            name='name',
-            field=models.CharField(blank=True, db_index=True, max_length=255, null=True),
+            model_name="geolookup",
+            name="name",
+            field=models.CharField(
+                blank=True, db_index=True, max_length=255, null=True
+            ),
         ),
     ]

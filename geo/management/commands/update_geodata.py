@@ -118,11 +118,11 @@ class Command(BaseCommand):
         "delete any records from location that aren't based on current scrapes": """
             delete from ftc_organisationlocation
             where id in (
-                select fol.id 
+                select fol.id
                 from ftc_organisationlocation fol
-                    left outer join ftc_organisation fo 
+                    left outer join ftc_organisation fo
                         on fol.organisation_id = fo.id
-                            and fol.scrape_id = fo.scrape_id 
+                            and fol.scrape_id = fo.scrape_id
                 where fo.scrape_id is null
             )
         """,
@@ -169,7 +169,7 @@ class Command(BaseCommand):
             where ftc_organisationlocation."geoCode" = geo."geoCode"
                 and ftc_organisationlocation."geoCodeType" = 'ONS'
                 and ftc_organisationlocation.geo_ctry is null;
-        """
+        """,
     }
 
     def __init__(self, *args, **kwargs):

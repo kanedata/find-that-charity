@@ -92,7 +92,7 @@ class GeoLookup(models.Model):
         max_length=3,
         verbose_name="ISO3166-1 Country Code",
         db_index=True,
-        default='GB',
+        default="GB",
     )
     geo_oa11 = models.CharField(
         max_length=9, null=True, blank=True, verbose_name="Output Area"
