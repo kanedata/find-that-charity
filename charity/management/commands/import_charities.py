@@ -16,3 +16,4 @@ class Command(BaseCommand):
             except Exception:
                 self.stdout.write(self.style.ERROR("Command {} failed".format(scraper)))
         management.call_command("update_orgids")
+        management.call_command("update_geodata")

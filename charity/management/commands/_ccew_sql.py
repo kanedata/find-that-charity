@@ -331,3 +331,35 @@ from charity_charity cc
 where company_number not in ('01234567', '12345678', '00000000')
     and cc.source = '{source}'
 """
+
+UPDATE_CCEW[
+    "Insert into organisation location table"
+] = """
+insert into ftc_organisationlocation (
+    organisation_id,
+    org_id,
+    name,
+    "geoCode",
+    "geoCodeType",
+    "locationType",
+    geo_iso,
+    "source_id",
+    "scrape_id"
+)
+select fo.id as organisation_id,
+    CONCAT('GB-CHC-', cc.regno) as org_id,
+    aooname as name,
+    coalesce(ca."GSS", ca."ISO3166_1") as "geoCode",
+    case when ca."GSS" is not null then 'ONS'
+         when ca."ISO3166_1" is not null then 'ISO'
+         else null end as "geoCodeType",
+    'AOO' as "locationType",
+    ca."ISO3166_1" as geo_iso,
+    fo.source_id as source_id,
+    {scrape_id} as scrape_id
+from charity_ccewcharityaoo cc
+    inner join charity_areaofoperation ca
+        on cc.aookey = ca.aookey and cc.aootype = ca.aootype
+    inner join ftc_organisation fo
+        on fo.org_id = CONCAT('GB-CHC-', cc.regno)
+"""
