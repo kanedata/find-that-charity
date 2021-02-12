@@ -185,3 +185,38 @@ LOGGING = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+IGNORE_DOMAINS = (
+    "gmail.com",
+    "hotmail.com",
+    "btinternet.com",
+    "hotmail.co.uk",
+    "yahoo.co.uk",
+    "outlook.com",
+    "aol.com",
+    "btconnect.com",
+    "yahoo.com",
+    "googlemail.com",
+    "ntlworld.com",
+    "talktalk.net",
+    "sky.com",
+    "live.co.uk",
+    "ntlworld.com",
+    "tiscali.co.uk",
+    "icloud.com",
+    "btopenworld.com",
+    "blueyonder.co.uk",
+    "virginmedia.com",
+    "nhs.net",
+    "me.com",
+    "msn.com",
+    "talk21.com",
+    "aol.co.uk",
+    "mail.com",
+    "live.com",
+    "virgin.net",
+    "ymail.com",
+    "mac.com",
+    "waitrose.com",
+    "gmail.co.uk",
+)
