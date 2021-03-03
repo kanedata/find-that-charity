@@ -18,7 +18,7 @@ class Command(HTMLScraper):
         "https://www.gov.uk/government/publications/current-registered-providers-of-social-housing",
     ]
     org_id_prefix = "GB-SHPE"
-    id_field = "Registration Number"
+    id_field = "Registration number"
     source = {
         "title": "Current registered providers of social housing",
         "description": "Current registered providers of social housing and new registrations and deregistrations. Covers England",
@@ -63,31 +63,33 @@ class Command(HTMLScraper):
     def parse_row(self, record):
 
         record = self.clean_fields(record)
+        if not record.get("Organisation name"):
+            return
 
         org_types = [
             self.add_org_type("Registered Provider of Social Housing"),
         ]
-        if record.get("Corporate Form"):
-            if record["Corporate Form"] == "Company":
+        if record.get("Corporate form"):
+            if record["Corporate form"] == "Company":
                 org_types.append(self.add_org_type("Registered Company"))
                 org_types.append(
                     self.add_org_type(
-                        "{} {}".format(record["Designation"], record["Corporate Form"])
+                        "{} {}".format(record["Designation"], record["Corporate form"])
                     )
                 )
-            elif record["Corporate Form"] == "CIO-Charitable Incorporated Organisation":
+            elif record["Corporate form"] == "CIO-Charitable Incorporated Organisation":
                 org_types.append(
                     self.add_org_type("Charitable Incorporated Organisation")
                 )
                 org_types.append(self.add_org_type("Registered Charity"))
-            elif record["Corporate Form"] == "Charitable Company":
+            elif record["Corporate form"] == "Charitable Company":
                 org_types.append(self.add_org_type("Registered Company"))
                 org_types.append(self.add_org_type("Incorporated Charity"))
                 org_types.append(self.add_org_type("Registered Charity"))
-            elif record["Corporate Form"] == "Unincorporated Charity":
+            elif record["Corporate form"] == "Unincorporated Charity":
                 org_types.append(self.add_org_type("Registered Charity"))
             else:
-                org_types.append(self.add_org_type(record["Corporate Form"]))
+                org_types.append(self.add_org_type(record["Corporate form"]))
         elif record.get("Designation"):
             org_types.append(self.add_org_type(record["Designation"]))
 
@@ -112,7 +114,7 @@ class Command(HTMLScraper):
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),
-                    "name": record.get("Organisation Name"),
+                    "name": record.get("Organisation name"),
                     "charityNumber": None,
                     "companyNumber": None,
                     "streetAddress": None,
@@ -130,7 +132,7 @@ class Command(HTMLScraper):
                     "location": locations,
                     "latestIncome": None,
                     "dateModified": datetime.datetime.now(),
-                    "dateRegistered": record.get("Registration Date"),
+                    "dateRegistered": record.get("Registration date"),
                     "dateRemoved": None,
                     "active": True,
                     "parent": None,
