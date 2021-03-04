@@ -1,5 +1,4 @@
 import datetime
-import re
 
 import requests_cache
 from requests_html import HTMLSession
@@ -46,9 +45,7 @@ class Command(CSVScraper):
     }
 
     date_format = "%d-%m-%Y"
-    gias_regex = re.compile(
-        r"https?://ea-edubase-api-prod.azurewebsites.net/edubase/downloads/public/edubasealldata[0-9]{8}\.csv"
-    )
+    gias_url_format = "https://ea-edubase-api-prod.azurewebsites.net/edubase/downloads/public/edubasealldata{:%Y%m%d}.csv"
     date_fields = ["OpenDate", "CloseDate"]
     location_fields = [
         "GOR",
@@ -73,8 +70,17 @@ class Command(CSVScraper):
             self.set_access_url(u)
             response = self.session.get(u)
             response.raise_for_status()
-            for link in response.html.links:
-                if self.gias_regex.match(link):
+            for item in response.html.find(".govuk-checkboxes__item"):
+                item_data = {
+                    field.attrs["name"].split(".")[1]: field.attrs["value"]
+                    for field in item.find("input")
+                }
+                if item_data.get("Tag") == 'all.edubase.data':
+                    last_updated = datetime.datetime.strptime(
+                        item_data.get("FileGeneratedDate").split(" ")[0],
+                        "%m/%d/%Y"
+                    )
+                    link = self.gias_url_format.format(last_updated)
                     self.set_download_url(link)
                     self.files[link] = self.session.get(link)
                     self.files[link].raise_for_status()
