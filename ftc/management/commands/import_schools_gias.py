@@ -75,10 +75,9 @@ class Command(CSVScraper):
                     field.attrs["name"].split(".")[1]: field.attrs["value"]
                     for field in item.find("input")
                 }
-                if item_data.get("Tag") == 'all.edubase.data':
+                if item_data.get("Tag") == "all.edubase.data":
                     last_updated = datetime.datetime.strptime(
-                        item_data.get("FileGeneratedDate").split(" ")[0],
-                        "%m/%d/%Y"
+                        item_data.get("FileGeneratedDate").split(" ")[0], "%m/%d/%Y"
                     )
                     link = self.gias_url_format.format(last_updated)
                     self.set_download_url(link)
