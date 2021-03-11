@@ -8,7 +8,7 @@ class Command(CSVScraper):
     name = "lae"
     allowed_domains = ["register.gov.uk"]
     start_urls = [
-        "https://local-authority-eng.register.gov.uk/records.csv?page-size=5000"
+        "https://raw.githubusercontent.com/drkane/registers-backup/main/local-authority-eng.csv"
     ]
     org_id_prefix = "GB-LAE"
     id_field = "key"

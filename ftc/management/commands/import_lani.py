@@ -9,7 +9,7 @@ class Command(CSVScraper):
     name = "lani"
     allowed_domains = ["register.gov.uk"]
     start_urls = [
-        "https://local-authority-nir.register.gov.uk/records.csv?page-size=5000"
+        "https://raw.githubusercontent.com/drkane/registers-backup/main/local-authority-nir.csv"
     ]
     org_id_prefix = "GB-LANI"
     id_field = "key"

@@ -9,7 +9,7 @@ class Command(CSVScraper):
     name = "gor"
     allowed_domains = ["register.gov.uk"]
     start_urls = [
-        "https://government-organisation.register.gov.uk/records.csv?page-size=5000"
+        "https://raw.githubusercontent.com/drkane/registers-backup/main/government-organisation.csv"
     ]
     org_id_prefix = "GB-GOR"
     id_field = "key"
