@@ -62,6 +62,11 @@ class Command(BaseCommand):
             where fo."geoCode" = 'K04000001'
                 and "geoCodeType" = 'ONS';
         """,
+        'remove any "ENGLAND AND WALES" references': """
+            delete from ftc_organisationlocation fo
+            where fo."geoCode" = 'K04000001'
+                and "geoCodeType" = 'ONS';
+        """,
         "add postcode data to location from organisation table": """
             insert into ftc_organisationlocation (
                 organisation_id,

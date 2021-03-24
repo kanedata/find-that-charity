@@ -82,7 +82,10 @@ def get_orgidschemes():
 
 
 def get_geoname(code):
-    return GeoLookup.objects.get(geoCode=code).name
+    try:
+        return GeoLookup.objects.get(geoCode=code).name
+    except GeoLookup.DoesNotExist:
+        return code
 
 
 def environment(**options):

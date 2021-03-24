@@ -2,6 +2,8 @@ import csv
 import io
 from collections import namedtuple
 
+import pycountry
+
 from ftc.management.commands._base_scraper import BaseScraper
 from geo.models import GeoLookup
 
@@ -170,6 +172,15 @@ class Command(BaseScraper):
         # delete existing records
         GeoLookup.objects.all().delete()
         self.logger.info("Deleting existing items")
+
+        # Import countries from pycountry
+        for country in pycountry.countries:
+            self.add_record(**{
+                "geoCode": country.alpha_2,
+                "geoCodeType": "iso",
+                "geo_iso": country.alpha_2,
+                "name": country.name
+            })
 
         # create the manual records
         for m in self.MANUAL_RECORDS:

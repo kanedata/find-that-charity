@@ -119,6 +119,8 @@ def regex_search(s, regex):
 def list_to_string(items, sep=", ", final_sep=" and "):
     if isinstance(items, str):
         return items
+    if isinstance(items, set):
+        items = list(items)
 
     if len(items) == 1:
         return items[0]

@@ -5,7 +5,7 @@ var bounds = L.latLngBounds(
     L.latLng(49.8647440573549, -8.649995833304311),
     L.latLng(60.86078239016185, 1.763705609663519),
 );
-if (GEOCODES || (ORG_LAT && ORG_LONG)) {
+if (GEOCODES || ORG_LAT_LONGS) {
     var map = L.map('locationmap').setView([51.505, -0.09], 13);
     map.scrollWheelZoom.disable();
     L.tileLayer(TILES, { style: 'toner' }).addTo(map);
@@ -30,16 +30,16 @@ if (GEOCODES || (ORG_LAT && ORG_LONG)) {
         });
     }
 
-    if (ORG_LAT && ORG_LONG) {
-        var point = L.latLng([
-            ORG_LAT,
-            ORG_LONG,
-        ]);
-        var marker = L.marker(point).addTo(map);
-        if(POSTCODE){
-            marker.bindPopup(POSTCODE);
-        }
-        bounds.extend(point);
-        map.fitBounds(bounds);
+    if (ORG_LAT_LONGS) {
+        ORG_LAT_LONGS.forEach((latlng) => {
+            var point = L.latLng([
+                latlng[0],
+                latlng[1],
+            ]);
+            var marker = L.marker(point).addTo(map);
+            marker.bindPopup(`<strong>${latlng[2]}</strong>: ${latlng[3]}`);
+            bounds.extend(point);
+            map.fitBounds(bounds);
+        });
     }
 }

@@ -38,6 +38,7 @@ markupsafe==1.1.1         # via jinja2
 openpyxl==3.0.3           # via -r requirements.in
 parse==1.15.0             # via requests-html
 psycopg2==2.8.6           # via -r requirements.in
+pycountry==20.7.3         # via -r requirements.in
 pydantic==1.7.3           # via django-ninja
 pyee==7.0.2               # via pyppeteer
 pyexcel-ezodf==0.3.4      # via pyexcel-ods3

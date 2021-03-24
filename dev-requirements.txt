@@ -46,6 +46,7 @@ parse==1.15.0             # via -r requirements.txt, requests-html
 pathspec==0.8.1           # via black
 psycopg2==2.8.6           # via -r requirements.txt
 pycodestyle==2.6.0        # via flake8
+pycountry==20.7.3         # via -r requirements.txt
 pydantic==1.7.3           # via -r requirements.txt, django-ninja
 pyee==7.0.2               # via -r requirements.txt, pyppeteer
 pyexcel-ezodf==0.3.4      # via -r requirements.txt, pyexcel-ods3

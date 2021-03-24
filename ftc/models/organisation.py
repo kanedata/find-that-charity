@@ -336,23 +336,47 @@ class Organisation(models.Model):
             "K04000001": ["E92000001", "W92000004"],  # England and Wales
         }
 
-        for v in self.locations.all():
-            if re.match("[ENWSK][0-9]{8}", v.geoCode):
+        for location in self.locations.all():
+            if re.match("[ENWSK][0-9]{8}", location.geoCode):
                 # special case for combinations of countries
-                if v.geoCode in special_cases:
-                    for a in special_cases[v.geoCode]:
+                if location.geoCode in special_cases:
+                    for a in special_cases[location.geoCode]:
                         yield a
                     continue
-                yield v.geoCode
+                yield location.geoCode
 
     def locations_group(self):
         locations = defaultdict(lambda: defaultdict(set))
 
-        for v in self.locations.all():
-            print(OrganisationLocation.LocationTypes)
-            location_type = OrganisationLocation.LocationTypes(v.locationType).label
-            if v.geo_laua:
-                locations[v.geo_iso][v.geo_laua].add(location_type)
+        for location in self.locations.all():
+            location_type = OrganisationLocation.LocationTypes(location.locationType).label
+            if location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE:
+                locations[location_type][location.geo_iso].add(location.geo_laua)
             else:
-                locations[v.geo_iso][v.geo_iso].add(location_type)
+                locations[location_type][location.geo_iso].add(location.geoCode)
         return locations
+
+    @property
+    def location(self):
+        locations = []
+        for location in self.locations.all():
+            if location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE:
+                geocode = location.geo_laua
+            else:
+                geocode = location.geoCode
+            locations.append({
+                "id": location.geoCode,
+                "name": location.name,
+                "geoCode": geocode,
+                "type": location.locationType,
+            })
+        return locations
+
+    @property
+    def lat_lngs(self):
+        return_lat_lngs = []
+        for location in self.locations.all():
+            if location.geo_lat and location.geo_long:
+                location_type = OrganisationLocation.LocationTypes(location.locationType).label
+                return_lat_lngs.append((location.geo_lat, location.geo_long, location_type, location.name))
+        return return_lat_lngs
