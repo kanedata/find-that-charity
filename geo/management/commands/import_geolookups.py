@@ -175,12 +175,14 @@ class Command(BaseScraper):
 
         # Import countries from pycountry
         for country in pycountry.countries:
-            self.add_record(**{
-                "geoCode": country.alpha_2,
-                "geoCodeType": "iso",
-                "geo_iso": country.alpha_2,
-                "name": country.name
-            })
+            self.add_record(
+                **{
+                    "geoCode": country.alpha_2,
+                    "geoCodeType": "iso",
+                    "geo_iso": country.alpha_2,
+                    "name": country.name,
+                }
+            )
 
         # create the manual records
         for m in self.MANUAL_RECORDS:

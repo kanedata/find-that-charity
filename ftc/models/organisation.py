@@ -8,9 +8,9 @@ from django.urls import reverse
 from django_better_admin_arrayfield.models.fields import ArrayField
 
 from .organisation_link import OrganisationLink
+from .organisation_location import OrganisationLocation
 from .orgid import OrgidField
 from .orgid_scheme import OrgidScheme
-from .organisation_location import OrganisationLocation
 
 EXTERNAL_LINKS = {
     "GB-CHC": [
@@ -376,7 +376,9 @@ class Organisation(models.Model):
         locations = defaultdict(lambda: defaultdict(set))
 
         for location in self.locations.all():
-            location_type = OrganisationLocation.LocationTypes(location.locationType).label
+            location_type = OrganisationLocation.LocationTypes(
+                location.locationType
+            ).label
             if location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE:
                 locations[location_type][location.geo_iso].add(location.geo_laua)
             else:
@@ -391,12 +393,14 @@ class Organisation(models.Model):
                 geocode = location.geo_laua
             else:
                 geocode = location.geoCode
-            locations.append({
-                "id": location.geoCode,
-                "name": location.name,
-                "geoCode": geocode,
-                "type": location.locationType,
-            })
+            locations.append(
+                {
+                    "id": location.geoCode,
+                    "name": location.name,
+                    "geoCode": geocode,
+                    "type": location.locationType,
+                }
+            )
         return locations
 
     @property
@@ -404,6 +408,10 @@ class Organisation(models.Model):
         return_lat_lngs = []
         for location in self.locations.all():
             if location.geo_lat and location.geo_long:
-                location_type = OrganisationLocation.LocationTypes(location.locationType).label
-                return_lat_lngs.append((location.geo_lat, location.geo_long, location_type, location.name))
+                location_type = OrganisationLocation.LocationTypes(
+                    location.locationType
+                ).label
+                return_lat_lngs.append(
+                    (location.geo_lat, location.geo_long, location_type, location.name)
+                )
         return return_lat_lngs

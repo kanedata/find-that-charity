@@ -6,64 +6,64 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ftc', '0012_remove_organisation_location'),
+        ("ftc", "0012_remove_organisation_location"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_ctry',
+            model_name="organisation",
+            name="geo_ctry",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_cty',
+            model_name="organisation",
+            name="geo_cty",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_lat',
+            model_name="organisation",
+            name="geo_lat",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_laua',
+            model_name="organisation",
+            name="geo_laua",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_lep1',
+            model_name="organisation",
+            name="geo_lep1",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_lep2',
+            model_name="organisation",
+            name="geo_lep2",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_long',
+            model_name="organisation",
+            name="geo_long",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_lsoa11',
+            model_name="organisation",
+            name="geo_lsoa11",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_msoa11',
+            model_name="organisation",
+            name="geo_msoa11",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_oa11',
+            model_name="organisation",
+            name="geo_oa11",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_pcon',
+            model_name="organisation",
+            name="geo_pcon",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_rgn',
+            model_name="organisation",
+            name="geo_rgn",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_ttwa',
+            model_name="organisation",
+            name="geo_ttwa",
         ),
         migrations.RemoveField(
-            model_name='organisation',
-            name='geo_ward',
+            model_name="organisation",
+            name="geo_ward",
         ),
     ]

@@ -120,6 +120,4 @@ class OrganisationLocation(models.Model):
     geo_long = models.FloatField(null=True, blank=True, verbose_name="Longitude")
 
     def __repr__(self):
-        return "<Location {}/>".format(
-            self.geoCode
-        )
+        return "<Location {}/>".format(self.geoCode)
