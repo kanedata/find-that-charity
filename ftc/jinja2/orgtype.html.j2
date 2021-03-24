@@ -1,6 +1,7 @@
 {% extends 'base.html.j2' %}
 {% set sources = get_sources() %}
 {% set orgtypes = get_orgtypes() %}
+{% set locations = get_locations() %}
 {% set heading = '{}'.format(
     base_query.title,
 ) if base_query else 'Search Results' %}
@@ -29,7 +30,7 @@
     <form class="" action="{{ url_remove(request, 'q') }}">
         <div class="fl w-100 w-70-l pa2">
             {% include 'components/search_form.html.j2' %}
-            {% if search.other_orgtypes or search.source %}
+            {% if search.other_orgtypes or search.source or search.location %}
             <div class="w-100">
                 <span class="f6 b mr2">Filters: </span>
                 {% if search.other_orgtypes %}
@@ -48,7 +49,15 @@
                 </span>
                 {% endfor %}
                 {% endif %}
-                <a href="{{ url_remove(request, ['orgtype', 'source']) }}" class="f6 link blue underline">Clear filters</a>
+                {% if search.location %}
+                {% for l in search.location if base_query.slug != l %}
+                <span class="bg-moon-gray b--dark-gray bw0 ba mr2 mb2 dib f6 br3 pv1 ph2">
+                    Location: 
+                    {{ l|get_geoname }}
+                </span>
+                {% endfor %}
+                {% endif %}
+                <a href="{{ url_remove(request, ['orgtype', 'source', 'location']) }}" class="f6 link blue underline">Clear filters</a>
             </div>
             {% endif %}
             <div class="mt4">

@@ -81,6 +81,23 @@ def get_orgidschemes():
     return value
 
 
+def get_locations():
+    cache_key = "locationnames"
+    value = cache.get(cache_key)
+    if value:
+        return value
+    if GeoLookup._meta.db_table in connection.introspection.table_names():
+        value = {}
+        for s in GeoLookup.objects.all():
+            if s.geoCodeType not in value:
+                value[s.geoCodeType] = {}
+            value[s.geoCodeType][s.geoCode] = s.name
+        cache.set(cache_key, value, 60 * 60)
+    else:
+        value = {}
+    return value
+
+
 def get_geoname(code):
     try:
         return GeoLookup.objects.get(geoCode=code).name
@@ -99,6 +116,7 @@ def environment(**options):
             "get_orgtypes": get_orgtypes,
             "get_sources": get_sources,
             "get_orgidschemes": get_orgidschemes,
+            "get_locations": get_locations,
             "url_replace": url_replace,
             "url_remove": url_remove,
             "ga_tracking": settings.GOOGLE_ANALYTICS,

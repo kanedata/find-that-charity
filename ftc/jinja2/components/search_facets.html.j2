@@ -73,3 +73,18 @@
     </li>
 {% endfor %}
 </ul>
+{% for locationtype, locationtypename in (('ctry', 'UK Country'), ('rgn', 'English Region'), ('la', 'UK Local Authority'), ('iso', 'Country')) %}
+<h4 class="ma0 pa0">{{ locationtypename }}</h4>
+<ul class="mb4 mt2 list mh0 pa0">
+{% for areacode, areaname in locations[locationtype]|dictsort %}
+    {% if areacode in search.aggregation.by_location %}
+    <li class="w-100 f4 mb2">
+        <div class="lh-title">
+            <a class="link dark-blue underline-hover mr3 lh-title" href="{{ url_replace(request, location=areacode) }}">{{ areaname }}</a>
+            <span class="mid-gray">{{ "{:,.0f}".format(search.aggregation.by_location[areacode]) }}</span>
+        </div>
+    </li>
+    {% endif %}
+{% endfor %}
+</ul>
+{% endfor %}

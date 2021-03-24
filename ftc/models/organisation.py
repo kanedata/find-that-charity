@@ -345,6 +345,33 @@ class Organisation(models.Model):
                     continue
                 yield location.geoCode
 
+    @property
+    def allGeoCodes(self):
+
+        location_fields = [
+            "geo_iso",
+            "geo_oa11",
+            "geo_cty",
+            "geo_laua",
+            "geo_ward",
+            "geo_ctry",
+            "geo_rgn",
+            "geo_pcon",
+            "geo_ttwa",
+            "geo_lsoa11",
+            "geo_msoa11",
+            "geo_lep1",
+            "geo_lep2",
+        ]
+
+        locations = set()
+        for location in self.locations.all():
+            for f in location_fields:
+                value = getattr(location, f, None)
+                if value and not value.endswith("999999"):
+                    locations.add(value)
+        return list(locations)
+
     def locations_group(self):
         locations = defaultdict(lambda: defaultdict(set))
 

@@ -78,6 +78,7 @@ class OrganisationSearch:
         self.active = None
         self.domain = None
         self.postcode = None
+        self.location = None
 
         self.query = None
         self.paginator = None
@@ -95,6 +96,7 @@ class OrganisationSearch:
         active=None,
         domain=None,
         postcode=None,
+        location=None,
     ):
         if term and isinstance(term, str):
             self.term = term
@@ -103,6 +105,7 @@ class OrganisationSearch:
             (base_orgtype, "base_orgtype"),
             (other_orgtypes, "other_orgtypes"),
             (source, "source"),
+            (location, "location"),
         ]:
             if t:
                 if isinstance(t, str) and t != "all":
@@ -127,6 +130,8 @@ class OrganisationSearch:
             self.set_criteria(other_orgtypes=request.GET.getlist("orgtype"))
         if "source" in request.GET and request.GET.get("source") != "all":
             self.set_criteria(source=request.GET.getlist("source"))
+        if "location" in request.GET and request.GET.get("location") != "all":
+            self.set_criteria(location=request.GET.getlist("location"))
         if "q" in request.GET:
             self.set_criteria(term=request.GET["q"])
         if request.GET.get("active", "").lower().startswith("t"):
@@ -182,6 +187,10 @@ class OrganisationSearch:
         if self.source:
             filter_.append({"terms": {"source": self.source}})
 
+        # check for source
+        if self.location:
+            filter_.append({"terms": {"location": self.location}})
+
         # check for active or inactive organisations
         if self.active is True:
             filter_.append({"match": {"active": True}})
@@ -206,9 +215,11 @@ class OrganisationSearch:
             by_source = A("terms", field="source", size=150)
             by_orgtype = A("terms", field="organisationType", size=150)
             by_active = A("terms", field="active", size=150)
+            by_location = A("terms", field="location", size=150)
             q.aggs.bucket("by_source", by_source)
             q.aggs.bucket("by_orgtype", by_orgtype)
             q.aggs.bucket("by_active", by_active)
+            q.aggs.bucket("by_location", by_location)
 
         self.query = q.execute(params=params)
         if with_pagination:
@@ -223,6 +234,10 @@ class OrganisationSearch:
                 {"orgtype": b["key"], "records": b["doc_count"]}
                 for b in self.query.aggregations["by_orgtype"]["buckets"]
             ]
+            self.aggregation["by_location"] = {
+                b["key"]: b["doc_count"]
+                for b in self.query.aggregations["by_location"]["buckets"]
+            }
             self.aggregation["by_active"] = {
                 "active": 0,
                 "inactive": 0,

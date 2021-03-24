@@ -156,7 +156,7 @@ class FullOrganisation(Document):
         return instance.domain
 
     def prepare_location(self, instance):
-        return list(set([location['geoCode'] for location in instance.location]))
+        return instance.allGeoCodes
 
     def prepare_latestIncome(self, instance):
         return instance.latestIncome
