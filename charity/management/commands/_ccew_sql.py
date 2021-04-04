@@ -5,44 +5,43 @@ UPDATE_CCEW[
 ] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
     postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
-    company_number, source, first_added, last_updated )
-select distinct on(c.regno)
-    CONCAT('GB-CHC-', c.regno) as "id",
-    c.name as "name",
-    c.gd as "constitution",
-    c.aob as "geographical_spread",
+    company_number, activities, source, first_added, last_updated, income, spending, latest_fye)
+select distinct on(c.registered_charity_number)
+    CONCAT('GB-CHC-', c.registered_charity_number) as "id",
+    c.charity_name as "name",
+    cgd.governing_document_description as "constitution",
+    cgd.area_of_benefit as "geographical_spread",
     NULLIF(concat_ws(', ',
-        c."add1",
-        c."add2",
-        c."add3",
-        c."add4",
-        c."add5"
+        c."charity_contact_address1",
+        c."charity_contact_address2",
+        c."charity_contact_address3",
+        c."charity_contact_address4",
+        c."charity_contact_address5"
     ), '') as "address",
-    c.postcode as postcode,
-    c.phone as "phone",
-    c.orgtype = 'R' as active,
-     to_date(reg.data->0->>'regdate', 'YYYY-MM-DD') as "date_registered",
-    to_date(reg.data->-1->>'remdate', 'YYYY-MM-DD') as "date_removed",
-    reg.data->-1->>'remcode' as "removal_reason",
-    cm.web as "web",
-    cm.email as "email",
-    lpad(cm.coyno, 8, '0') as "company_number",
+    c.charity_contact_postcode as postcode,
+    c.charity_contact_phone as "phone",
+    c.charity_registration_status = 'Registered' as active,
+    c.date_of_registration as "date_registered",
+    c.date_of_removal as "date_removed",
+    ceh.reason as "removal_reason",
+    c.charity_contact_web as "web",
+    c.charity_contact_email as "email",
+    lpad(c.charity_company_registration_number, 8, '0') as "company_number",
+    coalesce(c.charity_activities, cgd.charitable_objects) as activities,
     '{source}' as "source",
     NOW() as "first_added",
-    NOW() as "last_updated"
+    NOW() as "last_updated",
+    c.latest_income as income,
+    c.latest_expenditure as spending,
+    c.latest_acc_fin_period_end_date as latest_fye
 from charity_ccewcharity c
-    left outer join charity_ccewmaincharity cm
-        on c.regno = cm.regno
-    left outer join (
-        select regno,
-            subno,
-            jsonb_agg(cr order by regdate desc) as data
-        from charity_ccewregistration cr
-        group by regno, subno
-    ) as reg
-        on c.regno = reg.regno
-            and c.subno = reg.subno
-where c.subno = 0
+    left outer join charity_ccewcharitygoverningdocument cgd
+        on c.organisation_number = cgd.organisation_number
+    left outer join charity_ccewcharityeventhistory ceh
+        on c.organisation_number = ceh.organisation_number
+            and ceh.date_of_event = c.date_of_removal
+            and ceh.event_type = 'Removed'
+where c.linked_charity_number = 0
 on conflict (id) do update
 set "name" = EXCLUDED.name,
     constitution = COALESCE(EXCLUDED.constitution, cc.constitution),
@@ -57,30 +56,36 @@ set "name" = EXCLUDED.name,
     web = COALESCE(EXCLUDED.web, cc.web),
     email = COALESCE(EXCLUDED.email, cc.email),
     company_number = COALESCE(EXCLUDED.company_number, cc.company_number),
+    activities = COALESCE(EXCLUDED.activities, cc.activities),
     source = EXCLUDED.source,
     first_added = cc.first_added,
-    last_updated = EXCLUDED.last_updated;
+    last_updated = EXCLUDED.last_updated,
+    income = COALESCE(EXCLUDED.income, cc.income),
+    spending = COALESCE(EXCLUDED.spending, cc.spending),
+    latest_fye = COALESCE(EXCLUDED.latest_fye, cc.latest_fye)
 """
 
 UPDATE_CCEW[
     "Insert into charity financial"
 ] = """
-insert into charity_charityfinancial as cf (charity_id, fyend, fystart, income, spending, account_type)
+insert into charity_charityfinancial as cf (charity_id, fyend, fystart, income, spending, volunteers, account_type)
 select DISTINCT ON ("org_id", "fyend") a.*
 from (
-    select CONCAT('GB-CHC-', c.regno) as org_id,
-        c."fyend",
-        c."fystart",
-        c."income",
-        c."expend" as "spending",
+    select CONCAT('GB-CHC-', c.registered_charity_number) as org_id,
+        c.fin_period_end_date as "fyend",
+        c.fin_period_start_date as "fystart",
+        c.total_gross_income as "income",
+        c.total_gross_expenditure as "spending",
+        c.count_volunteers as "volunteers",
         'basic' as "account_type"
-    from charity_ccewfinancial c
-    where "income" is not null
+    from charity_ccewcharityarparta c
+    where "total_gross_income" is not null
 ) as a
 on conflict (charity_id, fyend) do update
 set fystart = EXCLUDED.fystart,
     income = EXCLUDED.income,
     spending = EXCLUDED.spending,
+    volunteers = EXCLUDED.volunteers,
     account_type = cf.account_type;
 """
 
@@ -89,79 +94,59 @@ UPDATE_CCEW[
 ] = """
 update charity_charityfinancial cf
 set
-    inc_leg = a.inc_leg,
-    inc_end = a.inc_end,
-    inc_vol = a.inc_vol,
-    inc_fr = a.inc_fr,
-    inc_char = a.inc_char,
-    inc_invest = a.inc_invest,
-    inc_other = a.inc_other,
-    inc_total = a.inc_total,
-    invest_gain = a.invest_gain,
-    asset_gain = a.asset_gain,
-    pension_gain = a.pension_gain,
-    exp_vol = a.exp_vol,
-    exp_trade = a.exp_trade,
-    exp_invest = a.exp_invest,
-    exp_grant = a.exp_grant,
-    exp_charble = a.exp_charble,
-    exp_gov = a.exp_gov,
-    exp_other = a.exp_other,
-    exp_total = a.exp_total,
-    exp_support = a.exp_support,
-    exp_dep = a.exp_dep,
+    inc_leg = a.income_legacies,
+    inc_end = a.income_endowments,
+    inc_vol = a.income_donations_and_legacies,
+    inc_fr = a.income_other_trading_activities,
+    inc_char = a.income_charitable_activities,
+    inc_invest = a.income_investments,
+    inc_other = a.income_other,
+    inc_total = a.income_total_income_and_endowments,
+    invest_gain = a.gain_loss_investment,
+    asset_gain = a.gain_loss_pension_fund,
+    pension_gain = a.gain_loss_pension_fund,
+    exp_vol = a.expenditure_raising_funds,
+    exp_trade = null,
+    exp_invest = null,
+    exp_grant = a.expenditure_grants_institution,
+    exp_charble = a.expenditure_charitable_expenditure,
+    exp_gov = a.expenditure_governance,
+    exp_other = a.expenditure_other,
+    exp_total = a.expenditure_total,
+    exp_support = a.expenditure_support_costs,
+    exp_dep = a.expenditure_depreciation,
     reserves = a.reserves,
-    asset_open = a.asset_open,
-    asset_close = a.asset_close,
-    fixed_assets = a.fixed_assets,
-    open_assets = a.open_assets,
-    invest_assets = a.invest_assets,
-    cash_assets = a.cash_assets,
-    current_assets = a.current_assets,
-    credit_1 = a.credit_1,
-    credit_long = a.credit_long,
-    pension_assets = a.pension_assets,
-    total_assets = a.total_assets,
-    funds_end = a.funds_end,
-    funds_restrict = a.funds_restrict,
-    funds_unrestrict = a.funds_unrestrict,
+    asset_open = null,
+    asset_close = a.assets_total_fixed, -- Total fixed assets
+    fixed_assets = a.assets_long_term_investment, -- Fixed Investments Assets
+    open_assets = null,
+    invest_assets = a.assets_current_investment, -- Current Investment Assets
+    cash_assets = a.assets_cash, -- Cash
+    current_assets = null, -- Total Current Assets
+    credit_1 = a.creditors_one_year_total_current,
+    credit_long = a.creditors_falling_due_after_one_year,
+    pension_assets = a.defined_benefit_pension_scheme,
+    total_assets = a.assets_total_assets_and_liabilities,
+    funds_end = a.funds_endowment,
+    funds_restrict = a.funds_restricted,
+    funds_unrestrict = a.funds_unrestricted,
     funds_total = a.funds_total,
-    employees = a.employees,
-    volunteers = a.volunteers,
-    account_type = case when "cons_acc" = 'Yes' then 'consolidated' else 'charity' end
-from charity_ccewpartb a
-where cf.charity_id = CONCAT('GB-CHC-', a.regno)
-    and cf.fyend = a.fyend;
-"""
-
-UPDATE_CCEW[
-    "Update charity table with latest income"
-] = """
-update charity_charity
-set latest_fye = cf.fyend,
-    income = cf.income,
-    spending = cf.spending
-from (
-    select charity_id, max(fyend) as max_fyend
-    from charity_charityfinancial
-    group by charity_id
-) as cf_max
-    inner join charity_charityfinancial cf
-        on cf_max.charity_id = cf.charity_id
-            and cf_max.max_fyend = cf.fyend
-where cf.charity_id = charity_charity.id;
+    employees = a.count_employees,
+    account_type = case when "consolidated_accounts" then 'consolidated' else 'charity' end
+from charity_ccewcharityarpartb a
+where cf.charity_id = CONCAT('GB-CHC-', a.registered_charity_number)
+    and cf.fyend = a.fin_period_end_date;
 """
 
 UPDATE_CCEW[
     "Insert into charity areas of operation"
 ] = """
 insert into charity_charity_areas_of_operation as ca (charity_id, areaofoperation_id )
-select CONCAT('GB-CHC-', c.regno) as charity_id,
+select CONCAT('GB-CHC-', c.registered_charity_number) as charity_id,
     aoo.id as "areaofoperation_id"
-from charity_ccewcharityaoo c
+from charity_ccewcharityareaofoperation c
     inner join charity_areaofoperation aoo
-        on c.aookey = aoo.aookey
-            and c.aootype = aoo.aootype
+        on c.geographic_area_description = aoo.aooname
 on conflict (charity_id, areaofoperation_id) do nothing;
 """
 
@@ -169,36 +154,38 @@ UPDATE_CCEW[
     "Insert into charity names"
 ] = """
 insert into charity_charityname as cn (charity_id, name, "normalisedName", name_type)
-select CONCAT('GB-CHC-', c.regno) as charity_id,
-    c."name",
-    c."name" as "normalisedName",
-    case when c.subno != '0' then 'Subsidiary'
-        when c.name = ccc."name" then 'Primary'
-        else 'Alternative' end as "name_type"
-from charity_ccewname c
+select CONCAT('GB-CHC-', c.registered_charity_number) as charity_id,
+    c.charity_name as "name",
+    c.charity_name as "normalisedName",
+    case when c.linked_charity_number != '0' then 'Subsidiary'
+        when c.charity_name = ccc."charity_name" then 'Primary'
+        else c.charity_name_type end as "name_type"
+from charity_ccewcharityothernames c
     left outer join charity_ccewcharity ccc
-        on c.regno = ccc.regno
-            and c.subno = ccc.subno
+        on c.registered_charity_number = ccc.registered_charity_number
+            and c.linked_charity_number = ccc.linked_charity_number
+where c.charity_name is not null
 on conflict (charity_id, name) do nothing;
 """
 
 UPDATE_CCEW[
-    "Update charity objects"
+    "Insert charity classification into vocabs"
 ] = """
-update charity_charity
-set activities = "objects"
-from (
-    select CONCAT('GB-CHC-', a.regno) as charity_id,
-        string_agg(regexp_replace("object", "next_seqno" || '$', ''), '' order by seqno) as "objects"
-    from (
-        select *,
-            to_char(seqno::int + 1, 'fm0000') as "next_seqno"
-        from charity_ccewobjects cc
-        where cc.subno = '0'
-    ) as a
-    group by charity_id
-) as a
-where charity_charity.id = a.charity_id;
+insert into charity_vocabularyentries (code, title, vocabulary_id)
+select c.classification_code as "code",
+    c.classification_description as "title",
+    cv.id
+from charity_ccewcharityclassification c
+    inner join charity_vocabulary cv
+        on case when c.classification_type = 'What' then 'ccew_theme'
+            when c.classification_type = 'How' then 'ccew_activities'
+            when c.classification_type = 'Who' then 'ccew_beneficiaries'
+            else null end = cv.title
+group by c.classification_code,
+    c.classification_description,
+    cv.id
+on conflict (code, vocabulary_id) do update
+set title = EXCLUDED.title;
 """
 
 UPDATE_CCEW[
@@ -208,9 +195,9 @@ insert into charity_charity_classification as ca (charity_id, vocabularyentries_
 select org_id,
     ve.id
 from (
-    select CONCAT('GB-CHC-', c.regno) as org_id,
-        c.class as "c_class"
-    from charity_ccewclass c
+    select CONCAT('GB-CHC-', c.registered_charity_number) as org_id,
+        cast(c.classification_code as varchar) as "c_class"
+    from charity_ccewcharityclassification c
 ) as c_class
     inner join charity_vocabularyentries ve
         on c_class.c_class = ve.code
@@ -245,10 +232,10 @@ select distinct on (cc.id)
     cn."alternateName" as "alternateName",
     regexp_replace(cc.id, 'GB\-(SC|NIC|COH|CHC)\-', '') as "charityNumber",
     cc.company_number as "companyNumber",
-    concat_ws(', ', ccew.add1, ccew.add2) as "streetAddress",
-    ccew.add3 as "addressLocality",
-    ccew.add4 as "addressRegion",
-    ccew.add5 as "addressCountry",
+    concat_ws(', ', ccew.charity_contact_address1, ccew.charity_contact_address2) as "streetAddress",
+    ccew.charity_contact_address3 as "addressLocality",
+    ccew.charity_contact_address4 as "addressRegion",
+    ccew.charity_contact_address5 as "addressCountry",
     cc.postcode as "postalCode",
     cc.phone as telephone,
     cc.email as email,
@@ -267,13 +254,15 @@ select distinct on (cc.id)
             when cc."source" = 'oscr' then array['registered-charity-scotland']
             when cc."source" = 'ccni' then array['registered-charity-northern-ireland']
             else array[]::text[] end ||
-        case when cc.company_number is not null then array['registered-company', 'incorporated-charity']
+        case when cc.company_number is not null or ccew.charity_type = 'Charitable company' then array['registered-company', 'incorporated-charity']
             else array[]::text[] end ||
-        case when cc.constitution ilike 'CIO - %' then array['charitable-incorporated-organisation', 'incorporated-charity']
+        case when cc.constitution ilike 'CIO - %' or ccew.charity_type = 'CIO' then array['charitable-incorporated-organisation', 'incorporated-charity']
             else array[]::text[] end ||
         case when cc.constitution ilike 'cio - association %' then array['charitable-incorporated-organisation-association']
             else array[]::text[] end ||
         case when cc.constitution ilike 'cio - foundation %' then array['charitable-incorporated-organisation-foundation']
+            else array[]::text[] end ||
+        case when ccew.charity_type = 'Trust' then array['trust']
             else array[]::text[] end
         as "organisationType",
     cc."source" as spider,
@@ -293,8 +282,8 @@ from charity_charity cc
     ) as cn
         on cc.id = cn.charity_id
     left outer join charity_ccewcharity ccew
-        on cc.id = CONCAT('GB-CHC-', ccew.regno)
-            and ccew.subno = '0',
+        on cc.id = CONCAT('GB-CHC-', ccew.registered_charity_number)
+            and ccew.linked_charity_number = '0',
     ftc_organisationtype ot
 where ot.title = 'Registered Charity'
     and cc.source = '{source}'
@@ -335,7 +324,7 @@ insert into ftc_organisationlocation (
     "scrape_id"
 )
 select fo.id as organisation_id,
-    CONCAT('GB-CHC-', cc.regno) as org_id,
+    CONCAT('GB-CHC-', cc.registered_charity_number) as org_id,
     aooname as name,
     coalesce(ca."GSS", ca."ISO3166_1") as "geoCode",
     case when ca."GSS" is not null then 'ONS'
@@ -345,9 +334,10 @@ select fo.id as organisation_id,
     ca."ISO3166_1" as geo_iso,
     fo.source_id as source_id,
     {scrape_id} as scrape_id
-from charity_ccewcharityaoo cc
+from charity_ccewcharityareaofoperation cc
     inner join charity_areaofoperation ca
-        on cc.aookey = ca.aookey and cc.aootype = ca.aootype
+        on cc.geographic_area_description = ca.aooname
     inner join ftc_organisation fo
-        on fo.org_id = CONCAT('GB-CHC-', cc.regno)
+        on fo.org_id = CONCAT('GB-CHC-', cc.registered_charity_number)
+where ca."GSS" is not null or ca."ISO3166_1" is not null
 """
