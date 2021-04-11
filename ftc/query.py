@@ -1,7 +1,7 @@
 import copy
 
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Func
+from django.db.models import Count, F, Func, Q
 from django.shortcuts import Http404
 from elasticsearch_dsl import A
 
@@ -187,7 +187,7 @@ class OrganisationSearch:
         if self.source:
             filter_.append({"terms": {"source": self.source}})
 
-        # check for source
+        # check for location
         if self.location:
             filter_.append({"terms": {"location": self.location}})
 
@@ -249,17 +249,27 @@ class OrganisationSearch:
                     self.aggregation["by_active"]["inactive"] = b["doc_count"]
 
     def run_db(self, with_pagination=False, with_aggregation=False):
-        db_filter = {}
+        db_filter = []
         if self.base_orgtype:
-            db_filter["organisationType__contains"] = self.base_orgtype
+            db_filter.append(Q(organisationType__contains=self.base_orgtype))
         if self.source:
-            db_filter["source__id__in"] = self.source
+            db_filter.append(Q(source__id__in=self.source))
         if self.term:
-            db_filter["name__search"] = self.term
+            db_filter.append(Q(name__search=self.term))
         if self.active is True or self.active is False:
-            db_filter["active"] = self.active
+            db_filter.append(Q(active=self.active))
 
-        self.query = Organisation.objects.filter(**{k: v for k, v in db_filter.items()})
+        # check for location
+        if self.location:
+            db_filter.append(
+                Q(locations__geo_laua__in=self.location)
+                | Q(locations__geo_rgn__in=self.location)
+                | Q(locations__geo_ctry__in=self.location)
+                | Q(locations__geoCode__in=self.location)
+            )
+
+        # self.query = Organisation.objects.filter(**{k: v for k, v in db_filter.items()})
+        self.query = Organisation.objects.filter(*db_filter)
 
         if with_pagination:
             self.paginator = Paginator(
