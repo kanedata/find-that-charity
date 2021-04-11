@@ -415,3 +415,9 @@ class Organisation(models.Model):
                     (location.geo_lat, location.geo_long, location_type, location.name)
                 )
         return return_lat_lngs
+
+    @property
+    def hq(self):
+        for location in self.locations.all():
+            if location.locationType == OrganisationLocation.LocationTypes.REGISTERED_OFFICE:
+                return location
