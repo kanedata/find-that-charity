@@ -6,35 +6,35 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('charity', '0009_auto_20200921_1156'),
+        ("charity", "0009_auto_20200921_1156"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='CCEWCharity',
+            name="CCEWCharity",
         ),
         migrations.DeleteModel(
-            name='CCEWCharityAOO',
+            name="CCEWCharityAOO",
         ),
         migrations.DeleteModel(
-            name='CCEWClass',
+            name="CCEWClass",
         ),
         migrations.DeleteModel(
-            name='CCEWFinancial',
+            name="CCEWFinancial",
         ),
         migrations.DeleteModel(
-            name='CCEWMainCharity',
+            name="CCEWMainCharity",
         ),
         migrations.DeleteModel(
-            name='CCEWName',
+            name="CCEWName",
         ),
         migrations.DeleteModel(
-            name='CCEWObjects',
+            name="CCEWObjects",
         ),
         migrations.DeleteModel(
-            name='CCEWPartB',
+            name="CCEWPartB",
         ),
         migrations.DeleteModel(
-            name='CCEWRegistration',
+            name="CCEWRegistration",
         ),
     ]

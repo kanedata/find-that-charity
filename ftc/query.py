@@ -138,7 +138,7 @@ class OrganisationSearch:
             self.set_criteria(active=True)
         elif request.GET.get("active", "").lower().startswith("f"):
             self.set_criteria(active=False)
-    
+
     @property
     def orgtypes(self):
         orgtypes = []

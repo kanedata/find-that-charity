@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import io
 import csv
+import io
 import re
 import zipfile
 

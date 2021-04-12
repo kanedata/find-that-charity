@@ -419,5 +419,8 @@ class Organisation(models.Model):
     @property
     def hq(self):
         for location in self.locations.all():
-            if location.locationType == OrganisationLocation.LocationTypes.REGISTERED_OFFICE:
+            if (
+                location.locationType
+                == OrganisationLocation.LocationTypes.REGISTERED_OFFICE
+            ):
                 return location

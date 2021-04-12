@@ -520,7 +520,9 @@ class CCEWCharityEventHistory(models.Model):
     linked_charity_number = models.IntegerField(
         null=True, blank=True
     )  # A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.
-    charity_name = models.CharField(max_length=255, null=True, blank=True)  # The Main Name of the Charity
+    charity_name = models.CharField(
+        max_length=255, null=True, blank=True
+    )  # The Main Name of the Charity
     charity_event_order = models.IntegerField(
         null=True, blank=True
     )  # The order of the event in the charity history. 1 is the earliest event.
