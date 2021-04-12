@@ -138,6 +138,15 @@ class OrganisationSearch:
             self.set_criteria(active=True)
         elif request.GET.get("active", "").lower().startswith("f"):
             self.set_criteria(active=False)
+    
+    @property
+    def orgtypes(self):
+        orgtypes = []
+        if isinstance(self.base_orgtype, list):
+            orgtypes.extend(self.base_orgtype)
+        if isinstance(self.other_orgtypes, list):
+            orgtypes.extend(self.other_orgtypes)
+        return orgtypes
 
     def run_es(self, with_pagination=False, with_aggregation=False):
         """
@@ -215,7 +224,7 @@ class OrganisationSearch:
             by_source = A("terms", field="source", size=150)
             by_orgtype = A("terms", field="organisationType", size=150)
             by_active = A("terms", field="active", size=150)
-            by_location = A("terms", field="location", size=150)
+            by_location = A("terms", field="location", size=1000)
             q.aggs.bucket("by_source", by_source)
             q.aggs.bucket("by_orgtype", by_orgtype)
             q.aggs.bucket("by_active", by_active)
@@ -252,6 +261,8 @@ class OrganisationSearch:
         db_filter = []
         if self.base_orgtype:
             db_filter.append(Q(organisationType__contains=self.base_orgtype))
+        if self.other_orgtypes:
+            db_filter.append(Q(organisationType__contains=self.other_orgtypes))
         if self.source:
             db_filter.append(Q(source__id__in=self.source))
         if self.term:
