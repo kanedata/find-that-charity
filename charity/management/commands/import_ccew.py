@@ -54,7 +54,7 @@ class Command(BaseScraper):
         "distribution": [
             {
                 "downloadURL": "",
-                "accessURL": "",
+                "accessURL": "https://register-of-charities.charitycommission.gov.uk/register/full-register-download",
                 "title": "Registered charities in England and Wales",
             }
         ],
