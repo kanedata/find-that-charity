@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('other_data', '0003_auto_20201020_0103'),
+        ("other_data", "0003_auto_20201020_0103"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='genderpaygap',
-            name='id',
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+            model_name="genderpaygap",
+            name="id",
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
     ]
