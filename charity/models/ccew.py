@@ -472,7 +472,10 @@ class CCEWCharityAreaOfOperation(models.Model):
         max_length=255, null=True, blank=True
     )  # The area type for this row
     geographic_area_description = models.CharField(
-        max_length=255, null=True, blank=True, db_index=True,
+        max_length=255,
+        null=True,
+        blank=True,
+        db_index=True,
     )  # The area descriptor for this row
     parent_geographic_area_type = models.CharField(
         max_length=255, null=True, blank=True
