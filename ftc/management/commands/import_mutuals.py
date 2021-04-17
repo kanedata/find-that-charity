@@ -97,7 +97,6 @@ class Command(CSVScraper):
             "organisationType": [o.slug for o in orgtypes],
             "organisationTypePrimary": orgtypes[1],
             "url": None,
-            "location": [],
             "latestIncome": None,
             "dateModified": datetime.datetime.now(),
             "dateRegistered": record.get("Registration Date"),

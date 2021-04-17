@@ -26,50 +26,71 @@
 {% endif %}
 
 <h4 class="ma0 pa0">Organisation types</h4>
-{#<select class="js-choices" multiple>
+<select class="js-choices w-100" style="max-width: 100%" multiple name="orgtype">
+    <option value="">Organisation type</option>
     <optgroup label="Main organisation types">
-    {% for t in search.aggregation.by_orgtype if orgtypes[t.orgtype].is_keytype() %}
-        <option value="{{ t.orgtype }}">
+    {% for t in search.aggregation.by_orgtype if orgtypes[t.orgtype].is_keytype() and search.base_orgtype != t.orgtype %}
+        <option value="{{ t.orgtype }}" {% if search.other_orgtypes and t.orgtype in search.other_orgtypes %}selected="selected"{% endif %}>
             {{ orgtypes[t.orgtype].title }}
             <span class="mid-gray">({{ "{:,.0f}".format(t.records) }})</span>
         </option>
     {% endfor %}
     </optgroup>
     <optgroup label="Other organisation types">
-    {% for t in search.aggregation.by_orgtype if not orgtypes[t.orgtype].is_keytype() %}
-        <option value="{{ t.orgtype }}">
+    {% for t in search.aggregation.by_orgtype if not orgtypes[t.orgtype].is_keytype() and search.base_orgtype != t.orgtype %}
+        <option value="{{ t.orgtype }}" {% if search.other_orgtypes and t.orgtype in search.other_orgtypes %}selected="selected"{% endif %}>
             {{ orgtypes[t.orgtype].title }}
             <span class="mid-gray">({{ "{:,.0f}".format(t.records) }})</span>
         </option>
     {% endfor %}
     </optgroup>
-</select>#}
-<ul class="mb4 mt2 list mh0 pa0 lh-title">
-{% for t in search.aggregation.by_orgtype if orgtypes[t.orgtype].is_keytype() %}
-    <li class="w-100 f4 mb2">
-        <div class="">
-            <a class="link dark-blue underline-hover mr3" href="{{ url_replace(request, orgtype=t.orgtype) }}">{{ orgtypes[t.orgtype].title }}</a>
-            <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
-        </div>
-    </li>
-{% endfor %}
-{% for t in search.aggregation.by_orgtype if not orgtypes[t.orgtype].is_keytype() %}
-    <li class="w-100 f5 mb2">
-        <div class="">
-            <a class="link dark-blue underline-hover mr3" href="{{ url_replace(request, orgtype=t.orgtype) }}">{{ orgtypes[t.orgtype].title }}</a>
-            <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
-        </div>
-    </li>
-{% endfor %}
-</ul>
+</select>
+
 <h4 class="ma0 pa0">Data sources</h4>
-<ul class="mb4 mt2 list mh0 pa0">
-{% for t in search.aggregation.by_source %}
-    <li class="w-100 f4 mb2">
-        <div class="lh-title">
-            <a class="link dark-blue underline-hover mr3 lh-title" href="{{ url_replace(request, source=t.source) }}">{{ sources[t.source].title }}</a>
-            <span class="mid-gray">{{ "{:,.0f}".format(t.records) }}</span>
-        </div>
-    </li>
+<select class="js-choices w-100" style="max-width: 100%" multiple name="source">
+    <option value="">Data source</option>
+    {% for t in search.aggregation.by_source %}
+        <option value="{{ t.source }}" {% if search.source and t.source in search.source %}selected="selected"{% endif %}>
+            {{ sources[t.source] }}
+            <span class="mid-gray">({{ "{:,.0f}".format(t.records) }})</span>
+        </option>
+    {% endfor %}
+</select>
+
+<h4 class="ma0 pa0">UK areas</h4>
+<select class="js-choices w-100" style="max-width: 100%" multiple name="location">
+    <option value="">UK areas</option>
+{% for locationtype, locationtypename in (('ctry', 'Country'), ('rgn', 'Region (England)'), ('la', 'UK Local Authority'), ) %}
+    <optgroup label="{{ locationtypename }}">
+    {% for areacode, areaname in locations[locationtype]|dictsort %}
+        {% if areacode in search.aggregation.by_location %}
+            <option value="{{ areacode }}" {% if search.location and areacode in search.location %}selected="selected"{% endif %}>
+                {{ areaname }}
+                <span class="mid-gray">({{ "{:,.0f}".format(search.aggregation.by_location[areacode]) }})</span>
+            </option>
+        {% endif %}
+    {% endfor %}
+    </optgroup>
 {% endfor %}
-</ul>
+</select>
+
+
+<h4 class="ma0 pa0">Country</h4>
+<select class="js-choices w-100" style="max-width: 100%" multiple name="location">
+    <option value="">Country</option>
+{% for areacode, areaname in locations["iso"]|dictsort %}
+    {% if areacode in search.aggregation.by_location %}
+        <option value="{{ areacode }}" {% if search.location and areacode in search.location %}selected="selected"{% endif %}>
+            {{ areaname }}
+            <span class="mid-gray">({{ "{:,.0f}".format(search.aggregation.by_location[areacode]) }})</span>
+        </option>
+    {% endif %}
+{% endfor %}
+</select>
+
+<input
+    type="submit"
+    value="Filter organisations"
+    class="f5 f4-l button-reset header-font pv3 ph4 tc bg-animate bg-yellow dim near-black pointer bw2 b--near-black ba"
+    />
+<a href="{{ url_remove(request, ['orgtype', 'source', 'location']) }}" class="f6 link blue underline">Clear filters</a>

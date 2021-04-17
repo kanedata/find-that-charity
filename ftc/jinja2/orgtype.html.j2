@@ -1,6 +1,7 @@
 {% extends 'base.html.j2' %}
 {% set sources = get_sources() %}
 {% set orgtypes = get_orgtypes() %}
+{% set locations = get_locations() %}
 {% set heading = '{}'.format(
     base_query.title,
 ) if base_query else 'Search Results' %}
@@ -14,41 +15,52 @@
     {% set subtitle = "Showing all {:,.0f} organisations".format(res.paginator.count) %}
 {% endif %}
 
-{#% block headscripts %}
-{{ super() }}
+{% block headscripts %}
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/styles/choices.min.css"
+/>
 <script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
+{{ super() }}
 {% endblock headscripts %}
 
 {% block bodyscripts %}
 {{ super() }}
 <script src='{{ static("js/choices.js") }}' type="text/javascript"></script>
-{% endblock bodyscripts %#}
+{% endblock bodyscripts %}
+
+{% macro filter_tag(key, value) %}
+<li class="b--dark-gray bn mr2 mb2 dib f6">
+    <span class="bg-near-black yellow pv1 ph2 br-pill br--left dib b">{{ key }}</span><span class="bg-moon-gray pv1 ph2 br-pill br--right dib">{{ value }}</span>
+</li>
+{% endmacro %}
 
 {% block content %}
 <main class="">
     <form class="" action="{{ url_remove(request, 'q') }}">
         <div class="fl w-100 w-70-l pa2">
             {% include 'components/search_form.html.j2' %}
-            {% if search.other_orgtypes or search.source %}
+            {% if search.other_orgtypes or search.source or search.location %}
             <div class="w-100">
                 <span class="f6 b mr2">Filters: </span>
-                {% if search.other_orgtypes %}
-                {% for r in search.other_orgtypes if r in orgtypes and base_query.slug != r %}
-                <span class="bg-moon-gray b--dark-gray bw0 ba mr2 mb2 dib f6 br3 pv1 ph2">
-                    Type: 
-                    {{ orgtypes[r].title }}
-                </span>
-                {% endfor %}
-                {% endif %}
-                {% if search.source %}
-                {% for r in search.source if r in sources and base_query.slug != r %}
-                <span class="bg-moon-gray b--dark-gray bw0 ba mr2 mb2 dib f6 br3 pv1 ph2">
-                    Source: 
-                    {{ sources[r].title }}
-                </span>
-                {% endfor %}
-                {% endif %}
-                <a href="{{ url_remove(request, ['orgtype', 'source']) }}" class="f6 link blue underline">Clear filters</a>
+                <ul class="list pa0 ma0 dib">
+                    {% if search.other_orgtypes %}
+                    {% for r in search.other_orgtypes if r in orgtypes and base_query.slug != r %}
+                    {{ filter_tag('Type', orgtypes[r].title) }}
+                    {% endfor %}
+                    {% endif %}
+                    {% if search.source %}
+                    {% for r in search.source if r in sources and base_query.slug != r %}
+                    {{ filter_tag('Source', sources[r].title) }}
+                    {% endfor %}
+                    {% endif %}
+                    {% if search.location %}
+                    {% for l in search.location if base_query.slug != l %}
+                    {{ filter_tag('Location', l|get_geoname) }}
+                    {% endfor %}
+                    {% endif %}
+                </ul>
+                <a href="{{ url_remove(request, ['orgtype', 'source', 'location']) }}" class="f6 link blue underline">Clear filters</a>
             </div>
             {% endif %}
             <div class="mt4">

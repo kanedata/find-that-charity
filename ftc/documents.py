@@ -99,6 +99,7 @@ class FullOrganisation(Document):
     organisationTypePrimary = fields.KeywordField()
     source = fields.KeywordField()
     domain = fields.KeywordField()
+    location = fields.KeywordField()
     latestIncome = fields.IntegerField()
 
     @classmethod
@@ -153,6 +154,9 @@ class FullOrganisation(Document):
 
     def prepare_domain(self, instance):
         return instance.domain
+
+    def prepare_location(self, instance):
+        return instance.allGeoCodes
 
     def prepare_latestIncome(self, instance):
         return instance.latestIncome

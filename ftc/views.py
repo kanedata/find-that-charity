@@ -156,8 +156,11 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
             yield writer.writerow(columns.values())
             s.run_db()
             res = s.query.values_list(*columns.keys()).order_by("org_id")
+            prev_id = None
             for r in res:
-                yield writer.writerow(r)
+                if r[0] != prev_id:
+                    yield writer.writerow(r)
+                prev_id = r[0]
 
         response = StreamingHttpResponse(stream(), content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="{}.csv"'.format(

@@ -15,12 +15,11 @@ class OrganisationFilter(filters.FilterSet):
 
     class Meta:
         model = Organisation
-        fields = ["active", "geo_laua", "organisationType"]
+        fields = ["active", "organisationType"]
 
 
 class OrganisationIn(Schema):
     organisationType: List[str] = None
-    geo_laua: str = None
     active: bool = True
     page: int = 1
     limit: int = 10

@@ -1,28 +1,26 @@
-<form method="get" id="search-autocomplete" class="">
-    <div class="cf mt3 flex-l">
-        <div class="ba br1 b--black-20 inline-flex flex-grow">
-            <input name="q" 
-                id="search-autocomplete-q"
-                class="h-100 input-reset bn pa3 near-black bg-white flex-grow base-font"
-                type="text" 
-                placeholder="Search for a name or number"
-                value="{{ search.term if search and search.term }}" autocomplete='off'>
-            {% if not search %}
-            <select name="orgtype"
-                id="search-autocomplete-orgtype"
-                class="bn f6 mh2 mw5-l mw4 bg-light-gray br-pill pv1 ph2 mv2 base-font"
-                autocomplete="off">
-                <option class="bg-white" value="all">All organisation types</option>
-                <option class="bg-white" disabled>----------</option>
-                {% for o in orgtypes.values()|sort(attribute='title') if o.is_keytype() %}
-                    <option class="bg-white" value="{{ o.slug }}">{{ o.title }}</option>
-                {%- endfor -%}
-            </select>
-            {% endif %}
-        </div>
-        <input type="submit" value="Search" class="ml2 f6 f5-l button-reset header-font bn fl pv3 ph4 tc bg-animate bg-yellow dim near-black pointer br2-ns br--right-ns">
+<div class="cf mv3 flex-l">
+    <div class="ba br1 b--gray inline-flex flex-grow">
+        <input name="q" 
+            id="search-autocomplete-q"
+            class="h-100 input-reset bn pa3 near-black bg-white flex-grow header-font"
+            type="text" 
+            placeholder="Search for a name or number"
+            value="{{ search.term if search and search.term }}" autocomplete='off'>
+        {% if not search %}
+        <select name="orgtype"
+            id="search-autocomplete-orgtype"
+            class="bn f6 mh2 mw5-l mw4 bg-light-gray br-pill pv1 ph2 mv2 header-font"
+            autocomplete="off">
+            <option class="bg-white" value="all">All organisation types</option>
+            <option class="bg-white" disabled>----------</option>
+            {% for o in orgtypes.values()|sort(attribute='title') if o.is_keytype() %}
+                <option class="bg-white" value="{{ o.slug }}">{{ o.title }}</option>
+            {%- endfor -%}
+        </select>
+        {% endif %}
     </div>
-    <div id='autocomplete-results' class="autocomplete-results dn relative w-100 absolute-l w-60-l bg-white">
-        
-    </div>
-</form>
+    <input type="submit" value="Search" class="f5 f4-l button-reset header-font fl pv3 ph4 tc bg-animate bg-yellow dim near-black pointer br2-ns br--right-ns  bw2 b--near-black ba">
+</div>
+<div id='autocomplete-results' class="autocomplete-results dn relative w-100 absolute-l w-60-l bg-white">
+    
+</div>

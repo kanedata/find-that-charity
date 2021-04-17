@@ -119,32 +119,4 @@
         {% endif %}
       </div>
       <br>
-      {# {% if charity["geo"]["location"] %}
-      <div class="card">
-        <header class="card-header">
-          <p class="card-header-title">Location</p>
-        </header>
-        <div class="card-content">
-          <div class="content">
-            <table class="table">
-              <tbody>
-                {% if charity.get("geo", {}).get("location") %}
-                <tr>
-                  <th>Latitude/longitude</th>
-                  <td>
-                    <a href="#">
-                      {{ charity.get("geo", {}).get("location",{}).get("lat") }},
-                      {{ charity.get("geo", {}).get("location",{}).get("lon") }}
-                    </a>
-                  </td>
-                </tr>
-                {% endif %}
-                <!--<tr><th>Local Authority</th><td>{{ charity.get("geo", {}).get("areas",[]) }}</td></tr>-->
-                <tr><th>Postcode</th><td>{{ charity.get("geo", {}).get("postcode") }}</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      {% endif %} #}
 {% endmacro %}

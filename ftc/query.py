@@ -1,7 +1,7 @@
 import copy
 
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Func
+from django.db.models import Count, F, Func, Q
 from django.shortcuts import Http404
 from elasticsearch_dsl import A
 
@@ -78,6 +78,7 @@ class OrganisationSearch:
         self.active = None
         self.domain = None
         self.postcode = None
+        self.location = None
 
         self.query = None
         self.paginator = None
@@ -95,6 +96,7 @@ class OrganisationSearch:
         active=None,
         domain=None,
         postcode=None,
+        location=None,
     ):
         if term and isinstance(term, str):
             self.term = term
@@ -103,6 +105,7 @@ class OrganisationSearch:
             (base_orgtype, "base_orgtype"),
             (other_orgtypes, "other_orgtypes"),
             (source, "source"),
+            (location, "location"),
         ]:
             if t:
                 if isinstance(t, str) and t != "all":
@@ -127,12 +130,23 @@ class OrganisationSearch:
             self.set_criteria(other_orgtypes=request.GET.getlist("orgtype"))
         if "source" in request.GET and request.GET.get("source") != "all":
             self.set_criteria(source=request.GET.getlist("source"))
+        if "location" in request.GET and request.GET.get("location") != "all":
+            self.set_criteria(location=request.GET.getlist("location"))
         if "q" in request.GET:
             self.set_criteria(term=request.GET["q"])
         if request.GET.get("active", "").lower().startswith("t"):
             self.set_criteria(active=True)
         elif request.GET.get("active", "").lower().startswith("f"):
             self.set_criteria(active=False)
+
+    @property
+    def orgtypes(self):
+        orgtypes = []
+        if isinstance(self.base_orgtype, list):
+            orgtypes.extend(self.base_orgtype)
+        if isinstance(self.other_orgtypes, list):
+            orgtypes.extend(self.other_orgtypes)
+        return orgtypes
 
     def run_es(self, with_pagination=False, with_aggregation=False):
         """
@@ -182,6 +196,10 @@ class OrganisationSearch:
         if self.source:
             filter_.append({"terms": {"source": self.source}})
 
+        # check for location
+        if self.location:
+            filter_.append({"terms": {"location": self.location}})
+
         # check for active or inactive organisations
         if self.active is True:
             filter_.append({"match": {"active": True}})
@@ -206,9 +224,11 @@ class OrganisationSearch:
             by_source = A("terms", field="source", size=150)
             by_orgtype = A("terms", field="organisationType", size=150)
             by_active = A("terms", field="active", size=150)
+            by_location = A("terms", field="location", size=1000)
             q.aggs.bucket("by_source", by_source)
             q.aggs.bucket("by_orgtype", by_orgtype)
             q.aggs.bucket("by_active", by_active)
+            q.aggs.bucket("by_location", by_location)
 
         self.query = q.execute(params=params)
         if with_pagination:
@@ -223,6 +243,10 @@ class OrganisationSearch:
                 {"orgtype": b["key"], "records": b["doc_count"]}
                 for b in self.query.aggregations["by_orgtype"]["buckets"]
             ]
+            self.aggregation["by_location"] = {
+                b["key"]: b["doc_count"]
+                for b in self.query.aggregations["by_location"]["buckets"]
+            }
             self.aggregation["by_active"] = {
                 "active": 0,
                 "inactive": 0,
@@ -234,17 +258,29 @@ class OrganisationSearch:
                     self.aggregation["by_active"]["inactive"] = b["doc_count"]
 
     def run_db(self, with_pagination=False, with_aggregation=False):
-        db_filter = {}
+        db_filter = []
         if self.base_orgtype:
-            db_filter["organisationType__contains"] = self.base_orgtype
+            db_filter.append(Q(organisationType__contains=self.base_orgtype))
+        if self.other_orgtypes:
+            db_filter.append(Q(organisationType__contains=self.other_orgtypes))
         if self.source:
-            db_filter["source__id__in"] = self.source
+            db_filter.append(Q(source__id__in=self.source))
         if self.term:
-            db_filter["name__search"] = self.term
+            db_filter.append(Q(name__search=self.term))
         if self.active is True or self.active is False:
-            db_filter["active"] = self.active
+            db_filter.append(Q(active=self.active))
 
-        self.query = Organisation.objects.filter(**{k: v for k, v in db_filter.items()})
+        # check for location
+        if self.location:
+            db_filter.append(
+                Q(locations__geo_laua__in=self.location)
+                | Q(locations__geo_rgn__in=self.location)
+                | Q(locations__geo_ctry__in=self.location)
+                | Q(locations__geoCode__in=self.location)
+            )
+
+        # self.query = Organisation.objects.filter(**{k: v for k, v in db_filter.items()})
+        self.query = Organisation.objects.filter(*db_filter)
 
         if with_pagination:
             self.paginator = Paginator(

@@ -1,6 +1,5 @@
 import csv
 import io
-import string
 
 import requests
 from django.core.management.base import BaseCommand
@@ -17,6 +16,7 @@ class Command(BaseCommand):
         self.fetch_aoo()
 
     def fetch_cc_classifications(self):
+        print("Fetching CC classifications")
         ccew = "https://github.com/drkane/charity-lookups/raw/master/classification/ccew.csv"
 
         for r in self.get_csv(ccew):
@@ -28,6 +28,7 @@ class Command(BaseCommand):
             )
 
     def fetch_icnpo(self):
+        print("Fetching ICNPO")
         icnpo = "https://github.com/drkane/charity-lookups/raw/master/classification/icnpo.csv"
         v, _ = Vocabulary.objects.update_or_create(
             title="International Classification of Non Profit Organisations (ICNPO)",
@@ -57,6 +58,7 @@ class Command(BaseCommand):
             )
 
     def fetch_icnptso(self):
+        print("Fetching ICNPTSO")
         icnptso = "https://github.com/drkane/charity-lookups/raw/master/classification/icnptso.csv"
         v, _ = Vocabulary.objects.update_or_create(
             title="International Classification of Non-profit and Third Sector Organizations (ICNP/TSO)",
@@ -84,31 +86,17 @@ class Command(BaseCommand):
     #     ntee = 'https://github.com/drkane/charity-lookups/raw/master/classification/ntee.csv'
 
     def fetch_aoo(self):
-        aoo = "https://github.com/drkane/charity-lookups/raw/master/cc-aoo-gss-iso.csv"
-        cache = {}
-        aoos = [r for r in self.get_csv(aoo)]
-        aoos.reverse()
-        for r in aoos:
-            code = (r["aootype"], r["aookey"])
-            master = None
-            if r.get("master"):
-                master = cache[
-                    (
-                        string.ascii_letters[string.ascii_letters.index(code[0]) + 1],
-                        r["master"],
-                    )
-                ]
+        print("Fetching AOO lookups")
+        aoo = "https://github.com/drkane/charity-lookups/raw/master/cc-aoo-gss-iso-new.csv"
+        for r in self.get_csv(aoo):
             for k, v in r.items():
                 if v == "":
                     r[k] = None
             ve, _ = AreaOfOperation.objects.update_or_create(
-                aootype=r["aootype"],
-                aookey=r["aookey"],
+                aooname=r["geographic_area_description"],
                 defaults={
-                    "aooname": r.get("aooname"),
-                    "aoosort": r.get("aoosort"),
+                    "aoosort": r.get("geographic_area_description"),
                     "welsh": r.get("welsh") == "Y",
-                    "master": master,
                     "GSS": r.get("GSS"),
                     "ISO3166_1": r.get("ISO3166-1"),
                     "ISO3166_1_3": r.get("ISO3166-1:3"),
@@ -116,7 +104,6 @@ class Command(BaseCommand):
                     "ContinentCode": r.get("ContinentCode"),
                 },
             )
-            cache[code] = ve
 
     def get_csv(self, url, encoding="utf8"):
         response = requests.get(url)

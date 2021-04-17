@@ -221,6 +221,7 @@ class BaseScraper(BaseCommand):
                     self.object_count,
                 )
             )
+            self.get_link_records()
             self.records = []
 
     def save_sources(self):

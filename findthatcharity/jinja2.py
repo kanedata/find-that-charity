@@ -18,6 +18,7 @@ from findthatcharity.utils import (
     url_replace,
 )
 from ftc.models import Organisation, OrganisationType, OrgidScheme, Source
+from geo.models import GeoLookup
 from jinja2 import Environment
 
 
@@ -80,6 +81,30 @@ def get_orgidschemes():
     return value
 
 
+def get_locations():
+    cache_key = "locationnames"
+    value = cache.get(cache_key)
+    if value:
+        return value
+    if GeoLookup._meta.db_table in connection.introspection.table_names():
+        value = {}
+        for s in GeoLookup.objects.all():
+            if s.geoCodeType not in value:
+                value[s.geoCodeType] = {}
+            value[s.geoCodeType][s.geoCode] = s.name
+        cache.set(cache_key, value, 60 * 60)
+    else:
+        value = {}
+    return value
+
+
+def get_geoname(code):
+    try:
+        return GeoLookup.objects.get(geoCode=code).name
+    except GeoLookup.DoesNotExist:
+        return code
+
+
 def environment(**options):
     env = Environment(**options)
 
@@ -91,6 +116,7 @@ def environment(**options):
             "get_orgtypes": get_orgtypes,
             "get_sources": get_sources,
             "get_orgidschemes": get_orgidschemes,
+            "get_locations": get_locations,
             "url_replace": url_replace,
             "url_remove": url_remove,
             "ga_tracking": settings.GOOGLE_ANALYTICS,
@@ -104,6 +130,7 @@ def environment(**options):
             "slugify": slugify,
             "titlecase": to_titlecase,
             "pluralise": pluralise,
+            "get_geoname": get_geoname,
         }
     )
     return env

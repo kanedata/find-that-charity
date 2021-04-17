@@ -123,7 +123,6 @@ class Command(HTMLScraper):
                     organisationType=[o.slug for o in org_types],
                     organisationTypePrimary=org_types[0],
                     url=record.get("website_address"),
-                    location=self.get_locations(record),
                     latestIncome=None,
                     dateModified=datetime.datetime.now(),
                     dateRegistered=None,
@@ -187,17 +186,3 @@ class Command(HTMLScraper):
             if record.get(f):
                 org_types.append(self.add_org_type(record[f] + " School"))
         return org_types
-
-    def get_locations(self, record):
-        locations = []
-        if SCOT_LAS.get(record.get("la_name")):
-            code = SCOT_LAS.get(record.get("la_name"))
-            locations.append(
-                {
-                    "id": code,
-                    "name": record.get("la_name"),
-                    "geoCode": code,
-                    "geoCodeType": AREA_TYPES.get(code[0:3], "Local Authority"),
-                }
-            )
-        return locations

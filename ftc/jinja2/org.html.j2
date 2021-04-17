@@ -30,7 +30,7 @@
 
 {% block headscripts %}
 {{ super() }}
-{% if org.location or org.postalCode %}
+{% if org.locations.exists() or org.postalCode %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
    crossorigin=""/>
@@ -45,12 +45,11 @@
 
 {% block bodyscripts %}
 {{ super() }}
-{% if org.location or org.postalCode %}
+{% if org.locations.exists() or org.postalCode %}
 <script>
   const GEOCODES = {{ org.geoCodes()|list|tojson }};
   const POSTCODE = {{ org.postalCode|tojson }};
-  const ORG_LAT = {{ org.geo_lat|tojson }};
-  const ORG_LONG = {{ org.geo_long|tojson }};
+  const ORG_LAT_LONGS = {{ org.lat_lngs|tojson }};
 </script>
 <script src="{{ static('js/locationmap.js') }}"></script>
 {% endif %}

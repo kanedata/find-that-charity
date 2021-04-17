@@ -4,7 +4,7 @@ import io
 
 from pyexcel_ods3 import get_data
 
-from ftc.management.commands._base_scraper import AREA_TYPES, HTMLScraper
+from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation
 
 WAL_LAS = {
@@ -107,7 +107,6 @@ class Command(HTMLScraper):
                     "organisationType": [o.slug for o in org_types],
                     "organisationTypePrimary": org_types[0],
                     "url": None,
-                    "location": self.get_locations(record),
                     "latestIncome": None,
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": None,
@@ -139,17 +138,3 @@ class Command(HTMLScraper):
                     org_types.append(self.add_org_type(record[f] + " School"))
         org_types.append(self.add_org_type("Education"))
         return org_types
-
-    def get_locations(self, record):
-        locations = []
-        if WAL_LAS.get(record.get("Local Authority")):
-            code = WAL_LAS.get(record.get("Local Authority"))
-            locations.append(
-                {
-                    "id": code,
-                    "name": record.get("Local Authority"),
-                    "geoCode": code,
-                    "geoCodeType": AREA_TYPES.get(code[0:3], "Local Authority"),
-                }
-            )
-        return locations

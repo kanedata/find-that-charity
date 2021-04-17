@@ -104,7 +104,7 @@ def propose_properties(request):
 
 
 @csrf_exempt
-def suggest(request, orgtypes=None):
+def suggest(request, orgtype=None):
     SUGGEST_NAME = "name_complete"
 
     prefix = request.GET.get("prefix")
@@ -113,12 +113,16 @@ def suggest(request, orgtypes=None):
         raise Http404("Prefix must be supplied")
     q = FullOrganisation.search()
 
+    if not orgtype or orgtype == "all":
+        orgtype = []
+    orgtype.extend(request.GET.getlist("orgtype"))
+
     completion = {"field": "complete_names", "fuzzy": {"fuzziness": 1}}
-    if orgtypes and orgtypes != "all":
-        completion["contexts"] = dict(organisationType=[o.slug for o in orgtypes])
+    if orgtype:
+        completion["contexts"] = dict(organisationType=orgtype)
     else:
-        orgtypes = get_orgtypes()
-        completion["contexts"] = dict(organisationType=[o for o in orgtypes.keys()])
+        all_orgtypes = get_orgtypes()
+        completion["contexts"] = dict(organisationType=[o for o in all_orgtypes.keys()])
 
     q = q.suggest(SUGGEST_NAME, prefix, completion=completion).source(
         ["org_id", "name", "organisationType"]

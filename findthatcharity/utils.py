@@ -60,7 +60,7 @@ def title_exceptions(word, **kwargs):
         "clwb",
         "drs",
     ]:
-        return None
+        return word_test.title()
 
     # words with number ordinals
     if bool(ORD_NUMBERS_RE.search(word_test.lower())):
@@ -73,16 +73,24 @@ def title_exceptions(word, **kwargs):
             # check for possesive apostrophes
             if s == "'" and dots[-1].upper() == "S":
                 return s.join(
-                    [titlecase.titlecase(i, title_exceptions) for i in dots[:-1]]
+                    [
+                        titlecase.titlecase(i, callback=title_exceptions)
+                        for i in dots[:-1]
+                    ]
                     + [dots[-1].lower()]
                 )
             # check for you're and other contractions
             if word_test.upper() in ["YOU'RE", "DON'T", "HAVEN'T"]:
                 return s.join(
-                    [titlecase.titlecase(i, title_exceptions) for i in dots[:-1]]
+                    [
+                        titlecase.titlecase(i, callback=title_exceptions)
+                        for i in dots[:-1]
+                    ]
                     + [dots[-1].lower()]
                 )
-            return s.join([titlecase.titlecase(i, title_exceptions) for i in dots])
+            return s.join(
+                [titlecase.titlecase(i, callback=title_exceptions) for i in dots]
+            )
 
     # words with no vowels in (treat as acronyms)
     if not bool(VOWELS.search(word_test)):
@@ -106,7 +114,7 @@ def to_titlecase(s, sentence=False):
         return "".join([sent.capitalize() for sent in re.split(SENTENCE_SPLIT, s)])
 
     # try titlecasing
-    s = titlecase.titlecase(s, title_exceptions)
+    s = titlecase.titlecase(s, callback=title_exceptions)
 
     # Make sure first letter is capitalise
     return s[0].upper() + s[1:]
@@ -117,8 +125,10 @@ def regex_search(s, regex):
 
 
 def list_to_string(items, sep=", ", final_sep=" and "):
-    if not isinstance(items, list):
+    if isinstance(items, str):
         return items
+    if isinstance(items, set):
+        items = list(items)
 
     if len(items) == 1:
         return items[0]

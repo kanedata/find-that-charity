@@ -12,7 +12,12 @@
       {% else %}
       A
       {% endif %}
-      {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in the UK
+      {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in
+      {% if org.hq.geo_ctry %}
+      {{ org.hq.geo_ctry|get_geoname }}
+      {% else %}
+      the UK
+      {% endif %}
       {%- if org.dateRemoved %}. Removed on {{ "{:%d %B %Y}".format(org.dateRemoved) }}.{% endif %}
     </h3>
     <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">

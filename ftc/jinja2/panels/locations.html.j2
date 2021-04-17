@@ -1,39 +1,57 @@
-{% if org.location or org.postalCode %}
+{% if org.locations.exists() or org.postalCode %}
 {% call org_panel("Locations", org) %}
-<div class="w-100 w-30-l fl">
+<div class="w-100 w-40-l w-30-m fl">
     <div id="locationmap" class="h5"></div>
 </div>
-<div class="w-100 w-70-l fl ph3 measure">
+<div class="w-100 w-60-l w-70-m fl ph3 measure">
     <p class="f6 gray">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>
     {% if org.postalCode %}
     <div class="mv3">
-        <h5 class="ma0 pa0">Postcode</h5>
+        <h4 class="ma0 pa0">Postcode</h4>
         <p class="f6 ma0 pa0">
         {{ org.postalCode }}
         </p>
     </div>
     {% endif %}
-    {% if org.location %}
-    <div class="mv3">
-        <h5 class="ma0 pa0">Locations</h5>
-        <ul class="mv0 list mh0 pa0 f6">
-        {% for v in org.location %}
-        {% if v.geoCode and v.geoCode|regex_search("[ENWSK][0-9]{8}") %}
-        <li class="w-100 mb2">
-            <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ v.geoCode }}.html" target="_blank">{{ v.name|titlecase }}</a>
-            {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
-            {# {{ show_sources(v) }} #}
-        </li>
-        {% else %}
-        <li class="w-100 mb2">
-            {{ v.name|titlecase }} {% if v.geoCode %}(<code>{{ v.geoCode }}</code>){% endif %}
-            {% if v.geoCodeType %}({{ v.geoCodeType }}){% endif %}
-            {# {{ show_sources(v) }} #}
-        </li>
+    {% if org.locations.exists() %}
+        {% for areatype, countries in org.locations_group()|dictsort %}
+        {% for country, areas in countries|dictsort|selectattr(0, "equalto", 'GB') %}
+        {% if loop.first %}
+        <div class="mv3">
+            <h4 class="ma0 pa0">{{ areatype }} in the UK</h4>
+            <ul class="mv0 list mh0 pa0 f6 w-100" style="max-height: 150px; overflow-y: auto;">
+        {% endif %}
+                {% for l in areas|sort %}
+                <li class="">
+                    {% if l and l|regex_search("[ENWSK][0-9]{8}") %}
+                    <a class="link dark-blue underline-hover" href="https://findthatpostcode.uk/areas/{{ l }}.html" target="_blank">
+                        {{ l|get_geoname }}
+                    </a>
+                    {% else %}
+                    {{ l|get_geoname }} (<code>{{ l }}</code>)
+                    {% endif %}
+                </li>
+                {% endfor %}
+        {% if loop.last %}
+            </ul>
+        </div>
         {% endif %}
         {% endfor %}
-        </ul>
-    </div>
+        {% for country, areas in countries|dictsort|rejectattr(0, "equalto", 'GB') %}
+        {% if loop.first %}
+        <div class="mv3">
+            <h4 class="ma0 pa0">{{ areatype }} outside the UK</h4>
+            <ul class="mv0 list mh0 pa0 f6 w-100" style="max-height: 150px; overflow-y: auto;">
+        {% endif %}
+                {% for area in areas|sort %}
+                <li>{{ area|get_geoname }}</li>
+                {% endfor %}
+        {% if loop.last %}
+            </ul>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
     {% endif %}
 </div>
 {% endcall %}
