@@ -2,14 +2,14 @@
     <div class="ba br1 b--gray inline-flex flex-grow">
         <input name="q" 
             id="search-autocomplete-q"
-            class="h-100 input-reset bn pa3 near-black bg-white flex-grow base-font"
+            class="h-100 input-reset bn pa3 near-black bg-white flex-grow header-font"
             type="text" 
             placeholder="Search for a name or number"
             value="{{ search.term if search and search.term }}" autocomplete='off'>
         {% if not search %}
         <select name="orgtype"
             id="search-autocomplete-orgtype"
-            class="bn f6 mh2 mw5-l mw4 bg-light-gray br-pill pv1 ph2 mv2 base-font"
+            class="bn f6 mh2 mw5-l mw4 bg-light-gray br-pill pv1 ph2 mv2 header-font"
             autocomplete="off">
             <option class="bg-white" value="all">All organisation types</option>
             <option class="bg-white" disabled>----------</option>
