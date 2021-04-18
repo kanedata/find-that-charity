@@ -45,6 +45,12 @@ class Command(BaseScraper):
             "WDCD",
             "WDNM",
         ),
+        "pcon": GeoSource(
+            "https://opendata.arcgis.com/datasets/8efdc64f7b4641c485adf606f8f39756_0.csv",
+            "pcon",
+            "PCON20CD",
+            "PCON20NM",
+        ),
     }
 
     FIELD_MATCH = {
@@ -57,6 +63,7 @@ class Command(BaseScraper):
         "RGNCD": "geo_rgn",  # Region code
         "CTRYCD": "geo_ctry",  # Country code
         "TTWA11CD": "geo_ttwa",  # Travel to work area code
+        "PCON20CD": "geo_pcon",  # Parliamentary Constituency
     }
 
     MANUAL_RECORDS = (
