@@ -70,7 +70,7 @@ class Command(CSVScraper):
                     "organisationType": list(self.orgtype_cache.keys()),
                     "organisationTypePrimary": self.orgtype_cache["local-authority"],
                     "url": None,
-                    "location": locations,
+                    # "location": locations,
                     "latestIncome": None,
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("start-date"),
