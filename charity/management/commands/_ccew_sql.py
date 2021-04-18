@@ -320,6 +320,7 @@ insert into ftc_organisationlocation (
     "geoCodeType",
     "locationType",
     geo_iso,
+    "spider",
     "source_id",
     "scrape_id"
 )
@@ -332,6 +333,7 @@ select fo.id as organisation_id,
          else null end as "geoCodeType",
     'AOO' as "locationType",
     ca."ISO3166_1" as geo_iso,
+    fo.source_id as spider,
     fo.source_id as source_id,
     {scrape_id} as scrape_id
 from charity_ccewcharityareaofoperation cc

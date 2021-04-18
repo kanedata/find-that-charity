@@ -31,6 +31,7 @@ class Command(BaseCommand):
                 "geoCodeType",
                 "locationType",
                 "geo_iso",
+                "spider",
                 "source_id",
                 "scrape_id"
             )
@@ -42,6 +43,7 @@ class Command(BaseCommand):
                 fo."geoCodeType",
                 fo."locationType",
                 fo.geo_iso,
+                fo.spider,
                 fo.source_id,
                 fo.scrape_id
             from ftc_organisationlocation fo
@@ -56,6 +58,7 @@ class Command(BaseCommand):
                 fo."geoCodeType",
                 fo."locationType",
                 fo.geo_iso,
+                fo.spider,
                 fo.source_id,
                 fo.scrape_id
             from ftc_organisationlocation fo
@@ -90,6 +93,7 @@ class Command(BaseCommand):
                 "geo_lep2",
                 "geo_lat",
                 "geo_long",
+                "spider",
                 "source_id",
                 "scrape_id"
             )
@@ -114,6 +118,7 @@ class Command(BaseCommand):
                 geo.lep2 as "geo_lep2",
                 geo.lat as "geo_lat",
                 geo.long as "geo_long",
+                fo.spider as spider,
                 fo.source_id as source_id,
                 fo.scrape_id as scrape_id
             from ftc_organisation fo

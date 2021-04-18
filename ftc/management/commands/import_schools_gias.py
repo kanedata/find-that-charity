@@ -3,7 +3,7 @@ import datetime
 import requests_cache
 from requests_html import HTMLSession
 
-from ftc.management.commands._base_scraper import AREA_TYPES, CSVScraper
+from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation
 
 REGION_CONVERT = {
@@ -111,7 +111,7 @@ class Command(CSVScraper):
             ),
         ]
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 org_id=self.get_org_id(record),
                 name=record.get("EstablishmentName"),

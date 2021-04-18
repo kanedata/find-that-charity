@@ -3,8 +3,8 @@ import io
 
 from openpyxl import load_workbook
 
-from ftc.management.commands._base_scraper import AREA_TYPES, HTMLScraper
-from ftc.models import Organisation
+from ftc.management.commands._base_scraper import HTMLScraper
+from ftc.models import Organisation, OrganisationLocation
 
 
 class Command(HTMLScraper):
@@ -94,23 +94,24 @@ class Command(HTMLScraper):
             org_types.append(self.add_org_type(record["Designation"]))
 
         org_ids = [self.get_org_id(record)]
-        locations = []
         if record.get("Designation") == "Local Authority":
             la_codes = LA_LOOKUP.get(record.get(self.id_field))
             if la_codes:
                 org_ids.append("GB-LAE-{}".format(la_codes.get("register-code")))
-                locations.append(
+                self.add_location_record(
                     {
-                        "id": la_codes.get("GSS"),
+                        "org_id": self.get_org_id(record),
                         "name": la_codes.get("name"),
                         "geoCode": la_codes.get("GSS"),
-                        "geoCodeType": AREA_TYPES.get(
-                            la_codes.get("GSS")[0:3], "Local Authority"
-                        ),
+                        "geoCodeType": OrganisationLocation.GeoCodeTypes.ONS_CODE,
+                        "locationType": OrganisationLocation.LocationTypes.AREA_OF_OPERATION,
+                        "spider": self.name,
+                        "scrape": self.scrape,
+                        "source": self.source,
                     }
                 )
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),

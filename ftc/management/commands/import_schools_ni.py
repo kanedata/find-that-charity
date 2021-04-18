@@ -77,7 +77,6 @@ class Command(HTMLScraper):
             csvreader = csv.DictReader(a)
             for k, row in enumerate(csvreader):
                 self.parse_row(row)
-                self.object_count += 1
 
     def parse_row(self, record):
 
@@ -99,7 +98,7 @@ class Command(HTMLScraper):
             self.add_org_type(record.get("Type", "") + " School"),
         ]
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),

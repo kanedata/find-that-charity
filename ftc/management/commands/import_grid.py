@@ -96,7 +96,7 @@ It includes cross-linkages to a range of other identifier sources.""",
         orgtype = record.get("types", [])[0] if record.get("types", []) else "Education"
         orgtype = self.add_org_type(orgtype)
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),

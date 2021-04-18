@@ -3,6 +3,7 @@ import datetime
 import io
 import logging
 import re
+from collections import defaultdict
 
 import requests
 import requests_cache
@@ -15,6 +16,7 @@ from ftc.management.commands._db_logger import ScrapeHandler
 from ftc.models import (
     Organisation,
     OrganisationLink,
+    OrganisationLocation,
     OrganisationType,
     OrgidScheme,
     Scrape,
@@ -78,11 +80,11 @@ class BaseScraper(BaseCommand):
             log="",
         )
         self.scrape.save()
-        self.object_count = 0
+        self.object_count = defaultdict(lambda: 0)
         self.error_count = 0
         self.orgtype_cache = {}
-        self.records = []
-        self.link_records = []
+        self.records = defaultdict(list)
+        self.location_records = defaultdict(list)
 
         # set up logging
         self.logger = logging.getLogger("ftc.{}".format(self.name))
@@ -149,56 +151,54 @@ class BaseScraper(BaseCommand):
         self.logger.info("Processing files")
         for u, f in self.files.items():
             self.parse_file(f, u)
-        self.logger.info(
-            "Files processed. Found {:,.0f} records".format(self.object_count)
-        )
+        self.logger.info("Files processed.")
+        for model, count in self.object_count.items():
+            self.logger.info("Found {:,.0f} {} records".format(count, model.__name__))
 
         # get any link records that need to be created
         self.logger.info("Getting link records")
         self.get_link_records()
-        self.logger.info("Found {:,.0f} records".format(len(self.link_records)))
+        self.logger.info(
+            "Found {:,.0f} link records".format(len(self.records[OrganisationLink]))
+        )
 
         # close the spider
         self.close_spider()
         self.logger.info("Spider finished")
 
     def close_spider(self):
-        self.object_count += len(self.records)
-        self.scrape.items = self.object_count
-        results = {"records": self.object_count}
-        if self.records:
-            self.logger.info(
-                "Saving {:,.0f} organisation records".format(len(self.records))
-            )
-            Organisation.objects.bulk_create(self.records)
-            self.logger.info(
-                "Saved {:,.0f} organisation records".format(len(self.records))
-            )
+        results = {}
+        for model, records in self.records.items():
+            self.save_records(model)
+            if model == OrganisationLink:
+                results["link_records"] = len(records)
+        self.save_location_records()
+        results["records"] = sum(self.object_count.values())
+        self.scrape.items = sum(self.object_count.values())
 
-        if self.link_records:
-            results["link_records"] = len(self.link_records)
-            self.object_count += results["link_records"]
-            self.logger.info(
-                "Saving {:,.0f} link records".format(results["link_records"])
-            )
-            OrganisationLink.objects.bulk_create(self.link_records)
-            self.logger.info(
-                "Saved {:,.0f} link records".format(results["link_records"])
-            )
         self.scrape.errors = self.error_count
         self.scrape.result = results
         self.scrape_logger.teardown()
 
         # if we've been successfull then delete previous items
-        if self.object_count > 0:
-            self.logger.info("Deleting previous records")
-            Organisation.objects.filter(spider__exact=self.name,).exclude(
-                scrape_id=self.scrape.id,
-            ).delete()
-            OrganisationLink.objects.filter(spider__exact=self.name,).exclude(
-                scrape_id=self.scrape.id,
-            ).delete()
-            self.logger.info("Deleted previous records")
+        self.logger.info("Deleting previous records")
+        for model in [Organisation, OrganisationLink, OrganisationLocation]:
+            result, deleted_types = (
+                model.objects.filter(
+                    spider__exact=self.name,
+                )
+                .exclude(
+                    scrape_id=self.scrape.id,
+                )
+                .delete()
+            )
+            for deleted_model, deleted_count in deleted_types.items():
+                self.logger.info(
+                    "Deleted {:,.0f} previous {} records".format(
+                        deleted_count,
+                        deleted_model,
+                    )
+                )
 
         # do any SQL actions after the data has been included
         with connection.cursor() as cursor:
@@ -208,21 +208,52 @@ class BaseScraper(BaseCommand):
                 self.logger.info("Finished SQL: {}".format(sql_name))
 
     def add_org_record(self, record):
-        self.records.append(record)
-        if len(self.records) >= self.bulk_limit:
-            self.object_count += len(self.records)
-            self.logger.info(
-                "Saving {:,.0f} organisation records".format(len(self.records))
+        self.add_record(Organisation, record)
+
+    def add_record(self, model, record):
+        if isinstance(record, dict):
+            record = model(**record)
+        self.records[model].append(record)
+        if len(self.records[model]) >= self.bulk_limit:
+            self.save_records(model)
+
+    def save_records(self, model):
+        self.logger.info(
+            "Saving {:,.0f} {} records".format(len(self.records[model]), model.__name__)
+        )
+        model.objects.bulk_create(self.records[model])
+        self.object_count[model] += len(self.records[model])
+        self.logger.info(
+            "Saved {:,.0f} {} records ({:,.0f} total)".format(
+                len(self.records[model]),
+                model.__name__,
+                self.object_count[model],
             )
-            Organisation.objects.bulk_create(self.records)
-            self.logger.info(
-                "Saved {:,.0f} organisation records ({:,.0f} total)".format(
-                    len(self.records),
-                    self.object_count,
-                )
+        )
+        self.get_link_records()
+        self.records[model] = []
+
+    def add_location_record(self, record):
+        if isinstance(record, dict):
+            record = OrganisationLocation(**record)
+        self.location_records[record.org_id].append(record)
+
+    def save_location_records(self):
+        self.logger.info("Saving location records")
+        record_count = 0
+        for org_id, records in self.location_records.items():
+            org = Organisation.objects.get(
+                org_id=org_id,
+                spider__exact=self.name,
+                scrape_id=self.scrape.id,
             )
-            self.get_link_records()
-            self.records = []
+            if org:
+                for record in records:
+                    record.organisation_id = org.id
+                    record.save()
+                    record_count += 1
+        self.object_count[OrganisationLocation] = record_count
+        self.logger.info("Saved {:,.0f} location records".format(record_count))
 
     def save_sources(self):
         if hasattr(self, "source"):
@@ -266,11 +297,11 @@ class BaseScraper(BaseCommand):
         return self.clean_fields(row)
 
     def get_link_records(self):
-        for o in self.records:
+        for o in self.records[Organisation]:
             for orgid in o.orgIDs:
                 if orgid == o.org_id:
                     continue
-                self.link_records.append(
+                self.records[OrganisationLink].append(
                     OrganisationLink(
                         org_id_a=o.org_id,
                         org_id_b=orgid,
@@ -511,70 +542,3 @@ class HTMLScraper(BaseScraper):
     def parse_file(self, response, source_url):
         self.logger.info(source_url)
         pass
-
-
-AREA_TYPES = {
-    "E00": "OA",
-    "E01": "LSOA",
-    "E02": "MSOA",
-    "E04": "PAR",
-    "E05": "WD",
-    "E06": "UA",
-    "E07": "NMD",
-    "E08": "MD",
-    "E09": "LONB",
-    "E10": "CTY",
-    "E12": "RGN/GOR",
-    "E14": "WPC",
-    "E15": "EER",
-    "E21": "CANNET",
-    "E22": "CSP",
-    "E23": "PFA",
-    "E25": "PUA",
-    "E26": "NPARK",
-    "E28": "REGD",
-    "E29": "REGSD",
-    "E30": "TTWA",
-    "E31": "FRA",
-    "E32": "LAC",
-    "E33": "WZ",
-    "E36": "CMWD",
-    "E37": "LEP",
-    "E38": "CCG",
-    "E39": "NHSAT",
-    "E41": "CMLAD",
-    "E42": "CMCTY",
-    "N00": "SA",
-    "N06": "WPC",
-    "S00": "OA",
-    "S01": "DZ",
-    "S02": "IG",
-    "S03": "CHP",
-    "S05": "ROA - CPP",
-    "S06": "ROA - Local",
-    "S08": "HB",
-    "S12": "CA",
-    "S13": "WD",
-    "S14": "WPC",
-    "S16": "SPC",
-    "S22": "TTWA",
-    "W00": "OA",
-    "W01": "LSOA",
-    "W02": "MSOA",
-    "W03": "USOA",
-    "W04": "COM",
-    "W05": "WD",
-    "W06": "UA",
-    "W07": "WPC",
-    "W09": "NAWC",
-    "W14": "CDRP",
-    "W20": "REGD",
-    "W21": "REGSD",
-    "W22": "TTWA",
-    "W30": "AgricSmall",
-    "W33": "CFA",
-    "W35": "WZ",
-    "W39": "CMWD",
-    "W40": "CMLAD",
-    "W41": "CMCTY",
-}

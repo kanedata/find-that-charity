@@ -109,4 +109,4 @@ class Command(CSVScraper):
             "spider": self.name,
             "org_id_scheme": self.orgid_scheme,
         }
-        self.records.append(Organisation(**org_record))
+        self.add_org_record(Organisation(**org_record))

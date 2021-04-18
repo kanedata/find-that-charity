@@ -88,7 +88,7 @@ class Command(HTMLScraper):
         if not record.get("School Name") or not record.get("School Number"):
             return
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),

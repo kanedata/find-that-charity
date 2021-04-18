@@ -221,7 +221,7 @@ class Command(HTMLScraper):
             else:
                 address["addressLocality"] = record.get("Address Line 4")
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),

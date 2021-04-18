@@ -4,7 +4,7 @@ import io
 
 from openpyxl import load_workbook
 
-from ftc.management.commands._base_scraper import AREA_TYPES, HTMLScraper
+from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation
 
 SCOT_LAS = {
@@ -105,7 +105,7 @@ class Command(HTMLScraper):
             org_id = self.get_org_id(record)
             org_types = self.get_org_types(record)
 
-            self.records.append(
+            self.add_org_record(
                 Organisation(
                     org_id=org_id,
                     name=record.get("school_name"),

@@ -75,7 +75,7 @@ class Command(HTMLScraper):
             self.orgtype_cache["higher-education"],
         ]
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": orgids[0],

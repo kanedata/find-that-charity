@@ -63,7 +63,7 @@ class Command(CSVScraper):
         locations = []
         # @TODO: map local authority code to GSS to add locations
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),

@@ -56,7 +56,7 @@ class Command(CSVScraper):
             org_ids.append(self.coynos[record["id"]])
             orgtypes.append(self.orgtype_cache["registered-company"])
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": record["id"],

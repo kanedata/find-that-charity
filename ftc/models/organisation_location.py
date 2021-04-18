@@ -39,6 +39,7 @@ class OrganisationLocation(models.Model):
         db_index=True,
         verbose_name="Location Type",
     )
+    spider = models.CharField(max_length=200, db_index=True)
     source = models.ForeignKey(
         "Source",
         related_name="organisation_locations",

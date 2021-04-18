@@ -44,7 +44,7 @@ class Command(CSVScraper):
     def parse_row(self, record):
 
         record = self.clean_fields(record)
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),

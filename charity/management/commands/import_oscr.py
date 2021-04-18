@@ -124,7 +124,7 @@ class Command(CSVScraper):
 
         self.raw_records.append(record)
 
-        self.records.append(
+        self.add_org_record(
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),

@@ -271,16 +271,16 @@ class Command(CSVScraper):
                     row = source["_parse_row"](row)
                 row["source"] = source["identifier"]
                 if row.get("org_id_a") and row.get("org_id_b"):
-                    self.link_records.append(
+                    self.add_record(
+                        OrganisationLink,
                         OrganisationLink(
                             org_id_a=row["org_id_a"],
                             org_id_b=row["org_id_b"],
                             spider=self.name,
                             source=self.source_cache[source["identifier"]],
                             scrape=self.scrape,
-                        )
+                        ),
                     )
-                    self.object_count += 1
 
     def rsp_charity_company_csv(self, response, source):
 
@@ -288,24 +288,24 @@ class Command(CSVScraper):
             csvreader = csv.DictReader(a)
             for row in csvreader:
                 if row["Charity Number"].strip() != "":
-                    self.link_records.append(
+                    self.add_record(
+                        OrganisationLink,
                         OrganisationLink(
                             org_id_a="GB-SHPE-{}".format(row["RP Code"].strip()),
                             org_id_b="GB-CHC-{}".format(row["Charity Number"].strip()),
                             spider=self.name,
                             source=self.source_cache[source["identifier"]],
                             scrape=self.scrape,
-                        )
+                        ),
                     )
-                    self.object_count += 1
                 if row["Company Number"].strip() != "":
-                    self.link_records.append(
+                    self.add_record(
+                        OrganisationLink,
                         OrganisationLink(
                             org_id_a="GB-SHPE-{}".format(row["RP Code"].strip()),
                             org_id_b="GB-COH-{}".format(row["Company Number"].strip()),
                             spider=self.name,
                             source=self.source_cache[source["identifier"]],
                             scrape=self.scrape,
-                        )
+                        ),
                     )
-                    self.object_count += 1
