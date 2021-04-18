@@ -1,8 +1,9 @@
 import datetime
 
 from ftc.management.commands._base_scraper import CSVScraper
+from ftc.management.commands._la_locations import LA_LOCATIONS
 from ftc.management.commands.import_lae import LA_TYPES
-from ftc.models import Organisation
+from ftc.models import Organisation, OrganisationLocation
 
 
 class Command(CSVScraper):
@@ -60,8 +61,20 @@ class Command(CSVScraper):
             )
         org_ids = [self.get_org_id(record)]
 
-        locations = []
-        # @TODO: map local authority code to GSS to add locations
+        gss = LA_LOCATIONS.get(record.get(self.id_field))
+        if gss:
+            self.add_location_record(
+                {
+                    "org_id": self.get_org_id(record),
+                    "name": record.get("name"),
+                    "geoCode": gss,
+                    "geoCodeType": OrganisationLocation.GeoCodeTypes.ONS_CODE,
+                    "locationType": OrganisationLocation.LocationTypes.AREA_OF_OPERATION,
+                    "spider": self.name,
+                    "scrape": self.scrape,
+                    "source": self.source,
+                }
+            )
 
         self.add_org_record(
             Organisation(
