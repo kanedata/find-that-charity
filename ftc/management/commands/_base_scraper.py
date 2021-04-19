@@ -189,20 +189,28 @@ class BaseScraper(BaseCommand):
                     model.__name__,
                 )
             )
-            result, deleted_types = (
-                model.objects.filter(
-                    spider__exact=self.name,
+            with connection.cursor() as cursor:
+                delete_sql = """
+                    DELETE
+                    FROM "{db_table}"
+                    WHERE (
+                        "{db_table}"."spider" = %s
+                        AND NOT ("{db_table}"."scrape_id" = %s)
+                    );
+                """.format(
+                    db_table=model._meta.db_table
                 )
-                .exclude(
-                    scrape_id=self.scrape.id,
+                cursor.execute(
+                    delete_sql,
+                    [
+                        self.name,
+                        self.scrape.id,
+                    ],
                 )
-                .delete()
-            )
-            for deleted_model, deleted_count in deleted_types.items():
                 self.logger.info(
                     "Deleted {:,.0f} previous {} records".format(
-                        deleted_count,
-                        deleted_model,
+                        cursor.rowcount,
+                        model.__name__,
                     )
                 )
 

@@ -173,7 +173,7 @@ class Organisation(models.Model):
     source = models.ForeignKey(
         "Source",
         related_name="organisations",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
     organisationType = ArrayField(
         models.CharField(max_length=255, blank=True),
@@ -183,19 +183,19 @@ class Organisation(models.Model):
     )
     organisationTypePrimary = models.ForeignKey(
         "OrganisationType",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
         related_name="organisations",
         verbose_name="Primary organisation type",
     )
     scrape = models.ForeignKey(
         "Scrape",
         related_name="organisations",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
     spider = models.CharField(max_length=200, db_index=True)
     org_id_scheme = models.ForeignKey(
         "OrgidScheme",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
         blank=True,
         null=True,
     )

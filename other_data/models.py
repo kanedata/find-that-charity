@@ -51,7 +51,7 @@ class GenderPayGap(models.Model):
     DateSubmitted = models.DateField(null=True, blank=True)
     scrape = models.ForeignKey(
         "ftc.Scrape",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
     spider = models.CharField(max_length=200, db_index=True, default="gpg")
 

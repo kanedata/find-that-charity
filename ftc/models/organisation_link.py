@@ -10,12 +10,12 @@ class OrganisationLink(models.Model):
     source = models.ForeignKey(
         "Source",
         related_name="organisation_links",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
     scrape = models.ForeignKey(
         "Scrape",
         related_name="organisation_links",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
 
     def __str__(self):

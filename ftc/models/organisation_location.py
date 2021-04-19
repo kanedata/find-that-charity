@@ -38,12 +38,12 @@ class OrganisationLocation(models.Model):
     source = models.ForeignKey(
         "Source",
         related_name="organisation_locations",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
     scrape = models.ForeignKey(
         "Scrape",
         related_name="organisation_locations",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
 
     # geography fields
