@@ -221,6 +221,10 @@ class Organisation(models.Model):
             models.Q(org_id_a=self.org_id) | models.Q(org_id_b=self.org_id)
         )
 
+    @property
+    def locations(self):
+        return OrganisationLocation.objects.filter(org_id=self.org_id)
+
     def get_priority(self):
         if self.org_id.scheme in OrgidScheme.PRIORITIES:
             prefix_order = OrgidScheme.PRIORITIES.index(self.org_id.scheme)

@@ -1,7 +1,7 @@
 import io
 
-import tqdm
-from openpyxl import load_workbook
+from pyexcel_ods3 import get_data
+from tqdm import tqdm
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from other_data.models import CQCBrand, CQCLocation, CQCProvider
@@ -52,14 +52,44 @@ class Command(HTMLScraper):
         ],
     }
     models = [CQCBrand, CQCProvider, CQCLocation]
+    models_to_delete = [CQCBrand, CQCProvider, CQCLocation]
+    post_sql = {
+        "add CQC locations": """
+            insert into ftc_organisationlocation (
+                org_id,
+                name,
+                "geoCode",
+                "geoCodeType",
+                "locationType",
+                geo_iso,
+                "spider",
+                "source_id",
+                "scrape_id"
+            )
+            select cqc_p.org_id as "org_id",
+                cqc_l.address_postcode as "name",
+                cqc_l.address_postcode as "geoCode",
+                'PC' as "geoCodeType",
+                'SITE' as "locationType",
+                'GB' as "geo_iso",
+                cqc_l.scrape_id as "scrape_id",
+                cqc_l.spider as "spider"
+            from other_data_cqclocation cqc_l
+                inner join other_data_cqcprovider cqc_p
+                    on cqc_l.provider_id = cqc_p.id
+                        and cqc_l.scrape_id = cqc_p.scrape_id
+                inner join ftc_organisation fo
+                    on cqc_p.org_id = fo.org_id
+        """
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.cqc_records = {}
         self.field_lookup = {}
+        self.brand_ids = set()
+        self.provider_ids = set()
         for m in self.models:
-            self.cqc_records[m.__name__] = {}
             for k in m._meta.fields:
                 self.field_lookup[k.verbose_name] = {
                     "model": m.__name__,
@@ -69,31 +99,32 @@ class Command(HTMLScraper):
     def parse_file(self, response, source_url):
         self.logger.info(source_url)
         for link in response.html.absolute_links:
-            if not link.endswith(".xlsx"):
+            if not link.endswith(".ods"):
                 continue
 
-            if "HSCA_Active_Locations" in link:
+            if "HSCA_Active_Locations".lower() in link.lower():
                 # parse active locations
-                # https://www.cqc.org.uk/sites/default/files/HSCA_Active_Locations_01_October_2020.xlsx
-                self.parse_xlsx(link)
-            elif "Deactivated_Locations" in link:
+                # https://www.cqc.org.uk/sites/default/files/April_2021_HSCA_Active_Locations.ods
+                self.parse_ods(link)
+            elif "Deactivated_Locations".lower() in link.lower():
                 # parse inactive locations
-                # https://www.cqc.org.uk/sites/default/files/Deactivated_Locations1_October_2020.xlsx
-                self.parse_xlsx(link)
+                # https://www.cqc.org.uk/sites/default/files/Deactivated_locations_01_April_2021.ods
+                self.parse_ods(link)
 
-    def parse_xlsx(self, link):
+    def parse_ods(self, link):
         self.logger.info("Downloading: {}".format(link))
         r = self.session.get(link)
         r.raise_for_status()
 
-        wb = load_workbook(io.BytesIO(r.content), read_only=True)
-        for ws in wb:
-            if ws.title == "README":
+        wb = get_data(io.BytesIO(r.content))
+        for ws_name in wb:
+            if ws_name == "README":
                 continue
-            self.logger.info("Loading from sheet '{}'".format(ws.title))
+            self.logger.info("Loading from sheet '{}'".format(ws_name))
+            ws = wb[ws_name]
             headers = None
 
-            for row in ws.iter_rows(min_row=1, values_only=True):
+            for row in tqdm(ws):
                 if not headers:
                     headers = row
                     continue
@@ -104,6 +135,10 @@ class Command(HTMLScraper):
                     if k in self.field_lookup:
                         meta = self.field_lookup[k]
                         this_model[meta["model"]][meta["field"]] = row[k]
+
+                # if row is blank then ignore
+                if not this_model["CQCProvider"].get("id"):
+                    continue
 
                 # add IDs
                 this_model["CQCLocation"]["provider_id"] = this_model["CQCProvider"][
@@ -138,22 +173,18 @@ class Command(HTMLScraper):
 
                 for m in self.models:
                     if this_model[m.__name__]["id"]:
-                        self.cqc_records[m.__name__][
-                            this_model[m.__name__]["id"]
-                        ] = this_model[m.__name__]
-
-    def bulk_create(self, m):
-        for record in tqdm.tqdm(self.cqc_records[m.__name__].values()):
-            yield m(**record)
-
-    def close_spider(self):
-        super(Command, self).close_spider()
-        self.records = None
-        self.link_records = None
-
-        # now start inserting CQC records
-        for m in self.models:
-            self.logger.info("Inserting {} records".format(m.__name__))
-            m.objects.all().delete()
-            m.objects.bulk_create(self.bulk_create(m))
-            self.logger.info("{} records inserted".format(m.__name__))
+                        if (
+                            m.__name__ == "CQCProvider"
+                            and this_model[m.__name__]["id"] in self.provider_ids
+                        ):
+                            continue
+                        if (
+                            m.__name__ == "CQCBrand"
+                            and this_model[m.__name__]["id"] in self.brand_ids
+                        ):
+                            continue
+                        self.add_record(m, this_model[m.__name__])
+                        if m.__name__ == "CQCProvider":
+                            self.provider_ids.add(this_model[m.__name__]["id"])
+                        if m.__name__ == "CQCBrand":
+                            self.brand_ids.add(this_model[m.__name__]["id"])

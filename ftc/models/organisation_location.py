@@ -14,11 +14,6 @@ class OrganisationLocation(models.Model):
         ONS_CODE = "ONS", "ONS code"
         ISO_CODE = "ISO", "ISO3166-1 Country Code"
 
-    organisation = models.ForeignKey(
-        "Organisation",
-        on_delete=models.CASCADE,
-        related_name="locations",
-    )
     org_id = OrgidField(db_index=True, verbose_name="Organisation Identifier")
     name = models.CharField(max_length=255, verbose_name="Name")
     description = models.TextField(null=True, blank=True, verbose_name="Description")

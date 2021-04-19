@@ -15,6 +15,7 @@ cssselect==1.1.0          # via pyquery
 decorator==5.0.7          # via validators
 dj-database-url==0.5.0    # via -r requirements.in
 django-better-admin-arrayfield==1.4.2  # via -r requirements.in
+django-composite-foreignkey==1.1.0  # via -r requirements.in
 django-cors-headers==3.7.0  # via -r requirements.in
 django-elasticsearch-dsl==7.1.4  # via -r requirements.in
 django-environ==0.4.5     # via -r requirements.in

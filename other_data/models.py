@@ -1,3 +1,4 @@
+from compositefk.fields import CompositeForeignKey
 from django.db import models
 from django_better_admin_arrayfield.models.fields import ArrayField
 
@@ -52,6 +53,7 @@ class GenderPayGap(models.Model):
         "ftc.Scrape",
         on_delete=models.CASCADE,
     )
+    spider = models.CharField(max_length=200, db_index=True, default="gpg")
 
     def __str__(self):
         return "<GenderPayGap '{}' [{}]>".format(self.EmployerName, self.Year)
@@ -107,7 +109,8 @@ class CQCProvider(models.Model):
     org_id = OrgidField(
         db_index=True, verbose_name="Organisation Identifier", null=True, blank=True
     )
-    id = models.CharField(max_length=255, verbose_name="Provider ID", primary_key=True)
+    record_id = models.BigAutoField(primary_key=True)
+    id = models.CharField(max_length=255, verbose_name="Provider ID")
     name = models.CharField(max_length=255, verbose_name="Provider Name")
     start_date = models.DateField(
         null=True, blank=True, verbose_name="Provider HSCA start date"
@@ -192,25 +195,35 @@ class CQCProvider(models.Model):
         max_length=255,
         verbose_name="Provider Parliamentary Constituency",
     )
-    brand = models.ForeignKey(
-        "CQCBrand",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
     scrape = models.ForeignKey(
         "ftc.Scrape",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
+    )
+    spider = models.CharField(max_length=200, db_index=True, default="cqc")
+    brand_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    brand = CompositeForeignKey(
+        "CQCBrand",
+        on_delete=models.DO_NOTHING,
+        to_fields={"id": "brand_id", "scrape_id": "scrape_id"},
+        null=True,
+        blank=True,
     )
 
 
 class CQCBrand(models.Model):
-    id = models.CharField(max_length=255, verbose_name="Brand ID", primary_key=True)
+    record_id = models.BigAutoField(primary_key=True)
+    id = models.CharField(max_length=255, verbose_name="Brand ID")
     name = models.CharField(max_length=255, verbose_name="Brand Name")
     scrape = models.ForeignKey(
         "ftc.Scrape",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
+    spider = models.CharField(max_length=200, db_index=True, default="cqc")
 
 
 class CQCLocation(models.Model):
@@ -219,7 +232,8 @@ class CQCLocation(models.Model):
         INACTIVE = "Inactive-Dereg"
         REMOVED = "Removed"
 
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="Location ID")
+    record_id = models.BigAutoField(primary_key=True)
+    id = models.CharField(max_length=255, verbose_name="Location ID")
     start_date = models.DateField(
         null=True, blank=True, verbose_name="Location HSCA start date"
     )
@@ -332,13 +346,23 @@ class CQCLocation(models.Model):
         max_length=255,
         verbose_name="Location Parliamentary Constituency",
     )
-    provider = models.ForeignKey(
-        "CQCProvider",
-        related_name="locations",
-        on_delete=models.CASCADE,
-    )
-    classification = models.ManyToManyField("charity.VocabularyEntries")
     scrape = models.ForeignKey(
         "ftc.Scrape",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
+    spider = models.CharField(max_length=200, db_index=True, default="cqc")
+    provider_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    provider = CompositeForeignKey(
+        "CQCProvider",
+        related_name="locations",
+        on_delete=models.DO_NOTHING,
+        to_fields={"id": "provider_id", "scrape_id": "scrape_id"},
+        null=True,
+        blank=True,
+    )
+    classification = models.ManyToManyField("charity.VocabularyEntries")

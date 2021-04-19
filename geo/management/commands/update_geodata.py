@@ -23,7 +23,6 @@ class Command(BaseCommand):
         """,
         'convert "ENGLAND AND WALES" to "ENGLAND" and "WALES"': """
             insert into ftc_organisationlocation (
-                "organisation_id",
                 "org_id",
                 "name",
                 "description",
@@ -35,8 +34,7 @@ class Command(BaseCommand):
                 "source_id",
                 "scrape_id"
             )
-            select fo.organisation_id,
-                fo.org_id,
+            select fo.org_id,
                 'England' as name,
                 fo.description,
                 'E92000001' as "geoCode",
@@ -50,8 +48,7 @@ class Command(BaseCommand):
             where fo."geoCode" = 'K04000001'
                 and "geoCodeType" = 'ONS'
             union
-            select fo.organisation_id,
-                fo.org_id,
+            select fo.org_id,
                 'Wales' as name,
                 fo.description,
                 'W92000004' as "geoCode",
@@ -72,7 +69,6 @@ class Command(BaseCommand):
         """,
         "add postcode data to location from organisation table": """
             insert into ftc_organisationlocation (
-                organisation_id,
                 org_id,
                 name,
                 "geoCode",
@@ -97,8 +93,7 @@ class Command(BaseCommand):
                 "source_id",
                 "scrape_id"
             )
-            select fo.id as organisation_id,
-                fo.org_id as org_id,
+            select fo.org_id as org_id,
                 fo."postalCode" as name,
                 geo.pcds as "geoCode",
                 'PC' as "geoCodeType",

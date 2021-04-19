@@ -67,6 +67,11 @@ class BaseScraper(BaseCommand):
     encoding = "utf8"
     orgtypes = []
     bulk_limit = 10000
+    models_to_delete = [
+        Organisation,
+        OrganisationLink,
+        OrganisationLocation,
+    ]
 
     postcode_regex = re.compile(
         r"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"
@@ -172,17 +177,18 @@ class BaseScraper(BaseCommand):
             self.save_records(model)
             if model == OrganisationLink:
                 results["link_records"] = len(records)
-        self.save_location_records()
+            results[f"{model.__name__}_records"] = len(records)
         results["records"] = sum(self.object_count.values())
         self.scrape.items = sum(self.object_count.values())
 
-        self.scrape.errors = self.error_count
-        self.scrape.result = results
-        self.scrape_logger.teardown()
-
         # if we've been successfull then delete previous items
         self.logger.info("Deleting previous records")
-        for model in [Organisation, OrganisationLink, OrganisationLocation]:
+        for model in self.models_to_delete:
+            self.logger.info(
+                "Deleting previous {} records".format(
+                    model.__name__,
+                )
+            )
             result, deleted_types = (
                 model.objects.filter(
                     spider__exact=self.name,
@@ -206,6 +212,10 @@ class BaseScraper(BaseCommand):
                 self.logger.info("Starting SQL: {}".format(sql_name))
                 cursor.execute(sql, {"spider_name": self.name})
                 self.logger.info("Finished SQL: {}".format(sql_name))
+
+        self.scrape.errors = self.error_count
+        self.scrape.result = results
+        self.scrape_logger.teardown()
 
     def add_org_record(self, record):
         self.add_record(Organisation, record)
@@ -234,26 +244,7 @@ class BaseScraper(BaseCommand):
         self.records[model] = []
 
     def add_location_record(self, record):
-        if isinstance(record, dict):
-            record = OrganisationLocation(**record)
-        self.location_records[record.org_id].append(record)
-
-    def save_location_records(self):
-        self.logger.info("Saving location records")
-        record_count = 0
-        for org_id, records in self.location_records.items():
-            org = Organisation.objects.get(
-                org_id=org_id,
-                spider__exact=self.name,
-                scrape_id=self.scrape.id,
-            )
-            if org:
-                for record in records:
-                    record.organisation_id = org.id
-                    record.save()
-                    record_count += 1
-        self.object_count[OrganisationLocation] = record_count
-        self.logger.info("Saved {:,.0f} location records".format(record_count))
+        self.add_record(OrganisationLocation, record)
 
     def save_sources(self):
         if hasattr(self, "source"):

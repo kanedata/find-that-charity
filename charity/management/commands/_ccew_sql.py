@@ -313,7 +313,6 @@ UPDATE_CCEW[
     "Insert into organisation location table"
 ] = """
 insert into ftc_organisationlocation (
-    organisation_id,
     org_id,
     name,
     "geoCode",
@@ -324,8 +323,7 @@ insert into ftc_organisationlocation (
     "source_id",
     "scrape_id"
 )
-select fo.id as organisation_id,
-    CONCAT('GB-CHC-', cc.registered_charity_number) as org_id,
+select CONCAT('GB-CHC-', cc.registered_charity_number) as org_id,
     aooname as name,
     coalesce(ca."GSS", ca."ISO3166_1") as "geoCode",
     case when ca."GSS" is not null then 'ONS'
@@ -333,13 +331,11 @@ select fo.id as organisation_id,
          else null end as "geoCodeType",
     'AOO' as "locationType",
     ca."ISO3166_1" as geo_iso,
-    fo.source_id as spider,
-    fo.source_id as source_id,
+    '{source}' as spider,
+    '{source}' as source_id,
     {scrape_id} as scrape_id
 from charity_ccewcharityareaofoperation cc
     inner join charity_areaofoperation ca
         on cc.geographic_area_description = ca.aooname
-    inner join ftc_organisation fo
-        on fo.org_id = CONCAT('GB-CHC-', cc.registered_charity_number)
 where ca."GSS" is not null or ca."ISO3166_1" is not null
 """

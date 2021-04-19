@@ -5,6 +5,7 @@ django-elasticsearch-dsl
 django-environ
 django-prettyjson
 django-filter
+django-composite-foreignkey
 dj-database-url
 django-ninja
 whitenoise

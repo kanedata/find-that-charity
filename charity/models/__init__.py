@@ -283,3 +283,27 @@ class VocabularyEntries(models.Model):
         if slugify(self.title) == slugify(self.code):
             return self.title
         return "[{}] {}".format(self.code, self.title)
+
+
+__all__ = (
+    Charity,
+    CharityName,
+    CharityFinancial,
+    CharityRaw,
+    AreaOfOperation,
+    Vocabulary,
+    VocabularyEntries,
+    CCEWCharity,
+    CCEWCharityAnnualReturnHistory,
+    CCEWCharityAreaOfOperation,
+    CCEWCharityARPartA,
+    CCEWCharityARPartB,
+    CCEWCharityClassification,
+    CCEWCharityEventHistory,
+    CCEWCharityGoverningDocument,
+    CCEWCharityOtherNames,
+    CCEWCharityOtherRegulators,
+    CCEWCharityPolicy,
+    CCEWCharityPublishedReport,
+    CCEWCharityTrustee,
+)

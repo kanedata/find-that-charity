@@ -1,8 +1,6 @@
 import csv
 import io
 
-import tqdm
-
 from ftc.management.commands._base_scraper import HTMLScraper
 from other_data.models import GenderPayGap
 
@@ -55,10 +53,7 @@ class Command(HTMLScraper):
             }
         ],
     }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.raw_records = []
+    models_to_delete = [GenderPayGap]
 
     def parse_file(self, response, source_url):
         self.logger.info(source_url)
@@ -102,24 +97,4 @@ class Command(HTMLScraper):
 
         row["Year"] = year
         row["scrape"] = self.scrape
-        self.raw_records.append(row)
-
-    def close_spider(self):
-        super(Command, self).close_spider()
-        self.records = None
-        self.link_records = None
-
-        # now start inserting charity records
-        self.logger.info("Inserting GenderPayGap records")
-        GenderPayGap.objects.bulk_create(self.get_bulk_create())
-        self.logger.info("GenderPayGap records inserted")
-
-        self.logger.info("Deleting old GenderPayGap records")
-        GenderPayGap.objects.exclude(
-            scrape_id=self.scrape.id,
-        ).delete()
-        self.logger.info("Old GenderPayGap records deleted")
-
-    def get_bulk_create(self):
-        for record in tqdm.tqdm(self.raw_records):
-            yield GenderPayGap(**record)
+        self.add_record(GenderPayGap, row)

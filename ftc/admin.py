@@ -64,15 +64,18 @@ class OrganisationAdmin(JSONFieldAdmin):
 
 
 class SourceAdmin(JSONFieldAdmin):
-    list_display = ("id", "publisher", "title", "item_count", "link_count")
+    list_display = ("id", "publisher", "title", "organisation_count", "organisation_link_count")
     search_fields = ("title",)
     list_filter = ()
 
-    def item_count(self, obj):
+    def organisation_count(self, obj):
         return obj.organisations.count()
 
-    def link_count(self, obj):
+    def organisation_link_count(self, obj):
         return obj.organisation_links.count()
+
+    def organisation_location_count(self, obj):
+        return obj.organisation_locations.count()
 
 
 class ScrapeAdmin(SourceAdmin):
@@ -84,8 +87,9 @@ class ScrapeAdmin(SourceAdmin):
         "status",
         "errors",
         "items",
-        "item_count",
-        "link_count",
+        "organisation_count",
+        "organisation_link_count",
+        "organisation_location_count",
     )
     list_filter = (
         "status",
