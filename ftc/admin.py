@@ -64,7 +64,14 @@ class OrganisationAdmin(JSONFieldAdmin):
 
 
 class SourceAdmin(JSONFieldAdmin):
-    list_display = ("id", "publisher", "title", "organisation_count", "organisation_link_count")
+    list_display = (
+        "id",
+        "publisher",
+        "title",
+        "organisation_count",
+        "organisation_link_count",
+        "organisation_location_count",
+    )
     search_fields = ("title",)
     list_filter = ()
 
