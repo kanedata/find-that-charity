@@ -20,7 +20,7 @@ f6 pv0 ph1 br1
 
 {% macro orgtype_link(orgtype, large=false) %}
 <a href="{{ url('orgid_type', kwargs={'orgtype': orgtype.slug}) }}"
-   class="link dib bg-light-gray near-black underline-hover {{orgid_classname(large)}}">
+   class="link dib bg-light-gray near-black underline-hover {{orgid_classname(large)}} mb2">
    {{orgtype.title}}
 </a>
 {% endmacro %}

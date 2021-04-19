@@ -1,11 +1,11 @@
 {% if cqc %}
-  {% call org_panel("Care Quality Commission", org) %}
+  {% call org_panel("Services regulated by the Care Quality Commission", org) %}
     {% for cqc_provider in cqc %}
       <p>Registered as a provider with the <a href="https://www.cqc.org.uk/" class="link underline blue">Care Quality Commission<span class="material-icons ml1" title="Opens in a new window">launch</span></a>
       (id: <code>{{ cqc_provider.id }}</code>)</p>
       <p><a href="https://www.cqc.org.uk/provider/{{ cqc_provider.id }}" class="link underline blue b">
       <abbr title="Care Quality Commission">CQC</abbr> Provider: {{ cqc_provider.name }}<span class="material-icons ml1" title="Opens in a new window">launch</span></a></p>
-      <p>Locations:</p>
+      <p>Services:</p>
       <ul>
         {% for location in cqc_provider.locations.all() %}
         <li>
