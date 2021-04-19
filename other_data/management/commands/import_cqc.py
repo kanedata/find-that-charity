@@ -6,6 +6,35 @@ from tqdm import tqdm
 from ftc.management.commands._base_scraper import HTMLScraper
 from other_data.models import CQCBrand, CQCLocation, CQCProvider
 
+UPDATE_GEODATA = """
+    insert into ftc_organisationlocation (
+        org_id,
+        name,
+        "geoCode",
+        "geoCodeType",
+        "locationType",
+        geo_iso,
+        "spider",
+        "source_id",
+        "scrape_id"
+    )
+    select cqc_p.org_id as "org_id",
+        cqc_l.address_postcode as "name",
+        cqc_l.address_postcode as "geoCode",
+        'PC' as "geoCodeType",
+        'SITE' as "locationType",
+        'GB' as "geo_iso",
+        cqc_l.spider as "spider",
+        cqc_l.spider as "source_id",
+        cqc_l.scrape_id as "scrape_id"
+    from other_data_cqclocation cqc_l
+        inner join other_data_cqcprovider cqc_p
+            on cqc_l.provider_id = cqc_p.id
+                and cqc_l.scrape_id = cqc_p.scrape_id
+        inner join ftc_organisation fo
+            on cqc_p.org_id = fo.org_id
+"""
+
 
 class Command(HTMLScraper):
     name = "cqc"
@@ -53,38 +82,12 @@ class Command(HTMLScraper):
     }
     models = [CQCBrand, CQCProvider, CQCLocation]
     models_to_delete = [CQCBrand, CQCProvider, CQCLocation]
-    post_sql = {
-        "add CQC locations": """
-            insert into ftc_organisationlocation (
-                org_id,
-                name,
-                "geoCode",
-                "geoCodeType",
-                "locationType",
-                geo_iso,
-                "spider",
-                "source_id",
-                "scrape_id"
-            )
-            select cqc_p.org_id as "org_id",
-                cqc_l.address_postcode as "name",
-                cqc_l.address_postcode as "geoCode",
-                'PC' as "geoCodeType",
-                'SITE' as "locationType",
-                'GB' as "geo_iso",
-                cqc_l.scrape_id as "scrape_id",
-                cqc_l.spider as "spider"
-            from other_data_cqclocation cqc_l
-                inner join other_data_cqcprovider cqc_p
-                    on cqc_l.provider_id = cqc_p.id
-                        and cqc_l.scrape_id = cqc_p.scrape_id
-                inner join ftc_organisation fo
-                    on cqc_p.org_id = fo.org_id
-        """
-    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.post_sql = {
+            "add CQC locations": UPDATE_GEODATA,
+        }
 
         self.field_lookup = {}
         self.brand_ids = set()
