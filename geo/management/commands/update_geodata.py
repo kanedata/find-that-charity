@@ -121,14 +121,18 @@ class Command(BaseCommand):
                     on fo."postalCode" = geo.pcds;
         """,
         "delete any records from location that aren't based on current scrapes": """
-            delete from ftc_organisationlocation
-            where id in (
-                select fol.id
-                from ftc_organisationlocation fol
-                    left outer join ftc_organisation fo
-                        on fol.organisation_id = fo.id
-                            and fol.scrape_id = fo.scrape_id
-                where fo.scrape_id is null
+            delete from ftc_organisationlocation fo
+            where fo.scrape_id not in (
+                select ftc_scrape.id
+                from ftc_scrape
+                inner join (
+                    select spider,
+                        max(finish_time) as latest_scrape
+                    from ftc_scrape
+                    where status = 'success'
+                    group by spider
+                ) as latest_scrapes on ftc_scrape.spider = latest_scrapes.spider
+                    and ftc_scrape.finish_time = latest_scrapes.latest_scrape
             )
         """,
         "add missing area information for postcodes": """
