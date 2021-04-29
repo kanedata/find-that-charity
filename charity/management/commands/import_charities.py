@@ -6,7 +6,7 @@ class Command(BaseCommand):
     scrapers = [
         "ccew",
         "ccni",
-        "oscr",
+        # "oscr",
     ]
 
     def handle(self, *args, **options):
