@@ -1,15 +1,22 @@
 const GEOJSON_URL = 'https://findthatpostcode.uk/areas/{}.geojson';
 const GEOPOINT_URL = 'https://findthatpostcode.uk/postcodes/{}.json';
 const TILES = 'https://stamen-tiles-{s}.a.ssl.fastly.net/{style}/{z}/{x}/{y}.png';
-var bounds = L.latLngBounds(
+var DEFAULT_BOUNDS = L.latLngBounds(
     L.latLng(49.8647440573549, -8.649995833304311),
     L.latLng(60.86078239016185, 1.763705609663519),
 );
+
 if (GEOCODES || ORG_LAT_LONGS) {
     var map = L.map('locationmap').setView([51.505, -0.09], 13);
     map.scrollWheelZoom.disable();
-    L.tileLayer(TILES, { style: 'toner' }).addTo(map);
-    map.fitBounds(bounds);
+    L.tileLayer(TILES, { style: 'toner-lite' }).addTo(map);
+    map.fitBounds(DEFAULT_BOUNDS);
+    var bounds = L.latLngBounds();
+    
+    function updateBounds(layer){
+        bounds.extend(layer);
+        map.fitBounds(bounds);
+    }
 
     var layer_groups = {};
     if (GEOCODES) {
@@ -29,8 +36,7 @@ if (GEOCODES || ORG_LAT_LONGS) {
                         }
                     })
                     layer_groups[geocode_type].addLayer(layer);
-                    geojsonbounds.extend(layer.getBounds());
-                    map.fitBounds(geojsonbounds);
+                    updateBounds(layer.getBounds());
                 });
         });
     }
@@ -41,7 +47,6 @@ if (GEOCODES || ORG_LAT_LONGS) {
                 latlng[0],
                 latlng[1],
             ]);
-            bounds.extend(point);
             var group_label = latlng[2];
             if(latlng[2]=="Registered Office"){
                 // group_label = `<img src="" /> ${latlng[2]}`;
@@ -59,6 +64,7 @@ if (GEOCODES || ORG_LAT_LONGS) {
                 layer_groups[group_label] = L.layerGroup().addTo(map);
             }
             layer_groups[group_label].addLayer(marker);
+            updateBounds(point);
         });
     }
     L.control.layers(null, layer_groups, {
