@@ -23,9 +23,7 @@ class Command(BaseCommand):
     ]
 
     def handle(self, *args, **options):
-        scrapers_to_run = [
-            "import_{}".format(scraper) for scraper in self.scrapers
-        ] + [
+        scrapers_to_run = ["import_{}".format(scraper) for scraper in self.scrapers] + [
             "update_orgids",
             "update_geodata",
         ]
