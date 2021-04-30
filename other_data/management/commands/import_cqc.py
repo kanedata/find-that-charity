@@ -33,6 +33,7 @@ UPDATE_GEODATA = """
                 and cqc_l.scrape_id = cqc_p.scrape_id
         inner join ftc_organisation fo
             on cqc_p.org_id = fo.org_id
+    where cqc_l.status = 'Active'
 """
 
 
