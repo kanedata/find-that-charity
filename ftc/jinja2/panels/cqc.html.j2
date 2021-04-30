@@ -6,8 +6,8 @@
       <p><a href="https://www.cqc.org.uk/provider/{{ cqc_provider.id }}" class="link underline blue b">
       <abbr title="Care Quality Commission">CQC</abbr> Provider: {{ cqc_provider.name }}<span class="material-icons ml1" title="Opens in a new window">launch</span></a></p>
       <p>Services:</p>
-      <ul>
-        {% for location in cqc_provider.locations.all() %}
+      <ul style="max-height: 24rem; overflow-y: scroll;">
+        {% for location in cqc_provider.locations.all() if location.status == 'Active' %}
         <li>
           <a href="https://www.cqc.org.uk/location/{{location.id}}" class="link underline blue">{{location.name}}<span class="material-icons ml1" title="Opens in a new window">launch</span></a>
           ({{ location.inspection_category }} in {{location.address_city}})
