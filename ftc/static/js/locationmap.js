@@ -11,19 +11,24 @@ if (GEOCODES || ORG_LAT_LONGS) {
     L.tileLayer(TILES, { style: 'toner' }).addTo(map);
     map.fitBounds(bounds);
 
+    var layer_groups = {};
     if (GEOCODES) {
         geojsonbounds = L.latLngBounds();
-        GEOCODES.forEach(function (geocode) {
+        GEOCODES.forEach(function ([geocode_type, geocode]) {
+            if(!layer_groups[geocode_type]){
+                layer_groups[geocode_type] = L.layerGroup().addTo(map);
+            }
             fetch(GEOJSON_URL.replace('{}', geocode))
                 .then(response => response.json())
                 .then(data => {
                     var layer = L.geoJSON(data, {
                         onEachFeature: function (feature, layer) {
                             if (feature.properties && feature.properties.name) {
-                                layer.bindPopup(feature.properties.name);
+                                layer.bindPopup(`<strong>${geocode_type}</strong>: ${feature.properties.name}`);
                             }
                         }
-                    }).addTo(map);
+                    })
+                    layer_groups[geocode_type].addLayer(layer);
                     geojsonbounds.extend(layer.getBounds());
                     map.fitBounds(geojsonbounds);
                 });
@@ -36,10 +41,28 @@ if (GEOCODES || ORG_LAT_LONGS) {
                 latlng[0],
                 latlng[1],
             ]);
-            var marker = L.marker(point).addTo(map);
-            marker.bindPopup(`<strong>${latlng[2]}</strong>: ${latlng[3]}`);
             bounds.extend(point);
-            map.fitBounds(bounds);
+            var group_label = latlng[2];
+            if(latlng[2]=="Registered Office"){
+                // group_label = `<img src="" /> ${latlng[2]}`;
+                var marker = L.marker(point).bindPopup(`<strong>${latlng[2]}</strong>: ${latlng[3]}`);
+            } else {
+                var marker = L.circleMarker(point, {
+                    radius: 4,
+                    color: 'red',
+                    weight: 4,
+                    fill: true,
+                    fillOpacity: 0,
+                }).bindPopup(`<strong>${latlng[2]}</strong>: ${latlng[3]}`);
+            }
+            if(!layer_groups[group_label]){
+                layer_groups[group_label] = L.layerGroup().addTo(map);
+            }
+            layer_groups[group_label].addLayer(marker);
         });
     }
+    L.control.layers(null, layer_groups, {
+        collapsed: false,
+    }).addTo(map);
+    map.fitBounds(bounds);
 }

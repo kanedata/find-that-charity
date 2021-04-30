@@ -342,12 +342,15 @@ class Organisation(models.Model):
 
         for location in self.locations.all():
             if re.match("[ENWSK][0-9]{8}", location.geoCode):
+                location_type = OrganisationLocation.LocationTypes(
+                    location.locationType
+                ).label
                 # special case for combinations of countries
                 if location.geoCode in special_cases:
                     for a in special_cases[location.geoCode]:
-                        yield a
+                        yield [location_type, a]
                     continue
-                yield location.geoCode
+                yield [location_type, location.geoCode]
 
     @property
     def allGeoCodes(self):

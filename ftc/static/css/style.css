@@ -38,6 +38,39 @@
   .sticky-l { position: sticky; }
 }
 
+/* Extra heights */
+.h6 {
+    height: 24rem;
+}
+.h7 {
+    height: 32rem;
+}
+@media screen and (min-width:30em) {
+    .h6-ns {
+        height: 24rem;
+    }
+    .h7-ns {
+        height: 32rem;
+    }
+}
+@media screen and (min-width:30em) and (max-width:60em) {
+    .h6-m {
+        height: 24rem;
+    }
+    .h7-m {
+        height: 32rem;
+    }
+}
+@media screen and (min-width:60em) {
+    .h6-l {
+        height: 24rem;
+    }
+    .h7-l {
+        height: 32rem;
+    }
+}
+
+
 
 /* choices dropdown */
 .choices {

@@ -1,23 +1,15 @@
 {% if org.locations.exists() or org.postalCode %}
 {% call org_panel("Locations", org) %}
-<div class="w-100 w-40-l w-30-m fl">
-    <div id="locationmap" class="h5"></div>
+<div class="w-100 fl">
+    <div id="locationmap" class="h6 h7-l"></div>
 </div>
-<div class="w-100 w-60-l w-70-m fl ph3 measure">
-    <p class="f6 gray">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>
-    {% if org.postalCode %}
-    <div class="mv3">
-        <h4 class="ma0 pa0">Postcode</h4>
-        <p class="f6 ma0 pa0">
-        {{ org.postalCode }}
-        </p>
-    </div>
-    {% endif %}
+<div class="w-100 fl ph3 ">
+    <p class="f6 gray measure">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>
     {% if org.locations.exists() %}
         {% for areatype, countries in org.locations_group()|dictsort %}
         {% for country, areas in countries|dictsort|selectattr(0, "equalto", 'GB') %}
         {% if loop.first %}
-        <div class="mv3">
+        <div class="mv3 w-100 w-third-l fl-l pr3-l">
             <h4 class="ma0 pa0">{{ areatype|pluralise(count=areas|length, text_format="{text}") }} in the UK</h4>
             <ul class="mv0 list mh0 pa0 f6 w-100" style="max-height: 150px; overflow-y: auto;">
         {% endif %}

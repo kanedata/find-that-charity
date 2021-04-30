@@ -23,10 +23,14 @@ class Command(BaseCommand):
     ]
 
     def handle(self, *args, **options):
-        for scraper in self.scrapers:
+        scrapers_to_run = [
+            "import_{}".format(scraper) for scraper in self.scrapers
+        ] + [
+            "update_orgids",
+            "update_geodata",
+        ]
+        for scraper in scrapers_to_run:
             try:
                 management.call_command("import_{}".format(scraper))
             except Exception:
                 self.stdout.write(self.style.ERROR("Command {} failed".format(scraper)))
-        management.call_command("update_orgids")
-        management.call_command("update_geodata")
