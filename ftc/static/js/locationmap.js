@@ -1,13 +1,14 @@
 const GEOJSON_URL = 'https://findthatpostcode.uk/areas/{}.geojson';
 const GEOPOINT_URL = 'https://findthatpostcode.uk/postcodes/{}.json';
 const TILES = 'https://stamen-tiles-{s}.a.ssl.fastly.net/{style}/{z}/{x}/{y}.png';
-var DEFAULT_BOUNDS = L.latLngBounds(
+const DEFAULT_BOUNDS = L.latLngBounds(
     L.latLng(49.8647440573549, -8.649995833304311),
     L.latLng(60.86078239016185, 1.763705609663519),
 );
+const MAX_ZOOM_BOUNDS = 8;
 
 if (GEOCODES || ORG_LAT_LONGS) {
-    var map = L.map('locationmap').setView([51.505, -0.09], 13);
+    var map = L.map('locationmap');
     map.scrollWheelZoom.disable();
     L.tileLayer(TILES, { style: 'toner-lite' }).addTo(map);
     map.fitBounds(DEFAULT_BOUNDS);
@@ -15,7 +16,9 @@ if (GEOCODES || ORG_LAT_LONGS) {
     
     function updateBounds(layer){
         bounds.extend(layer);
-        map.fitBounds(bounds);
+        map.fitBounds(bounds, {
+            maxZoom: MAX_ZOOM_BOUNDS
+        });
     }
 
     var layer_groups = {};
