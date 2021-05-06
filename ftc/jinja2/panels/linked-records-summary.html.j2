@@ -2,6 +2,13 @@
     <p>
         This organisation record is based on data from <a href="#data-source-{{ org.source.id }}" class="link underline-hover blue b">{{ org.source.title }}</a> published by {{ org.source.publisher }}.
     </p>
+    {% if 'registered-charity' not in related_orgs.organisationType %}
+    <p class="f6">
+      Find that Charity displays records of not for profit organisations that use other legal forms, as well
+      as registered charities. According to information from the available data sources, this organisation is not
+      registered as a charity.
+    </p>
+    {% endif %}
 </div>
 
 {% if related_orgs.records|length > 1 %}
