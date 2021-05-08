@@ -83,7 +83,11 @@ git push dokku master
 On Dokku server run:
 
 ```bash
-# setup and run import
+# setup
+dokku run ftc python ./manage.py migrate
+dokku run ftc python ./manage.py createcachetable
+
+# run import
 dokku run ftc python ./manage.py charity_setup
 dokku run ftc python ./manage.py import_charities
 dokku run ftc python ./manage.py import_companies

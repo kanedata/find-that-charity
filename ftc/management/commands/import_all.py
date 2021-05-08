@@ -29,6 +29,6 @@ class Command(BaseCommand):
         ]
         for scraper in scrapers_to_run:
             try:
-                management.call_command("import_{}".format(scraper))
-            except Exception:
+                management.call_command(scraper)
+            except Exception as err:
                 self.stdout.write(self.style.ERROR("Command {} failed".format(scraper)))
