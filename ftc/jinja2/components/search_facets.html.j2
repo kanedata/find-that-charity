@@ -60,9 +60,9 @@
 <h4 class="ma0 pa0">UK areas</h4>
 <select class="js-choices w-100" style="max-width: 100%" multiple name="location">
     <option value="">UK areas</option>
-{% for locationtype, locationtypename in (('ctry', 'Country'), ('rgn', 'Region (England)'), ('la', 'UK Local Authority'), ) %}
+{% for locationtype, locationtypename in (('ctry', 'Country'), ('rgn', 'Region (England)'), ('la', 'UK Local Authority'), ) if locations[locationtype] %}
     <optgroup label="{{ locationtypename }}">
-    {% for areacode, areaname in locations[locationtype]|dictsort %}
+    {% for areacode, areaname in locations[locationtype]|dictsort%}
         {% if areacode in search.aggregation.by_location %}
             <option value="{{ areacode }}" {% if search.location and areacode in search.location %}selected="selected"{% endif %}>
                 {{ areaname }}
@@ -74,7 +74,7 @@
 {% endfor %}
 </select>
 
-
+{% if locations["iso"] %}
 <h4 class="ma0 pa0">Country</h4>
 <select class="js-choices w-100" style="max-width: 100%" multiple name="location">
     <option value="">Country</option>
@@ -87,6 +87,7 @@
     {% endif %}
 {% endfor %}
 </select>
+{% endif %}
 
 <input
     type="submit"
