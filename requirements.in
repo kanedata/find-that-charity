@@ -27,3 +27,4 @@ bcp-reader
 PyYAML
 lxml==4.6.3
 pycountry
+sentry-sdk
