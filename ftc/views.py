@@ -5,6 +5,7 @@ from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
+from elasticsearch.exceptions import RequestError
 
 from charity.models import Charity
 from ftc.documents import FullOrganisation
@@ -168,7 +169,14 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         )
         return response
 
-    s.run_es(with_pagination=True, with_aggregation=True)
+    try:
+        s.run_es(with_pagination=True, with_aggregation=True)
+    except RequestError:
+        if request.GET.get("q"):
+            s.set_criteria(term='"' + request.GET["q"] + '"')
+            s.run_es(with_pagination=True, with_aggregation=True)
+        else:
+            raise
     page_number = request.GET.get("page")
     page_obj = s.paginator.get_page(page_number)
 
