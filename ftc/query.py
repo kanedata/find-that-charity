@@ -13,7 +13,7 @@ from reconcile.query import RECONCILE_QUERY
 def get_organisation(org_id):
     try:
         return Organisation.objects.get(org_id=org_id)
-    except Organisation.DoesNotExist:
+    except Organisation.DoesNotExist or Organisation.MultipleObjectsReturned:
         orgs = list(Organisation.objects.filter(orgIDs__contains=[org_id]))
         if orgs:
             orgs = RelatedOrganisation(orgs)
