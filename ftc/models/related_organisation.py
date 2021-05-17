@@ -164,26 +164,27 @@ class RelatedOrganisation:
             ccni_number = None
             ccni_link = None
             company_numbers = []
-            for o in self.linked_orgs:
-                if o.startswith("GB-CHC-"):
-                    ccew_number = o.replace("GB-CHC-", "")
-                    ccew_link = EXTERNAL_LINKS["GB-CHC"][1][0].format(ccew_number)
-                elif o.startswith("GB-NIC-"):
-                    ccni_number = o.replace("GB-NIC-", "")
-                    ccni_link = EXTERNAL_LINKS["GB-NIC"][0][0].format(ccni_number)
-                elif o.startswith("GB-SC-"):
-                    oscr_number = o.replace("GB-SC-", "")
-                    oscr_link = EXTERNAL_LINKS["GB-SC"][0][0].format(oscr_number)
-                elif o.startswith("GB-COH-"):
-                    company_numbers.append(
-                        {
-                            "number": o.replace("GB-COH-", ""),
-                            "url": EXTERNAL_LINKS["GB-COH"][0][0].format(
-                                o.replace("GB-COH-", "")
-                            ),
-                            "source": self.source.id,
-                        }
-                    )
+            if self.linked_orgs:
+                for o in self.linked_orgs:
+                    if o.startswith("GB-CHC-"):
+                        ccew_number = o.replace("GB-CHC-", "")
+                        ccew_link = EXTERNAL_LINKS["GB-CHC"][1][0].format(ccew_number)
+                    elif o.startswith("GB-NIC-"):
+                        ccni_number = o.replace("GB-NIC-", "")
+                        ccni_link = EXTERNAL_LINKS["GB-NIC"][0][0].format(ccni_number)
+                    elif o.startswith("GB-SC-"):
+                        oscr_number = o.replace("GB-SC-", "")
+                        oscr_link = EXTERNAL_LINKS["GB-SC"][0][0].format(oscr_number)
+                    elif o.startswith("GB-COH-"):
+                        company_numbers.append(
+                            {
+                                "number": o.replace("GB-COH-", ""),
+                                "url": EXTERNAL_LINKS["GB-COH"][0][0].format(
+                                    o.replace("GB-COH-", "")
+                                ),
+                                "source": self.source.id,
+                            }
+                        )
             names = []
             names_seen = set()
             for r in self.records:
@@ -277,6 +278,8 @@ class RelatedOrganisation:
                     "url": build_url(reverse("orgid_json", kwargs={"org_id": orgid})),
                 }
                 for orgid in self.linked_orgs
-            ],
+            ]
+            if self.linked_orgs
+            else [],
             "dateModified": self.dateModified,
         }
