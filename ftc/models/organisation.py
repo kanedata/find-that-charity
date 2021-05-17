@@ -386,9 +386,12 @@ class Organisation(models.Model):
             location_type = OrganisationLocation.LocationTypes(
                 location.locationType
             ).label
-            if location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE:
+            if (
+                location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE
+                and location.geo_laua
+            ):
                 locations[location_type][location.geo_iso].add(location.geo_laua)
-            else:
+            elif location.geoCode:
                 locations[location_type][location.geo_iso].add(location.geoCode)
         return locations
 
