@@ -1,6 +1,14 @@
 const DEFAULT_HASH_LENGTH = 4;
 const ARRAY_CHUNK_SIZE = 100;
 const FIELD_MATCH_REGEX = /(organi[sz]ation|org_?id)/g;
+const ORGID_SCHEMES = {
+    'orgid': ["Organisation Identifier", "GB-CHC-1234567"],
+    'charity': ["Charity Number", "1234567"],
+    "GB-CHC": ["Charity Number (England and Wales only)", "1234567"],
+    "GB-SC": ["Charity Number (Scotland)", "SC012345"],
+    "GB-NIC": ["Charity Number (Northern Ireland)", "123456"],
+    "GB-COH": ["Company Number", "00123456"],
+};
 
 function chunk_array(arr, len) {
     var chunks = [],
@@ -49,9 +57,22 @@ var app = new Vue({
         csv: null,
         csv_results: null,
         field_select: [],
-        fields_to_add: [],
+        fields_to_add: [
+            "org_id",
+            "name",
+            "postalCode",
+            "url",
+            "latestIncome",
+            "latestIncomeDate",
+            "dateRegistered",
+            "dateRemoved",
+            "active",
+            "source",
+        ],
         column_to_use: null,
         column_to_use_auto: false,
+        identifier_type: null,
+        identifier_types: ORGID_SCHEMES,
         progress: null,
     },
     delimiters: ['[[', ']]'],
@@ -95,9 +116,31 @@ var app = new Vue({
                 }
             });
         },
+        getRowIdentifier: function(row){
+            var id = row[this.column_to_use];
+            if(this.identifier_type=='orgid'){
+                return id;
+            }
+            if(this.identifier_type=='charity'){
+                if(id.startsWith("S")){
+                    return `GB-SC-${id}`;
+                } else if(id.startsWith("N")){
+                    return `GB-NIC-${id.replace("[NI]+", "")}`;
+                }
+                return `GB-CHC-${id}`;
+            }
+            return `${this.identifier_type}-${id}`;
+        },
+        selectAllFields: function(){
+            if (this.fields_to_add.length){
+                this.fields_to_add = [];
+            } else {
+                this.fields_to_add = this.fields.map((f) => f.id);
+            }
+        },
         getResults: function(){
             var component = this;
-            var ids = this.csv_results.data.map((d) => d[component.column_to_use]);
+            var ids = this.csv_results.data.map((d) => component.getRowIdentifier(d));
             var id_chunks = chunk_array(ids, ARRAY_CHUNK_SIZE);
             var rows_done = 0;
             component.progress = 0;
@@ -127,7 +170,7 @@ var app = new Vue({
                         fields: component.csv_results.meta.fields.concat(component.fields_to_add),
                         data: component.csv_results.data.map(row => Object.assign(
                             row,
-                            new_data[row[component.column_to_use]]
+                            new_data[component.getRowIdentifier(row)]
                         ))
                     }),
                     component.csv.name.replace(".csv", "-org.csv")
@@ -138,6 +181,9 @@ var app = new Vue({
         stage: function () {
             if(!this.csv){
                 return 0;
+            }
+            if(this.identifier_type){
+                return 3;
             }
             if(this.column_to_use){
                 return 2;

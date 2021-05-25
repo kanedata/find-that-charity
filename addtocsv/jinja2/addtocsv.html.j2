@@ -77,16 +77,46 @@
       </div>
     </div>
 
+    <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-identifier-type-field">
+      <h3 class="pa0 ma0 dib">
+        Step 3: 
+        <span class="normal">Select identifier type</span>
+      </h3>
+      <span class="fr contents-top" v-if="stage > 2">
+        <a href="#" id="reset-identifier-type-field" class="stage-reset link f6 blue underline dim" v-on:click.prevent="identifier_type = null">Change field</a>
+        <span class="dib code pa1 bg-light-gray lh-solid" id="column-name-desc">[[identifier_type]]</span>
+        <input class="dn" type="text" name="column_name" id="column_name" :value="identifier_type">
+      </span>
+      <div class="contents mv4" v-else-if="stage == 2">
+        <div class="field mb3" id="identifier_select">
+          <ul class="list pa0 ma0">
+            <li class="mb2" v-for="label, i in identifier_types">
+                <label class="pointer">
+                    <input type="radio" name="identifier_type_field" :value="i" v-on:click.prevent="identifier_type = i" />
+                    [[ label[0] ]] (eg <span class="code pa1 bg-light-gray underline-hover">[[ label[1] ]]</span>)
+                </label>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-select-fields">
       <h3 class="pa0 ma0 dib">
         Step 3: 
         <span class="normal">Select data to add</span>
       </h3>
-      <span class="fr contents-top" v-if="stage > 2">
+      <span class="fr contents-top" v-if="stage > 3">
         <span class="dib code pa1 bg-light-gray" id="fields_to_add"></span>
       </span>
-      <div class="contents mv4" v-else-if="stage == 2">
+      <div class="contents mv4" v-else-if="stage == 3">
         <ul class="list ma0 pa0">
+            <li>            
+                <label>
+                    <input type="checkbox" name="select_all_fields" v-on:click.prevent="selectAllFields">
+                    <strong>Select all</strong>
+                </label>
+            </li>
             <li v-for="field in fields" :key="field.id">
                 <label>
                     <input type="checkbox" name="fields" :value="field.id" v-model="fields_to_add">
