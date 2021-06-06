@@ -197,12 +197,13 @@ class RelatedOrganisation:
                         }
                     )
                     names_seen.add(r.name)
-                for n in r.alternateName:
-                    if n not in names_seen:
-                        names.append(
-                            {"name": n, "type": "other name", "source": r.source.id}
-                        )
-                        names_seen.add(n)
+                if r.alternateName:
+                    for n in r.alternateName:
+                        if n not in names_seen:
+                            names.append(
+                                {"name": n, "type": "other name", "source": r.source.id}
+                            )
+                            names_seen.add(n)
 
             return {
                 "ccew_number": ccew_number,
