@@ -18,7 +18,7 @@ class Command(HTMLScraper):
         "https://www.gov.uk/government/publications/current-registered-providers-of-social-housing",
     ]
     org_id_prefix = "GB-SHPE"
-    id_field = "Registration number"
+    id_field = "registration number"
     source = {
         "title": "Current registered providers of social housing",
         "description": "Current registered providers of social housing and new registrations and deregistrations. Covers England",
@@ -48,53 +48,58 @@ class Command(HTMLScraper):
         r.raise_for_status()
 
         wb = load_workbook(io.BytesIO(r.content), read_only=True)
-        ws = wb["Organisation Advanced Find View"]
+        sheets = [
+            sheetname for sheetname in wb.sheetnames
+            if "listing" in sheetname.lower() or "find view" in sheetname.lower()
+        ]
+        for sheetname in sheets:
+            ws = wb[sheetname]
 
-        # self.source["issued"] = wb.properties.modified.isoformat()[0:10]
+            # self.source["issued"] = wb.properties.modified.isoformat()[0:10]
 
-        headers = None
-        for k, row in enumerate(ws.rows):
-            if not headers:
-                headers = [c.value for c in row]
-            else:
-                record = dict(zip(headers, [c.value for c in row]))
-                self.parse_row(record)
+            headers = None
+            for k, row in enumerate(ws.rows):
+                if not headers:
+                    headers = [c.value.lower() for c in row]
+                else:
+                    record = dict(zip(headers, [c.value for c in row]))
+                    self.parse_row(record)
 
     def parse_row(self, record):
 
         record = self.clean_fields(record)
-        if not record.get("Organisation name"):
+        if not record.get("organisation name") or not record.get("registration number"):
             return
 
         org_types = [
             self.add_org_type("Registered Provider of Social Housing"),
         ]
-        if record.get("Corporate form"):
-            if record["Corporate form"] == "Company":
+        if record.get("corporate form"):
+            if record["corporate form"] == "Company":
                 org_types.append(self.add_org_type("Registered Company"))
                 org_types.append(
                     self.add_org_type(
-                        "{} {}".format(record["Designation"], record["Corporate form"])
+                        "{} {}".format(record["designation"], record["corporate form"])
                     )
                 )
-            elif record["Corporate form"] == "CIO-Charitable Incorporated Organisation":
+            elif record["corporate form"] == "CIO-Charitable Incorporated Organisation":
                 org_types.append(
                     self.add_org_type("Charitable Incorporated Organisation")
                 )
                 org_types.append(self.add_org_type("Registered Charity"))
-            elif record["Corporate form"] == "Charitable Company":
+            elif record["corporate form"] == "Charitable Company":
                 org_types.append(self.add_org_type("Registered Company"))
                 org_types.append(self.add_org_type("Incorporated Charity"))
                 org_types.append(self.add_org_type("Registered Charity"))
-            elif record["Corporate form"] == "Unincorporated Charity":
+            elif record["corporate form"] == "Unincorporated Charity":
                 org_types.append(self.add_org_type("Registered Charity"))
             else:
-                org_types.append(self.add_org_type(record["Corporate form"]))
-        elif record.get("Designation"):
-            org_types.append(self.add_org_type(record["Designation"]))
+                org_types.append(self.add_org_type(record["corporate form"]))
+        elif record.get("designation"):
+            org_types.append(self.add_org_type(record["designation"]))
 
         org_ids = [self.get_org_id(record)]
-        if record.get("Designation") == "Local Authority":
+        if record.get("designation") == "Local Authority":
             la_codes = LA_LOOKUP.get(record.get(self.id_field))
             if la_codes:
                 org_ids.append("GB-LAE-{}".format(la_codes.get("register-code")))
@@ -115,7 +120,7 @@ class Command(HTMLScraper):
             Organisation(
                 **{
                     "org_id": self.get_org_id(record),
-                    "name": record.get("Organisation name"),
+                    "name": record.get("organisation name"),
                     "charityNumber": None,
                     "companyNumber": None,
                     "streetAddress": None,
@@ -133,7 +138,7 @@ class Command(HTMLScraper):
                     # "location": locations,
                     "latestIncome": None,
                     "dateModified": datetime.datetime.now(),
-                    "dateRegistered": record.get("Registration date"),
+                    "dateRegistered": record.get("registration date"),
                     "dateRemoved": None,
                     "active": True,
                     "parent": None,
