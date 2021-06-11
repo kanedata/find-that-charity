@@ -47,7 +47,7 @@ class Command(HTMLScraper):
     name = "schools_scotland"
     allowed_domains = ["gov.scot"]
     start_urls = ["https://www.gov.scot/publications/school-contact-details/"]
-    skip_rows = 5
+    skip_rows = 7
     org_id_prefix = "GB-SCOTEDU"
     id_field = "seed_code"
     source = {
