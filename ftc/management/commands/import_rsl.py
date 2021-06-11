@@ -49,7 +49,8 @@ class Command(HTMLScraper):
 
         wb = load_workbook(io.BytesIO(r.content), read_only=True)
         sheets = [
-            sheetname for sheetname in wb.sheetnames
+            sheetname
+            for sheetname in wb.sheetnames
             if "listing" in sheetname.lower() or "find view" in sheetname.lower()
         ]
         for sheetname in sheets:
