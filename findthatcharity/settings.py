@@ -244,3 +244,6 @@ IGNORE_DOMAINS = (
     "waitrose.com",
     "gmail.co.uk",
 )
+
+DASHBOARD_ROW_LIMIT = 1000
+DASHBOARD_ENABLE_FULL_EXPORT = True

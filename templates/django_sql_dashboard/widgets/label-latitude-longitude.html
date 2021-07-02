@@ -1,0 +1,40 @@
+{% extends "django_sql_dashboard/widgets/_base_widget.html" %}
+
+{% block widget_results %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+<script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.0/leaflet.markercluster.js" integrity="sha512-pWPELjRaw2ZdoT0PDi7iRpRlk1XX3rtnfejJ/HwskyojpHei+9hKpwdphC4yssNt4FM0TjMQOmMrk6ZYSn274w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.0/MarkerCluster.min.css" integrity="sha512-ENrTWqddXrLJsQS2A86QmvA17PkJ0GVm1bqj5aTgpeMAfDKN2+SIOLpKG8R/6KkimnhTb+VW5qqUHB/r1zaRgg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.0/MarkerCluster.Default.min.css" integrity="sha512-fYyZwU1wU0QWB4Yutd/Pvhy5J1oWAwFXun1pt+Bps04WSe4Aq6tyHlT4+MHSJhD8JlLfgLuC4CbCnX5KHSjyCg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<div id="vis{{ result.index }}" style="height: 680px;"></div>
+{% with "vis-data-"|add:result.index as script_name %}
+{{ result.rows|json_script:script_name }}
+<script>
+console.log(data);
+var data = JSON.parse(
+    document.getElementById("{{ script_name }}").textContent
+);
+var layer = new L.StamenTileLayer("terrain");
+var vis_map = L.map('vis{{ result.index }}').setView([51.505, -0.09], 13);
+vis_map.addLayer(layer);
+var bounds = L.latLngBounds();
+var markers = L.markerClusterGroup({
+    maxClusterRadius: 50,
+});
+data.forEach((value) => {
+    var latlng = [value.latitude, value.longitude];
+    L.marker(latlng).bindPopup(value.label).addTo(markers);
+    bounds.extend(latlng);
+})
+console.log(bounds);
+vis_map.fitBounds(bounds);
+markers.addTo(vis_map);
+</script>
+{% endwith %}
+{% endblock %}

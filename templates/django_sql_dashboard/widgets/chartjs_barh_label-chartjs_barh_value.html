@@ -1,0 +1,55 @@
+{% extends "django_sql_dashboard/widgets/_base_widget.html" %}
+
+{% block widget_results %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0/dist/chart.min.js" integrity="sha256-sKuIOg+m9ZQb96MRaiHCMzLniSnMlTv1h1h4T74C8ls=" crossorigin="anonymous"></script>
+
+<div>
+    <canvas id="vis{{ result.index }}" height="75"></canvas>
+</div>
+{% with "vis-data-"|add:result.index as script_name %}
+{{ result.rows|json_script:script_name }}
+<script>
+var data = JSON.parse(
+    document.getElementById("{{ script_name }}").textContent
+);
+
+Chart.defaults.font.size = 16;
+Chart.defaults.font.family = '"Raleway", sans-serif';
+
+var myChart = new Chart(
+    document.getElementById('vis{{ result.index }}'),
+    {
+        type: 'bar',
+        data: {
+            labels: data.map((value) => value.chartjs_barh_label ? value.chartjs_barh_label : "" ),
+            datasets: [{
+                data: data.map((value) => value.chartjs_barh_value),
+                backgroundColor: '#00449e',
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: false,
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            }
+        },
+    }
+);
+</script>
+{% endwith %}
+{% endblock %}

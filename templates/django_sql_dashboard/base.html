@@ -14,16 +14,37 @@
     font-size: 3rem;
     font-weight: 400;
   }
+  .sql-dashboard .btn {
+    appearance: button;
+    background-color: rgb(255, 255, 0);
+    border: 4px solid rgb(17, 17, 17);
+    color: rgb(17, 17, 17);
+    font-family: "Archivo", sans-serif;
+    text-align: center;
+    transition-delay: 0s;
+    transition-duration: 0.15s;
+    transition-property: background-color;
+    transition-timing-function: ease-in-out
+  }
   .sql-dashboard .query-results {
-    overflow-y: scroll;
+    overflow-x: auto;
+    overflow-y: auto;
     max-width: 100%;
     display: block;
     white-space: nowrap;
+    border-left: 0px solid black;
+    border-right: 0px solid black;
+    border-top: 0px solid black;
+    border-bottom: 0.5rem solid #eee;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 64px;
   }
   .sql-dashboard .query-results table {
     font-size: 0.9rem;
     font-family: Consolas,monaco,monospace;
     line-height: 1.2;
+    width: auto;
   }
   .sql-dashboard .query-results table tbody tr:nth-child(even) {
     background-color: #f2f2f2;

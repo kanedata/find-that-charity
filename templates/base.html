@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
     <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-    <title>{{ default_title }}{% block title %}{% endblock %}</title>
+    <title>{{ default_title }} - {% block title %}{% endblock %}</title>
     {% if ga_tracking %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking }}"></script>

@@ -1,0 +1,46 @@
+{% extends "django_sql_dashboard/widgets/_base_widget.html" %}
+
+{% block widget_results %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0/dist/chart.min.js" integrity="sha256-sKuIOg+m9ZQb96MRaiHCMzLniSnMlTv1h1h4T74C8ls=" crossorigin="anonymous"></script>
+
+<div>
+    <canvas id="vis{{ result.index }}" style="height: 550px; width: 550px;" width="550" height="550"></canvas>
+</div>
+{% with "vis-data-"|add:result.index as script_name %}
+{{ result.rows|json_script:script_name }}
+<script>
+var data = JSON.parse(
+    document.getElementById("{{ script_name }}").textContent
+);
+
+Chart.defaults.font.size = 16;
+Chart.defaults.font.family = '"Raleway", sans-serif';
+
+var colours = [
+    "#19A974", "#FF41B4", "#A463F2", "#FFFF00", "#357EDD", "#00449E", "#137752"
+]
+
+var myChart = new Chart(
+    document.getElementById('vis{{ result.index }}'),
+    {
+        type: 'doughnut',
+        data: {
+            labels: data.map((value) => value.chartjs_pie_label ? value.chartjs_pie_label : "" ),
+            datasets: [{
+                data: data.map((value) => value.chartjs_pie_value),
+                backgroundColor: data.map((value, index) => colours[index % colours.length]),
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                }
+            },
+            responsive: false,
+        },
+    }
+);
+</script>
+{% endwith %}
+{% endblock %}
