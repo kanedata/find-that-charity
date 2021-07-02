@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="w-100 w-25-ns center">
+
+{% if form.errors %}
+<p class="db bg-red white f4 pv2 ph3 br2 mb2">Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+{% if next %}
+    <p class="db bg-light-gray near-black f4 pv2 ph3 br2 mb2">
+    {% if user.is_authenticated %}
+    Your account doesn't have access to this page. To proceed,
+    please login with an account that has access.
+    {% else %}
+    Please login to see this page.
+    {% endif %}
+    </p>
+{% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div class="mt4">
+            <label class="b mb2 db" id="{{form.username.id_for_label}}">{{form.username.label}}</label>
+            {{ form.username|add_class:"w-100 pa2" }}
+        </div>
+        <div class="mt4">
+            <label class="b mb2 db" id="{{form.password.id_for_label}}">{{form.password.label}}</label>
+            {{ form.password|add_class:"w-100 pa2" }}
+        </div>
+
+        <input type="submit" value="login" class="f5 f4-l button-reset header-font mv4 pv2 ph3 tc bg-animate bg-yellow dim near-black pointer br2-ns br--right-ns  bw2 b--near-black ba">
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+
+    {# Assumes you setup the password_reset view in your URLconf #}
+    <p><a href="{% url 'password_reset' %}" class="link dark-blue underline">Lost password?</a></p>
+</div>
+
+{% endblock %}

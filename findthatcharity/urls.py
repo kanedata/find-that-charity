@@ -25,6 +25,7 @@ import reconcile.urls
 from api.endpoints import api
 
 urlpatterns = [
+    path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls, name="about"),
     path("", ftc.views.index, name="index"),
     path("about", ftc.views.about, name="about"),

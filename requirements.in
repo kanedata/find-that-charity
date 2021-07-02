@@ -6,6 +6,7 @@ django-environ
 django-prettyjson
 django-filter
 django-composite-foreignkey
+django-widget-tweaks
 dj-database-url
 django-ninja
 django-sql-dashboard

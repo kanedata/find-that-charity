@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "django_filters",
     "corsheaders",
     "django_sql_dashboard",
+    "widget_tweaks",
 ]
 
 MIDDLEWARE = [

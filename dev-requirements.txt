@@ -77,6 +77,8 @@ django-prettyjson==0.4.1
     # via -r requirements.txt
 django-sql-dashboard==1.0
     # via -r requirements.txt
+django-widget-tweaks==1.4.8
+    # via -r requirements.txt
 elasticsearch==7.12.0
     # via
     #   -r requirements.txt

@@ -1,0 +1,91 @@
+{% load static %}
+{% with default_title="Find that Charity" %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Archivo:400,700|Raleway:400,700|Material+Icons">
+    <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
+    <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <title>{{ default_title }}{% block title %}{% endblock %}</title>
+    {% if ga_tracking %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', {{ ga_tracking|escapejs }});
+    </script>
+    {% endif %}
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body class="home w-100 sans-serif near-black base-font bg-wavy">
+    <header class="body header-font normal ph3 ph5-ns pt4 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
+      <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
+          <a href="{% url 'about' %}" class="white logo underline double underline-yellow">About</a>
+            | <a href="{% url 'about' %}#data-sources" class="white logo underline double underline-yellow">Data sources</a>
+            | <a href="{% url 'about' %}#privacy" class="white logo underline double underline-yellow">Privacy</a>
+          {% if request.user.is_superuser %}
+            | <a href="{% url 'admin:index' %}" class="white logo underline double underline-yellow">Admin</a>
+          {% endif %}
+      </div>
+      <h1 class="{% if frontpage %}f-subheadline-ns{% endif %} tracked-tight f1 lh-title mv0 logo normal">
+        <a href="{% url 'index' %}" class="link moon-gray underline-yellow underline">
+          {{ default_title }}
+        </a>
+      </h1>
+    </header>
+    <main class="ph0 bg-white cf">
+      <section id="content" class="{% block sectionstyles %}fl w-100 ph3 pv5 ph5-ns lh-copy f4 entry-content{% endblock %}">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+    <footer id="contentinfo" class="body ph3 ph5-ns db pv5 moon-gray bg-near-black">
+      <div class="w-100">
+        <div class="w-100 w-third-l fr-l">
+          <p class="mv2 pa0 f6">
+            Find that Charity combines data from a number of different <a href="{% url 'about' %}#data-sources" class="link yellow underline-hover">data sources</a>
+            published by official regulators of organisations. Those regulators provide the most up-to-date and official versions of the data and should be contacted in
+            the event of any issues with the data on this site.
+          </p>
+        </div>
+        <div class="w-100 w-two-thirds-l">
+          <p class="mv2 pa0">
+              <strong>Find that Charity</strong>
+              | <a href="{% url 'about' %}" class="link yellow underline-hover">About</a>
+              | <a href="{% url 'about' %}#data-sources" class="link yellow underline-hover">Data sources</a>
+              | <a href="{% url 'about' %}#privacy" class="link yellow underline-hover">Privacy</a>
+              | <a href="https://findthatpostcode.uk/" target="_blank" class="link yellow underline-hover">Find that postcode</a>
+          </p>
+          <div class="mv2 pa0">
+              Supported by <a href="http://www.threesixtygiving.org/" target="_blank" class="link yellow underline-hover">360Giving</a>
+          </div>
+          <p class="ma0 pa0">© {{now.year}} <a href="https://dkane.net/" class="link yellow underline-hover">David Kane</a></p>
+          <div class="mv2 pa0">
+              <a href="https://github.com/drkane/find-that-charity" class="" title="View code on Github">
+                  <span class="icon mw2 dib">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w2" aria-label="Github" role="img"
+                          viewBox="0 0 512 512">
+                          <rect width="512" height="512" rx="15%" />
+                          <clipPath id="a">
+                              <rect width="512" height="512" rx="15%" />
+                          </clipPath>
+                          <path fill="#fff"
+                              d="M335 499c14 0 12 17 12 17H165s-2-17 12-17c13 0 16-6 16-12l-1-50c-71 16-86-28-86-28-12-30-28-37-28-37-24-16 1-16 1-16 26 2 40 26 40 26 22 39 59 28 74 22 2-17 9-28 16-35-57-6-116-28-116-126 0-28 10-51 26-69-3-6-11-32 3-67 0 0 21-7 70 26 42-12 86-12 128 0 49-33 70-26 70-26 14 35 6 61 3 67 16 18 26 41 26 69 0 98-60 120-117 126 10 8 18 24 18 48l-1 70c0 6 3 12 16 12z"
+                              clip-path="url(#a)" />
+                      </svg>
+                  </span>
+              </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    {% block bodyscripts %}
+    {% endblock %}
+  </body>
+</html>
+{% endwith %}
