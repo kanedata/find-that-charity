@@ -8,6 +8,7 @@ django-filter
 django-composite-foreignkey
 dj-database-url
 django-ninja
+django-sql-dashboard
 whitenoise
 gunicorn
 tqdm

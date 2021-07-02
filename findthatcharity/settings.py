@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     "django_better_admin_arrayfield",
     "django_filters",
     "corsheaders",
+    "django_sql_dashboard",
 ]
 
 MIDDLEWARE = [
@@ -101,7 +102,7 @@ ROOT_URLCONF = "findthatcharity.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [(os.path.join(BASE_DIR, "templates"))],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -135,7 +136,8 @@ WSGI_APPLICATION = "findthatcharity.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    "default": dj_database_url.config(),
+    "default": dj_database_url.config(env="DATABASE_URL"),
+    "dashboard": dj_database_url.config(env="DATABASE_DASHBOARD_URL"),
 }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

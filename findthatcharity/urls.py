@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import django_sql_dashboard
 from django.contrib import admin
 from django.urls import include, path
 
@@ -33,4 +34,5 @@ urlpatterns = [
     path("charity/", include(charity.urls)),
     path("reconcile/", include(reconcile.urls)),
     path("reconcile", reconcile.views.index, {"orgtype": "registered-charity"}),
+    path("dashboard/", include(django_sql_dashboard.urls)),
 ]
