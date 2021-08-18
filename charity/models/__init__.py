@@ -21,22 +21,22 @@ from .ccew import (
 
 
 class Charity(models.Model):
-    id = models.CharField(max_length=200, primary_key=True)
-    name = models.CharField(max_length=200, db_index=True)
+    id = models.CharField(max_length=255, primary_key=True)
+    name = models.CharField(max_length=255, db_index=True)
     constitution = models.TextField(null=True, blank=True)
     geographical_spread = models.TextField(null=True, blank=True)
     address = models.TextField(null=True, blank=True)
-    postcode = models.CharField(max_length=200, null=True, blank=True)
-    phone = models.CharField(max_length=200, null=True, blank=True)
+    postcode = models.CharField(max_length=255, null=True, blank=True)
+    phone = models.CharField(max_length=255, null=True, blank=True)
     active = models.BooleanField(db_index=True)
     date_registered = models.DateField(null=True, blank=True, db_index=True)
     date_removed = models.DateField(null=True, blank=True, db_index=True)
-    removal_reason = models.CharField(max_length=200, null=True, blank=True)
+    removal_reason = models.CharField(max_length=255, null=True, blank=True)
     web = models.URLField(null=True, blank=True)
-    email = models.CharField(max_length=200, null=True, blank=True)
-    company_number = models.CharField(max_length=200, null=True, blank=True)
+    email = models.CharField(max_length=255, null=True, blank=True)
+    company_number = models.CharField(max_length=255, null=True, blank=True)
     activities = models.TextField(null=True, blank=True)
-    source = models.CharField(max_length=200, null=True, blank=True, db_index=True)
+    source = models.CharField(max_length=255, null=True, blank=True, db_index=True)
     first_added = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     income = models.BigIntegerField(null=True, blank=True, db_index=True)
@@ -81,7 +81,7 @@ class CharityName(models.Model):
     normalisedName = models.CharField(
         max_length=255, db_index=True, blank=True, null=True
     )
-    name_type = models.CharField(max_length=200, db_index=True)
+    name_type = models.CharField(max_length=255, db_index=True)
 
     class Meta:
         unique_together = (
@@ -182,8 +182,8 @@ class CharityFinancial(models.Model):
 
 
 class CharityRaw(models.Model):
-    org_id = models.CharField(max_length=200, db_index=True)
-    spider = models.CharField(max_length=200, db_index=True)
+    org_id = models.CharField(max_length=255, db_index=True)
+    spider = models.CharField(max_length=255, db_index=True)
     scrape = models.ForeignKey(
         "ftc.Scrape",
         on_delete=models.CASCADE,
@@ -201,8 +201,8 @@ class CharityRaw(models.Model):
 class AreaOfOperation(models.Model):
     aootype = models.CharField(max_length=1, null=True, blank=True)
     aookey = models.IntegerField(null=True, blank=True)
-    aooname = models.CharField(max_length=200, db_index=True)
-    aoosort = models.CharField(max_length=200, db_index=True)
+    aooname = models.CharField(max_length=255, db_index=True)
+    aoosort = models.CharField(max_length=255, db_index=True)
     welsh = models.BooleanField(verbose_name="In Wales", null=True, blank=True)
     master = models.ForeignKey(
         "self",
@@ -252,7 +252,7 @@ class AreaOfOperation(models.Model):
 
 
 class Vocabulary(models.Model):
-    title = models.CharField(max_length=200, db_index=True, unique=True)
+    title = models.CharField(max_length=255, db_index=True, unique=True)
     single = models.BooleanField()
 
     def __str__(self):
