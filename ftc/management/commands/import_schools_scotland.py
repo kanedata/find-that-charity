@@ -83,15 +83,15 @@ class Command(HTMLScraper):
 
         self.logger.info("Latest sheet: {}".format(latest_sheet.title))
         headers = {}
-        seen_blank_row = False
         for k, row in enumerate(latest_sheet.rows):
-            if k < self.skip_rows or seen_blank_row:
+
+            if not row[0].value:
                 continue
-            elif k == self.skip_rows:
+
+            if "seed code" in str(row[0].value).lower():
                 headers = self.get_headers(row, latest_sheet, k)
                 continue
-            elif row[0].value is None:
-                seen_blank_row = True
+            elif not headers:
                 continue
 
             record = {}
@@ -157,7 +157,7 @@ class Command(HTMLScraper):
                         overtitle = "Pupil rolls"
                     elif overtitle.startswith("Teachers"):
                         overtitle = "Teachers FTE"
-                    elif overtitle.startswith("School type"):
+                    elif overtitle.lower().startswith("school type"):
                         overtitle = "School type"
                     else:
                         overtitle = None
@@ -178,11 +178,19 @@ class Command(HTMLScraper):
             self.orgtype_cache["education"],
             self.add_org_type(record.get("centre_type") + " School"),
         ]
-        for f in [
-            "school_type_primary",
-            "school_type_secondary",
-            "school_type_special",
-        ]:
-            if record.get(f):
-                org_types.append(self.add_org_type(record[f] + " School"))
+        if record.get("school_type_denomination"):
+            org_types.append(
+                self.add_org_type(record.get("school_type_denomination") + " School")
+            )
+
+        for type_key, type_name in {
+            "school_type_pre_school_department": "Pre-school",
+            "school_type_primary_department": "Primary school",
+            "school_type_secondary_department": "Secondary school",
+            "school_type_special_department": "Special school",
+            "school_type_gaelic_unit": "Gaelic Unit",
+            "school_type_integrated_special_unit": "Integrated Special Unit",
+        }.items():
+            if record.get(type_key) and str(record.get(type_key, "")).lower() == "yes":
+                org_types.append(self.add_org_type(type_name))
         return org_types
