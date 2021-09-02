@@ -202,3 +202,16 @@ from (
         on a.value = ve.title and v.id = ve.vocabulary_id
 on conflict (charity_id, vocabularyentries_id) do nothing;
 """
+
+UPDATE_OSCR[
+    "Add dual registered flag"
+] = """
+update charity_charity 
+set dual_registered = true 
+where id in (
+	select org_id_a
+	from ftc_organisationlink fo 
+	where fo.source_id = 'dual_registered'
+)
+and id like 'GB-SC-%';
+"""
