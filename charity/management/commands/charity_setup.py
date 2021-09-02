@@ -14,6 +14,7 @@ class Command(BaseCommand):
         self.fetch_icnpo()
         self.fetch_icnptso()
         self.fetch_aoo()
+        self.fetch_ukcat()
 
     def fetch_cc_classifications(self):
         print("Fetching CC classifications")
@@ -81,6 +82,40 @@ class Command(BaseCommand):
                 defaults={"title": r.get("Title"), "parent": parent},
             )
             cache[code] = ve
+
+    def fetch_ukcat(self):
+        print("Fetching UK-CAT categories")
+        ukcat = "https://raw.githubusercontent.com/drkane/ukcat/main/data/ukcat.csv"
+
+        vocab, _ = Vocabulary.objects.update_or_create(
+            title="UK Charity Activity Tags",
+            defaults={
+                "single": False,
+            },
+        )
+
+        cache = {}
+        for row in self.get_csv(ukcat, encoding="utf-8-sig"):
+            vocab_entry, _ = VocabularyEntries.objects.update_or_create(
+                vocabulary=vocab, code=row["Code"], defaults={"title": row["tag"]}
+            )
+            cache[row["tag"]] = {
+                "entry": vocab_entry,
+                "row": row,
+            }
+
+        for cat in cache.values():
+            if (
+                cat["row"]["Subcategory"]
+                and cat["row"]["Subcategory"] != cat["row"]["tag"]
+            ):
+                cat["entry"].parent = cache[cat["row"]["Subcategory"]]["entry"]
+                cat["entry"].save()
+                continue
+            if cat["row"]["Category"] and cat["row"]["Category"] != cat["row"]["tag"]:
+                cat["entry"].parent = cache[cat["row"]["Category"]]["entry"]
+                cat["entry"].save()
+                continue
 
     # def fetch_ntee(self):
     #     ntee = 'https://github.com/drkane/charity-lookups/raw/master/classification/ntee.csv'
