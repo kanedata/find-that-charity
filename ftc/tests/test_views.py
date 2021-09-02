@@ -23,10 +23,10 @@ class OrganisationViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
-        self.assertEqual(response_json['name'], "Test organisation")
-        self.assertEqual(response_json['id'], "GB-CHC-1234")
-        self.assertEqual(response_json['latestIncome'], None)
-        self.assertEqual(response_json['latestEmployees'], None)
+        self.assertEqual(response_json["name"], "Test organisation")
+        self.assertEqual(response_json["id"], "GB-CHC-1234")
+        self.assertEqual(response_json["latestIncome"], None)
+        self.assertEqual(response_json["latestEmployees"], None)
 
     def test_organisation_404(self):
 
