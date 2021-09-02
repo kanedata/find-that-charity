@@ -139,6 +139,32 @@ where cf.charity_id = CONCAT('GB-CHC-', a.registered_charity_number)
 """
 
 UPDATE_CCEW[
+    "Update number of employees and volunteers"
+] = """
+update charity_charity
+set employees = cf.employees,
+	volunteers = cf.volunteers 
+from charity_charityfinancial cf 
+where charity_charity.id = cf.charity_id
+	and charity_charity.latest_fye = cf.fyend;
+"""
+
+UPDATE_CCEW[
+    "Update number of trustees"
+] = """
+update charity_charity
+set trustees = t.trustees
+from (
+	select CONCAT('GB-CHC-', registered_charity_number) as "charity_id",
+		COUNT(*) as trustees
+	from charity_ccewcharitytrustee
+	where linked_charity_number = 0
+	group by charity_id
+) as t
+where charity_charity.id = t.charity_id;
+"""
+
+UPDATE_CCEW[
     "Insert into charity areas of operation"
 ] = """
 insert into charity_charity_areas_of_operation as ca (charity_id, areaofoperation_id )

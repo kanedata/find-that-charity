@@ -140,7 +140,7 @@ class RelatedOrganisation:
                 obj["sameAs"] = self.sameAs
         return obj
 
-    def to_json(self, charity=False, request=None):
+    def to_json(self, as_charity=False, request=None, charity=None):
         address_fields = [
             "streetAddress",
             "addressLocality",
@@ -156,7 +156,7 @@ class RelatedOrganisation:
                 return request.build_absolute_uri(url)
             return url
 
-        if charity:
+        if as_charity:
             ccew_number = None
             ccew_link = None
             oscr_number = None
@@ -244,7 +244,12 @@ class RelatedOrganisation:
             "companyNumber": self.companyNumber,
             "description": self.description,
             "url": self.cleanUrl,
+            "latestFinancialYearEnd": self.latestIncomeDate,
             "latestIncome": self.latestIncome,
+            "latestSpending": charity.spending if charity else None,
+            "latestEmployees": charity.employees if charity else None,
+            "latestVolunteers": charity.volunteers if charity else None,
+            "trusteeCount": charity.trustees if charity else None,
             "dateRegistered": self.dateRegistered,
             "dateRemoved": self.dateRemoved,
             "active": self.active,

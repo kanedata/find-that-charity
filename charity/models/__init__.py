@@ -42,6 +42,9 @@ class Charity(models.Model):
     income = models.BigIntegerField(null=True, blank=True, db_index=True)
     spending = models.BigIntegerField(null=True, blank=True)
     latest_fye = models.DateField(null=True, blank=True)
+    employees = models.IntegerField(null=True, blank=True, db_index=True)
+    volunteers = models.IntegerField(null=True, blank=True)
+    trustees = models.IntegerField(null=True, blank=True)
     dual_registered = models.BooleanField(null=True, blank=True)
 
     areas_of_operation = models.ManyToManyField("AreaOfOperation")

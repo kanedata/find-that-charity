@@ -45,12 +45,17 @@ def about(request):
 @xframe_options_exempt
 def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=False):
     org = get_organisation(org_id)
+    charity = Charity.objects.filter(id=org_id).first()
+
     if filetype == "json":
         return JsonResponse(
-            RelatedOrganisation([org]).to_json(as_charity, request=request)
+            RelatedOrganisation([org]).to_json(
+                as_charity,
+                request=request,
+                charity=charity,
+            )
         )
 
-    charity = Charity.objects.filter(id=org_id).first()
     related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
     if not related_orgs:
         related_orgs = [org]
