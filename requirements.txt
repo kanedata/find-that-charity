@@ -150,7 +150,7 @@ six==1.15.0
     #   w3lib
 soupsieve==2.2.1
     # via beautifulsoup4
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via django
 standardjson==0.3.1
     # via django-prettyjson
