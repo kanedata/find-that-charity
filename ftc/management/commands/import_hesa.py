@@ -5,15 +5,15 @@ from collections import defaultdict
 from django.utils.text import slugify
 from openpyxl import load_workbook
 
-from ftc.management.commands._base_scraper import HTMLScraper
+from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation
 
 
-class Command(HTMLScraper):
+class Command(CSVScraper):
     name = "hesa"
     allowed_domains = ["hesa.ac.uk"]
     start_urls = [
-        "https://www.hesa.ac.uk/support/providers",
+        "https://www.hesa.ac.uk/files/ProviderAllHESA.csv",
     ]
     org_id_prefix = "GB-HESA"
     source = {
@@ -34,42 +34,15 @@ class Command(HTMLScraper):
         ],
     }
     orgtypes = ["Higher Education"]
-    hesa_org_types = {
-        "HEI": "University",
-        "FEC": "Further Education College",
-        "AP": "Alternative Provider",
-    }
-
-    def parse_file(self, response, source_url):
-        files = [link for link in response.html.links if link.endswith(".xlsx")]
-        self.set_download_url(source_url)
-
-        records = defaultdict(dict)
-        for link in files:
-            r = self.session.get(link)
-            r.raise_for_status()
-
-            wb = load_workbook(io.BytesIO(r.content), read_only=True)
-            ws = wb.active
-
-            headers = None
-            for k, row in enumerate(ws.rows):
-                if not headers:
-                    headers = [slugify(c.value) for c in row]
-                else:
-                    record = dict(zip(headers, [c.value for c in row]))
-                    for k, v in record.items():
-                        records[record["instid"]][k] = v
-
-        for r in records.values():
-            self.parse_row(r)
 
     def parse_row(self, record):
 
+        record = self.clean_fields(record)
         orgids = [
-            "-".join([self.org_id_prefix, str(record["instid"])]),
-            "-".join(["GB-UKPRN", str(record["ukprn"])]),
+            "-".join([self.org_id_prefix, str(record["INSTID"])]),
         ]
+        if record["UKPRN"]:
+            orgids.append("-".join(["GB-UKPRN", str(record["UKPRN"])]))
 
         org_types = [
             self.orgtype_cache["higher-education"],
@@ -79,7 +52,7 @@ class Command(HTMLScraper):
             Organisation(
                 **{
                     "org_id": orgids[0],
-                    "name": record["provider-name"],
+                    "name": record["ProviderName"],
                     "charityNumber": None,
                     "companyNumber": None,
                     "streetAddress": None,
