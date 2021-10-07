@@ -131,9 +131,13 @@ class Command(BaseScraper):
                 "Starting table insert [{}]".format(db_table._meta.db_table)
             )
             db_table.objects.all().delete()
+            statement = """INSERT INTO "{table}" ("{fields}") VALUES %s;""".format(
+                table=db_table._meta.db_table,
+                fields='", "'.join(["id"] + list(reader.fieldnames)),
+            )
             psycopg2.extras.execute_values(
                 cursor,
-                """INSERT INTO {} VALUES %s;""".format(db_table._meta.db_table),
+                statement,
                 get_data(reader),
                 page_size=page_size,
             )

@@ -640,7 +640,7 @@ class CCEWCharityPublishedReport(models.Model):
     date_of_extract = models.DateField(
         null=True, blank=True
     )  # The date that the extract was taken from the main dataset.
-    charity_id = (
+    organisation_number = (
         models.IntegerField()
     )  # The organisation number for the charity. This is the index value for the charity.
     registered_charity_number = models.IntegerField(
