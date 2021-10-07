@@ -119,4 +119,14 @@ class OrganisationLocation(models.Model):
         return "<Location {}/>".format(self.geoCode)
 
     class Meta:
-        unique_together = (("org_id", "name", "geoCodeType", "locationType", "spider", "source_id", "scrape_id"),)
+        unique_together = (
+            (
+                "org_id",
+                "name",
+                "geoCodeType",
+                "locationType",
+                "spider",
+                "source_id",
+                "scrape_id",
+            ),
+        )

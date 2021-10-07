@@ -6,1083 +6,1927 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('charity', '0015_rename_charity_id_ccewcharitypublishedreport_organisation_number'),
+        (
+            "charity",
+            "0015_rename_charity_id_ccewcharitypublishedreport_organisation_number",
+        ),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_activities',
-            field=models.TextField(blank=True, help_text='The charity activities, the trustees’ description of what they do and who they help.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_company_registration_number',
-            field=models.CharField(blank=True, help_text='Registered Company Number of the Charity as assigned by Companies House. Integer returned as string', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_contact_address1',
-            field=models.CharField(blank=True, help_text='Charity Address Line 1', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_contact_address2',
-            field=models.CharField(blank=True, help_text='Charity Address Line 2', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_contact_address3',
-            field=models.CharField(blank=True, help_text='Charity Address Line 3', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_contact_address4',
-            field=models.CharField(blank=True, help_text='Charity Address Line 4', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_contact_address5',
-            field=models.CharField(blank=True, help_text='Charity Address Line 5', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_contact_email',
-            field=models.CharField(blank=True, help_text='Charity Public email address', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_contact_phone',
-            field=models.CharField(blank=True, help_text='Charity Public Telephone Number', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_contact_postcode',
-            field=models.CharField(blank=True, help_text='Charity Postcode', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_contact_web',
-            field=models.CharField(blank=True, help_text='Charity Website Address', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_gift_aid',
-            field=models.BooleanField(blank=True, help_text='Indicates whether the charity is registered for gift aid with HMRC. True, False, NULL (not known)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_has_land',
-            field=models.BooleanField(blank=True, help_text='Indicates whether the charity owns or leases any land or buildings. True, False, NULL (not known)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_in_administration',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity is in administration.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_insolvent',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity is insolvent.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_is_cdf_or_cif',
-            field=models.CharField(blank=True, help_text='Indicates whether the charity is a Common Investment Fund or Common Deposit Fund.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_is_cio',
-            field=models.BooleanField(blank=True, help_text='Indicates whether the charity is a Charitable Incorporated Organisation.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_name',
-            field=models.CharField(blank=True, help_text='The Main Name of the Charity', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_previously_excepted',
-            field=models.BooleanField(blank=True, help_text='Indicates the charity was previously an excepted charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_registration_status',
-            field=models.CharField(blank=True, help_text='The charity registration status indicates whether a charity is registered or removed', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_reporting_status',
-            field=models.CharField(blank=True, help_text='The current reporting status of the charity', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='charity_type',
-            field=models.CharField(blank=True, help_text='The type of the charity displayed on the public register of charities. Only the main parent charity will have a value for this field (i.e. linked_charity_number=0).', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='cio_is_dissolved',
-            field=models.BooleanField(blank=True, help_text='Indicates the CIO is to be dissolved.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='date_cio_dissolution_notice',
-            field=models.DateField(blank=True, help_text='Date the CIO dissolution notice expires', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='date_of_registration',
-            field=models.DateField(blank=True, help_text='The date the charity was registered with the Charity Commission.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='date_of_removal',
-            field=models.DateField(blank=True, help_text='This is the date the charity was removed from the Register of Charities. This will not necessarily be the same date that the charity ceased to exist or ceased to operate. For non-removed charities the field is NULL.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='latest_acc_fin_period_end_date',
-            field=models.DateField(blank=True, help_text='The end date of the latest financial period for which the charity has made a submission.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='latest_acc_fin_period_start_date',
-            field=models.DateField(blank=True, help_text='The start date of the latest financial period for which the charity has made a submission.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='latest_expenditure',
-            field=models.FloatField(blank=True, help_text='The latest expenditure submitted by a charity. This is the expenditure submitted on part A of the annual return submission.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='latest_income',
-            field=models.FloatField(blank=True, help_text='The latest income submitted by the charity. This is the total gross income submitted on part A of the annual return submission.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='linked_charity_number',
-            field=models.IntegerField(db_index=True, help_text='A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharity',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='accounts_qualified',
-            field=models.BooleanField(blank=True, help_text='Indicates whether the accounts have a qualified opinion. (True or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='ar_cycle_reference',
-            field=models.CharField(blank=True, help_text='The annual return cycle to which the submission details relate.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='date_accounts_received',
-            field=models.DateField(blank=True, help_text='The date the charity accounts were received for the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='date_annual_return_received',
-            field=models.DateField(blank=True, help_text='The date the annual return was received for the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='fin_period_end_date',
-            field=models.DateField(blank=True, help_text='The end date of the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='fin_period_start_date',
-            field=models.DateField(blank=True, help_text='The start date of the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='reporting_due_date',
-            field=models.DateField(blank=True, help_text='The due date of the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='suppression_ind',
-            field=models.BooleanField(blank=True, help_text='An indicator of whether the finances for this year are currently suppressed. 1 = Supressed, 0 = not supressed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='total_gross_expenditure',
-            field=models.BigIntegerField(blank=True, help_text='The total gross expenditure reported on Part A of the annual return for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityannualreturnhistory',
-            name='total_gross_income',
-            field=models.BigIntegerField(blank=True, help_text='The total gross income reported on Part A of the annual return for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityareaofoperation',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityareaofoperation',
-            name='geographic_area_description',
-            field=models.CharField(blank=True, db_index=True, help_text='The area descriptor for this row', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityareaofoperation',
-            name='geographic_area_type',
-            field=models.CharField(blank=True, help_text='The area type for this row', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityareaofoperation',
-            name='linked_charity_number',
-            field=models.IntegerField(blank=True, help_text='A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityareaofoperation',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityareaofoperation',
-            name='parent_geographic_area_description',
-            field=models.CharField(blank=True, help_text='The descriptor for the parent area type', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityareaofoperation',
-            name='parent_geographic_area_type',
-            field=models.CharField(blank=True, help_text='The parent area type. For example, if the area type is a country this indicator will be continent', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityareaofoperation',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='ar_cycle_reference',
-            field=models.CharField(blank=True, help_text='The annual return cycle to which the submission details relate.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='ar_due_date',
-            field=models.DateField(blank=True, help_text='The due date of the annual return which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='ar_received_date',
-            field=models.DateField(blank=True, help_text='The date the annual return was received for the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='charity_agreement_commerical_participator',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity had an agreement with its commercial participators for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='charity_agreement_professional_fundraiser',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity had an agreement with its professional fundraisers for the financial period which is detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='charity_commercial_participator',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity worked with commercial participators for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='charity_has_trading_subsidiary',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity had a trading subsidiary for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='charity_professional_fundraiser',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity worked with professional fundraisers for the financial period which is detailed for the charity. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='charity_raises_funds_from_public',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity raised funds from the public for the financial period which is detailed for the charity. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='charity_receives_govt_funding_contracts',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity received any income from government contracts for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='charity_receives_govt_funding_grants',
-            field=models.BooleanField(blank=True, help_text='Indicates if the charity received any income from government grants for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_govt_contracts',
-            field=models.IntegerField(blank=True, help_text='The number of government contracts the charity had for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_govt_grants',
-            field=models.IntegerField(blank=True, help_text='The number of government grants the charity received for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_100001_110000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_110001_120000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_120001_130000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_130001_140000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_140001_150000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_150001_200000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_200001_250000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_250001_300000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_300001_350000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_350001_400000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_400001_450000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_450001_500000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_60001_70000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_70001_80000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_80001_90000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_90001_100000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_salary_band_over_500000',
-            field=models.IntegerField(blank=True, help_text='Number of staff whose total employment benefits were in this band for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='count_volunteers',
-            field=models.IntegerField(blank=True, help_text="Number of Volunteers. The trustees' estimate of the number of people who undertook voluntary work in the UK for the charity during the year. The number shown is a head count and not expressed as full-time equivalents. Charities are invited to provide an estimate of volunteer numbers in their Annual Return but are not obliged to do so. Where a number is provided by the charity, including zero, that number is displayed.", null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='does_trustee_receive_any_benefit',
-            field=models.BooleanField(blank=True, help_text='Indicates if any of the trustees received any remuneration, payments or benefits from the charity other than refunds of legitimate trustee expenses for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='employees_salary_over_60k',
-            field=models.BooleanField(blank=True, help_text="Indicates if any of the charity's staff received total employee benefits of £60,000 or more. (True, False or NULL)", null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='fin_period_end_date',
-            field=models.DateField(blank=True, help_text='The end date of the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='fin_period_order_number',
-            field=models.IntegerField(blank=True, help_text='A field to aid ordering of the financial data for each charity. (1=Most recent data in the table, 5=Least recent data in the table)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='fin_period_start_date',
-            field=models.DateField(blank=True, help_text='The start date of the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='grant_making_is_main_activity',
-            field=models.BooleanField(blank=True, help_text='Indicates if grant making was the main way the charity carried out its purposes for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='income_from_government_contracts',
-            field=models.BigIntegerField(blank=True, help_text='The income the charity received from government contracts for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='income_from_government_grants',
-            field=models.BigIntegerField(blank=True, help_text='The income the charity received from government grants for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='latest_fin_period_submitted_ind',
-            field=models.BooleanField(blank=True, help_text='Indicates whether the financial data on this line relates to the latest financial data submitted by the charity. (True or False)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='total_gross_expenditure',
-            field=models.BigIntegerField(blank=True, help_text='The total gross expenditure reported on Part A of the annual return for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='total_gross_income',
-            field=models.BigIntegerField(blank=True, help_text='The total gross income reported on Part A of the annual return for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='trustee_also_director_of_subsidiary',
-            field=models.BooleanField(blank=True, help_text='Indicates if a trustee was also a director of a trading subsidiary for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='trustee_payments_acting_as_trustee',
-            field=models.BooleanField(blank=True, help_text='Indicates if any trustees received payments for acting as a trustee for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='trustee_receives_other_benefit',
-            field=models.BooleanField(blank=True, help_text='Indicates if any trustees received any other benefit from the charity for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='trustee_receives_payments_services',
-            field=models.BooleanField(blank=True, help_text='Indicates if any trustees received payments for providing services to the charity for the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarparta',
-            name='trustee_resigned_employment',
-            field=models.BooleanField(blank=True, help_text='Indicates if any of the trustees resigned and took up employment with the charity during the financial period detailed. (True, False or NULL)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='ar_cycle_reference',
-            field=models.CharField(help_text='The annual return cycle to which the submission details relate.', max_length=255),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='ar_due_date',
-            field=models.DateField(blank=True, help_text='The due date of the annual return which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='ar_received_date',
-            field=models.DateField(blank=True, help_text='The date the annual return was received for the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='assets_cash',
-            field=models.BigIntegerField(blank=True, help_text='Cash at bank and in hand are a separate class of Total Current Assets.  This amount includes deposits with banks and other financial institutions, which are repayable on demand, but excludes bank overdrafts.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='assets_current_investment',
-            field=models.BigIntegerField(blank=True, help_text='Total Current Assets are a separate class of Total Current Asset and they are held with intention of disposing of them within 12 months.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='assets_long_term_investment',
-            field=models.BigIntegerField(blank=True, help_text='Fixed Asset Investment are held for the long term to generate income or gains and may include quoted and unquoted shares, bonds, gilts, common investment funds, investment property and term deposits held as part of an investment portfolio.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='assets_other_assets',
-            field=models.BigIntegerField(blank=True, help_text='The value of any other assets', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='assets_own_use',
-            field=models.BigIntegerField(blank=True, help_text='Total own use assets. This is a calculated field. assets_own_use = assets_total_fixed – assets_long_term_investment', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='assets_total_assets_and_liabilities',
-            field=models.BigIntegerField(blank=True, help_text='Total Net assets or liabilities can be found on the Balance Sheet. This is the total of all assets shown less all liabilities. This should be the same as the Total funds of the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='assets_total_fixed',
-            field=models.BigIntegerField(blank=True, help_text='Total fixed assets. Fixed assets are those held for continuing use and include tangible fixed assets such as land, buildings, equipment and vehicles, and any investments held on a long-term basis to generate income or gains.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='assets_total_liabilities',
-            field=models.BigIntegerField(blank=True, help_text='The value of the total liabilities for the charity. This is a calculated field. assets_total_liabilities = creditors_one_year_total_current + creditors_falling_due_after_one_year', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='charity_only_accounts',
-            field=models.BooleanField(blank=True, help_text='Indicates if the accounts represent only the charity accounts', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='consolidated_accounts',
-            field=models.BooleanField(blank=True, help_text='Consolidated accounts bring together the resources of the charity and the subsidiaries under its control in one statement. These subsidiaries may be non-charitable and to exist for purposes that benefit the parent charity e.g. fund-raising. If set to 1 the accounts are consolidated.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='count_employees',
-            field=models.IntegerField(blank=True, help_text='The number of people that the charity employs', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='creditors_falling_due_after_one_year',
-            field=models.BigIntegerField(blank=True, help_text='These are the amounts owed to creditors payable after more than one year, with provisions for liabilities and charges.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='creditors_one_year_total_current',
-            field=models.BigIntegerField(blank=True, help_text='Creditors due within one year are the amounts owed to creditors and include loans and overdrafts, trade creditors, accruals and deferred income and they are payable within one year.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='defined_benefit_pension_scheme',
-            field=models.BigIntegerField(blank=True, help_text='This is surplus or deficit in any defined benefit pension scheme operated and represents a potential long-term asset or liability.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='expenditure_charitable_expenditure',
-            field=models.BigIntegerField(blank=True, help_text='Costs incurred by the charity in supplying goods or services to meet the needs of its beneficiaries. Grants made to meet the needs of the charity’s beneficiaries for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='expenditure_depreciation',
-            field=models.BigIntegerField(blank=True, help_text='Depreciation charge for the year can be found in the fixed asset analysis notes to the accounts.  This is the amount of depreciation on tangible fixed assets (including impairment charges, if any), which will be shown as the charge for the year in the tangible fixed asset note to the accounts.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='expenditure_governance',
-            field=models.BigIntegerField(blank=True, help_text='Costs associated with running the charity itself for the financial period. (e.g. costs of trustee meetings, internal and external audit costs and legal advice relating to governance matters).', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='expenditure_grants_institution',
-            field=models.BigIntegerField(blank=True, help_text='Any grants that the charity has awarded to other institutions to further their charitable work.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='expenditure_investment_management',
-            field=models.BigIntegerField(blank=True, help_text='Expenditure managing investments for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='expenditure_other',
-            field=models.BigIntegerField(blank=True, help_text='Other expenditure for the financial period detailed. This category is only used very exceptionally for items that don’t fit within one of the categories above.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='expenditure_raising_funds',
-            field=models.BigIntegerField(blank=True, help_text='Costs associated with providing goods and services to the public, where the main motive is to raise funds for the charity rather than providing goods or services to meet the needs of its beneficiaries for the financial period detailed. (eg charity shops, fundraising dinners etc.).', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='expenditure_support_costs',
-            field=models.BigIntegerField(blank=True, help_text='Support costs should be allocated across activities and are those costs which, while necessary to deliver an activity, do not themselves produce the activity.  They include the central office functions of the charity and are often apportioned to activities.  The amount shown here is the total amount of support costs (for charitable, fundraising and governance activities) included in resources expended.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='expenditure_total',
-            field=models.BigIntegerField(blank=True, help_text='Total expenditure for the financial period detailed on the Part B of the annual return.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='fin_period_end_date',
-            field=models.DateField(blank=True, help_text='The end date of the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='fin_period_order_number',
-            field=models.IntegerField(blank=True, help_text='A field to aid ordering of the financial data for each charity. (1=Most recent data in the table, 5=Least recent data in the table)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='fin_period_start_date',
-            field=models.DateField(blank=True, help_text='The start date of the financial period which is detailed for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='funds_endowment',
-            field=models.BigIntegerField(blank=True, help_text='Endowment funds include the amount of all permanent and expendable endowment funds.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='funds_restricted',
-            field=models.BigIntegerField(blank=True, help_text='Restricted funds include the amount of all funds held that must be spent on the purposes of the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='funds_total',
-            field=models.BigIntegerField(blank=True, help_text='Total funds can be found on the Balance Sheet and should be the same as Total net assets/(liabilities).', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='funds_unrestricted',
-            field=models.BigIntegerField(blank=True, help_text='Unrestricted funds include the amount of all funds held for the general purposes of the charity.  This will include unrestricted income funds, designated funds, revaluation reserves and any pension reserve.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='gain_loss_investment',
-            field=models.BigIntegerField(blank=True, help_text='The gain or loss associated with the charity’s investments', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='gain_loss_other',
-            field=models.BigIntegerField(blank=True, help_text='The gain or loss associated with any other assets', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='gain_loss_pension_fund',
-            field=models.BigIntegerField(blank=True, help_text='The gain or loss associated with the charity’s pension fund', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='gain_loss_revaluation_fixed_investment',
-            field=models.BigIntegerField(blank=True, help_text='The gain or loss associated with any revaluation of fixed assets', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='income_charitable_activities',
-            field=models.BigIntegerField(blank=True, help_text='Income received as fees or grants specifically for goods and services supplied by the charity to meet the needs of its beneficiaries for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='income_donations_and_legacies',
-            field=models.BigIntegerField(blank=True, help_text='Income from donations and legacies as entered on the Annual Return form for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='income_endowments',
-            field=models.BigIntegerField(blank=True, help_text='Income from endowments as entered on the Annual Return form for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='income_investments',
-            field=models.BigIntegerField(blank=True, help_text='Income from investments including dividends, interest and rents but excluding changes (realised and unrealised gains) in the capital value of the investment portfolio for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='income_legacies',
-            field=models.BigIntegerField(blank=True, help_text='Income from legacies as entered on the Annual Return form for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='income_other',
-            field=models.BigIntegerField(blank=True, help_text='Other income. This category includes gains on the disposal of own use assets (i.e. fixed assets not held as investments), but otherwise is only used exceptionally for very unusual transactions that cannot be accounted for in the categories above for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='income_other_trading_activities',
-            field=models.BigIntegerField(blank=True, help_text='Income from other trading activity as entered on the Annual Return form for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='income_total_income_and_endowments',
-            field=models.BigIntegerField(blank=True, help_text='Total income including endowments for the financial period detailed.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='latest_fin_period_submitted_ind',
-            field=models.BooleanField(blank=True, help_text='Indicates whether the financial data on this line relates to the latest financial data submitted by the charity. (True or False)', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityarpartb',
-            name='reserves',
-            field=models.BigIntegerField(blank=True, help_text='The level of reserves is those unrestricted funds which are freely available for the charity to spend and can be found in the Financial Review in the Trustees Annual Report and will exclude endowments.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityclassification',
-            name='classification_code',
-            field=models.IntegerField(blank=True, help_text='The code of the classification described in the row', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityclassification',
-            name='classification_description',
-            field=models.CharField(blank=True, help_text='The descriptor of the classification code.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityclassification',
-            name='classification_type',
-            field=models.CharField(blank=True, help_text='The type of the classification. What - What the charity does. How - How the charity helps. Who - Who the charity helps', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityclassification',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityclassification',
-            name='linked_charity_number',
-            field=models.IntegerField(blank=True, help_text='A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityclassification',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityclassification',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='assoc_charity_name',
-            field=models.CharField(blank=True, help_text='The charity name of the charity associated with the charity event. For example, in the case of asset transfer in this is the charity that has transferred the funds into the charity.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='assoc_organisation_number',
-            field=models.IntegerField(blank=True, help_text='The charity id for the charity associated with the charity event. For example, in the case of asset transfer in this is the charity that has transferred the funds into the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='assoc_registered_charity_number',
-            field=models.IntegerField(blank=True, db_index=True, help_text='The registered charity number for the charity associated with the charity event. For example, in the case of asset transfer in this is the charity that has transferred the funds into the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='charity_event_order',
-            field=models.IntegerField(blank=True, help_text='The order of the event in the charity history. 1 is the earliest event.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='charity_name',
-            field=models.CharField(blank=True, help_text='The Main Name of the Charity', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='date_of_event',
-            field=models.DateField(blank=True, help_text='The date that the event occurred.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='event_type',
-            field=models.CharField(blank=True, help_text='The type of charity event that has occurred.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='linked_charity_number',
-            field=models.IntegerField(blank=True, help_text='A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='reason',
-            field=models.CharField(blank=True, help_text='The reason that the event occurred. A registration event will not have a reason available.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityeventhistory',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitygoverningdocument',
-            name='area_of_benefit',
-            field=models.TextField(blank=True, help_text='The area of benefit of the charity as defined in the governing document. This field can be blank as a charity does not have to define an area of benefit in the governing document.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitygoverningdocument',
-            name='charitable_objects',
-            field=models.TextField(blank=True, help_text='The charitable objects of the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitygoverningdocument',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitygoverningdocument',
-            name='governing_document_description',
-            field=models.TextField(blank=True, help_text='The description of the governing document. Note that this is not the governing document itself but the details of the original document and any subsequent amendments.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitygoverningdocument',
-            name='linked_charity_number',
-            field=models.IntegerField(blank=True, help_text='A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitygoverningdocument',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitygoverningdocument',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityothernames',
-            name='charity_name',
-            field=models.CharField(blank=True, help_text='The Main Name of the Charity', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityothernames',
-            name='charity_name_id',
-            field=models.IntegerField(blank=True, help_text='An id for the other charity name', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityothernames',
-            name='charity_name_type',
-            field=models.CharField(blank=True, help_text='The type of other charity name. This can be working name or previous name.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityothernames',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityothernames',
-            name='linked_charity_number',
-            field=models.IntegerField(blank=True, help_text='A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityothernames',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityothernames',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityotherregulators',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityotherregulators',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityotherregulators',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityotherregulators',
-            name='regulator_name',
-            field=models.CharField(blank=True, help_text='The name of the regulator.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityotherregulators',
-            name='regulator_order',
-            field=models.IntegerField(blank=True, help_text='A field to aid the ordering of the regulators for the charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharityotherregulators',
-            name='regulator_web_url',
-            field=models.CharField(blank=True, help_text='The web URL for the regulator.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypolicy',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypolicy',
-            name='linked_charity_number',
-            field=models.IntegerField(help_text='A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypolicy',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypolicy',
-            name='policy_name',
-            field=models.CharField(blank=True, help_text='The name of the policy that the charity has in place.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypolicy',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypublishedreport',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypublishedreport',
-            name='date_published',
-            field=models.DateField(blank=True, help_text='The date that the message on the public register of charities to the report was published.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypublishedreport',
-            name='linked_charity_number',
-            field=models.IntegerField(blank=True, help_text='A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypublishedreport',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypublishedreport',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypublishedreport',
-            name='report_location',
-            field=models.CharField(blank=True, help_text='The web URL for the location on the charity commission .gov site where the published report can be located.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitypublishedreport',
-            name='report_name',
-            field=models.CharField(blank=True, help_text='The type of report that has been published in relation to the charity.', max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitytrustee',
-            name='date_of_extract',
-            field=models.DateField(blank=True, help_text='The date that the extract was taken from the main dataset.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitytrustee',
-            name='individual_or_organisation',
-            field=models.CharField(blank=True, choices=[('P', 'Individual'), ('O', 'Organisation')], help_text='A flag to denote whether the trustee is an individual or an organisation. O for organisation or P for an individual.', max_length=1, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitytrustee',
-            name='linked_charity_number',
-            field=models.IntegerField(help_text='A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitytrustee',
-            name='organisation_number',
-            field=models.IntegerField(help_text='The organisation number for the charity. This is the index value for the charity.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitytrustee',
-            name='registered_charity_number',
-            field=models.IntegerField(db_index=True, help_text='The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.'),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitytrustee',
-            name='trustee_date_of_appointment',
-            field=models.DateField(blank=True, help_text='The date of appointment of the trustee for that charity.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitytrustee',
-            name='trustee_id',
-            field=models.IntegerField(blank=True, help_text='The id number of the trustee.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitytrustee',
-            name='trustee_is_chair',
-            field=models.BooleanField(blank=True, help_text='TRUE if the trustee is the Chair. FALSE otherwise.', null=True),
-        ),
-        migrations.AlterField(
-            model_name='ccewcharitytrustee',
-            name='trustee_name',
-            field=models.CharField(blank=True, help_text='The name of the trustee.', max_length=255, null=True),
+            model_name="ccewcharity",
+            name="charity_activities",
+            field=models.TextField(
+                blank=True,
+                help_text="The charity activities, the trustees’ description of what they do and who they help.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_company_registration_number",
+            field=models.CharField(
+                blank=True,
+                help_text="Registered Company Number of the Charity as assigned by Companies House. Integer returned as string",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_contact_address1",
+            field=models.CharField(
+                blank=True,
+                help_text="Charity Address Line 1",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_contact_address2",
+            field=models.CharField(
+                blank=True,
+                help_text="Charity Address Line 2",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_contact_address3",
+            field=models.CharField(
+                blank=True,
+                help_text="Charity Address Line 3",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_contact_address4",
+            field=models.CharField(
+                blank=True,
+                help_text="Charity Address Line 4",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_contact_address5",
+            field=models.CharField(
+                blank=True,
+                help_text="Charity Address Line 5",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_contact_email",
+            field=models.CharField(
+                blank=True,
+                help_text="Charity Public email address",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_contact_phone",
+            field=models.CharField(
+                blank=True,
+                help_text="Charity Public Telephone Number",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_contact_postcode",
+            field=models.CharField(
+                blank=True, help_text="Charity Postcode", max_length=255, null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_contact_web",
+            field=models.CharField(
+                blank=True,
+                help_text="Charity Website Address",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_gift_aid",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates whether the charity is registered for gift aid with HMRC. True, False, NULL (not known)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_has_land",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates whether the charity owns or leases any land or buildings. True, False, NULL (not known)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_in_administration",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity is in administration.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_insolvent",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity is insolvent.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_is_cdf_or_cif",
+            field=models.CharField(
+                blank=True,
+                help_text="Indicates whether the charity is a Common Investment Fund or Common Deposit Fund.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_is_cio",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates whether the charity is a Charitable Incorporated Organisation.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The Main Name of the Charity",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_previously_excepted",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates the charity was previously an excepted charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_registration_status",
+            field=models.CharField(
+                blank=True,
+                help_text="The charity registration status indicates whether a charity is registered or removed",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_reporting_status",
+            field=models.CharField(
+                blank=True,
+                help_text="The current reporting status of the charity",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="charity_type",
+            field=models.CharField(
+                blank=True,
+                help_text="The type of the charity displayed on the public register of charities. Only the main parent charity will have a value for this field (i.e. linked_charity_number=0).",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="cio_is_dissolved",
+            field=models.BooleanField(
+                blank=True, help_text="Indicates the CIO is to be dissolved.", null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="date_cio_dissolution_notice",
+            field=models.DateField(
+                blank=True,
+                help_text="Date the CIO dissolution notice expires",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="date_of_registration",
+            field=models.DateField(
+                blank=True,
+                help_text="The date the charity was registered with the Charity Commission.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="date_of_removal",
+            field=models.DateField(
+                blank=True,
+                help_text="This is the date the charity was removed from the Register of Charities. This will not necessarily be the same date that the charity ceased to exist or ceased to operate. For non-removed charities the field is NULL.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="latest_acc_fin_period_end_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The end date of the latest financial period for which the charity has made a submission.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="latest_acc_fin_period_start_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The start date of the latest financial period for which the charity has made a submission.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="latest_expenditure",
+            field=models.FloatField(
+                blank=True,
+                help_text="The latest expenditure submitted by a charity. This is the expenditure submitted on part A of the annual return submission.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="latest_income",
+            field=models.FloatField(
+                blank=True,
+                help_text="The latest income submitted by the charity. This is the total gross income submitted on part A of the annual return submission.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="linked_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharity",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="accounts_qualified",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates whether the accounts have a qualified opinion. (True or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="ar_cycle_reference",
+            field=models.CharField(
+                blank=True,
+                help_text="The annual return cycle to which the submission details relate.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="date_accounts_received",
+            field=models.DateField(
+                blank=True,
+                help_text="The date the charity accounts were received for the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="date_annual_return_received",
+            field=models.DateField(
+                blank=True,
+                help_text="The date the annual return was received for the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="fin_period_end_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The end date of the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="fin_period_start_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The start date of the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="reporting_due_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The due date of the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="suppression_ind",
+            field=models.BooleanField(
+                blank=True,
+                help_text="An indicator of whether the finances for this year are currently suppressed. 1 = Supressed, 0 = not supressed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="total_gross_expenditure",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The total gross expenditure reported on Part A of the annual return for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityannualreturnhistory",
+            name="total_gross_income",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The total gross income reported on Part A of the annual return for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityareaofoperation",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityareaofoperation",
+            name="geographic_area_description",
+            field=models.CharField(
+                blank=True,
+                db_index=True,
+                help_text="The area descriptor for this row",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityareaofoperation",
+            name="geographic_area_type",
+            field=models.CharField(
+                blank=True,
+                help_text="The area type for this row",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityareaofoperation",
+            name="linked_charity_number",
+            field=models.IntegerField(
+                blank=True,
+                help_text="A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityareaofoperation",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityareaofoperation",
+            name="parent_geographic_area_description",
+            field=models.CharField(
+                blank=True,
+                help_text="The descriptor for the parent area type",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityareaofoperation",
+            name="parent_geographic_area_type",
+            field=models.CharField(
+                blank=True,
+                help_text="The parent area type. For example, if the area type is a country this indicator will be continent",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityareaofoperation",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="ar_cycle_reference",
+            field=models.CharField(
+                blank=True,
+                help_text="The annual return cycle to which the submission details relate.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="ar_due_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The due date of the annual return which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="ar_received_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The date the annual return was received for the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="charity_agreement_commerical_participator",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity had an agreement with its commercial participators for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="charity_agreement_professional_fundraiser",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity had an agreement with its professional fundraisers for the financial period which is detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="charity_commercial_participator",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity worked with commercial participators for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="charity_has_trading_subsidiary",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity had a trading subsidiary for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="charity_professional_fundraiser",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity worked with professional fundraisers for the financial period which is detailed for the charity. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="charity_raises_funds_from_public",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity raised funds from the public for the financial period which is detailed for the charity. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="charity_receives_govt_funding_contracts",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity received any income from government contracts for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="charity_receives_govt_funding_grants",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the charity received any income from government grants for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_govt_contracts",
+            field=models.IntegerField(
+                blank=True,
+                help_text="The number of government contracts the charity had for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_govt_grants",
+            field=models.IntegerField(
+                blank=True,
+                help_text="The number of government grants the charity received for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_100001_110000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_110001_120000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_120001_130000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_130001_140000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_140001_150000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_150001_200000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_200001_250000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_250001_300000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_300001_350000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_350001_400000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_400001_450000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_450001_500000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_60001_70000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_70001_80000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_80001_90000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_90001_100000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_salary_band_over_500000",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of staff whose total employment benefits were in this band for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="count_volunteers",
+            field=models.IntegerField(
+                blank=True,
+                help_text="Number of Volunteers. The trustees' estimate of the number of people who undertook voluntary work in the UK for the charity during the year. The number shown is a head count and not expressed as full-time equivalents. Charities are invited to provide an estimate of volunteer numbers in their Annual Return but are not obliged to do so. Where a number is provided by the charity, including zero, that number is displayed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="does_trustee_receive_any_benefit",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if any of the trustees received any remuneration, payments or benefits from the charity other than refunds of legitimate trustee expenses for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="employees_salary_over_60k",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if any of the charity's staff received total employee benefits of £60,000 or more. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="fin_period_end_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The end date of the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="fin_period_order_number",
+            field=models.IntegerField(
+                blank=True,
+                help_text="A field to aid ordering of the financial data for each charity. (1=Most recent data in the table, 5=Least recent data in the table)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="fin_period_start_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The start date of the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="grant_making_is_main_activity",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if grant making was the main way the charity carried out its purposes for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="income_from_government_contracts",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The income the charity received from government contracts for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="income_from_government_grants",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The income the charity received from government grants for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="latest_fin_period_submitted_ind",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates whether the financial data on this line relates to the latest financial data submitted by the charity. (True or False)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="total_gross_expenditure",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The total gross expenditure reported on Part A of the annual return for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="total_gross_income",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The total gross income reported on Part A of the annual return for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="trustee_also_director_of_subsidiary",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if a trustee was also a director of a trading subsidiary for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="trustee_payments_acting_as_trustee",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if any trustees received payments for acting as a trustee for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="trustee_receives_other_benefit",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if any trustees received any other benefit from the charity for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="trustee_receives_payments_services",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if any trustees received payments for providing services to the charity for the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarparta",
+            name="trustee_resigned_employment",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if any of the trustees resigned and took up employment with the charity during the financial period detailed. (True, False or NULL)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="ar_cycle_reference",
+            field=models.CharField(
+                help_text="The annual return cycle to which the submission details relate.",
+                max_length=255,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="ar_due_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The due date of the annual return which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="ar_received_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The date the annual return was received for the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="assets_cash",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Cash at bank and in hand are a separate class of Total Current Assets.  This amount includes deposits with banks and other financial institutions, which are repayable on demand, but excludes bank overdrafts.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="assets_current_investment",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Total Current Assets are a separate class of Total Current Asset and they are held with intention of disposing of them within 12 months.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="assets_long_term_investment",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Fixed Asset Investment are held for the long term to generate income or gains and may include quoted and unquoted shares, bonds, gilts, common investment funds, investment property and term deposits held as part of an investment portfolio.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="assets_other_assets",
+            field=models.BigIntegerField(
+                blank=True, help_text="The value of any other assets", null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="assets_own_use",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Total own use assets. This is a calculated field. assets_own_use = assets_total_fixed – assets_long_term_investment",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="assets_total_assets_and_liabilities",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Total Net assets or liabilities can be found on the Balance Sheet. This is the total of all assets shown less all liabilities. This should be the same as the Total funds of the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="assets_total_fixed",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Total fixed assets. Fixed assets are those held for continuing use and include tangible fixed assets such as land, buildings, equipment and vehicles, and any investments held on a long-term basis to generate income or gains.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="assets_total_liabilities",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The value of the total liabilities for the charity. This is a calculated field. assets_total_liabilities = creditors_one_year_total_current + creditors_falling_due_after_one_year",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="charity_only_accounts",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if the accounts represent only the charity accounts",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="consolidated_accounts",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Consolidated accounts bring together the resources of the charity and the subsidiaries under its control in one statement. These subsidiaries may be non-charitable and to exist for purposes that benefit the parent charity e.g. fund-raising. If set to 1 the accounts are consolidated.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="count_employees",
+            field=models.IntegerField(
+                blank=True,
+                help_text="The number of people that the charity employs",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="creditors_falling_due_after_one_year",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="These are the amounts owed to creditors payable after more than one year, with provisions for liabilities and charges.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="creditors_one_year_total_current",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Creditors due within one year are the amounts owed to creditors and include loans and overdrafts, trade creditors, accruals and deferred income and they are payable within one year.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="defined_benefit_pension_scheme",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="This is surplus or deficit in any defined benefit pension scheme operated and represents a potential long-term asset or liability.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="expenditure_charitable_expenditure",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Costs incurred by the charity in supplying goods or services to meet the needs of its beneficiaries. Grants made to meet the needs of the charity’s beneficiaries for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="expenditure_depreciation",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Depreciation charge for the year can be found in the fixed asset analysis notes to the accounts.  This is the amount of depreciation on tangible fixed assets (including impairment charges, if any), which will be shown as the charge for the year in the tangible fixed asset note to the accounts.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="expenditure_governance",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Costs associated with running the charity itself for the financial period. (e.g. costs of trustee meetings, internal and external audit costs and legal advice relating to governance matters).",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="expenditure_grants_institution",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Any grants that the charity has awarded to other institutions to further their charitable work.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="expenditure_investment_management",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Expenditure managing investments for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="expenditure_other",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Other expenditure for the financial period detailed. This category is only used very exceptionally for items that don’t fit within one of the categories above.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="expenditure_raising_funds",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Costs associated with providing goods and services to the public, where the main motive is to raise funds for the charity rather than providing goods or services to meet the needs of its beneficiaries for the financial period detailed. (eg charity shops, fundraising dinners etc.).",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="expenditure_support_costs",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Support costs should be allocated across activities and are those costs which, while necessary to deliver an activity, do not themselves produce the activity.  They include the central office functions of the charity and are often apportioned to activities.  The amount shown here is the total amount of support costs (for charitable, fundraising and governance activities) included in resources expended.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="expenditure_total",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Total expenditure for the financial period detailed on the Part B of the annual return.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="fin_period_end_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The end date of the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="fin_period_order_number",
+            field=models.IntegerField(
+                blank=True,
+                help_text="A field to aid ordering of the financial data for each charity. (1=Most recent data in the table, 5=Least recent data in the table)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="fin_period_start_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The start date of the financial period which is detailed for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="funds_endowment",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Endowment funds include the amount of all permanent and expendable endowment funds.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="funds_restricted",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Restricted funds include the amount of all funds held that must be spent on the purposes of the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="funds_total",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Total funds can be found on the Balance Sheet and should be the same as Total net assets/(liabilities).",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="funds_unrestricted",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Unrestricted funds include the amount of all funds held for the general purposes of the charity.  This will include unrestricted income funds, designated funds, revaluation reserves and any pension reserve.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="gain_loss_investment",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The gain or loss associated with the charity’s investments",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="gain_loss_other",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The gain or loss associated with any other assets",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="gain_loss_pension_fund",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The gain or loss associated with the charity’s pension fund",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="gain_loss_revaluation_fixed_investment",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The gain or loss associated with any revaluation of fixed assets",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="income_charitable_activities",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Income received as fees or grants specifically for goods and services supplied by the charity to meet the needs of its beneficiaries for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="income_donations_and_legacies",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Income from donations and legacies as entered on the Annual Return form for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="income_endowments",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Income from endowments as entered on the Annual Return form for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="income_investments",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Income from investments including dividends, interest and rents but excluding changes (realised and unrealised gains) in the capital value of the investment portfolio for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="income_legacies",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Income from legacies as entered on the Annual Return form for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="income_other",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Other income. This category includes gains on the disposal of own use assets (i.e. fixed assets not held as investments), but otherwise is only used exceptionally for very unusual transactions that cannot be accounted for in the categories above for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="income_other_trading_activities",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Income from other trading activity as entered on the Annual Return form for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="income_total_income_and_endowments",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Total income including endowments for the financial period detailed.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="latest_fin_period_submitted_ind",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates whether the financial data on this line relates to the latest financial data submitted by the charity. (True or False)",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityarpartb",
+            name="reserves",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="The level of reserves is those unrestricted funds which are freely available for the charity to spend and can be found in the Financial Review in the Trustees Annual Report and will exclude endowments.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityclassification",
+            name="classification_code",
+            field=models.IntegerField(
+                blank=True,
+                help_text="The code of the classification described in the row",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityclassification",
+            name="classification_description",
+            field=models.CharField(
+                blank=True,
+                help_text="The descriptor of the classification code.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityclassification",
+            name="classification_type",
+            field=models.CharField(
+                blank=True,
+                help_text="The type of the classification. What - What the charity does. How - How the charity helps. Who - Who the charity helps",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityclassification",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityclassification",
+            name="linked_charity_number",
+            field=models.IntegerField(
+                blank=True,
+                help_text="A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityclassification",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityclassification",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="assoc_charity_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The charity name of the charity associated with the charity event. For example, in the case of asset transfer in this is the charity that has transferred the funds into the charity.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="assoc_organisation_number",
+            field=models.IntegerField(
+                blank=True,
+                help_text="The charity id for the charity associated with the charity event. For example, in the case of asset transfer in this is the charity that has transferred the funds into the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="assoc_registered_charity_number",
+            field=models.IntegerField(
+                blank=True,
+                db_index=True,
+                help_text="The registered charity number for the charity associated with the charity event. For example, in the case of asset transfer in this is the charity that has transferred the funds into the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="charity_event_order",
+            field=models.IntegerField(
+                blank=True,
+                help_text="The order of the event in the charity history. 1 is the earliest event.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="charity_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The Main Name of the Charity",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="date_of_event",
+            field=models.DateField(
+                blank=True, help_text="The date that the event occurred.", null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="event_type",
+            field=models.CharField(
+                blank=True,
+                help_text="The type of charity event that has occurred.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="linked_charity_number",
+            field=models.IntegerField(
+                blank=True,
+                help_text="A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="reason",
+            field=models.CharField(
+                blank=True,
+                help_text="The reason that the event occurred. A registration event will not have a reason available.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityeventhistory",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitygoverningdocument",
+            name="area_of_benefit",
+            field=models.TextField(
+                blank=True,
+                help_text="The area of benefit of the charity as defined in the governing document. This field can be blank as a charity does not have to define an area of benefit in the governing document.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitygoverningdocument",
+            name="charitable_objects",
+            field=models.TextField(
+                blank=True,
+                help_text="The charitable objects of the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitygoverningdocument",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitygoverningdocument",
+            name="governing_document_description",
+            field=models.TextField(
+                blank=True,
+                help_text="The description of the governing document. Note that this is not the governing document itself but the details of the original document and any subsequent amendments.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitygoverningdocument",
+            name="linked_charity_number",
+            field=models.IntegerField(
+                blank=True,
+                help_text="A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitygoverningdocument",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitygoverningdocument",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityothernames",
+            name="charity_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The Main Name of the Charity",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityothernames",
+            name="charity_name_id",
+            field=models.IntegerField(
+                blank=True, help_text="An id for the other charity name", null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityothernames",
+            name="charity_name_type",
+            field=models.CharField(
+                blank=True,
+                help_text="The type of other charity name. This can be working name or previous name.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityothernames",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityothernames",
+            name="linked_charity_number",
+            field=models.IntegerField(
+                blank=True,
+                help_text="A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityothernames",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityothernames",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityotherregulators",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityotherregulators",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityotherregulators",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityotherregulators",
+            name="regulator_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The name of the regulator.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityotherregulators",
+            name="regulator_order",
+            field=models.IntegerField(
+                blank=True,
+                help_text="A field to aid the ordering of the regulators for the charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharityotherregulators",
+            name="regulator_web_url",
+            field=models.CharField(
+                blank=True,
+                help_text="The web URL for the regulator.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypolicy",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypolicy",
+            name="linked_charity_number",
+            field=models.IntegerField(
+                help_text="A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypolicy",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypolicy",
+            name="policy_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The name of the policy that the charity has in place.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypolicy",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypublishedreport",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypublishedreport",
+            name="date_published",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the message on the public register of charities to the report was published.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypublishedreport",
+            name="linked_charity_number",
+            field=models.IntegerField(
+                blank=True,
+                help_text="A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypublishedreport",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypublishedreport",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypublishedreport",
+            name="report_location",
+            field=models.CharField(
+                blank=True,
+                help_text="The web URL for the location on the charity commission .gov site where the published report can be located.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitypublishedreport",
+            name="report_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The type of report that has been published in relation to the charity.",
+                max_length=255,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitytrustee",
+            name="date_of_extract",
+            field=models.DateField(
+                blank=True,
+                help_text="The date that the extract was taken from the main dataset.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitytrustee",
+            name="individual_or_organisation",
+            field=models.CharField(
+                blank=True,
+                choices=[("P", "Individual"), ("O", "Organisation")],
+                help_text="A flag to denote whether the trustee is an individual or an organisation. O for organisation or P for an individual.",
+                max_length=1,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitytrustee",
+            name="linked_charity_number",
+            field=models.IntegerField(
+                help_text="A number that uniquely identifies the subsidiary or group member associated with a registered charity. Used for user identification purposes where the subsidiary is known by the parent registration number and the subsidiary number. The main parent charity has a linked_charity_number of 0."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitytrustee",
+            name="organisation_number",
+            field=models.IntegerField(
+                help_text="The organisation number for the charity. This is the index value for the charity."
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitytrustee",
+            name="registered_charity_number",
+            field=models.IntegerField(
+                db_index=True,
+                help_text="The registration number of the registered organisation allocated by the Commission. Note that a main charity and all its linked charities will share the same registered_charity_number.",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitytrustee",
+            name="trustee_date_of_appointment",
+            field=models.DateField(
+                blank=True,
+                help_text="The date of appointment of the trustee for that charity.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitytrustee",
+            name="trustee_id",
+            field=models.IntegerField(
+                blank=True, help_text="The id number of the trustee.", null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitytrustee",
+            name="trustee_is_chair",
+            field=models.BooleanField(
+                blank=True,
+                help_text="TRUE if the trustee is the Chair. FALSE otherwise.",
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="ccewcharitytrustee",
+            name="trustee_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The name of the trustee.",
+                max_length=255,
+                null=True,
+            ),
         ),
     ]
