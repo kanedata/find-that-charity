@@ -18,7 +18,9 @@ class GenderPayGap(models.Model):
     )
     Year = models.IntegerField(db_index=True)
     EmployerName = models.CharField(db_index=True, max_length=255)
+    EmployerId = models.CharField(db_index=True, max_length=255)
     Address = models.CharField(max_length=255, null=True, blank=True)
+    PostCode = models.CharField(max_length=255, null=True, blank=True)
     CompanyNumber = models.CharField(
         db_index=True, max_length=255, null=True, blank=True
     )
