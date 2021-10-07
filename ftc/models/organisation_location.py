@@ -117,3 +117,6 @@ class OrganisationLocation(models.Model):
 
     def __repr__(self):
         return "<Location {}/>".format(self.geoCode)
+
+    class Meta:
+        unique_together = (("org_id", "name", "geoCodeType", "locationType", "spider", "source_id", "scrape_id"),)

@@ -60,7 +60,8 @@ class Command(BaseCommand):
                 fo.scrape_id
             from ftc_organisationlocation fo
             where fo."geoCode" = 'K04000001'
-                and "geoCodeType" = 'ONS';
+                and "geoCodeType" = 'ONS'
+            on conflict (org_id, "name", "geoCodeType", "locationType", spider, source_id, scrape_id) do nothing;
         """,
         'remove any "ENGLAND AND WALES" references': """
             delete from ftc_organisationlocation fo
@@ -118,7 +119,8 @@ class Command(BaseCommand):
                 fo.scrape_id as scrape_id
             from ftc_organisation fo
                 inner join geo_postcode geo
-                    on fo."postalCode" = geo.pcds;
+                    on fo."postalCode" = geo.pcds
+            on conflict (org_id, "name", "geoCodeType", "locationType", spider, source_id, scrape_id) do nothing;
         """,
         "delete any records from location that aren't based on current scrapes": """
             delete from ftc_organisationlocation fo

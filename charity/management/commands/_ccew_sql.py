@@ -364,4 +364,5 @@ from charity_ccewcharityareaofoperation cc
     inner join charity_areaofoperation ca
         on cc.geographic_area_description = ca.aooname
 where ca."GSS" is not null or ca."ISO3166_1" is not null
+on conflict ("org_id", "name", "geoCodeType", "locationType", "spider", "source_id", "scrape_id") do nothing;
 """

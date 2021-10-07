@@ -34,6 +34,7 @@ UPDATE_GEODATA = """
         inner join ftc_organisation fo
             on cqc_p.org_id = fo.org_id
     where cqc_l.status = 'Active'
+    on conflict (org_id, "name", "geoCodeType", "locationType", spider, source_id, scrape_id) do nothing;
 """
 
 
@@ -150,6 +151,8 @@ class Command(HTMLScraper):
                 ]
                 if this_model["CQCBrand"]["id"] == "-":
                     this_model["CQCBrand"]["id"] = None
+                if this_model["CQCBrand"].get("name", "").startswith("BRAND "):
+                    this_model["CQCBrand"]["name"] = this_model["CQCBrand"]["name"][6:]
                 this_model["CQCProvider"]["brand_id"] = this_model["CQCBrand"]["id"]
 
                 if this_model["CQCProvider"]["charity_number"]:
