@@ -11,16 +11,6 @@
     <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <title>{{ default_title }} - {% block title %}{% endblock %}</title>
-    {% if ga_tracking %}
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking }}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', {{ ga_tracking|escapejs }});
-    </script>
-    {% endif %}
     {% block extra_head %}{% endblock %}
   </head>
   <body class="home w-100 sans-serif near-black base-font bg-wavy">
@@ -86,6 +76,8 @@
     </footer>
     {% block bodyscripts %}
     {% endblock %}
+    <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+    <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade" /></noscript>
   </body>
 </html>
 {% endwith %}

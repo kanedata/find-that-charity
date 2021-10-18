@@ -119,7 +119,6 @@ def environment(**options):
             "get_locations": get_locations,
             "url_replace": url_replace,
             "url_remove": url_remove,
-            "ga_tracking": settings.GOOGLE_ANALYTICS,
         }
     )
     env.filters.update(
