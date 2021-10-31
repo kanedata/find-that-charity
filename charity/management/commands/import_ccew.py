@@ -116,9 +116,17 @@ class Command(BaseScraper):
                 if isinstance(row[k], str):
                     row[k] = row[k].decode(self.encoding).encode("utf8")
 
-        def get_data(reader):
+        def get_data(reader, row_count=None):
             for k, row in tqdm.tqdm(enumerate(reader)):
                 row = self.clean_fields(row)
+                if row_count and row_count != (len(row) + 1):
+                    self.logger.info(row)
+                    raise ValueError(
+                        "Incorrect number of rows (expected {} and got {})".format(
+                            row_count,
+                            len(row) + 1,
+                        )
+                    )
                 yield [k] + list(row.values())
 
         with connection.cursor() as cursor:
@@ -138,7 +146,7 @@ class Command(BaseScraper):
             psycopg2.extras.execute_values(
                 cursor,
                 statement,
-                get_data(reader),
+                get_data(reader, len(reader.fieldnames) + 1),
                 page_size=page_size,
             )
             self.logger.info(
