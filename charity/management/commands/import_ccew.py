@@ -134,6 +134,7 @@ class Command(BaseScraper):
                 io.TextIOWrapper(csvfile, encoding="utf8"),
                 delimiter="\t",
                 escapechar="\\",
+                quoting=csv.QUOTE_NONE,
             )
             self.logger.info(
                 "Starting table insert [{}]".format(db_table._meta.db_table)
