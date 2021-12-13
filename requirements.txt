@@ -79,7 +79,7 @@ jinja2==2.11.3
     # via -r requirements.in
 lml==0.1.0
     # via pyexcel-io
-lxml==4.6.3
+lxml==4.6.5
     # via
     #   -r requirements.in
     #   pyexcel-ezodf
