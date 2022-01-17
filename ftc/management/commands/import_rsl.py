@@ -100,7 +100,7 @@ class Command(HTMLScraper):
             org_types.append(self.add_org_type(record["designation"]))
 
         org_ids = [self.get_org_id(record)]
-        if record.get("designation") == "Local Authority":
+        if record.get(self.id_field) in LA_LOOKUP:
             la_codes = LA_LOOKUP.get(record.get(self.id_field))
             if la_codes:
                 org_ids.append("GB-LAE-{}".format(la_codes.get("register-code")))

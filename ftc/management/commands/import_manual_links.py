@@ -104,7 +104,7 @@ class Command(CSVScraper):
                 }
             ],
             "_parse_csv": "rsp_charity_company_csv",
-            "_encoding": "utf-16",
+            "_encoding": "utf-8-sig",
         },
         {
             "title": "University Royal Charters",
@@ -243,6 +243,7 @@ class Command(CSVScraper):
         self.files = {}
         self.source_cache = {}
         for s in self.sources:
+            self.logger.info("Fetching: " + s["title"])
             self.source_cache[s["identifier"]], _ = Source.objects.update_or_create(
                 id=s["identifier"],
                 defaults={
@@ -264,6 +265,7 @@ class Command(CSVScraper):
         if source.get("_parse_csv"):
             return getattr(self, source.get("_parse_csv"))(response, source)
 
+        record_count = 0
         with io.StringIO(response.text) as a:
             csvreader = csv.DictReader(a)
             for row in csvreader:
@@ -281,9 +283,14 @@ class Command(CSVScraper):
                             scrape=self.scrape,
                         ),
                     )
+                    record_count += 1
+        if record_count == 0:
+            raise Exception("No records found")
+        self.logger.info("{} records added [{}]".format(record_count, source["title"]))
 
     def rsp_charity_company_csv(self, response, source):
 
+        record_count = 0
         with io.StringIO(response.text) as a:
             csvreader = csv.DictReader(a)
             for row in csvreader:
@@ -298,6 +305,7 @@ class Command(CSVScraper):
                             scrape=self.scrape,
                         ),
                     )
+                    record_count += 1
                 if row["Company Number"].strip() != "":
                     self.add_record(
                         OrganisationLink,
@@ -309,3 +317,7 @@ class Command(CSVScraper):
                             scrape=self.scrape,
                         ),
                     )
+                    record_count += 1
+        if record_count == 0:
+            raise Exception("No records found")
+        self.logger.info("{} records added [{}]".format(record_count, source["title"]))
