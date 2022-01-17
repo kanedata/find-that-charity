@@ -103,8 +103,10 @@ class Command(CSVScraper):
                     "title": "Registered housing providers",
                 }
             ],
-            "_parse_csv": "rsp_charity_company_csv",
-            "_encoding": "utf-8-sig",
+            "_parse_row": lambda row: {
+                "org_id_a": "GB-SHPE-{}".format(row["RP Code"].strip()),
+                "org_id_b": row["Org ID"].strip(),
+            },
         },
         {
             "title": "University Royal Charters",
@@ -255,7 +257,7 @@ class Command(CSVScraper):
             )
             r = self.session.get(s["distribution"][0]["downloadURL"])
             r.raise_for_status()
-            r.encoding = s.get("_encoding", "utf8")
+            r.encoding = s.get("_encoding", "utf-8-sig")
             self.files[s["identifier"]] = r
 
     def parse_file(self, response, source):
@@ -278,40 +280,6 @@ class Command(CSVScraper):
                         OrganisationLink(
                             org_id_a=row["org_id_a"],
                             org_id_b=row["org_id_b"],
-                            spider=self.name,
-                            source=self.source_cache[source["identifier"]],
-                            scrape=self.scrape,
-                        ),
-                    )
-                    record_count += 1
-        if record_count == 0:
-            raise Exception("No records found")
-        self.logger.info("{} records added [{}]".format(record_count, source["title"]))
-
-    def rsp_charity_company_csv(self, response, source):
-
-        record_count = 0
-        with io.StringIO(response.text) as a:
-            csvreader = csv.DictReader(a)
-            for row in csvreader:
-                if row["Charity Number"].strip() != "":
-                    self.add_record(
-                        OrganisationLink,
-                        OrganisationLink(
-                            org_id_a="GB-SHPE-{}".format(row["RP Code"].strip()),
-                            org_id_b="GB-CHC-{}".format(row["Charity Number"].strip()),
-                            spider=self.name,
-                            source=self.source_cache[source["identifier"]],
-                            scrape=self.scrape,
-                        ),
-                    )
-                    record_count += 1
-                if row["Company Number"].strip() != "":
-                    self.add_record(
-                        OrganisationLink,
-                        OrganisationLink(
-                            org_id_a="GB-SHPE-{}".format(row["RP Code"].strip()),
-                            org_id_b="GB-COH-{}".format(row["Company Number"].strip()),
                             spider=self.name,
                             source=self.source_cache[source["identifier"]],
                             scrape=self.scrape,
