@@ -15,10 +15,12 @@
 
 {% block organisation_details %}
 
-  {{ super() }}
-
+  {% include 'panels/locations.html.j2' %}
+  {% include 'panels/linked-records.html.j2' %}
   {% include 'panels/charity-activities.html.j2' %}
   {% include 'panels/charity-financials.html.j2' %}
+  {% include 'panels/grants.html.j2' %}
+  {% include 'panels/cqc.html.j2' %}
 
 {% endblock %}
 

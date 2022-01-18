@@ -1,9 +1,9 @@
 import re
 
 import babel.numbers
+import humanize
 import inflect
 import titlecase
-import humanize
 
 VOWELS = re.compile("[AEIOUYaeiouy]")
 ORD_NUMBERS_RE = re.compile(r"([0-9]+(?:st|nd|rd|th))")
@@ -162,9 +162,7 @@ def pluralise(text, count=1, number_format=":,.0f", text_format="{count} {text}"
     return text_format.format(count=count_str, text=p.plural(text, count))
 
 
-def format_currency(
-    amount, currency="GBP", int_format="¤#,##0"
-):
+def format_currency(amount, currency="GBP", int_format="¤#,##0"):
     return babel.numbers.format_currency(
         amount, currency, format=int_format, currency_digits=False, locale="en_UK"
     )

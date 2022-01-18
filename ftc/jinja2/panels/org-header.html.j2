@@ -13,52 +13,13 @@
       A
       {% endif %}
       {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in
-      {% if org.hq.geo_ctry %}
-      {{ org.hq.geo_ctry|get_geoname }}
-      {% else %}
+      {% if org.hq.geo_ctry -%}
+      {{ org.hq.geo_ctry|get_geoname -}}
+      {% else -%}
       the UK
-      {% endif %}
+      {% endif -%}
       {%- if org.dateRemoved %}. Removed on {{ "{:%d %B %Y}".format(org.dateRemoved) }}.{% endif %}
     </h3>
-    <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">
-      The identifier for this organisation record is:
-    </h4>
-    <div class="mv3 w-100">
-      <div class="mb1">{{ orgid_link(org.org_id, true) }}</div>
-      <p class="pa0 mt0 mb1">
-        <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ org.org_id }}">Copy this identifier to your clipboard</a>
-      </p>
-      <details class="mb3">
-        <summary class="blue link underline-hover f7 pointer">What is an organisation identifier?</summary>
-        <div class="f6 measure pl3 bl bw2 b--gray mt1 pv1">
-          <p class="pa0 mt0 mb1">
-            An organisation identifier is a unique piece of text that definitively identifies an organisation.
-          </p>
-          <p class="pa0 mt0 mb2">
-            Examples include charity numbers and company numbers.
-          </p>
-          <p class="pa0 mt0 mb2">
-            Identifiers are usually assigned by an external body like a regulator.
-          </p>
-          <p class="pa0 mt0 mb2">
-            Findthatcharity uses the <a href="http://org-id.guide/about" class="link blue underline" target="_blank">Org ID</a> scheme to create identifiers.
-          </p>
-          <p class="pa0 mt0 mb2">
-            <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.scheme }}</span> gives the scheme for this identifier 
-            {% if org.org_id.scheme in orgidschemes and orgidschemes[org.org_id.scheme].data %}(<a href="http://org-id.guide/list/{{ org.org_id.scheme }}" class="link blue underline" target="_blank">{{ orgidschemes[org.org_id.scheme].data.name.en }}</a>){% endif %}, while <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.id }}</span>
-            is the identifier for this organisation within the scheme.
-          </p>
-        </div>
-      </details>
-    </div>
-    {% if org.orgIDs and org.orgIDs|length > 1 %}
-    <h4 class="f5 f4-ns mb1 mt3 lh-solid normal">The organisation can also be identified by:</h4>
-    <div class="mv3 w-100 w-50-l">
-      {% for v in org.orgIDs if v != org.org_id %}
-      {{ orgid_link(v) }}
-      {% endfor %}
-    </div>
-    {% endif %}
 
     <div class="mv3 w-100 w-50-l">
       {% if org.active %}
@@ -73,7 +34,27 @@
   </div>
   
   <div class="w-100 w-20-l fl">
+    <p class="cf">
     <a href="{{ url('orgid_json', kwargs={'org_id': org.org_id}) }}"
        class="link dib bg-dark-green white code underline-hover normal f6 pv0 ph1 br1 fr">Access this data in JSON format</a>
+    </p>
+    <div class="mv3 w-100 tr">
+      <div class="mb1">{{ orgid_link(org.org_id, true, copy=true) }}</div>
+      {% if org.orgIDs and org.orgIDs|length > 1 %}
+      <div class="mb1">
+        {% for v in org.orgIDs if v != org.org_id %}
+        {{ orgid_link(v, copy=true) }}
+        {% endfor %}
+      </div>
+    {% endif %}
+      {% if 'registered-charity' not in related_orgs.organisationType %}
+      <div class="f6 mt4 br2 h-100 pa2 bg-washed-red">
+        <p class="mt0">Find that Charity displays records of not for profit organisations that use other legal forms, as well
+        as registered charities.</p>
+        <p class="mv0">According to information from the available data sources, this organisation is not
+        registered as a charity.</p>
+      </div>
+      {% endif %}
+    </div>
   </div>
 </header>

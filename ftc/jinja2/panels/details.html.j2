@@ -1,12 +1,12 @@
 {% from 'components/date_format.html.j2' import format_date %}
 
-{% call org_panel("Organisation details", org) %}
+{# {% call org_panel("Organisation details", org) %} #}
 <div class="measure-wide">
 {% if org.description %}
 <h4>Description</h4>
-<p>
+<blockquote class="bl bw3 b--light-blue pl3 ml0 i">
     {{ org.description|titlecase(sentence=true) }}
-</p>
+</blockquote>
 {% endif %}
 {% if org.sortedAlternateName %}
 <h4>Also known as</h4>
@@ -90,4 +90,4 @@
 </p>
 {% endif %}
 </div>
-{% endcall %}
+{# {% endcall %} #}

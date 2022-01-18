@@ -1,9 +1,8 @@
-from tqdm import tqdm
 import psycopg2
+from tqdm import tqdm
 
 from ftc.management.commands._base_scraper import BaseScraper
 from other_data.models import Grant
-
 
 QUERY = """
 select g.data->>'id' as "grant_id",
@@ -21,6 +20,7 @@ select g.data->>'id' as "grant_id",
   g.source_data->>'license' as "license"
 from view_latest_grant g
 """
+
 
 class Command(BaseScraper):
     name = "360g"

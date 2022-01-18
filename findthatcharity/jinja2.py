@@ -10,14 +10,14 @@ from django.utils.text import slugify
 from humanize import naturaldelta
 
 from findthatcharity.utils import (
+    format_currency,
     list_to_string,
     pluralise,
     regex_search,
+    str_format,
     to_titlecase,
     url_remove,
     url_replace,
-    format_currency,
-    str_format,
 )
 from ftc.models import Organisation, OrganisationType, OrgidScheme, Source
 from geo.models import GeoLookup

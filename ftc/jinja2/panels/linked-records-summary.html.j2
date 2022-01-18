@@ -1,27 +1,19 @@
-<div class="mv3 measure">
-    <p>
-        This organisation record is based on data from <a href="#data-source-{{ org.source.id }}" class="link underline-hover blue b">{{ org.source.title }}</a> published by {{ org.source.publisher }}.
-    </p>
-    {% if 'registered-charity' not in related_orgs.organisationType %}
-    <p class="f6">
-      Find that Charity displays records of not for profit organisations that use other legal forms, as well
-      as registered charities. According to information from the available data sources, this organisation is not
-      registered as a charity.
-    </p>
-    {% endif %}
-</div>
-
+<div class="mv3 measure f5">
 {% if related_orgs.records|length > 1 %}
-<div class="mv3 measure">
     <p>
         This organisation record is part of a group of <a href="#linked-records" class="link underline-hover blue">linked records</a> that describe a single organisation.
         The organisation is linked to {{ "active record"|pluralise(related_orgs.activeRecords|length) }} and 
         {{ "inactive record"|pluralise(related_orgs.inactiveRecords|length) }}, from 
         {{ "data source"|pluralise(related_orgs.activeRecords|length) }}.
     </p>
-    <p>
-        The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, large=true) }}.<br>
-        <a href="#" class="blue link underline-hover pointer f7 copy-text" data-target="{{ related_orgs.org_id }}">Copy this identifier to your clipboard</a>
-    </p>
-</div>
+    <div>
+        The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, large=true, copy=true) }}.
+        {% include 'components/what_is_an_identifier.html.j2' %}
+    </div>
+{% else %}
+    <div>
+        This organisation's identifier is {{ orgid_link(related_orgs.org_id, large=true, copy=true) }}.
+        {% include 'components/what_is_an_identifier.html.j2' %}
+    </div>
 {% endif %}
+</div>

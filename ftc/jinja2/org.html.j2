@@ -84,6 +84,7 @@
 {% block organisation_links %}
 <div class="w-100 w-80-ns fl">
   {% include 'panels/linked-records-summary.html.j2' %}
+  {% include 'panels/details.html.j2' %}
 </div>
 {% endblock %}
 
@@ -95,18 +96,17 @@
 
 <div class="w-100 fl pr3-l">
 
-  {% block organisation_details %}
-
   <nav class="tabs mb4 cf dn" id="org-panel-tabs">
     <h4 class="f3 b mt2 mb0">Contents</h4>
     <ol class="f5"></ol>
   </nav>
 
-  {% include 'panels/details.html.j2' %}
+  {% block organisation_details %}
+
   {% include 'panels/locations.html.j2' %}
   {% include 'panels/linked-records.html.j2' %}
-  {% include 'panels/cqc.html.j2' %}
   {% include 'panels/grants.html.j2' %}
+  {% include 'panels/cqc.html.j2' %}
 
   {% endblock %}
   {% include 'panels/data-sources.html.j2' %}

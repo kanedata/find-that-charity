@@ -1,6 +1,6 @@
 
 {% set partb_tables = {
-    "Income": {
+    "Charity Income": {
         "inc_leg": "Legacies",
         "inc_end": "Endowment",
         "inc_vol": "Voluntary income",
@@ -10,7 +10,7 @@
         "inc_other": "Other income",
         "inc_total": "Total income",
     },
-    "Spending": {
+    "Charity Spending": {
         "exp_vol": "Voluntary income costs",
         "exp_trade": "Fundraising Trading costs",
         "exp_gen": "Cost of generating funds",
@@ -21,12 +21,12 @@
         "exp_other": "Other resources expended",
         "exp_total": "Total Resources expended",
     },
-    "Other expenditure": {
+    "Charity Other expenditure": {
         "exp_support": "Support costs",
         "exp_dep": "Depreciation",
         "exp_total": "Total Resources expended",
     },
-    "Assets": {
+    "Charity Assets": {
         "asset_close": "Total fixed assets",
         "fixed_assets": "Fixed Investments Assets",
         "invest_assets": "Current Investment Assets",
@@ -37,24 +37,25 @@
         "pension_assets": "Pension Assets/Liabilities",
         "funds_total": "Total Net Assets/Liabilities",
     },
-    "Funds": {
+    "Charity Funds": {
         "funds_end": "Endowment funds",
         "funds_restrict": "Restricted funds",
         "funds_unrestrict": "Unrestricted funds",
         "funds_total": "Total funds",
     },
-    "Reserves": {
+    "Charity Reserves": {
         "reserves": "Reserves (£)",
         "reserves_months": "Reserves (as months of expenditure)",
     },
-    "People": {
+    "Charity People": {
         "employees": "Employees",
         "volunteers": "Volunteers",
     }
 } %}
 
 {% if charity.financial.count() %}
-  {% call org_panel("Charity financials", org) %}
+  {% set finances = charity.financial.order_by('fyend').all() %}
+  {% call org_panel("Charity financial history", org) %}
 
     {# {% if charity.has_ccew_partb %}
     <nav class="tabs mb4 cf">
@@ -67,7 +68,6 @@
     </nav>
     {% endif %} #}
 
-      {% set finances = charity.financial.order_by('fyend').all() %}
       
       <div class="w-100 cf" id="charity-financials">
       <div class="w-100 w-50-ns fl">
@@ -114,10 +114,13 @@
       </div>
       </div>
 
+    {% endcall %}
+
       {% if charity.has_ccew_partb %}
       {% for table, fields in partb_tables.items() %}
+      {% call org_panel(table, org) %}
       <div  id="{{ table|slugify }}">
-      <h3>{{table}}</h3>
+      {# <h3>{{table}}</h3> #}
       <div class="table-wrapper">
       <table class="financial-table">
         <thead>
@@ -160,8 +163,8 @@
       </table>
       </div>
       </div>
+      {% endcall %}
       {% endfor %}
       {% endif %}
 
-  {% endcall %}
   {% endif %}

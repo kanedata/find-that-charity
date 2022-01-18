@@ -1,0 +1,22 @@
+<details class="mb3">
+    <summary class="blue link underline-hover f7 pointer">What is an organisation identifier?</summary>
+    <div class="f6 measure pl3 bl bw2 b--gray mt1 pv1">
+        <p class="pa0 mt0 mb1">
+        An organisation identifier is a unique piece of text that definitively identifies an organisation.
+        </p>
+        <p class="pa0 mt0 mb2">
+        Examples include charity numbers and company numbers.
+        </p>
+        <p class="pa0 mt0 mb2">
+        Identifiers are usually assigned by an external body like a regulator.
+        </p>
+        <p class="pa0 mt0 mb2">
+        Findthatcharity uses the <a href="http://org-id.guide/about" class="link blue underline" target="_blank">Org ID</a> scheme to create identifiers.
+        </p>
+        <p class="pa0 mt0 mb2">
+        <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.scheme }}</span> gives the scheme for this identifier 
+        {% if org.org_id.scheme in orgidschemes and orgidschemes[org.org_id.scheme].data %}(<a href="http://org-id.guide/list/{{ org.org_id.scheme }}" class="link blue underline" target="_blank">{{ orgidschemes[org.org_id.scheme].data.name.en }}</a>){% endif %}, while <span class="dib bg-dark-blue white code f6 pv0 ph1 br1 mr1 mb1">{{ org.org_id.id }}</span>
+        is the identifier for this organisation within the scheme.
+        </p>
+    </div>
+</details>

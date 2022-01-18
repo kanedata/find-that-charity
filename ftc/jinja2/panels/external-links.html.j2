@@ -1,3 +1,9 @@
+<div class="mv3 measure f5">
+    <p>
+        This organisation record is based on data from <a href="#data-source-{{ org.source.id }}" class="link underline-hover blue b">{{ org.source.title }}</a> published by {{ org.source.publisher }}.
+    </p>
+</div>
+
 {% set links = org.get_links()|list %}
 {% if links %}
 <article class="message is-info">

@@ -1,5 +1,5 @@
-from collections import defaultdict
 import csv
+from collections import defaultdict
 
 from django.conf import settings
 from django.http import JsonResponse, StreamingHttpResponse
@@ -63,33 +63,38 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
     related_orgs = RelatedOrganisation(related_orgs)
 
     additional_data = dict(
-        cqc = CQCProvider.objects.filter(org_id__in=related_orgs.orgIDs).all(),
-        grants_received = Grant.objects.filter(recipientOrganization_id__in=related_orgs.orgIDs).order_by("-awardDate").all(),
-        grants_given = Grant.objects.filter(fundingOrganization_id__in=related_orgs.orgIDs).order_by("-awardDate").all(),
+        cqc=CQCProvider.objects.filter(org_id__in=related_orgs.orgIDs).all(),
+        grants_received=Grant.objects.filter(
+            recipientOrganization_id__in=related_orgs.orgIDs
+        )
+        .order_by("-awardDate")
+        .all(),
+        grants_given=Grant.objects.filter(
+            fundingOrganization_id__in=related_orgs.orgIDs
+        )
+        .order_by("-awardDate")
+        .all(),
     )
 
-    additional_data["grants_given_by_year"] = defaultdict(lambda: defaultdict(lambda: {
-        "grants": 0,
-        "amountAwarded": 0,
-    }))
+    additional_data["grants_given_by_year"] = defaultdict(
+        lambda: defaultdict(
+            lambda: {
+                "grants": 0,
+                "amountAwarded": 0,
+            }
+        )
+    )
     for g in additional_data["grants_given"]:
-        additional_data["grants_given_by_year"][
-            g.awardDate.year
-        ][
-            g.currency
-        ]["grants"] += 1
-        additional_data["grants_given_by_year"][
-            g.awardDate.year
-        ][
-            g.currency
-        ]["amountAwarded"] += g.amountAwarded
+        additional_data["grants_given_by_year"][g.awardDate.year][g.currency][
+            "grants"
+        ] += 1
+        additional_data["grants_given_by_year"][g.awardDate.year][g.currency][
+            "amountAwarded"
+        ] += g.amountAwarded
 
-
-    template = "org.html.j2"
+    template = "charity.html.j2" if charity else "org.html.j2"
     if preview:
         template = "org_preview.html.j2"
-    elif settings.DEBUG:
-        template = "charity.html.j2" if charity else "org.html.j2"
 
     return render(
         request,
