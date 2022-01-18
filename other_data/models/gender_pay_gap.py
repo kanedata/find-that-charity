@@ -3,6 +3,7 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 
 from ftc.models import OrgidField
 
+
 class GenderPayGap(models.Model):
     class EmployerSizeChoices(models.TextChoices):
         LESS_THAN_250 = "Less than 250"

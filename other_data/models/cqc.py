@@ -3,6 +3,7 @@ from django.db import models
 
 from ftc.models import OrgidField
 
+
 class CQCProviderType(models.TextChoices):
     SOCIAL_CARE = "Social Care Org"
     INDEPENDENT_HEALTHCARE = "Independent Healthcare Org"
