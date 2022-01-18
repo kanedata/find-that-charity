@@ -1,6 +1,5 @@
 import datetime
 
-from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.db.models import Count, F, Func
@@ -10,6 +9,7 @@ from django.utils.text import slugify
 from humanize import naturaldelta
 
 from findthatcharity.utils import (
+    a_or_an,
     format_currency,
     list_to_string,
     pluralise,
@@ -134,6 +134,7 @@ def environment(**options):
             "get_geoname": get_geoname,
             "format_currency": format_currency,
             "str_format": str_format,
+            "a_or_an": a_or_an,
         }
     )
     return env

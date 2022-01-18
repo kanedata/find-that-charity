@@ -85,7 +85,9 @@ class Command(CSVScraper):
             self.orgtype_cache["registered-charity"],
             self.orgtype_cache["registered-charity-scotland"],
         ]
-        if record.get("Regulatory Type") != "Standard" and record.get(
+        if record.get("Regulatory Type") == "Cross Border":
+            org_types.append(self.add_org_type("Cross Border Charity"))
+        elif record.get("Regulatory Type") != "Standard" and record.get(
             "Regulatory Type"
         ):
             org_types.append(self.add_org_type(record.get("Regulatory Type")))

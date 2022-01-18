@@ -56,7 +56,7 @@ class Command(CSVScraper):
         "MSOA",
         "LSOA",
     ]
-    orgtypes = ["Education"]
+    orgtypes = ["Education Institution"]
 
     def set_session(self, install_cache=False):
         if install_cache:
@@ -87,10 +87,14 @@ class Command(CSVScraper):
     def depluralise(self, s):
         if not isinstance(s, str):
             return s
+        if s.startswith("Free schools"):
+            return s.replace("Free schools", "Free school")
         if s in ("British schools overseas"):
-            return s
+            return "British school overseas"
         if s in ("Miscellaneous", "Other types"):
-            return "Other education"
+            return "Other education provider"
+        if s in ("Further education"):
+            return s + " provider"
         if s.endswith("ies"):
             return s[:-3] + "y"
         if s.endswith("s"):
@@ -102,7 +106,7 @@ class Command(CSVScraper):
         record = self.clean_fields(record)
 
         org_types = [
-            self.orgtype_cache["education"],
+            self.orgtype_cache["education-institution"],
             self.add_org_type(
                 self.depluralise(record.get("EstablishmentTypeGroup (name)"))
             ),

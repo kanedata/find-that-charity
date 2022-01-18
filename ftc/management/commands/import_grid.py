@@ -94,7 +94,12 @@ It includes cross-linkages to a range of other identifier sources.""",
                 parent = self.org_id_prefix + "-" + r.get("id")
 
         orgtype = record.get("types", [])[0] if record.get("types", []) else "Education"
-        orgtype = self.add_org_type(orgtype)
+        orgtype = self.add_org_type(orgtype + " Institution")
+        orgtypes = [orgtype.slug]
+        if orgtype == "Healthcare":
+            orgtypes.append(self.add_org_type("Health organisation").slug)
+        if orgtype == "University":
+            orgtypes.append(self.add_org_type("higher-education-institution").slug)
 
         self.add_org_record(
             Organisation(
@@ -113,7 +118,7 @@ It includes cross-linkages to a range of other identifier sources.""",
                     + record.get("acronyms", []),
                     "email": record.get("email_address"),
                     "description": None,
-                    "organisationType": [orgtype.slug],
+                    "organisationType": orgtypes,
                     "organisationTypePrimary": orgtype,
                     "url": url,
                     "latestIncome": None,

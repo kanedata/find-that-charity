@@ -76,23 +76,40 @@ class Command(HTMLScraper):
             self.add_org_type("Registered Provider of Social Housing"),
         ]
         if record.get("corporate form"):
-            if record["corporate form"] == "Company":
+            if record["corporate form"].lower() == "Company".lower():
                 org_types.append(self.add_org_type("Registered Company"))
                 org_types.append(
                     self.add_org_type(
                         "{} {}".format(record["designation"], record["corporate form"])
                     )
                 )
-            elif record["corporate form"] == "CIO-Charitable Incorporated Organisation":
+            elif (
+                record["corporate form"].lower()
+                == "CIC-community Interest company".lower()
+            ):
+                org_types.append(self.add_org_type("Community Interest Company"))
+                org_types.append(self.add_org_type("Registered Company"))
+            elif (
+                record["corporate form"].lower()
+                == "LLP-Limited Liability Partnership".lower()
+            ):
+                org_types.append(self.add_org_type("Limited Liability Partnership"))
+                org_types.append(self.add_org_type("Registered Company"))
+            elif (
+                record["corporate form"].lower()
+                == "CIO-Charitable incorporated organisation".lower()
+            ):
                 org_types.append(
                     self.add_org_type("Charitable Incorporated Organisation")
                 )
                 org_types.append(self.add_org_type("Registered Charity"))
-            elif record["corporate form"] == "Charitable Company":
+            elif record["corporate form"].lower() == "Charitable Company".lower():
                 org_types.append(self.add_org_type("Registered Company"))
                 org_types.append(self.add_org_type("Incorporated Charity"))
                 org_types.append(self.add_org_type("Registered Charity"))
-            elif record["corporate form"] == "Unincorporated Charity":
+            elif record["corporate form"].lower() == "Unincorporated Charity".lower():
+                org_types.append(self.add_org_type("Registered Charity"))
+            elif record["corporate form"].lower() == "Charity".lower():
                 org_types.append(self.add_org_type("Registered Charity"))
             else:
                 org_types.append(self.add_org_type(record["corporate form"]))

@@ -66,7 +66,7 @@ class Command(HTMLScraper):
             {"downloadURL": "", "accessURL": "", "title": "School Contact Details"}
         ],
     }
-    orgtypes = ["Education"]
+    orgtypes = ["Education Institution"]
 
     def parse_file(self, response, source_url):
         link = [
@@ -175,7 +175,7 @@ class Command(HTMLScraper):
 
     def get_org_types(self, record):
         org_types = [
-            self.orgtype_cache["education"],
+            self.orgtype_cache["education-institution"],
             self.add_org_type(record.get("centre_type") + " School"),
         ]
         if record.get("school_type_denomination"):

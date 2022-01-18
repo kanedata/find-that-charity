@@ -30,7 +30,7 @@ class Command(HTMLScraper):
             {"downloadURL": "", "accessURL": "", "title": "Institution Search"}
         ],
     }
-    orgtypes = ["Education"]
+    orgtypes = ["Education Institution"]
 
     def parse_file(self, response, source_url):
         post_params = {
@@ -93,10 +93,14 @@ class Command(HTMLScraper):
             ]
         )
         org_types = [
-            self.orgtype_cache["education"],
-            self.add_org_type(record.get("Management")),
+            self.orgtype_cache["education-institution"],
+            self.add_org_type(record.get("Management") + " School"),
             self.add_org_type(record.get("Type", "") + " School"),
         ]
+        if org_types[2].slug == "further-education-school":
+            org_types[2] = self.add_org_type("Further Education Provider")
+        if org_types[2].slug == "preps-school":
+            org_types[2] = self.add_org_type("Prep School")
 
         self.add_org_record(
             Organisation(

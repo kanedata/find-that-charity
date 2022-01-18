@@ -1,7 +1,6 @@
 import re
 
 import babel.numbers
-import humanize
 import inflect
 import titlecase
 
@@ -170,3 +169,7 @@ def format_currency(amount, currency="GBP", int_format="¤#,##0"):
 
 def str_format(value, format="{}"):
     return format.format(value)
+
+
+def a_or_an(value):
+    return p.a(value).split()[0]

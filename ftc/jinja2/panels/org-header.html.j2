@@ -7,10 +7,8 @@
     <h3 class="f3-ns mb4 mt4 f4 lh-subtitle normal">
       {% if not org.active %}
       An <span class="normal red">inactive</span>
-      {% elif org.organisationTypePrimary.title[0]|lower is in (("a", "e", "i", "o", "u")) %}
-      An
       {% else %}
-      A
+      {{ org.organisationTypePrimary.title|a_or_an|title }}
       {% endif %}
       {{ orgtype_link(org.organisationTypePrimary, large=true) }}based in
       {% if org.hq.geo_ctry -%}
@@ -48,7 +46,7 @@
       </div>
     {% endif %}
       {% if 'registered-charity' not in related_orgs.organisationType %}
-      <div class="f6 mt4 br2 h-100 pa2 bg-washed-red">
+      <div class="f6 mt4 br2 h-100 pa2 bg-washed-red tl">
         <p class="mt0">Find that Charity displays records of not for profit organisations that use other legal forms, as well
         as registered charities.</p>
         <p class="mv0">According to information from the available data sources, this organisation is not

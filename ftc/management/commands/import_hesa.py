@@ -33,7 +33,7 @@ class Command(CSVScraper):
             }
         ],
     }
-    orgtypes = ["Higher Education"]
+    orgtypes = ["Higher Education Institution"]
 
     def parse_row(self, record):
 
@@ -45,7 +45,7 @@ class Command(CSVScraper):
             orgids.append("-".join(["GB-UKPRN", str(record["UKPRN"])]))
 
         org_types = [
-            self.orgtype_cache["higher-education"],
+            self.orgtype_cache["higher-education-institution"],
         ]
 
         self.add_org_record(

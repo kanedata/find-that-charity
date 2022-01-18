@@ -36,12 +36,12 @@ class Command(HTMLScraper):
         #   "id": "eauth",
         # },
         {
-            "org_type": "Special Health Authorities",
+            "org_type": "Special Health Authority",
             "url": "https://files.digital.nhs.uk/assets/ods/current/espha.zip",
             "id": "espha",
         },
         {
-            "org_type": "Commissioning Support Units",
+            "org_type": "Commissioning Support Unit",
             "url": "https://files.digital.nhs.uk/assets/ods/current/ecsu.zip",
             "id": "ecsu",
         },
@@ -56,17 +56,17 @@ class Command(HTMLScraper):
         #   "id": "eother",
         # },
         {
-            "org_type": "NHS Support Agencies and Shared Services",
+            "org_type": "NHS Support Agency or Shared Service",
             "url": "https://files.digital.nhs.uk/assets/ods/current/ensa.zip",
             "id": "ensa",
         },
         {
-            "org_type": "GP practices",
+            "org_type": "GP practice",
             "url": "https://files.digital.nhs.uk/assets/ods/current/epraccur.zip",
             "id": "epraccur",
         },
         {
-            "org_type": "Clinical Commissioning Groups",
+            "org_type": "Clinical Commissioning Group",
             "url": "https://files.digital.nhs.uk/assets/ods/current/eccg.zip",
             "id": "eccg",
         },
@@ -76,7 +76,7 @@ class Command(HTMLScraper):
         #   "id": "eccgsite",
         # },
         {
-            "org_type": "NHS Trusts",
+            "org_type": "NHS Trust",
             "url": "https://files.digital.nhs.uk/assets/ods/current/etr.zip",
             "id": "etr",
         },
@@ -91,7 +91,7 @@ class Command(HTMLScraper):
         #   "id": "etrust",
         # },
         {
-            "org_type": "Care Trusts",
+            "org_type": "Care Trust",
             "url": "https://files.digital.nhs.uk/assets/ods/current/ect.zip",
             "id": "ect",
         },
@@ -106,7 +106,7 @@ class Command(HTMLScraper):
         #   "id": "ecare",
         # },
         {
-            "org_type": "Welsh Local Health Boards",
+            "org_type": "Welsh Local Health Board",
             "url": "https://files.digital.nhs.uk/assets/ods/current/wlhb.zip",
             "id": "wlhb",
         },
@@ -150,7 +150,7 @@ class Command(HTMLScraper):
         "column-26",
         "column-27",
     ]
-    orgtypes = ["Health", "NHS"]
+    orgtypes = ["Health organisation", "NHS organisation"]
 
     def fetch_file(self):
         self.files = {}
@@ -195,8 +195,8 @@ class Command(HTMLScraper):
         record = self.clean_fields(record)
 
         org_types = [
-            self.orgtype_cache["health"],
-            self.orgtype_cache["nhs"],
+            self.orgtype_cache["health-organisation"],
+            self.orgtype_cache["nhs-organisation"],
         ]
         if org_type:
             o = self.add_org_type(org_type)

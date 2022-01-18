@@ -53,7 +53,7 @@ class Command(HTMLScraper):
             {"downloadURL": "", "accessURL": "", "title": "Address list of schools"}
         ],
     }
-    orgtypes = ["Education"]
+    orgtypes = ["Education Institution"]
 
     def parse_file(self, response, source_url):
         link = list(response.html.find("div.document", first=True).absolute_links)[0]
@@ -132,9 +132,13 @@ class Command(HTMLScraper):
             "type",
         ]:
             if record.get(f):
-                if record.get(f) == "PRU":
+                if record.get(f) == "Not available":
+                    continue
+                elif record.get(f) == "PRU":
                     org_types.append(self.add_org_type("Pupil Referral Unit"))
+                elif record.get(f) == "Juniors":
+                    org_types.append(self.add_org_type("Junior School"))
                 else:
                     org_types.append(self.add_org_type(record[f] + " School"))
-        org_types.append(self.add_org_type("Education"))
+        org_types.append(self.add_org_type("Education Institution"))
         return org_types
