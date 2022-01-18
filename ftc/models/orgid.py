@@ -12,6 +12,11 @@ class Orgid(str):
         self.id = value
         if value is None:
             return
+        if value.upper().startswith("360G-"):
+            self.scheme = "360G"
+            self.id = value[5:]
+            return
+        
         split_orgid = value.split("-", maxsplit=3)
         if len(split_orgid) > 2:
             self.scheme = "-".join(split_orgid[:2])

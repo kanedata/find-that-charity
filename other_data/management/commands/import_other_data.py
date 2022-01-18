@@ -6,6 +6,7 @@ class Command(BaseCommand):
     scrapers = [
         "cqc",
         "gender_pay_gap",
+        "360giving",
     ]
 
     def handle(self, *args, **options):

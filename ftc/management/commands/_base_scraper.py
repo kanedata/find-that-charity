@@ -173,6 +173,7 @@ class BaseScraper(BaseCommand):
 
     def close_spider(self):
         results = {}
+        self.get_link_records()
         for model, records in self.records.items():
             self.save_records(model)
             if model == OrganisationLink:

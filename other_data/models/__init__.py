@@ -1,16 +1,16 @@
-from .gender_pay_gap import GenderPayGap
 from .cqc import (
-    CQCProviderType,
-    CQCInspectionDirectorate,
-    CQCOwnershipType,
-    CQCRatings,
-    CQCProvider,
     CQCBrand,
+    CQCInspectionDirectorate,
     CQCLocation,
+    CQCOwnershipType,
+    CQCProvider,
+    CQCProviderType,
+    CQCRatings,
 )
+from .gender_pay_gap import GenderPayGap
+from .threesixtygiving import Grant
 
 __all__ = (
-    GenderPayGap,
     CQCProviderType,
     CQCInspectionDirectorate,
     CQCOwnershipType,
@@ -18,4 +18,6 @@ __all__ = (
     CQCProvider,
     CQCBrand,
     CQCLocation,
+    GenderPayGap,
+    Grant,
 )
