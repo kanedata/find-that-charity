@@ -1,3 +1,4 @@
+from collections import defaultdict
 import csv
 
 from django.conf import settings
@@ -15,7 +16,7 @@ from ftc.query import (
     get_organisation,
     random_query,
 )
-from other_data.models import CQCProvider
+from other_data.models import CQCProvider, Grant
 
 
 # site homepage
@@ -61,7 +62,28 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
         related_orgs = [org]
     related_orgs = RelatedOrganisation(related_orgs)
 
-    cqc = CQCProvider.objects.filter(org_id=related_orgs.org_id).all()
+    additional_data = dict(
+        cqc = CQCProvider.objects.filter(org_id__in=related_orgs.orgIDs).all(),
+        grants_received = Grant.objects.filter(recipientOrganization_id__in=related_orgs.orgIDs).order_by("-awardDate").all(),
+        grants_given = Grant.objects.filter(fundingOrganization_id__in=related_orgs.orgIDs).order_by("-awardDate").all(),
+    )
+
+    additional_data["grants_given_by_year"] = defaultdict(lambda: defaultdict(lambda: {
+        "grants": 0,
+        "amountAwarded": 0,
+    }))
+    for g in additional_data["grants_given"]:
+        additional_data["grants_given_by_year"][
+            g.awardDate.year
+        ][
+            g.currency
+        ]["grants"] += 1
+        additional_data["grants_given_by_year"][
+            g.awardDate.year
+        ][
+            g.currency
+        ]["amountAwarded"] += g.amountAwarded
+
 
     template = "org.html.j2"
     if preview:
@@ -76,7 +98,7 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
             "org": org,
             "related_orgs": related_orgs,
             "charity": charity,
-            "cqc": cqc,
+            **additional_data,
         },
     )
 

@@ -62,7 +62,7 @@
         ev.preventDefault();
         navigator.clipboard.writeText(ev.target.dataset.target).then(()=> {
           const toast = document.createElement("span");
-          toast.classList = ['ml2 pa1 bg-dark-gray white f7 br2']
+          toast.classList = ['ml2 pa1 bg-dark-gray white f7 br2 absolute']
           toast.innerText = "Copied!";
           ev.target.after(toast); 
           setTimeout(() => {
@@ -106,6 +106,7 @@
   {% include 'panels/locations.html.j2' %}
   {% include 'panels/linked-records.html.j2' %}
   {% include 'panels/cqc.html.j2' %}
+  {% include 'panels/grants.html.j2' %}
 
   {% endblock %}
   {% include 'panels/data-sources.html.j2' %}

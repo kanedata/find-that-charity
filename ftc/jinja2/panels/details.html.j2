@@ -1,3 +1,5 @@
+{% from 'components/date_format.html.j2' import format_date %}
+
 {% call org_panel("Organisation details", org) %}
 <div class="measure-wide">
 {% if org.description %}
@@ -51,13 +53,13 @@
 {% if org.dateRegistered %}
 <h4>Registered</h4>
 <p>
-    {{ "{:%d %B %Y}".format(org.dateRegistered) }}
+    {{ format_date(org.dateRegistered) }}
 </p>
 {% endif %}
 {% if org.dateRemoved %}
 <h4>Removed</h4>
 <p>
-    {{ "{:%d %B %Y}".format(org.dateRemoved) }}
+    {{ format_date(org.dateRemoved) }}
 </p>
 {% endif %}
 {% if org.postalCode %}
@@ -83,7 +85,7 @@
 <p>
     &pound;{{ "{:,.0f}".format( org.latestIncome )}}
     {% if org.latestIncomeDate %}
-    <span class="grey">(on {{ "{:%d %B %Y}".format(org.latestIncomeDate) }})</span>
+    <span class="grey">(on {{ format_date(org.latestIncomeDate) }})</span>
     {% endif %}
 </p>
 {% endif %}

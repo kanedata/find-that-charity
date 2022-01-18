@@ -1,0 +1,93 @@
+{% from 'components/date_format.html.j2' import format_date %}
+{% set max_grants = 10 %}
+
+{% macro grant_data_source(grants) %}
+<h4>Data source</h4>
+<p>
+  Grants data comes from funders who publish data using the <a class="link dark-blue underline-hover" href="https://standard.threesixtygiving.org/">360Giving Data Standard</a>.
+  It was accessed using the <a class="link dark-blue underline-hover" href="https://www.threesixtygiving.org/data/360giving-datastore/">360Giving Datastore</a>.
+</p>
+<ul>
+  {% for publisher, pub_grants in grants|groupby("publisher_prefix") %}
+  <li>
+    <strong>{{ pub_grants.0.publisher_name }}</strong> ({{ "grant"|pluralise(pub_grants|length) }}) |
+    <a class="link dark-blue underline-hover" href="{{ pub_grants.0.license }}">Licence</a> | 
+    <a class="link dark-blue underline-hover" href="https://grantnav.threesixtygiving.org/publisher/{{ publisher }}">GrantNav Publisher page</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endmacro %}
+
+{% if grants_received %}
+  {% call org_panel("Grants received", org) %}
+    {% if grants_received|length > max_grants %}
+    <p>Received {{ "grant"|pluralise(grants_received|length) }}. Showing most recent {{ max_grants }} grants.</p>
+    {% endif %}
+    <p>View this organisation's grants on <a class="link dark-blue underline-hover" href="https://grantnav.threesixtygiving.org/recipient/{{ org.org_id }}">GrantNav</a>.</p>
+    <table class="table collapse">
+      <thead>
+        <tr>
+          <th class="tl">Date</th>
+          <th class="tl">Funder</th>
+          <th class="tl"></th>
+          <th class="tr">Amount awarded</th>
+          <th class="tl">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for grant in grants_received[:max_grants] %}
+        <tr>
+          <td class="tl v-top">{{ format_date(grant.awardDate, "%d %b %Y") }}</td>
+          <td class="tl v-top">
+            <a class="link dark-blue underline-hover" href="{{ url('orgid_html', kwargs={'org_id': grant.fundingOrganization_id}) }}">
+              {{ grant.fundingOrganization_name }}
+            </a>
+          </td>
+          <td class="tr v-top">
+            <div>{{ orgid_link(grant.fundingOrganization_id) }}</div>
+          </td>
+          <td class="tr v-top">{{ grant.amountAwarded|format_currency(grant.currency) }}</td>
+          <td class="tl v-top w-40 f6">
+            <a class="link dark-blue underline-hover" href="https://grantnav.threesixtygiving.org/grant/{{ grant.grant_id }}" title="View this grant on 360Giving GrantNav">{{ grant.title }}</a>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    {{ grant_data_source(grants_received) }}
+  {% endcall %}
+{% endif %}
+
+{% if grants_given and grants_given_by_year %}
+  {% call org_panel("Grants made", org) %}
+    Data published using the <a class="link dark-blue underline-hover" href="https://standard.threesixtygiving.org/">360Giving Data Standard</a> shows
+    this funder made {{ "grant"|pluralise(grants_given|length) }}
+    {% set latest_grant = grants_given|max(attribute="awardDate")|attr("awardDate")|str_format("{:%B %Y}") %}
+    {% set earliest_grant = grants_given|min(attribute="awardDate")|attr("awardDate")|str_format("{:%B %Y}") %}
+    {% if latest_grant == earliest_grant %}
+    in {{ earliest_grant }}.
+    {% else %}
+    between {{ earliest_grant }} and {{ latest_grant }}.
+    {% endif %}
+    
+    <p>View this organisation's grants on <a class="link dark-blue underline-hover" href="https://grantnav.threesixtygiving.org/funder/{{ org.org_id }}">GrantNav</a>.</p>
+
+    <table class="table collapse w-auto financial-table">
+      <tbody>
+      {% for year, currency_grants in grants_given_by_year.items() %}
+        {% for currency, grants in currency_grants.items() %}
+        <tr>
+          {% if loop.index == 1 %}
+          <th class="tl v-top" rowspan="{{ currency_grants|length }}">{{ year }}</td>
+          {% endif %}
+          <td class="tr pl4">{{ "grant"|pluralise(grants.grants) }}</td>
+          <td class="tr pl4">{{ grants.amountAwarded|format_currency(currency) }}</td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+      </tbody>
+    </table>
+
+    {{ grant_data_source(grants_given) }}
+  {% endcall %}
+{% endif %}

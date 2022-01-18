@@ -16,6 +16,8 @@ from findthatcharity.utils import (
     to_titlecase,
     url_remove,
     url_replace,
+    format_currency,
+    str_format,
 )
 from ftc.models import Organisation, OrganisationType, OrgidScheme, Source
 from geo.models import GeoLookup
@@ -130,6 +132,8 @@ def environment(**options):
             "titlecase": to_titlecase,
             "pluralise": pluralise,
             "get_geoname": get_geoname,
+            "format_currency": format_currency,
+            "str_format": str_format,
         }
     )
     return env

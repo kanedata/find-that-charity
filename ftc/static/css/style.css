@@ -11,6 +11,9 @@
     width: inherit;
     font-variant-numeric: tabular-nums;
 }
+.entry-content table.w-auto {
+    width: auto;
+}
 
 .entry-content table th.tl,
 .entry-content table td.tl {

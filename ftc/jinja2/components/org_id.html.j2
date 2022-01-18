@@ -6,21 +6,22 @@ f6 pv0 ph1 br1
 {% endif %}
 {% endmacro %}
 
-{% macro orgid_link(id, large=false) %}
-<a href="{{ url('orgid_html', kwargs={'org_id': id}) }}"
-   class="link dib bg-dark-blue white code underline-hover normal {{orgid_classname(large)}}">{{id}}</a>{% endmacro %}
+{% macro orgid_link(id, large=false, copy=true) %}
+<span class="nowrap"><a href="{{ url('orgid_html', kwargs={'org_id': id}) }}"
+   class="link dib bg-dark-blue white code underline-hover normal nowrap {{orgid_classname(large)}}">{{id}}</a>{%- if copy -%}
+<a class="copy-text pointer f6 grow" data-target="GB-EDU-133902" title="Copy this identifier to your clipboard">&#128203;</a></span>{%- endif -%}{% endmacro %}
 
 {% macro orgid_connection(id_a, id_b, large=false) %}
 <span class="dib bg-dark-blue white code {{orgid_classname(large)}}">
-    <a href="{{ url('orgid_html', kwargs={'org_id': id_a}) }}" class="link di white underline-hover">{{- id_a -}}</a>
+    <a href="{{ url('orgid_html', kwargs={'org_id': id_a}) }}" class="link di white underline-hover nowrap">{{- id_a -}}</a>
     <span class="bg-lightest-blue dark-blue ph2 dib">to</span> 
-    <a href="{{ url('orgid_html', kwargs={'org_id': id_b}) }}" class="link di white underline-hover">{{- id_b -}}</a>
+    <a href="{{ url('orgid_html', kwargs={'org_id': id_b}) }}" class="link di white underline-hover nowrap">{{- id_b -}}</a>
 </span>
 {% endmacro %}
 
 {% macro orgtype_link(orgtype, large=false) %}
 <a href="{{ url('orgid_type', kwargs={'orgtype': orgtype.slug}) }}"
-   class="link dib bg-light-gray near-black underline-hover {{orgid_classname(large)}} mb2">
+   class="link dib bg-light-gray near-black underline-hover nowrap {{orgid_classname(large)}} mb2">
    {{orgtype.title}}
 </a>
 {% endmacro %}
