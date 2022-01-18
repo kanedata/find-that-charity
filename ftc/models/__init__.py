@@ -7,6 +7,7 @@ from .orgid_scheme import OrgidScheme
 from .related_organisation import RelatedOrganisation
 from .scrape import Scrape
 from .source import Source
+from .vocabulary import Vocabulary, VocabularyEntries
 
 __all__ = [
     "Organisation",

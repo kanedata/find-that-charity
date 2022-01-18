@@ -310,4 +310,4 @@ class CQCLocation(models.Model):
         null=True,
         blank=True,
     )
-    classification = models.ManyToManyField("charity.VocabularyEntries")
+    classification = models.ManyToManyField("ftc.VocabularyEntries")

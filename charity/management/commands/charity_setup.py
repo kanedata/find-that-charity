@@ -4,7 +4,8 @@ import io
 import requests
 from django.core.management.base import BaseCommand
 
-from charity.models import AreaOfOperation, Vocabulary, VocabularyEntries
+from charity.models import AreaOfOperation
+from ftc.models import Vocabulary, VocabularyEntries
 
 
 class Command(BaseCommand):
@@ -20,12 +21,20 @@ class Command(BaseCommand):
         print("Fetching CC classifications")
         ccew = "https://github.com/drkane/charity-lookups/raw/master/classification/ccew.csv"
 
+        for f in ("theme", "beneficiaries", "activities"):
+            v, _ = Vocabulary.objects.update_or_create(
+                title="ccew_" + f, defaults=dict(single=False)
+            )
+            VocabularyEntries.objects.filter(vocabulary=v).update(current=False)
+
         for r in self.get_csv(ccew):
             v, _ = Vocabulary.objects.update_or_create(
                 title="ccew_" + r["category"], defaults=dict(single=False)
             )
             VocabularyEntries.objects.update_or_create(
-                code=r["code"], vocabulary=v, defaults={"title": r["name"]}
+                code=r["code"],
+                vocabulary=v,
+                defaults={"title": r["name"], "current": True},
             )
 
     def fetch_icnpo(self):
@@ -35,6 +44,7 @@ class Command(BaseCommand):
             title="International Classification of Non Profit Organisations (ICNPO)",
             defaults=dict(single=False),
         )
+        VocabularyEntries.objects.filter(vocabulary=v).update(current=False)
         icnpo_cats = []
         icnpo_group_names = set()
         for r in self.get_csv(icnpo):
@@ -44,7 +54,7 @@ class Command(BaseCommand):
         icnpo_groups = {}
         for i in icnpo_group_names:
             ve, _ = VocabularyEntries.objects.update_or_create(
-                code=i, vocabulary=v, defaults={"title": i}
+                code=i, vocabulary=v, defaults={"title": i, "current": True}
             )
             icnpo_groups[i] = ve
 
@@ -55,6 +65,7 @@ class Command(BaseCommand):
                 defaults={
                     "title": r["icnpo_desc"],
                     "parent": icnpo_groups[r["icnpo_group"]],
+                    "current": True,
                 },
             )
 
@@ -65,6 +76,7 @@ class Command(BaseCommand):
             title="International Classification of Non-profit and Third Sector Organizations (ICNP/TSO)",
             defaults=dict(single=False),
         )
+        VocabularyEntries.objects.filter(vocabulary=v).update(current=False)
         cache = {}
         for r in self.get_csv(icnptso, encoding="utf-8-sig"):
             if not r.get("Sub-group") and not r.get("Group"):
@@ -79,7 +91,7 @@ class Command(BaseCommand):
             ve, _ = VocabularyEntries.objects.update_or_create(
                 code=code,
                 vocabulary=v,
-                defaults={"title": r.get("Title"), "parent": parent},
+                defaults={"title": r.get("Title"), "parent": parent, "current": True},
             )
             cache[code] = ve
 
@@ -93,11 +105,14 @@ class Command(BaseCommand):
                 "single": False,
             },
         )
+        VocabularyEntries.objects.filter(vocabulary=vocab).update(current=False)
 
         cache = {}
         for row in self.get_csv(ukcat, encoding="utf-8-sig"):
             vocab_entry, _ = VocabularyEntries.objects.update_or_create(
-                vocabulary=vocab, code=row["Code"], defaults={"title": row["tag"]}
+                vocabulary=vocab,
+                code=row["Code"],
+                defaults={"title": row["tag"], "current": True},
             )
             cache[row["tag"]] = {
                 "entry": vocab_entry,

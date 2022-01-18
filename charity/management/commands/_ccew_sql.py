@@ -195,14 +195,29 @@ on conflict (charity_id, name) do nothing;
 """
 
 UPDATE_CCEW[
+    "Update charity classification to set current as false"
+] = """
+update ftc_vocabularyentries
+set current = false
+where vocabulary_id in (
+    select id from ftc_vocabulary where title in (
+        'ccew_theme',
+        'ccew_activities',
+        'ccew_beneficiaries'
+    )
+);
+"""
+
+UPDATE_CCEW[
     "Insert charity classification into vocabs"
 ] = """
-insert into charity_vocabularyentries (code, title, vocabulary_id)
+insert into ftc_vocabularyentries (code, title, vocabulary_id, current)
 select c.classification_code as "code",
     c.classification_description as "title",
-    cv.id
+    cv.id,
+    true
 from charity_ccewcharityclassification c
-    inner join charity_vocabulary cv
+    inner join ftc_vocabulary cv
         on case when c.classification_type = 'What' then 'ccew_theme'
             when c.classification_type = 'How' then 'ccew_activities'
             when c.classification_type = 'Who' then 'ccew_beneficiaries'
@@ -211,7 +226,7 @@ group by c.classification_code,
     c.classification_description,
     cv.id
 on conflict (code, vocabulary_id) do update
-set title = EXCLUDED.title;
+set title = EXCLUDED.title, current = true;
 """
 
 UPDATE_CCEW[
@@ -225,9 +240,9 @@ from (
         cast(c.classification_code as varchar) as "c_class"
     from charity_ccewcharityclassification c
 ) as c_class
-    inner join charity_vocabularyentries ve
+    inner join ftc_vocabularyentries ve
         on c_class.c_class = ve.code
-    inner join charity_vocabulary v
+    inner join ftc_vocabulary v
         on ve.vocabulary_id = v.id
 where v.title like 'ccew_%'
 on conflict (charity_id, vocabularyentries_id) do nothing;

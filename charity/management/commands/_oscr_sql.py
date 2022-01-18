@@ -112,7 +112,7 @@ on conflict (charity_id, name) do nothing;
 UPDATE_OSCR[
     "Add vocabulary records"
 ] = """
-insert into charity_vocabulary (title, single)
+insert into ftc_vocabulary (title, single)
 select field, false
 from (
     select cc.org_id as org_id,
@@ -138,10 +138,24 @@ on conflict (title) do nothing;
 """
 
 UPDATE_OSCR[
+    "Update vocabulary entries to set current as false"
+] = """
+update ftc_vocabularyentries
+set current = false
+where vocabulary_id in (
+    select id from ftc_vocabulary where title in (
+        'oscr_purposes',
+        'oscr_activities',
+        'oscr_beneficiaries'
+    )
+);
+"""
+
+UPDATE_OSCR[
     "Add vocabulary entries"
 ] = """
-insert into charity_vocabularyentries (code, title, vocabulary_id)
-select regexp_replace(lower(value), '[^a-z]+', '-', 'g'),  value, v.id
+insert into ftc_vocabularyentries (code, title, vocabulary_id, current)
+select regexp_replace(lower(value), '[^a-z]+', '-', 'g'),  value, v.id, true
 from (
     select field, value, count(*) as records
     from (
@@ -165,10 +179,11 @@ from (
     ) as a
     group by field, value
 ) as b
-    inner join charity_vocabulary v
+    inner join ftc_vocabulary v
         on b.field = v.title
 order by id, records
-on conflict (code, vocabulary_id) do nothing;
+on conflict (code, vocabulary_id) do update
+set title = EXCLUDED.title, current = true;
 """
 
 UPDATE_OSCR[
@@ -196,9 +211,9 @@ from (
     from charity_charityraw cc
     where cc.spider = 'oscr'
 ) as a
-    left outer join charity_vocabulary v
+    left outer join ftc_vocabulary v
         on a.field = v.title
-    left outer join charity_vocabularyentries ve
+    left outer join ftc_vocabularyentries ve
         on a.value = ve.title and v.id = ve.vocabulary_id
 on conflict (charity_id, vocabularyentries_id) do nothing;
 """
