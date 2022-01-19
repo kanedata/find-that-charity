@@ -1,6 +1,6 @@
 
 {% set partb_tables = {
-    "Charity Income": {
+    "Charity income": {
         "inc_leg": "Legacies",
         "inc_end": "Endowment",
         "inc_vol": "Voluntary income",
@@ -10,7 +10,7 @@
         "inc_other": "Other income",
         "inc_total": "Total income",
     },
-    "Charity Spending": {
+    "Charity spending": {
         "exp_vol": "Voluntary income costs",
         "exp_trade": "Fundraising Trading costs",
         "exp_gen": "Cost of generating funds",
@@ -21,12 +21,12 @@
         "exp_other": "Other resources expended",
         "exp_total": "Total Resources expended",
     },
-    "Charity Other expenditure": {
+    "Other charity spending": {
         "exp_support": "Support costs",
         "exp_dep": "Depreciation",
         "exp_total": "Total Resources expended",
     },
-    "Charity Assets": {
+    "Charity assets": {
         "asset_close": "Total fixed assets",
         "fixed_assets": "Fixed Investments Assets",
         "invest_assets": "Current Investment Assets",
@@ -37,17 +37,17 @@
         "pension_assets": "Pension Assets/Liabilities",
         "funds_total": "Total Net Assets/Liabilities",
     },
-    "Charity Funds": {
+    "Charity funds": {
         "funds_end": "Endowment funds",
         "funds_restrict": "Restricted funds",
         "funds_unrestrict": "Unrestricted funds",
         "funds_total": "Total funds",
     },
-    "Charity Reserves": {
+    "Charity reserves": {
         "reserves": "Reserves (£)",
         "reserves_months": "Reserves (as months of expenditure)",
     },
-    "Charity People": {
+    "People": {
         "employees": "Employees",
         "volunteers": "Volunteers",
     }
@@ -56,19 +56,6 @@
 {% if charity.financial.count() %}
   {% set finances = charity.financial.order_by('fyend').all() %}
   {% call org_panel("Charity financial history", org) %}
-
-    {# {% if charity.has_ccew_partb %}
-    <nav class="tabs mb4 cf">
-      <ul class="list ma0 pa0 flex bb bw2 b--gray pb1">
-        <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="charity-financials" data-tabactive="true">Charity financials</a></li>
-        {% for table, fields in partb_tables.items() %}
-        <li class="mr2"><a class="link pa2 underline-hover" href="#" data-tabid="{{ table|slugify }}">{{ table }}</a></li>
-        {% endfor %}
-      </ul>
-    </nav>
-    {% endif %} #}
-
-      
       <div class="w-100 cf" id="charity-financials">
       <div class="w-100 w-50-ns fl">
       <table class="table collapse financial-table">
