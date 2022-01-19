@@ -7,6 +7,8 @@ from django.db import models
 from django.urls import reverse
 from django_better_admin_arrayfield.models.fields import ArrayField
 
+from ftc.models.organisation_classification import OrganisationClassification
+
 from .organisation_link import OrganisationLink
 from .organisation_location import OrganisationLocation
 from .orgid import OrgidField
@@ -224,6 +226,14 @@ class Organisation(models.Model):
     @property
     def locations(self):
         return OrganisationLocation.objects.filter(org_id=self.org_id)
+
+    @property
+    def classifications(self):
+        classes = OrganisationClassification.objects.filter(org_id=self.org_id).all()
+        return {
+            vocab: [v for v in classes if v.vocabulary.vocabulary == vocab]
+            for vocab in set(v.vocabulary.vocabulary for v in classes)
+        }
 
     def get_priority(self):
         if self.org_id.scheme in OrgidScheme.PRIORITIES:

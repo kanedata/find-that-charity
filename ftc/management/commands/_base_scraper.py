@@ -136,11 +136,11 @@ class BaseScraper(BaseCommand):
             )
 
         # save any orgtypes
-        self.logger.info("Saving orgtypes")
         if self.orgtypes:
+            self.logger.info("Saving orgtypes")
             for o in self.orgtypes:
                 self.add_org_type(o)
-        self.logger.info("orgtypes saved")
+            self.logger.info("orgtypes saved")
 
         # save any sources
         self.logger.info("saving sources")

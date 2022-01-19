@@ -1,4 +1,5 @@
 from .organisation import EXTERNAL_LINKS, Organisation
+from .organisation_classification import OrganisationClassification
 from .organisation_link import OrganisationLink
 from .organisation_location import OrganisationLocation
 from .organisation_type import OrganisationType
@@ -12,6 +13,7 @@ from .vocabulary import Vocabulary, VocabularyEntries
 __all__ = [
     "Organisation",
     "EXTERNAL_LINKS",
+    "OrganisationClassification",
     "OrganisationLink",
     "OrganisationLocation",
     "OrganisationType",
