@@ -1,8 +1,8 @@
 from email.policy import default
-import psycopg2
-from tqdm import tqdm
 
+import psycopg2
 from django.conf import settings
+from tqdm import tqdm
 
 from ftc.management.commands._base_scraper import BaseScraper
 from other_data.models import Grant
