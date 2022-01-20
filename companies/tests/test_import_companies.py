@@ -6,7 +6,7 @@ from django.test import TestCase
 from requests import Response
 from requests_html import HTMLSession
 
-from ftc.management.commands.import_companies import Command
+from companies.management.commands.import_companies import Command
 
 
 class TestImportCompanies(TestCase):

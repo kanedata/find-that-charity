@@ -1,8 +1,10 @@
 # data
 
 data/
-!ftc/tests/data/
-!ftc/tests/data/*.zip
+
+# test data
+!*/tests/data/
+!*/tests/data/*.zip
 
 # djangofiles
 /static/

@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "geo.apps.GeoConfig",
     "other_data.apps.OtherDataConfig",
     "api.apps.ApiConfig",
+    "companies.apps.CompaniesConfig",
     "django_elasticsearch_dsl",
     "django.contrib.postgres",
     "django.contrib.admin",

@@ -1,14 +1,14 @@
-from .organisation import EXTERNAL_LINKS, Organisation
-from .organisation_classification import OrganisationClassification
-from .organisation_link import OrganisationLink
-from .organisation_location import OrganisationLocation
-from .organisation_type import OrganisationType
-from .orgid import Orgid, OrgidField
-from .orgid_scheme import OrgidScheme
-from .related_organisation import RelatedOrganisation
-from .scrape import Scrape
-from .source import Source
-from .vocabulary import Vocabulary, VocabularyEntries
+from ftc.models.organisation import EXTERNAL_LINKS, Organisation
+from ftc.models.organisation_classification import OrganisationClassification
+from ftc.models.organisation_link import OrganisationLink
+from ftc.models.organisation_location import OrganisationLocation
+from ftc.models.organisation_type import OrganisationType
+from ftc.models.orgid import Orgid, OrgidField
+from ftc.models.orgid_scheme import OrgidScheme
+from ftc.models.related_organisation import RelatedOrganisation
+from ftc.models.scrape import Scrape
+from ftc.models.source import Source
+from ftc.models.vocabulary import Vocabulary, VocabularyEntries
 
 __all__ = [
     "Organisation",
@@ -23,4 +23,6 @@ __all__ = [
     "RelatedOrganisation",
     "Scrape",
     "Source",
+    "Vocabulary",
+    "VocabularyEntries",
 ]

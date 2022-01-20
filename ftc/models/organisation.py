@@ -8,11 +8,10 @@ from django.urls import reverse
 from django_better_admin_arrayfield.models.fields import ArrayField
 
 from ftc.models.organisation_classification import OrganisationClassification
-
-from .organisation_link import OrganisationLink
-from .organisation_location import OrganisationLocation
-from .orgid import OrgidField
-from .orgid_scheme import OrgidScheme
+from ftc.models.organisation_link import OrganisationLink
+from ftc.models.organisation_location import OrganisationLocation
+from ftc.models.orgid import OrgidField
+from ftc.models.orgid_scheme import OrgidScheme
 
 EXTERNAL_LINKS = {
     "GB-CHC": [
