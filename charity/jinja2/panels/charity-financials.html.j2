@@ -1,6 +1,9 @@
 
 {% set partb_tables = {
     "Charity income": {
+        "_description": """The type of income received by this charity, as recorded in this charities' returns
+        to the Charity Commission. Figures are in £""",
+        "_note": """Only available in years when the charities' income exceeded a threshold.""",
         "inc_leg": "Legacies",
         "inc_end": "Endowment",
         "inc_vol": "Voluntary income",
@@ -11,6 +14,9 @@
         "inc_total": "Total income",
     },
     "Charity spending": {
+        "_description": """A breakdown of spending made by this charity, as recorded in this charities' returns
+        to the Charity Commission.""",
+        "_note": """Only available in years when the charities' income exceeded a threshold.""",
         "exp_vol": "Voluntary income costs",
         "exp_trade": "Fundraising Trading costs",
         "exp_gen": "Cost of generating funds",
@@ -21,14 +27,10 @@
         "exp_other": "Other resources expended",
         "exp_total": "Total Resources expended",
     },
-    "Other charity spending": {
-        "exp_support": "Support costs",
-        "exp_dep": "Depreciation",
-        "exp_total": "Total Resources expended",
-    },
     "Charity assets": {
-        "asset_close": "Total fixed assets",
+        "_description": """Assets held by the charity""",
         "fixed_assets": "Fixed Investments Assets",
+        "asset_close": "Total fixed assets",
         "invest_assets": "Current Investment Assets",
         "cash_assets": "Cash",
         "current_assets": "Total Current Assets",
@@ -38,16 +40,19 @@
         "funds_total": "Total Net Assets/Liabilities",
     },
     "Charity funds": {
+        "_description": """ """,
         "funds_end": "Endowment funds",
         "funds_restrict": "Restricted funds",
         "funds_unrestrict": "Unrestricted funds",
         "funds_total": "Total funds",
     },
     "Charity reserves": {
+        "_description": """ """,
         "reserves": "Reserves (£)",
         "reserves_months": "Reserves (as months of expenditure)",
     },
     "People": {
+        "_description": """ """,
         "employees": "Employees",
         "volunteers": "Volunteers",
     }
@@ -108,17 +113,20 @@
       {% call org_panel(table, org) %}
       <div  id="{{ table|slugify }}">
       {# <h3>{{table}}</h3> #}
+      {% if fields["_description"] %}
+      <p>{{ fields["_description"] }}</p>
+      {% endif %}
       <div class="table-wrapper">
       <table class="financial-table">
         <thead>
           <tr>
             <th rowspan="2" class="sticky left-0 bg-white">Financial year end</th>
-            {% for field in fields %}
+            {% for field in fields if not field.startswith("_") %}
             <th class="bw0">{{ fields[field] }}</th>
             {% endfor %}
           </tr>
           <tr>
-            {% for field in fields %}
+            {% for field in fields if not field.startswith("_") %}
             <th>
               <canvas id="sparkline-{{field}}" data-field="{{field}}" class="sparkline mw4 fr" width="100" height="30"></canvas>
             </th>
@@ -130,7 +138,7 @@
             <tr>
                 <th class="sticky left-0 bg-white">{{ f.fyend }}</th>
                 {% if f.has_ccew_partb %}
-                    {% for field in fields %}
+                    {% for field in fields if not field.startswith("_") %}
                         {% if f[field] %}
                             {% if field == 'reserves_months' %}
                             <td>{{ "{:,.1f}".format(f[field]) }}</td>
@@ -149,6 +157,9 @@
         </tbody>
       </table>
       </div>
+      {% if fields["_note"] %}
+      <p>{{ fields["_note"] }}</p>
+      {% endif %}
       </div>
       {% endcall %}
       {% endfor %}
