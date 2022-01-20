@@ -22,6 +22,7 @@ import charity.urls
 import ftc.urls
 import ftc.views
 import reconcile.urls
+import companies.urls
 from api.endpoints import api
 
 urlpatterns = [
@@ -33,6 +34,7 @@ urlpatterns = [
     path("api/v1/", api.urls),
     path("orgid/", include(ftc.urls)),
     path("charity/", include(charity.urls)),
+    path("company/", include(companies.urls)),
     path("reconcile/", include(reconcile.urls)),
     path("reconcile", reconcile.views.index, {"orgtype": "registered-charity"}),
     path("dashboard/", include(django_sql_dashboard.urls)),

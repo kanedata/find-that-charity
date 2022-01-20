@@ -10,8 +10,18 @@ import tqdm
 from django.core import management
 from requests_html import HTMLSession
 
+from companies.models import Company, CompanyCategoryChoices, PreviousName, SICCode
 from ftc.management.commands._base_scraper import CSVScraper
-from ftc.models import Organisation
+from ftc.models import (
+    Organisation,
+    OrganisationLink,
+    OrganisationLocation,
+    Vocabulary,
+    VocabularyEntries,
+    vocabulary,
+)
+
+from ._company_sql import UPDATE_COMPANIES
 
 
 class Command(CSVScraper):
@@ -21,37 +31,20 @@ class Command(CSVScraper):
     zip_regex = re.compile(r".*/BasicCompanyData-.*\.zip")
     org_id_prefix = "GB-COH"
     clg_types = [
-        "PRI/LBG/NSC (Private, Limited by guarantee, no share capital, use of 'Limited' exemption)",
-        "PRI/LTD BY GUAR/NSC (Private, limited by guarantee, no share capital)",
+        CompanyCategoryChoices.CLG_LIMITED,
+        CompanyCategoryChoices.CLG,
     ]
     orgtypes = [
         "Registered Company",
-        "Charitable Incorporated Organisation",
-        "Community Interest Company",
         "Company Limited by Guarantee",
-        # "Converted/Closed",
-        # "European Public Limited-Liability Company (SE)",
-        "Industrial and Provident Society",
-        # "Investment Company with Variable Capital",
-        # "Investment Company with Variable Capital (Securities)",
-        # "Investment Company with Variable Capital(Umbrella)",
-        # "Limited Liability Partnership",
-        # "Limited Partnership",
-        # "Old Public Company",
-        # "Other Company Type",
-        # "Other company type",
-        "PRI/LBG/NSC (Private, Limited by guarantee, no share capital, use of 'Limited' exemption)",
-        "PRI/LTD BY GUAR/NSC (Private, limited by guarantee, no share capital)",
-        # "PRIV LTD SECT. 30 (Private limited company, section 30 of the Companies Act)",
-        # "Private Limited Company",
-        # "Private Unlimited",
-        # "Private Unlimited Company",
-        # "Protected Cell Company",
-        # "Public Limited Company",
-        "Registered Society",
-        "Royal Charter Company",
-        "Scottish Charitable Incorporated Organisation",
-        # "Scottish Partnership",
+        CompanyCategoryChoices.CIO,  # "Charitable Incorporated Organisation"
+        CompanyCategoryChoices.CIC,  # "Community Interest Company"
+        CompanyCategoryChoices.IPS,  # "Industrial and Provident Society"
+        CompanyCategoryChoices.CLG_LIMITED,  # "PRI/LBG/NSC (Private, Limited by guarantee, no share capital, use of 'Limited' exemption)"
+        CompanyCategoryChoices.CLG,  # "PRI/LTD BY GUAR/NSC (Private, limited by guarantee, no share capital)"
+        CompanyCategoryChoices.RS,  # "Registered Society"
+        CompanyCategoryChoices.RC,  # "Royal Charter Company"
+        CompanyCategoryChoices.SCIO,  # "Scottish Charitable Incorporated Organisation"
     ]
     id_field = "CompanyNumber"
     date_fields = [
@@ -82,8 +75,21 @@ class Command(CSVScraper):
         },
         "distribution": [],
     }
+    models_to_delete = [
+        Organisation,
+        OrganisationLink,
+        OrganisationLocation,
+        Company,
+        SICCode,
+        PreviousName,
+    ]
+    post_sql = UPDATE_COMPANIES
 
     def handle(self, *args, **options):
+        self.sic_cache = {}
+        self.vocab = Vocabulary.objects.get_or_create(
+            title="Companies House SIC Codes", single=False
+        )[0]
         super().handle()
         management.call_command("update_orgids")
 
@@ -118,9 +124,6 @@ class Command(CSVScraper):
                         io.TextIOWrapper(csvfile, encoding="latin1")
                     )
                     for row in tqdm.tqdm(reader):
-                        # We only want data from a subset of companies
-                        if row.get("CompanyCategory") not in self.orgtypes:
-                            continue
                         self.parse_row(row)
         response = None
 
@@ -128,8 +131,11 @@ class Command(CSVScraper):
         row = {k.strip().replace(".", "_"): row[k] for k in row}
         row = self.clean_fields(row)
 
-        if row.get("CompanyCategory") in self.clg_types:
-            row["CompanyCategory"] = "Company Limited by Guarantee"
+        company_category = (
+            "Company Limited by Guarantee"
+            if row.get("CompanyCategory") in self.clg_types
+            else row.get("CompanyCategory")
+        )
 
         previous_names = {}
         sic_codes = []
@@ -155,6 +161,14 @@ class Command(CSVScraper):
                     sic_codes.append(
                         {"code": sic_code[0].strip(), "name": sic_code[1].strip()}
                     )
+                    if sic_code[0].strip() not in self.sic_cache:
+                        vocab_entry = VocabularyEntries.objects.get_or_create(
+                            vocabulary=self.vocab,
+                            code=sic_code[0].strip(),
+                            title=sic_code[1].strip(),
+                            current=True,
+                        )
+                        self.sic_cache[sic_code[0].strip()] = vocab_entry
             else:
                 record[k] = row[k]
 
@@ -172,9 +186,48 @@ class Command(CSVScraper):
                 address1.append(record.get(f))
 
         orgtypes = [
+            self.add_org_type(company_category),
             self.orgtype_cache["registered-company"],
-            self.add_org_type(record.get("CompanyCategory")),
         ]
+
+        self.add_record(
+            Company,
+            {
+                **{
+                    k: v
+                    for k, v in record.items()
+                    if k not in ("sic_codes", "previous_names")
+                },
+                "org_id": self.get_org_id(record),
+                "scrape": self.scrape,
+                "spider": self.name,
+            },
+        )
+        for n in record["previous_names"]:
+            self.add_record(
+                PreviousName,
+                {
+                    "org_id": self.get_org_id(record),
+                    "CompanyName": n["CompanyName"],
+                    "ConDate": n["CONDATE"],
+                    "scrape": self.scrape,
+                    "spider": self.name,
+                },
+            )
+        for s in record["sic_codes"]:
+            self.add_record(
+                SICCode,
+                {
+                    "org_id": self.get_org_id(record),
+                    "code": s["code"],
+                    "scrape": self.scrape,
+                    "spider": self.name,
+                },
+            )
+
+        # We only want data from a subset of companies
+        if row.get("CompanyCategory") not in self.orgtypes:
+            return
 
         self.add_org_record(
             Organisation(
@@ -193,9 +246,7 @@ class Command(CSVScraper):
                     "email": None,
                     "description": None,
                     "organisationType": [o.slug for o in orgtypes],
-                    "organisationTypePrimary": self.add_org_type(
-                        record.get("CompanyCategory")
-                    ),
+                    "organisationTypePrimary": orgtypes[0],
                     "url": None,
                     "latestIncome": None,
                     "dateModified": datetime.datetime.now(),

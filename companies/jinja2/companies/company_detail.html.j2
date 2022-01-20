@@ -1,0 +1,16 @@
+{% extends 'base.html.j2' %}
+{% from 'components/org_id.html.j2' import orgid_link %}
+
+{% block title %} | {{ heading }}{% endblock %}
+
+{% block header %}
+{% include 'panels/company-header.html.j2' %}
+{% endblock %}
+
+{% block content %}
+
+<div class="w-100 w-80-ns fl">
+  {% include 'panels/company-details.html.j2' %}
+</div>
+
+{% endblock %}
