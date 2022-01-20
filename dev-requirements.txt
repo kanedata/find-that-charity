@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements.txt
     #   pyppeteer
-asgiref==3.3.4
+asgiref==3.4.1
     # via
     #   -r requirements.txt
     #   django
@@ -52,7 +52,7 @@ decorator==5.0.7
     #   validators
 dj-database-url==0.5.0
     # via -r requirements.txt
-django==3.2.5
+django==3.2.11
     # via
     #   -r requirements.txt
     #   django-cors-headers
@@ -120,7 +120,7 @@ lml==0.1.0
     # via
     #   -r requirements.txt
     #   pyexcel-io
-lxml==4.6.3
+lxml==4.6.5
     # via
     #   -r requirements.txt
     #   pyexcel-ezodf
@@ -237,7 +237,7 @@ soupsieve==2.2.1
     # via
     #   -r requirements.txt
     #   beautifulsoup4
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via
     #   -r requirements.txt
     #   django
