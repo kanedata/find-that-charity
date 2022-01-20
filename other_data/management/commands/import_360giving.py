@@ -1,5 +1,8 @@
+from email.policy import default
 import psycopg2
 from tqdm import tqdm
+
+from django.conf import settings
 
 from ftc.management.commands._base_scraper import BaseScraper
 from other_data.models import Grant
@@ -53,7 +56,8 @@ class Command(BaseScraper):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "db-con",
+            "--db-con",
+            default=settings.DATASTORE_360GIVING_URL,
             help="Database connection string",
         )
 
@@ -62,7 +66,7 @@ class Command(BaseScraper):
 
         # setup database connection
         self.logger.info("Connecting to database")
-        self.connection = psycopg2.connect(options["db-con"])
+        self.connection = psycopg2.connect(options["db_con"])
         self.cursor = self.connection.cursor()
 
         # run the query

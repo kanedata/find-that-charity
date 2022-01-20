@@ -156,6 +156,9 @@ ELASTICSEARCH_DSL = {
     "default": {"hosts": os.environ.get("ELASTICSEARCH_URL")},
 }
 
+# 360Giving datastore url
+
+DATASTORE_360GIVING_URL = os.environ.get("360GIVING_DATASTORE_URL")
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
