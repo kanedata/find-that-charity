@@ -25,11 +25,22 @@
   
   <div class="w-100 w-20-l fl">
     <p class="cf">
-    {# <a href="{{ url('orgid_json', kwargs={'org_id': org.org_id}) }}"
+    {% if org %}
+    <a href="{{ url('orgid_json', kwargs={'org_id': org.org_id}) }}"
        class="link dib bg-dark-green white code underline-hover normal f6 pv0 ph1 br1 fr">Access this data in JSON format</a>
-    </p> #}
+    </p>
+    {% endif %}
     <div class="mv3 w-100 tr">
-      <div class="mb1">{{ orgid_link(company.org_id, true, copy=true) }}</div>
+      {% if org %}
+      <div class="mb1">{{ orgid_link(org.org_id, true, copy=true) }}</div>
+      {% else %}
+      <div class="mb1">
+        <span class="dib nowrap bg-dark-blue f4 pv1 ph2 br2"><span
+   class="white code normal nowrap">{{ company.org_id}}</span>
+<a class="copy-text pointer f6 grow" data-target="{{ company.org_id}}" title="Copy this identifier to your clipboard">
+<svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 24 24" width="16px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></a></span>
+      </div>
+      {% endif %}
       <div class="f6 mt4 br2 h-100 pa2 bg-washed-red tl">
         <p class="mt0">Find that Charity displays records of organisations that use other legal forms, as well
         as registered charities.</p>

@@ -1,6 +1,6 @@
 from django.db import models
 
-from ftc.models import OrgidField
+from ftc.models import EXTERNAL_LINKS, OrgidField
 
 
 class SICCode(models.Model):
@@ -162,3 +162,8 @@ class Company(models.Model):
 
     def __str__(self):
         return "<Company {} [{}]>".format(self.CompanyName, self.CompanyNumber)
+
+    def get_links(self):
+        links = EXTERNAL_LINKS.get("GB-COH", [])
+        for link in links:
+            yield (link[0].format(self.org_id), link[1])

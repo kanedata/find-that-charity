@@ -7,10 +7,41 @@
 {% include 'panels/company-header.html.j2' %}
 {% endblock %}
 
+{% block bodyscripts %}
+{{ super() }}
+<script>
+  // copy text
+  document.querySelectorAll(".copy-text").forEach((el) => {
+    if(el.dataset.target){
+      el.onclick = (ev)=>{
+        ev.preventDefault();
+        navigator.clipboard.writeText(ev.target.dataset.target).then(()=> {
+          const toast = document.createElement("span");
+          toast.classList = ['ml2 pa1 bg-dark-gray white f7 br2 absolute']
+          toast.innerText = "Copied!";
+          ev.target.after(toast); 
+          setTimeout(() => {
+              toast.parentNode.removeChild(toast);
+          }, 2000);
+        });
+      };
+    }
+  });
+</script>
+{% endblock %}
+
 {% block content %}
 
+{% block organisation_links %}
 <div class="w-100 w-80-ns fl">
   {% include 'panels/company-details.html.j2' %}
 </div>
+{% endblock %}
+
+{% block external_links %}
+<div class="w-100 w-20-l fl">
+  {% include 'panels/company-external-links.html.j2' %}
+</div>
+{% endblock %}
 
 {% endblock %}
