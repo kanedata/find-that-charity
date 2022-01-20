@@ -5,6 +5,7 @@ django-elasticsearch-dsl
 django-environ
 django-prettyjson
 django-filter
+django-markdownx
 django-composite-foreignkey
 django-widget-tweaks
 dj-database-url

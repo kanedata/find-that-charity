@@ -1,13 +1,21 @@
 from django.db import models
 from django.utils.text import slugify
+from markdownx.models import MarkdownxField
 
 
 class Vocabulary(models.Model):
+    slug = models.SlugField(max_length=200, unique=True, null=True)
     title = models.CharField(max_length=255, db_index=True, unique=True)
-    single = models.BooleanField()
+    description = MarkdownxField(blank=True, null=True)
+    single = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super(Vocabulary, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Vocabulary"

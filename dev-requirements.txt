@@ -57,6 +57,7 @@ django==3.2.11
     #   -r requirements.txt
     #   django-cors-headers
     #   django-filter
+    #   django-markdownx
     #   django-ninja
     #   django-prettyjson
     #   django-sql-dashboard
@@ -71,6 +72,8 @@ django-elasticsearch-dsl==7.1.4
 django-environ==0.4.5
     # via -r requirements.txt
 django-filter==2.4.0
+    # via -r requirements.txt
+django-markdownx==3.0.1
     # via -r requirements.txt
 django-ninja==0.13.2
     # via -r requirements.txt
@@ -129,6 +132,7 @@ lxml==4.6.5
 markdown==3.3.4
     # via
     #   -r requirements.txt
+    #   django-markdownx
     #   django-sql-dashboard
 markupsafe==1.1.1
     # via
@@ -150,6 +154,10 @@ parse==1.19.0
     #   requests-html
 pathspec==0.9.0
     # via black
+pillow==9.0.0
+    # via
+    #   -r requirements.txt
+    #   django-markdownx
 platformdirs==2.4.1
     # via black
 psycopg2==2.8.6

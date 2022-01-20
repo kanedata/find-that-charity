@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "markdownx",
     "prettyjson",
     "django_better_admin_arrayfield",
     "django_filters",

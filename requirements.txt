@@ -36,6 +36,7 @@ django==3.2.11
     #   -r requirements.in
     #   django-cors-headers
     #   django-filter
+    #   django-markdownx
     #   django-ninja
     #   django-prettyjson
     #   django-sql-dashboard
@@ -50,6 +51,8 @@ django-elasticsearch-dsl==7.1.4
 django-environ==0.4.5
     # via -r requirements.in
 django-filter==2.4.0
+    # via -r requirements.in
+django-markdownx==3.0.1
     # via -r requirements.in
 django-ninja==0.13.2
     # via -r requirements.in
@@ -88,7 +91,9 @@ lxml==4.6.5
     #   pyexcel-ods3
     #   pyquery
 markdown==3.3.4
-    # via django-sql-dashboard
+    # via
+    #   django-markdownx
+    #   django-sql-dashboard
 markupsafe==1.1.1
     # via jinja2
 openpyxl==3.0.7
@@ -97,6 +102,8 @@ packaging==20.9
     # via bleach
 parse==1.19.0
     # via requests-html
+pillow==9.0.0
+    # via django-markdownx
 psycopg2==2.8.6
     # via -r requirements.in
 pycountry==20.7.3

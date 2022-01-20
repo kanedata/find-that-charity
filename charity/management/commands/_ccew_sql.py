@@ -200,7 +200,7 @@ UPDATE_CCEW[
 update ftc_vocabularyentries
 set current = false
 where vocabulary_id in (
-    select id from ftc_vocabulary where title in (
+    select id from ftc_vocabulary where slug in (
         'ccew_theme',
         'ccew_activities',
         'ccew_beneficiaries'
@@ -221,7 +221,7 @@ from charity_ccewcharityclassification c
         on case when c.classification_type = 'What' then 'ccew_theme'
             when c.classification_type = 'How' then 'ccew_activities'
             when c.classification_type = 'Who' then 'ccew_beneficiaries'
-            else null end = cv.title
+            else null end = cv.slug
 group by c.classification_code,
     c.classification_description,
     cv.id
@@ -244,7 +244,7 @@ from (
         on c_class.c_class = ve.code
     inner join ftc_vocabulary v
         on ve.vocabulary_id = v.id
-where v.title like 'ccew_%'
+where v.slug like 'ccew_%'
 on conflict (charity_id, vocabularyentries_id) do nothing;
 """
 

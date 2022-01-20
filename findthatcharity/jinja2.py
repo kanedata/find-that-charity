@@ -7,6 +7,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.text import slugify
 from humanize import naturaldelta
+from markdownx.utils import markdownify
 
 from findthatcharity.utils import (
     a_or_an,
@@ -135,6 +136,7 @@ def environment(**options):
             "format_currency": format_currency,
             "str_format": str_format,
             "a_or_an": a_or_an,
+            "markdown": markdownify,
         }
     )
     return env

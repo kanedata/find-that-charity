@@ -38,4 +38,5 @@ urlpatterns = [
     path("reconcile/", include(reconcile.urls)),
     path("reconcile", reconcile.views.index, {"orgtype": "registered-charity"}),
     path("dashboard/", include(django_sql_dashboard.urls)),
+    path("markdownx/", include("markdownx.urls")),
 ]

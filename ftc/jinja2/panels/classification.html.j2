@@ -2,6 +2,9 @@
   {% call org_panel("Classification", org) %}
     {% for vocab, entries in org.classifications.items() %}
     <h4>{{ vocab.title }}</h4>
+    {% if vocab.description %}
+    <div>{{ vocab.description|markdown|safe }}</div>
+    {% endif %}
     <ul>
       {% for entry in entries %}
         <li>{{ entry.vocabulary.title }} <code>{{ entry.vocabulary.code }}</code></li>

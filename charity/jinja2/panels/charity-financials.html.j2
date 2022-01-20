@@ -62,8 +62,8 @@
   {% set finances = charity.financial.order_by('fyend').all() %}
   {% call org_panel("Charity financial history", org) %}
       <div class="w-100 cf" id="charity-financials">
-      <div class="w-100 w-50-ns fl">
-      <table class="table collapse financial-table">
+      <div class="w-100 w-50-ns fl pr4-ns">
+      <table class="table collapse">
         <tr>
           <th>Year ending</th>
           <th>Income (£)</th>
@@ -117,7 +117,7 @@
       <p>{{ fields["_description"] }}</p>
       {% endif %}
       <div class="table-wrapper">
-      <table class="financial-table">
+      <table class="table collapse financial-table">
         <thead>
           <tr>
             <th rowspan="2" class="sticky left-0 bg-white">Financial year end</th>

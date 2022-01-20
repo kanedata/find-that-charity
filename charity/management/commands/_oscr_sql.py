@@ -112,8 +112,8 @@ on conflict (charity_id, name) do nothing;
 UPDATE_OSCR[
     "Add vocabulary records"
 ] = """
-insert into ftc_vocabulary (title, single)
-select field, false
+insert into ftc_vocabulary (title, slug, single)
+select field, field, false
 from (
     select cc.org_id as org_id,
         'oscr_purposes' as "field",
@@ -134,7 +134,7 @@ from (
     where cc.spider = 'oscr'
 ) as a
 group by field
-on conflict (title) do nothing;
+on conflict (slug) do nothing;
 """
 
 UPDATE_OSCR[
@@ -143,7 +143,7 @@ UPDATE_OSCR[
 update ftc_vocabularyentries
 set current = false
 where vocabulary_id in (
-    select id from ftc_vocabulary where title in (
+    select id from ftc_vocabulary where slug in (
         'oscr_purposes',
         'oscr_activities',
         'oscr_beneficiaries'
@@ -180,7 +180,7 @@ from (
     group by field, value
 ) as b
     inner join ftc_vocabulary v
-        on b.field = v.title
+        on b.field = v.slug
 order by id, records
 on conflict (code, vocabulary_id) do update
 set title = EXCLUDED.title, current = true;
@@ -212,7 +212,7 @@ from (
     where cc.spider = 'oscr'
 ) as a
     left outer join ftc_vocabulary v
-        on a.field = v.title
+        on a.field = v.slug
     left outer join ftc_vocabularyentries ve
         on a.value = ve.title and v.id = ve.vocabulary_id
 on conflict (charity_id, vocabularyentries_id) do nothing;

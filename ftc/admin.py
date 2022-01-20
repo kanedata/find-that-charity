@@ -145,7 +145,7 @@ class VocabularyEntriesInline(admin.TabularInline):
 
 class VocabularyAdmin(JSONFieldAdmin):
     list_display = ("title", "entries")
-    inlines = [VocabularyEntriesInline]
+    # inlines = [VocabularyEntriesInline]
 
     def entries(self, obj):
         return obj.entries.count()
