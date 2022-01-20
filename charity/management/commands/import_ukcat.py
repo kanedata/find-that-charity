@@ -69,7 +69,7 @@ class Command(CSVScraper):
             defaults=dict(
                 title=self.vocab[ICNPTSO]["title"],
                 single=False,
-            )
+            ),
         )
         self.vocab[ICNPTSO]["vocab"] = vocab
         VocabularyEntries.objects.filter(vocabulary=vocab).update(current=False)
@@ -98,7 +98,7 @@ class Command(CSVScraper):
             defaults=dict(
                 title=self.vocab[UKCAT]["title"],
                 single=False,
-            )
+            ),
         )
         self.vocab[UKCAT]["vocab"] = vocab
         VocabularyEntries.objects.filter(vocabulary=vocab).update(current=False)

@@ -18,7 +18,6 @@ from ftc.models import (
     OrganisationLocation,
     Vocabulary,
     VocabularyEntries,
-    vocabulary,
 )
 
 from ._company_sql import UPDATE_COMPANIES
