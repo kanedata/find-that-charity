@@ -65,8 +65,11 @@ class Command(CSVScraper):
     def fetch_icnptso(self):
         self.logger.info("Fetching ICNPTSO")
         vocab, _ = Vocabulary.objects.update_or_create(
-            title=self.vocab[ICNPTSO]["title"],
-            defaults=dict(single=False),
+            slug=ICNPTSO,
+            defaults=dict(
+                title=self.vocab[ICNPTSO]["title"],
+                single=False,
+            )
         )
         self.vocab[ICNPTSO]["vocab"] = vocab
         VocabularyEntries.objects.filter(vocabulary=vocab).update(current=False)
@@ -91,10 +94,11 @@ class Command(CSVScraper):
     def fetch_ukcat(self):
         self.logger.info("Fetching UK-CAT categories")
         vocab, _ = Vocabulary.objects.update_or_create(
-            title=self.vocab[UKCAT]["title"],
-            defaults={
-                "single": False,
-            },
+            slug=UKCAT,
+            defaults=dict(
+                title=self.vocab[UKCAT]["title"],
+                single=False,
+            )
         )
         self.vocab[UKCAT]["vocab"] = vocab
         VocabularyEntries.objects.filter(vocabulary=vocab).update(current=False)

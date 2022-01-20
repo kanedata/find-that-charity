@@ -20,14 +20,14 @@ class Command(BaseCommand):
         ccew = "https://github.com/drkane/charity-lookups/raw/master/classification/ccew.csv"
 
         for f in ("theme", "beneficiaries", "activities"):
-            v, _ = Vocabulary.objects.update_or_create(
-                title="ccew_" + f, defaults=dict(single=False)
+            v, _ = Vocabulary.objects.get_or_create(
+                slug="ccew_" + f, defaults=dict(single=False)
             )
             VocabularyEntries.objects.filter(vocabulary=v).update(current=False)
 
         for r in self.get_csv(ccew):
-            v, _ = Vocabulary.objects.update_or_create(
-                title="ccew_" + r["category"], defaults=dict(single=False)
+            v, _ = Vocabulary.objects.get_or_create(
+                slug="ccew_" + r["category"], defaults=dict(single=False)
             )
             VocabularyEntries.objects.update_or_create(
                 code=r["code"],
@@ -39,6 +39,7 @@ class Command(BaseCommand):
         print("Fetching ICNPO")
         icnpo = "https://github.com/drkane/charity-lookups/raw/master/classification/icnpo.csv"
         v, _ = Vocabulary.objects.update_or_create(
+            slug="icnpo",
             title="International Classification of Non Profit Organisations (ICNPO)",
             defaults=dict(single=False),
         )

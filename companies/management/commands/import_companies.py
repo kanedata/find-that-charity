@@ -83,13 +83,13 @@ class Command(CSVScraper):
         SICCode,
         PreviousName,
     ]
-    post_sql = UPDATE_COMPANIES
 
     def handle(self, *args, **options):
         self.sic_cache = {}
         self.vocab = Vocabulary.objects.get_or_create(
             title="Companies House SIC Codes", single=False
         )[0]
+        self.post_sql = UPDATE_COMPANIES
         super().handle()
         management.call_command("update_orgids")
 
