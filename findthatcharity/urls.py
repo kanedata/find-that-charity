@@ -19,10 +19,10 @@ from django.urls import include, path
 
 import addtocsv.views
 import charity.urls
+import companies.urls
 import ftc.urls
 import ftc.views
 import reconcile.urls
-import companies.urls
 from api.endpoints import api
 
 urlpatterns = [
