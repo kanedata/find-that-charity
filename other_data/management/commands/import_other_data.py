@@ -4,9 +4,9 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
     scrapers = [
-        "cqc",
         "gender_pay_gap",
         "360giving",
+        "cqc",
     ]
 
     def handle(self, *args, **options):
