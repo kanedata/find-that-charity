@@ -54,25 +54,7 @@
 <script src="{{ static('js/locationmap.js') }}"></script>
 {% endif %}
 <script src="{{ static('js/tabs.js') }}"></script>
-<script>
-  // copy text
-  document.querySelectorAll(".copy-text").forEach((el) => {
-    if(el.dataset.target){
-      el.onclick = (ev)=>{
-        ev.preventDefault();
-        navigator.clipboard.writeText(ev.target.dataset.target).then(()=> {
-          const toast = document.createElement("span");
-          toast.classList = ['ml2 pa1 bg-dark-gray white f7 br2 absolute']
-          toast.innerText = "Copied!";
-          ev.target.after(toast); 
-          setTimeout(() => {
-              toast.parentNode.removeChild(toast);
-          }, 2000);
-        });
-      };
-    }
-  });
-</script>
+<script src="{{ static('js/copy-text.js') }}"></script>
 {% endblock %}
 
 {% block header %}
