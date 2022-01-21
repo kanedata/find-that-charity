@@ -22,7 +22,7 @@ urlpatterns = [
     path(
         "all.csv",
         views.orgid_type,
-        {"filetype": "csv"},
+        {"filetype": "csv", "orgtype": None},
         name="orgid_all_download",
     ),
     path(

@@ -177,6 +177,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
             "active": "active",
             "dateModified": "dateModified",
             "orgIDs": "orgIDs",
+            "linked_orgs": "linked_orgs",
             "organisationType": "organisationType",
             "organisationTypePrimary__title": "organisationTypePrimary",
             "source": "source",
