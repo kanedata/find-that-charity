@@ -160,13 +160,6 @@ class BaseScraper(BaseCommand):
         for model, count in self.object_count.items():
             self.logger.info("Found {:,.0f} {} records".format(count, model.__name__))
 
-        # get any link records that need to be created
-        self.logger.info("Getting link records")
-        self.get_link_records()
-        self.logger.info(
-            "Found {:,.0f} link records".format(len(self.records[OrganisationLink]))
-        )
-
         # close the spider
         self.close_spider()
         self.logger.info("Spider finished")
@@ -297,19 +290,31 @@ class BaseScraper(BaseCommand):
         return self.clean_fields(row)
 
     def get_link_records(self):
+        links = set()
+
+        # save existing link records
+        for record in self.records[OrganisationLink]:
+            links.add(tuple(sorted((record.org_id_a, record.org_id_b))))
+        self.records[OrganisationLink] = []
+
+        # fetch any links that need to be created
         for o in self.records[Organisation]:
             for orgid in o.orgIDs:
                 if orgid == o.org_id:
                     continue
-                self.records[OrganisationLink].append(
-                    OrganisationLink(
-                        org_id_a=o.org_id,
-                        org_id_b=orgid,
-                        spider=self.name,
-                        scrape=self.scrape,
-                        source=self.source,
-                    )
+                links.add(tuple(sorted((orgid, o.org_id))))
+
+        # create new link records
+        for link in links:
+            self.records[OrganisationLink].append(
+                OrganisationLink(
+                    org_id_a=link[0],
+                    org_id_b=link[1],
+                    spider=self.name,
+                    scrape=self.scrape,
+                    source=self.source,
                 )
+            )
 
     def get_org_id(self, record):
         return "-".join([self.org_id_prefix, str(record.get(self.id_field))])
