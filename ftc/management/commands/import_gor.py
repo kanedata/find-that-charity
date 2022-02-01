@@ -44,6 +44,13 @@ class Command(CSVScraper):
     def parse_row(self, record):
 
         record = self.clean_fields(record)
+        org_ids = [self.get_org_id(record)]
+        if record.get("website"):
+            govuk = record.get("website", "").replace(
+                "https://www.gov.uk/government/organisations/", ""
+            )
+            if govuk and not govuk.startswith("http"):
+                org_ids.append("GB-GOVUK-" + govuk)
         self.add_org_record(
             Organisation(
                 **{
@@ -71,7 +78,7 @@ class Command(CSVScraper):
                     "dateRemoved": record.get("end-date"),
                     "active": record.get("end-date") is None,
                     "parent": None,
-                    "orgIDs": [self.get_org_id(record)],
+                    "orgIDs": org_ids,
                     "scrape": self.scrape,
                     "source": self.source,
                     "spider": self.name,
