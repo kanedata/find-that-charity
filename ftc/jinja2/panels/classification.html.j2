@@ -5,10 +5,23 @@
     {% if vocab.description %}
     <div>{{ vocab.description|markdown|safe }}</div>
     {% endif %}
-    <ul>
-      {% for entry in entries %}
-        <li>{{ entry.vocabulary.title }} <code>{{ entry.vocabulary.code }}</code></li>
-      {% endfor %}
+    <ul class="">
+    {% for entry in entries|sort(attribute="vocabulary.ancestor_codes") %}
+      <li class="mb2">
+        {% for a in entry.vocabulary.ancestors %}
+        {% if loop.first %}<strong>{{a.title}}</strong>
+        {% else %}{{ a.title }}
+        {% endif %}
+        <code>{{ a.code }}</code> &raquo;
+        {% endfor %}
+        {% if not entry.vocabulary.ancestors %}
+        <strong>{{ entry.vocabulary.title }}</strong>
+        {% else %}
+        {{ entry.vocabulary.title }} 
+        {% endif %}
+        <code>{{ entry.vocabulary.code }}</code>
+      </li>
+    {% endfor %}
     </ul>
     {% endfor %}
   {% endcall %}

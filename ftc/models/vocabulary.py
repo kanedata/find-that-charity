@@ -31,6 +31,30 @@ class VocabularyEntries(models.Model):
     parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
     current = models.BooleanField(default=True)
 
+    @property
+    def parent_title(self):
+        if self.parent:
+            return self.parent.title
+        return ""
+
+    @property
+    def ancestors(self):
+        ancestors = []
+        parent = self.parent
+        while parent:
+            ancestors.append(parent)
+            parent = parent.parent
+        return ancestors[::-1]
+
+    @property
+    def ancestor_codes(self):
+        ancestors = []
+        parent = self.parent
+        while parent:
+            ancestors.append(parent.code)
+            parent = parent.parent
+        return tuple(ancestors[::-1] + [self.vocabulary.code])
+
     class Meta:
         unique_together = (
             "vocabulary",

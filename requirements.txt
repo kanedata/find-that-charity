@@ -80,7 +80,7 @@ inflect==5.3.0
     # via -r requirements.in
 itsdangerous==1.1.0
     # via requests-cache
-jinja2==2.11.3
+jinja2==3.0.3
     # via -r requirements.in
 lml==0.1.0
     # via pyexcel-io
@@ -94,7 +94,7 @@ markdown==3.3.4
     # via
     #   django-markdownx
     #   django-sql-dashboard
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via jinja2
 openpyxl==3.0.7
     # via -r requirements.in
