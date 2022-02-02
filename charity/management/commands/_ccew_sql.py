@@ -28,7 +28,7 @@ select distinct on(c.registered_charity_number)
     c.charity_contact_email as "email",
     lpad(c.charity_company_registration_number, 8, '0') as "company_number",
     coalesce(c.charity_activities, cgd.charitable_objects) as activities,
-    '{source}' as "source",
+    %(source_id)s as "source",
     NOW() as "first_added",
     NOW() as "last_updated",
     c.latest_income as income,
@@ -232,8 +232,11 @@ set title = EXCLUDED.title, current = true;
 UPDATE_CCEW[
     "Insert into charity classification"
 ] = """
-insert into charity_charity_classification as ca (charity_id, vocabularyentries_id )
+insert into ftc_organisationclassification as ca (org_id, spider, scrape_id, source_id, vocabulary_id )
 select org_id,
+    %(spider_name)s as "spider",
+    %(scrape_id)s as "scrape_id",
+    %(source_id)s as "source_id",
     ve.id
 from (
     select CONCAT('GB-CHC-', c.registered_charity_number) as org_id,
@@ -244,8 +247,7 @@ from (
         on c_class.c_class = ve.code
     inner join ftc_vocabulary v
         on ve.vocabulary_id = v.id
-where v.slug like 'ccew_%'
-on conflict (charity_id, vocabularyentries_id) do nothing;
+where v.slug like 'ccew_%%';
 """
 
 UPDATE_CCEW[
@@ -297,11 +299,11 @@ select distinct on (cc.id)
             else array[]::text[] end ||
         case when cc.company_number is not null or ccew.charity_type = 'Charitable company' then array['registered-company', 'incorporated-charity']
             else array[]::text[] end ||
-        case when cc.constitution ilike 'CIO - %' or ccew.charity_type = 'CIO' then array['charitable-incorporated-organisation', 'incorporated-charity']
+        case when cc.constitution ilike 'CIO - %%' or ccew.charity_type = 'CIO' then array['charitable-incorporated-organisation', 'incorporated-charity']
             else array[]::text[] end ||
-        case when cc.constitution ilike 'cio - association %' then array['charitable-incorporated-organisation-association']
+        case when cc.constitution ilike 'cio - association %%' then array['charitable-incorporated-organisation-association']
             else array[]::text[] end ||
-        case when cc.constitution ilike 'cio - foundation %' then array['charitable-incorporated-organisation-foundation']
+        case when cc.constitution ilike 'cio - foundation %%' then array['charitable-incorporated-organisation-foundation']
             else array[]::text[] end ||
         case when ccew.charity_type = 'Trust' then array['trust']
             else array[]::text[] end
@@ -312,7 +314,7 @@ select distinct on (cc.id)
         when cc."source" = 'ccni' then 'GB-NIC'
         else null end as "org_id_scheme_id",
     ot.slug as "organisationTypePrimary_id",
-    {scrape_id} as scrape_id,
+    %(scrape_id)s as scrape_id,
     cc."source" as source_id
 from charity_charity cc
     left outer join (
@@ -327,7 +329,7 @@ from charity_charity cc
             and ccew.linked_charity_number = '0',
     ftc_organisationtype ot
 where ot.title = 'Registered Charity'
-    and cc.source = '{source}'
+    and cc.source = %(source_id)s
 """
 
 UPDATE_CCEW[
@@ -343,11 +345,11 @@ insert into "ftc_organisationlink" (
 select cc.id as org_id_a,
     CONCAT('GB-COH-', company_number) as org_id_b,
     cc.source as spider,
-    {scrape_id} as scrape_id,
+    %(scrape_id)s as scrape_id,
     cc.source as source_id
 from charity_charity cc
 where company_number not in ('01234567', '12345678', '00000000')
-    and cc.source = '{source}'
+    and cc.source = %(source_id)s
 """
 
 UPDATE_CCEW[
@@ -372,9 +374,9 @@ select CONCAT('GB-CHC-', cc.registered_charity_number) as org_id,
          else null end as "geoCodeType",
     'AOO' as "locationType",
     ca."ISO3166_1" as geo_iso,
-    '{source}' as spider,
-    '{source}' as source_id,
-    {scrape_id} as scrape_id
+    %(source_id)s as spider,
+    %(source_id)s as source_id,
+    %(scrape_id)s as scrape_id
 from charity_ccewcharityareaofoperation cc
     inner join charity_areaofoperation ca
         on cc.geographic_area_description = ca.aooname

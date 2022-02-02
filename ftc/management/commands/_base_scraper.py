@@ -209,15 +209,25 @@ class BaseScraper(BaseCommand):
                 )
 
         # do any SQL actions after the data has been included
-        with connection.cursor() as cursor:
-            for sql_name, sql in self.post_sql.items():
-                self.logger.info("Starting SQL: {}".format(sql_name))
-                cursor.execute(sql, {"spider_name": self.name})
-                self.logger.info("Finished SQL: {}".format(sql_name))
+        self.execute_sql_statements(self.post_sql)
 
         self.scrape.errors = self.error_count
         self.scrape.result = results
         self.scrape_logger.teardown()
+
+    def execute_sql_statements(self, sqls):
+        with connection.cursor() as cursor:
+            for sql_name, sql in sqls.items():
+                self.logger.info("Starting SQL: {}".format(sql_name))
+                cursor.execute(
+                    sql,
+                    {
+                        "spider_name": self.name,
+                        "scrape_id": self.scrape.id,
+                        "source_id": self.source.id if self.source else None,
+                    },
+                )
+                self.logger.info("Finished SQL: {}".format(sql_name))
 
     def add_org_record(self, record):
         self.add_record(Organisation, record)

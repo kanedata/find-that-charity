@@ -1,16 +1,13 @@
 import datetime
 from collections import defaultdict
 
-import tqdm
-from django.db import connection
-
+from charity.management.commands.import_oscr import Command as BaseCommand
 from charity.management.commands._ccni_sql import UPDATE_CCNI
-from charity.models import CharityRaw
 from ftc.management.commands._base_scraper import CSVScraper
-from ftc.models import Organisation
+from ftc.models import Organisation, OrganisationClassification
 
 
-class Command(CSVScraper):
+class Command(BaseCommand):
     name = "ccni"
     allowed_domains = ["charitycommissionni.org.uk", "gist.githubusercontent.com"]
     start_urls = [
@@ -48,10 +45,15 @@ class Command(CSVScraper):
         "Registered Charity",
         "Registered Charity (Northern Ireland)",
     ]
+    charity_sql = UPDATE_CCNI
+    vocab_fields = [
+        "What the charity does",
+        "Who the charity helps",
+        "How the charity works",
+    ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.raw_records = []
+    def parse_file(self, response, source_url):
+        CSVScraper.parse_file(self, response, source_url)
 
     def parse_row(self, record):
 
@@ -84,6 +86,23 @@ class Command(CSVScraper):
                 "postcode": postcode,
             }
         )
+
+        for v in self.vocabularies:
+            if not record.get(v):
+                continue
+            entries = record[v].replace(", ", "/").split(",")
+            for value in entries:
+                entry = self.add_vocabulary_entry(v, value)
+                self.add_record(
+                    OrganisationClassification,
+                    {
+                        "org_id": self.get_org_id(record),
+                        "vocabulary_id": entry,
+                        "scrape": self.scrape,
+                        "source": self.source,
+                        "spider": self.name,
+                    },
+                )
 
         self.add_org_record(
             Organisation(
@@ -135,36 +154,3 @@ class Command(CSVScraper):
             return "NI" + coyno.rjust(6, "0")
 
         return coyno
-
-    def close_spider(self):
-        super(Command, self).close_spider()
-        self.records = None
-        self.link_records = None
-
-        # now start inserting charity records
-        self.logger.info("Inserting CharityRaw records")
-        CharityRaw.objects.bulk_create(self.get_bulk_create())
-        self.logger.info("CharityRaw records inserted")
-
-        self.logger.info("Deleting old CharityRaw records")
-        CharityRaw.objects.filter(spider__exact=self.name,).exclude(
-            scrape_id=self.scrape.id,
-        ).delete()
-        self.logger.info("Old CharityRaw records deleted")
-
-        # execute SQL statements
-        with connection.cursor() as cursor:
-            for sql_name, sql in UPDATE_CCNI.items():
-                self.logger.info("Starting SQL: {}".format(sql_name))
-                cursor.execute(sql)
-                self.logger.info("Finished SQL: {}".format(sql_name))
-
-    def get_bulk_create(self):
-
-        for record in tqdm.tqdm(self.raw_records):
-            yield CharityRaw(
-                org_id=self.get_org_id(record),
-                data=record,
-                scrape=self.scrape,
-                spider=self.name,
-            )

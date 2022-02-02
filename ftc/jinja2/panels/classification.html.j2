@@ -1,9 +1,10 @@
 {% if org.classifications %}
-  {% call org_panel("Classification", org) %}
+  {% call org_panel("Themes and activities", org) %}
+    <p>This organisation has been classified using different categories:</p> 
     {% for vocab, entries in org.classifications.items() %}
     <h4>{{ vocab.title }}</h4>
     {% if vocab.description %}
-    <div>{{ vocab.description|markdown|safe }}</div>
+    <div class="measure-wide">{{ vocab.description|markdown|safe }}</div>
     {% endif %}
     <ul class="">
     {% for entry in entries|sort(attribute="vocabulary.ancestor_codes") %}
@@ -12,14 +13,10 @@
         {% if loop.first %}<strong>{{a.title}}</strong>
         {% else %}{{ a.title }}
         {% endif %}
-        <code>{{ a.code }}</code> &raquo;
+        {% if a.code and a.code|length < 10 %}<code>{{ a.code }}</code>{% endif %} &raquo;
         {% endfor %}
-        {% if not entry.vocabulary.ancestors %}
-        <strong>{{ entry.vocabulary.title }}</strong>
-        {% else %}
         {{ entry.vocabulary.title }} 
-        {% endif %}
-        <code>{{ entry.vocabulary.code }}</code>
+        {% if entry.vocabulary.code and entry.vocabulary.code|length < 10 %}<code>{{ entry.vocabulary.code }}</code>{% endif %}
       </li>
     {% endfor %}
     </ul>

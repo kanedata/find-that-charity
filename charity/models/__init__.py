@@ -47,7 +47,6 @@ class Charity(models.Model):
     dual_registered = models.BooleanField(null=True, blank=True)
 
     areas_of_operation = models.ManyToManyField("AreaOfOperation")
-    classification = models.ManyToManyField("ftc.VocabularyEntries")
 
     class Meta:
         verbose_name_plural = "Charities"

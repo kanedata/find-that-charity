@@ -29,7 +29,7 @@ select cc.org_id as org_id,
     to_date(cc.data->>'Date for financial year ending', 'YYYY-MM-DD') as latest_fye,
     null as dual_registered
 from charity_charityraw cc
-where cc.spider = 'ccni'
+where cc.spider = %(spider_name)s
 on conflict (id) do update
 set "name" = EXCLUDED.name,
     constitution = COALESCE(EXCLUDED.constitution, cc.constitution),
@@ -67,7 +67,7 @@ select cc.org_id as org_id,
     (cc.data->>'Charitable spending')::int as exp_charble,
     case when (cc.data->>'Charitable spending')::int > 0 then 'detailed_ccni' else 'basic_ccni' end as account_type
 from charity_charityraw cc
-where cc.spider = 'ccni'
+where cc.spider = %(spider_name)s
     and cc.data->>'Date for financial year ending' is not null
 on conflict (charity_id, fyend) do update
 set income = EXCLUDED.income,
@@ -77,114 +77,4 @@ set income = EXCLUDED.income,
     exp_vol = EXCLUDED.exp_vol,
     exp_charble = EXCLUDED.exp_charble,
     account_type = EXCLUDED.account_type;
-"""
-
-
-UPDATE_CCNI[
-    "Add vocabulary records"
-] = """
-insert into ftc_vocabulary (slug, title, single)
-select field, field, false
-from (
-    select cc.org_id as org_id,
-        'ccni_purposes' as "field",
-        unnest(string_to_array(replace(cc.data->>'What the charity does', ', ', '/'), ',')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'ccni'
-    union
-    select cc.org_id as org_id,
-        'ccni_theme' as "field",
-        unnest(string_to_array(replace(cc.data->>'How the charity works', ', ', '/'), ',')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'ccni'
-    union
-    select cc.org_id as org_id,
-        'ccni_beneficiaries' as "field",
-        unnest(string_to_array(replace(cc.data->>'Who the charity helps', ', ', '/'), ',')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'ccni'
-) as a
-group by field
-on conflict (slug) do nothing;
-"""
-
-UPDATE_CCNI[
-    "Update vocabulary entries to set current as false"
-] = """
-update ftc_vocabularyentries
-set current = false
-where vocabulary_id in (
-    select id from ftc_vocabulary where slug in (
-        'ccni_purposes',
-        'ccni_theme',
-        'ccni_beneficiaries'
-    )
-);
-"""
-
-UPDATE_CCNI[
-    "Add vocabulary entries"
-] = """
-insert into ftc_vocabularyentries (code, title, vocabulary_id, current)
-select regexp_replace(lower(value), '[^a-z]+', '-', 'g'),  value, v.id, true
-from (
-    select field, value, count(*) as records
-    from (
-        select cc.org_id as org_id,
-            'ccni_purposes' as "field",
-            unnest(string_to_array(replace(cc.data->>'What the charity does', ', ', '/'), ',')) as "value"
-        from charity_charityraw cc
-        where cc.spider = 'ccni'
-        union
-        select cc.org_id as org_id,
-            'ccni_theme' as "field",
-            unnest(string_to_array(replace(cc.data->>'How the charity works', ', ', '/'), ',')) as "value"
-        from charity_charityraw cc
-        where cc.spider = 'ccni'
-        union
-        select cc.org_id as org_id,
-            'ccni_beneficiaries' as "field",
-            unnest(string_to_array(replace(cc.data->>'Who the charity helps', ', ', '/'), ',')) as "value"
-        from charity_charityraw cc
-        where cc.spider = 'ccni'
-    ) as a
-    group by field, value
-) as b
-    inner join ftc_vocabulary v
-        on b.field = v.slug
-order by id, records
-on conflict (code, vocabulary_id) do update
-set title = EXCLUDED.title, current = true;
-"""
-
-UPDATE_CCNI[
-    "Add charity classification"
-] = """
-insert into charity_charity_classification (charity_id, vocabularyentries_id)
-select a.org_id as "charity_id",
-    ve.id as "vocabularyentries_id"
-from (
-    select cc.org_id as org_id,
-        'ccni_purposes' as "field",
-        unnest(string_to_array(replace(cc.data->>'What the charity does', ', ', '/'), ',')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'ccni'
-    union
-    select cc.org_id as org_id,
-        'ccni_theme' as "field",
-        unnest(string_to_array(replace(cc.data->>'How the charity works', ', ', '/'), ',')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'ccni'
-    union
-    select cc.org_id as org_id,
-        'ccni_beneficiaries' as "field",
-        unnest(string_to_array(replace(cc.data->>'Who the charity helps', ', ', '/'), ',')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'ccni'
-) as a
-    left outer join ftc_vocabulary v
-        on a.field = v.slug
-    left outer join ftc_vocabularyentries ve
-        on a.value = ve.title and v.id = ve.vocabulary_id
-on conflict (charity_id, vocabularyentries_id) do nothing;
 """

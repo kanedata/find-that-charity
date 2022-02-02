@@ -1,15 +1,24 @@
 import csv
 import datetime
 import io
+from turtle import title
 import zipfile
 
 import tqdm
+from django.utils.text import slugify
 from django.db import connection
 
 from charity.management.commands._oscr_sql import UPDATE_OSCR
 from charity.models import CharityRaw
 from ftc.management.commands._base_scraper import CSVScraper
-from ftc.models import Organisation
+from ftc.models import (
+    Organisation,
+    OrganisationClassification,
+    Vocabulary,
+    OrganisationLink,
+    OrganisationLocation,
+)
+from ftc.models.vocabulary import VocabularyEntries
 
 
 class Command(CSVScraper):
@@ -51,10 +60,47 @@ class Command(CSVScraper):
         "Registered Charity",
         "Registered Charity (Scotland)",
     ]
+    models_to_delete = [
+        Organisation,
+        OrganisationLink,
+        OrganisationLocation,
+        OrganisationClassification,
+    ]
+    charity_sql = UPDATE_OSCR
+    vocab_fields = ["Beneficiaries", "Activities", "Purposes"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.raw_records = []
+        self.vocabularies = {}
+        for f in self.vocab_fields:
+            v, _ = Vocabulary.objects.get_or_create(
+                slug="{}_{}".format(self.name, f.lower()),
+                defaults=dict(
+                    single=False,
+                    title=f"{f} ({self.name.upper()})",
+                    description=f"{f} as chosen by the organisation in their annual return to {self.source['publisher']['name']}. Organisations can chose multiple categories.",
+                ),
+            )
+            self.vocabularies[f] = {
+                "vocabulary": v,
+                "entries": {entry.title: entry.id for entry in v.entries.all()},
+            }
+
+    def add_vocabulary_entry(self, vocab, entry_title):
+        existing_id = (
+            self.vocabularies.get(vocab, {}).get("entries", {}).get(entry_title)
+        )
+        if existing_id:
+            return existing_id
+        new_vocab = VocabularyEntries.objects.create(
+            title=entry_title,
+            vocabulary=self.vocabularies[vocab]["vocabulary"],
+            current=True,
+            code=slugify(entry_title),
+        )
+        self.vocabularies[vocab]["entries"][entry_title] = new_vocab.id
+        return new_vocab.id
 
     def parse_file(self, response, source_url):
         try:
@@ -126,6 +172,23 @@ class Command(CSVScraper):
 
         self.raw_records.append(record)
 
+        for v in self.vocabularies:
+            if not record.get(v):
+                continue
+            reader = csv.reader([record.get(v, "")], delimiter=",", quotechar="'")
+            for value in next(reader):
+                entry = self.add_vocabulary_entry(v, value)
+                self.add_record(
+                    OrganisationClassification,
+                    {
+                        "org_id": self.get_org_id(record),
+                        "vocabulary_id": entry,
+                        "scrape": self.scrape,
+                        "source": self.source,
+                        "spider": self.name,
+                    },
+                )
+
         self.add_org_record(
             Organisation(
                 **{
@@ -183,11 +246,7 @@ class Command(CSVScraper):
         self.logger.info("Old CharityRaw records deleted")
 
         # execute SQL statements
-        with connection.cursor() as cursor:
-            for sql_name, sql in UPDATE_OSCR.items():
-                self.logger.info("Starting SQL: {}".format(sql_name))
-                cursor.execute(sql)
-                self.logger.info("Finished SQL: {}".format(sql_name))
+        self.execute_sql_statements(self.charity_sql)
 
     def get_bulk_create(self):
 

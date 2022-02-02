@@ -29,7 +29,7 @@ select cc.org_id as org_id,
     to_date(cc.data->>'Year End', 'YYYY-MM-DD') as latest_fye,
     null as dual_registered
 from charity_charityraw cc
-where cc.spider = 'oscr'
+where cc.spider = %(spider_name)s
 on conflict (id) do update
 set "name" = EXCLUDED.name,
     constitution = COALESCE(EXCLUDED.constitution, cc.constitution),
@@ -72,7 +72,7 @@ select cc.org_id as org_id,
     (cc.data->>'Other spending')::int as exp_other,
     case when cc.data->>'Charitable activities spending' is not null then 'detailed_oscr' else 'basic_oscr' end as account_type
 from charity_charityraw cc
-where cc.spider = 'oscr'
+where cc.spider = %(spider_name)s
     and cc.data->>'Year End' is not null
 on conflict (charity_id, fyend) do update
 set income = EXCLUDED.income,
@@ -98,124 +98,15 @@ select cc.org_id as org_id,
     cc.data->>'Charity Name' as "normalisedName",
     'Registered name' as "name_type"
 from charity_charityraw cc
-where cc.spider = 'oscr'
+where cc.spider = %(spider_name)s
 union
 select cc.org_id as org_id,
     cc.data->>'Known As' as "name",
     cc.data->>'Known As' as "normalisedName",
     'Known as' as "name_type"
 from charity_charityraw cc
-where cc.spider = 'oscr' and cc.data->>'Known As' is not null
+where cc.spider = %(spider_name)s and cc.data->>'Known As' is not null
 on conflict (charity_id, name) do nothing;
-"""
-
-UPDATE_OSCR[
-    "Add vocabulary records"
-] = """
-insert into ftc_vocabulary (title, slug, single)
-select field, field, false
-from (
-    select cc.org_id as org_id,
-        'oscr_purposes' as "field",
-        unnest(string_to_array(TRIM('''' from cc.data->>'Purposes'), ''',''')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'oscr'
-    union
-    select cc.org_id as org_id,
-        'oscr_activities' as "field",
-        unnest(string_to_array(TRIM('''' from cc.data->>'Activities'), ''',''')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'oscr'
-    union
-    select cc.org_id as org_id,
-        'oscr_beneficiaries' as "field",
-        unnest(string_to_array(TRIM('''' from cc.data->>'Beneficiaries'), ''',''')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'oscr'
-) as a
-group by field
-on conflict (slug) do nothing;
-"""
-
-UPDATE_OSCR[
-    "Update vocabulary entries to set current as false"
-] = """
-update ftc_vocabularyentries
-set current = false
-where vocabulary_id in (
-    select id from ftc_vocabulary where slug in (
-        'oscr_purposes',
-        'oscr_activities',
-        'oscr_beneficiaries'
-    )
-);
-"""
-
-UPDATE_OSCR[
-    "Add vocabulary entries"
-] = """
-insert into ftc_vocabularyentries (code, title, vocabulary_id, current)
-select regexp_replace(lower(value), '[^a-z]+', '-', 'g'),  value, v.id, true
-from (
-    select field, value, count(*) as records
-    from (
-        select cc.org_id as org_id,
-            'oscr_purposes' as "field",
-            unnest(string_to_array(TRIM('''' from cc.data->>'Purposes'), ''',''')) as "value"
-        from charity_charityraw cc
-        where cc.spider = 'oscr'
-        union
-        select cc.org_id as org_id,
-            'oscr_activities' as "field",
-            unnest(string_to_array(TRIM('''' from cc.data->>'Activities'), ''',''')) as "value"
-        from charity_charityraw cc
-        where cc.spider = 'oscr'
-        union
-        select cc.org_id as org_id,
-            'oscr_beneficiaries' as "field",
-            unnest(string_to_array(TRIM('''' from cc.data->>'Beneficiaries'), ''',''')) as "value"
-        from charity_charityraw cc
-        where cc.spider = 'oscr'
-    ) as a
-    group by field, value
-) as b
-    inner join ftc_vocabulary v
-        on b.field = v.slug
-order by id, records
-on conflict (code, vocabulary_id) do update
-set title = EXCLUDED.title, current = true;
-"""
-
-UPDATE_OSCR[
-    "Add charity classification"
-] = """
-insert into charity_charity_classification (charity_id, vocabularyentries_id)
-select a.org_id as "charity_id",
-    ve.id as "vocabularyentries_id"
-from (
-    select cc.org_id as org_id,
-        'oscr_purposes' as "field",
-        unnest(string_to_array(TRIM('''' from cc.data->>'Purposes'), ''',''')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'oscr'
-    union
-    select cc.org_id as org_id,
-        'oscr_activities' as "field",
-        unnest(string_to_array(TRIM('''' from cc.data->>'Activities'), ''',''')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'oscr'
-    union
-    select cc.org_id as org_id,
-        'oscr_beneficiaries' as "field",
-        unnest(string_to_array(TRIM('''' from cc.data->>'Beneficiaries'), ''',''')) as "value"
-    from charity_charityraw cc
-    where cc.spider = 'oscr'
-) as a
-    left outer join ftc_vocabulary v
-        on a.field = v.slug
-    left outer join ftc_vocabularyentries ve
-        on a.value = ve.title and v.id = ve.vocabulary_id
-on conflict (charity_id, vocabularyentries_id) do nothing;
 """
 
 UPDATE_OSCR[
@@ -228,5 +119,5 @@ where id in (
 	from ftc_organisationlink fo 
 	where fo.source_id = 'dual_registered'
 )
-and id like 'GB-SC-%';
+and source = %(spider_name)s;
 """

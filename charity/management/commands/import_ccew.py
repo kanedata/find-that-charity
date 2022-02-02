@@ -25,7 +25,12 @@ from charity.models import (
     CCEWCharityTrustee,
 )
 from ftc.management.commands._base_scraper import BaseScraper
-from ftc.models import Organisation, OrganisationLink, Scrape
+from ftc.models import (
+    Organisation,
+    OrganisationLink,
+    Scrape,
+    OrganisationClassification,
+)
 
 
 class Command(BaseScraper):
@@ -157,16 +162,7 @@ class Command(BaseScraper):
     def close_spider(self):
 
         # execute SQL statements
-        with connection.cursor() as cursor:
-            for sql_name, sql in UPDATE_CCEW.items():
-                self.logger.info("Starting SQL: {}".format(sql_name))
-                cursor.execute(
-                    sql.format(
-                        scrape_id=self.scrape.id,
-                        source=self.name,
-                    )
-                )
-                self.logger.info("Finished SQL: {}".format(sql_name))
+        self.execute_sql_statements(UPDATE_CCEW)
 
         self.object_count = Organisation.objects.filter(
             spider__exact=self.name,
@@ -204,6 +200,9 @@ class Command(BaseScraper):
                 scrape_id=self.scrape.id,
             ).delete()
             OrganisationLink.objects.filter(spider__exact=self.name,).exclude(
+                scrape_id=self.scrape.id,
+            ).delete()
+            OrganisationClassification.objects.filter(spider__exact=self.name,).exclude(
                 scrape_id=self.scrape.id,
             ).delete()
             self.logger.info("Deleted previous records")
