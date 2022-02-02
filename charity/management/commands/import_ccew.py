@@ -27,9 +27,9 @@ from charity.models import (
 from ftc.management.commands._base_scraper import BaseScraper
 from ftc.models import (
     Organisation,
+    OrganisationClassification,
     OrganisationLink,
     Scrape,
-    OrganisationClassification,
 )
 
 

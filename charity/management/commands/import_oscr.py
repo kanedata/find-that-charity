@@ -1,12 +1,12 @@
 import csv
 import datetime
 import io
-from turtle import title
 import zipfile
+from turtle import title
 
 import tqdm
-from django.utils.text import slugify
 from django.db import connection
+from django.utils.text import slugify
 
 from charity.management.commands._oscr_sql import UPDATE_OSCR
 from charity.models import CharityRaw
@@ -14,9 +14,9 @@ from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import (
     Organisation,
     OrganisationClassification,
-    Vocabulary,
     OrganisationLink,
     OrganisationLocation,
+    Vocabulary,
 )
 from ftc.models.vocabulary import VocabularyEntries
 

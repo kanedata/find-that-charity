@@ -1,8 +1,8 @@
 import datetime
 from collections import defaultdict
 
-from charity.management.commands.import_oscr import Command as BaseCommand
 from charity.management.commands._ccni_sql import UPDATE_CCNI
+from charity.management.commands.import_oscr import Command as BaseCommand
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation, OrganisationClassification
 
