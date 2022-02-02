@@ -260,6 +260,12 @@ class Command(CSVScraper):
             r.encoding = s.get("_encoding", "utf-8-sig")
             self.files[s["identifier"]] = r
 
+    def get_link_records(self):
+        pass
+
+    def execute_sql_statements(self, statements):
+        pass
+
     def parse_file(self, response, source):
 
         source = [s for s in self.sources if s["identifier"] == source][0]
