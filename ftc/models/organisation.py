@@ -103,7 +103,7 @@ class Organisation(models.Model):
         verbose_name="Other organisation identifiers",
     )
     linked_orgs = ArrayField(
-        models.CharField(max_length=100, blank=True),
+        models.CharField(max_length=200, blank=True),
         blank=True,
         null=True,
         verbose_name="Linked organisations",
