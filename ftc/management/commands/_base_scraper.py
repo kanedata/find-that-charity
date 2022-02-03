@@ -224,7 +224,9 @@ class BaseScraper(BaseCommand):
                     {
                         "spider_name": self.name,
                         "scrape_id": self.scrape.id,
-                        "source_id": self.source.id if self.source else None,
+                        "source_id": self.source.id
+                        if getattr(self, "source", None)
+                        else None,
                     },
                 )
                 self.logger.info("Finished SQL: {}".format(sql_name))
