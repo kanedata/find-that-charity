@@ -42,7 +42,7 @@
   }
   .sql-dashboard .query-results table {
     font-size: 0.9rem;
-    font-family: Consolas,monaco,monospace;
+    font-family: 'Raleway', sans-serif;
     line-height: 1.2;
     width: auto;
   }
@@ -53,7 +53,17 @@
     background-color: rgb(17, 17, 17);
     color: #ccc;
   }
+  .sql-dashboard .query-results table th,
+  .sql-dashboard .query-results table td {
+    text-align: left;
+  }
+  .sql-dashboard .query-results table th .dropdown-menu-icon {
+    float: right;
+  }
   .sql-dashboard .dashboard-columns {
+    font-family: 'Raleway', sans-serif;
+  }
+  .sql-dashboard .dashboard-columns > li > p {
     font-family: Consolas,monaco,monospace;
   }
   .CodeMirror {
