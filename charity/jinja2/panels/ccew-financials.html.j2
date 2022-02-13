@@ -1,0 +1,17 @@
+{% from 'components/date_format.html.j2' import format_date %}
+
+{% include 'components/financial-summary.html.j2' %}
+{% set ccew = charity.ccew_record() %}
+{% if ccew %}
+    {% set cy = ccew.current_year() %}
+    {% set py = ccew.previous_year() %}
+    {% if cy %}
+        {% include 'components/government-income.html.j2' %}
+        {% set cy_partb = cy.partb() %}
+        {% if py %}{% set py_partb = py.partb() %}{% endif %}
+        {% if cy_partb %}
+            {% include 'components/sofa.html.j2' %}
+            {% include 'components/balance-sheet.html.j2' %}
+        {% endif %}
+    {% endif %}
+{% endif %}

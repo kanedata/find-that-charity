@@ -54,6 +54,14 @@ class Charity(models.Model):
     def __str__(self):
         return "{} [{}]".format(self.name, self.id)
 
+    def ccew_record(self):
+        if not self.id.startswith("GB-CHC-"):
+            return None
+        return CCEWCharity.objects.filter(
+            registered_charity_number=self.id.replace("GB-CHC-", ""),
+            linked_charity_number=0,
+        ).first()
+
     def financial_json(self):
         return [
             {

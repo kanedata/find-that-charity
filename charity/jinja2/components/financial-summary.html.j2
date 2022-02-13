@@ -1,0 +1,50 @@
+{% if charity.financial.count() %}
+  {% set finances = charity.financial.order_by('fyend').all() %}
+  {% call org_panel("Charity financial history", org) %}
+      <div class="w-100 cf" id="charity-financials">
+      <div class="w-100 w-50-ns fl pr4-ns">
+      <table class="table collapse">
+        <tr>
+          <th>Year ending</th>
+          <th>Income (£)</th>
+          <th>Spending (£)</th>
+        </tr>
+      {% if org.dateRegistered %}
+        <tr>
+          <td colspan="">
+            {{ "{:%Y-%m-%d}".format(org.dateRegistered) }}
+          </td>
+          <td colspan="2" class="tc">
+            <span class="gray">(Registered as a charity)</span><br>
+          </td>
+        </tr>
+      {% endif %}
+      {% for f in finances|sort(attribute='fyend') %}
+        <tr>
+          <td>{{ f.fyend }}</td>
+          <td>{{ "{:,.0f}".format(f.income) }}</td>
+          <td>{% if f.spending %}{{ "{:,.0f}".format(f.spending) }}{% endif %}</td>
+        </tr>
+      {% endfor %}
+      {% if org.dateRemoved %}
+        <tr>
+          <td colspan="">
+            {{ "{:%d %B %Y}".format(org.dateRemoved) }}
+          </td>
+          <td colspan="2" class="tl">
+            <span class="gray">(Removed from the register)</span>
+          </td>
+        </tr>
+      {% endif %}
+      </table>
+      </div>
+      
+      <div class="w-100 w-50-ns fl">
+      {% if finances|length > 1 %}
+      <canvas id="financeChart" width="400" height="350" class="measure"></canvas>
+      {% endif %}
+      </div>
+      </div>
+
+    {% endcall %}
+{% endif %}

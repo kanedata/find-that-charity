@@ -1,0 +1,141 @@
+{% call org_panel("Balance sheet", org) %}
+<p class="measure">
+    Balance sheet at <strong>{{ format_date(cy.fin_period_end_date) }}</strong>.
+</p>
+<p class="measure">
+    Based on information provided to the Charity Commission for England and Wales in the
+    charity's annual return. This may not exactly match the figures supplied in the
+    charity's annual accounts.
+</p>
+<table class="table collapse financial-table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>{{ cy.fin_period_end_date.year }}<br>£</th>
+            {% if py_partb %}
+            <th>{{ py_partb.fin_period_end_date.year }}<br>£</th>
+            {% elif py %}
+            <th>{{ py.fin_period_end_date.year }}<br>£</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="bn ttu tl b" colspan="3">Fixed assets</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Tangible and intangible assets</td>
+            <td class="bn code">{{ "{:,.0f}".format(cy_partb.assets_own_use) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_own_use) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Investment assets</td>
+            <td class="bn code">{{ "{:,.0f}".format(cy_partb.assets_long_term_investment) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_long_term_investment) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl"></td>
+            <td class="bn b code">{{ "{:,.0f}".format(cy_partb.assets_total_fixed) }}</td>
+            <td class="bn b code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_total_fixed) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn ttu tl b" colspan="3">Current assets</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Current investment assets</td>
+            <td class="bn code">{{ "{:,.0f}".format(cy_partb.assets_current_investment) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_current_investment) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Cash</td>
+            <td class="bn code">{{ "{:,.0f}".format(cy_partb.assets_cash) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_cash) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Other current assets</td>
+            <td class="bn code">{{ "{:,.0f}".format(cy_partb.assets_other_current) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_other_current) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl"></td>
+            <td class="bn b code">{{ "{:,.0f}".format(cy_partb.assets_current) }}</td>
+            <td class="bn b code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_current) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn ttu tl b" colspan="3">Creditors</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Amounts falling due within one year</td>
+            <td class="bn code">{{ "{:,.0f}".format(-cy_partb.creditors_one_year_total_current) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(-py_partb.creditors_one_year_total_current) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl ttu b">Net current assets</td>
+            <td class="bn b code">{{ "{:,.0f}".format(cy_partb.assets_net_current) }}</td>
+            <td class="bn b code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_net_current) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl ttu b">Total assets less current liabilities</td>
+            <td class="bn b code">{{ "{:,.0f}".format(cy_partb.assets_less_current_liabilities) }}</td>
+            <td class="bn b code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_less_current_liabilities) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn ttu tl b" colspan="3">Creditors</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Amounts falling due after one year</td>
+            <td class="bn code">{{ "{:,.0f}".format(-cy_partb.creditors_falling_due_after_one_year) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(-py_partb.creditors_falling_due_after_one_year) }}{% endif %}</td>
+        </tr>
+        {% if cy_partb.defined_benefit_pension_scheme or (py_partb and py_partb.defined_benefit_pension_scheme)%}
+        <tr>
+            <td class="bn tl ttu b">Net assets (excluding pension scheme)</td>
+            <td class="bn b code">{{ "{:,.0f}".format(cy_partb.assets_total_excluding_pension) }}</td>
+            <td class="bn b code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_total_excluding_pension) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Defined benefit pension scheme</td>
+            <td class="bn code">{{ "{:,.0f}".format(cy_partb.defined_benefit_pension_scheme) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.defined_benefit_pension_scheme) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl ttu b">Net assets (including pension scheme)</td>
+            <td class="bn b code">{{ "{:,.0f}".format(cy_partb.assets_total_assets_and_liabilities) }}</td>
+            <td class="bn b code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_total_assets_and_liabilities) }}{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td class="bn tl ttu b">Net assets</td>
+            <td class="bn b code">{{ "{:,.0f}".format(cy_partb.assets_total_assets_and_liabilities) }}</td>
+            <td class="bn b code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.assets_total_assets_and_liabilities) }}{% endif %}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td class="" colspan="3"></td>
+        </tr>
+        <tr>
+            <td class="bn ttu tl b" colspan="3">Funds</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Endowment funds</td>
+            <td class="bn code">{{ "{:,.0f}".format(cy_partb.funds_endowment) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.funds_endowment) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Restricted funds</td>
+            <td class="bn code">{{ "{:,.0f}".format(cy_partb.funds_restricted) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.funds_restricted) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl">Unrestricted funds</td>
+            <td class="bn code">{{ "{:,.0f}".format(cy_partb.funds_unrestricted) }}</td>
+            <td class="bn code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.funds_unrestricted) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="bn tl"></td>
+            <td class="bn b code">{{ "{:,.0f}".format(cy_partb.funds_total) }}</td>
+            <td class="bn b code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.funds_total) }}{% endif %}</td>
+        </tr>
+    </tbody>
+</table>
+{% endcall %}

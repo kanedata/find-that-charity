@@ -1,0 +1,139 @@
+{% call org_panel("Statement of Financial Activities", org) %}
+<p class="measure">
+    Statement of financial activities for year ended <strong>{{ format_date(cy.fin_period_end_date) }}</strong>.
+</p>
+<p class="measure">
+    Based on information provided to the Charity Commission for England and Wales in the
+    charity's annual return. This may not exactly match the figures supplied in the
+    charity's annual accounts.
+</p>
+<table class="table collapse financial-table">
+    <thead>
+        <tr>
+            <th></th>
+            <th class="tr">{{ cy.fin_period_end_date.year }}<br>£</th>
+            {% if py_partb %}
+            <th class="tr">{{ py_partb.fin_period_end_date.year }}<br>£</th>
+            {% elif py %}
+            <th class="tr">{{ py.fin_period_end_date.year }}<br>£</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="bn ttu tl b" colspan="3">Incoming resources</td>
+        </tr>
+        <tr>
+            <td class="pl4 tl i">Donations and other voluntary income</td>
+            <td class="i code">{{ "{:,.0f}".format(cy_partb.income_donations) }}</td>
+            <td class="i code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.income_donations) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="pl4 tl i">Legacies</td>
+            <td class="i code">{{ "{:,.0f}".format(cy_partb.income_legacies) }}</td>
+            <td class="i code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.income_legacies) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="pl4 tl i">Endowments</td>
+            <td class="i code">{{ "{:,.0f}".format(cy_partb.income_endowments) }}</td>
+            <td class="i code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.income_endowments) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl">Donations and legacies</td>
+            <td class="code">{{ "{:,.0f}".format(cy_partb.income_donations_and_legacies) }}</td>
+            <td class="code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.income_donations_and_legacies) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl">Income from charitable activities</td>
+            <td class="code">{{ "{:,.0f}".format(cy_partb.income_charitable_activities) }}</td>
+            <td class="code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.income_charitable_activities) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl">Income from other trading activities</td>
+            <td class="code">{{ "{:,.0f}".format(cy_partb.income_other_trading_activities) }}</td>
+            <td class="code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.income_other_trading_activities) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl">Income from investments</td>
+            <td class="code">{{ "{:,.0f}".format(cy_partb.income_investments) }}</td>
+            <td class="code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.income_investments) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl">Other income</td>
+            <td class="code">{{ "{:,.0f}".format(cy_partb.income_other) }}</td>
+            <td class="code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.income_other) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl b">Total</td>
+            <td class="b code">{{ "{:,.0f}".format(cy_partb.income_total_income_and_endowments) }}</td>
+            {% if py_partb %}
+            <td class="b code">{{ "{:,.0f}".format(py_partb.income_total_income_and_endowments) }}</td>
+            {% elif py %}
+            <td class="b code">{{ "{:,.0f}".format(py.total_gross_income) }}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td class="bn ttu tl b" colspan="3">Expenditure</td>
+        </tr>
+        <tr>
+            <td class="pl4 tl i">Investment management</td>
+            <td class="i code">{{ "{:,.0f}".format(cy_partb.expenditure_investment_management) }}</td>
+            <td class="i code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.expenditure_investment_management) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="pl4 tl i">Other spending on raising funds</td>
+            <td class="i code">{{ "{:,.0f}".format(cy_partb.expenditure_other_raising_funds) }}</td>
+            <td class="i code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.expenditure_other_raising_funds) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl">Spending on raising funds</td>
+            <td class="code">{{ "{:,.0f}".format(cy_partb.expenditure_raising_funds) }}</td>
+            <td class="code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.expenditure_raising_funds) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl pl4 i">Grants to institutions</td>
+            <td class="i code">{{ "{:,.0f}".format(cy_partb.expenditure_grants_institution) }}</td>
+            <td class="i code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.expenditure_grants_institution) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl pl4 i">Other charitable activities</td>
+            <td class="i code">{{ "{:,.0f}".format(cy_partb.expenditure_other_charitable_activities) }}</td>
+            <td class="i code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.expenditure_other_charitable_activities) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl">Charitable activities</td>
+            <td class="code">{{ "{:,.0f}".format(cy_partb.expenditure_charitable_expenditure) }}</td>
+            <td class="code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.expenditure_charitable_expenditure) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl">Other spending</td>
+            <td class="code">{{ "{:,.0f}".format(cy_partb.expenditure_other) }}</td>
+            <td class="code">{% if py_partb %}{{ "{:,.0f}".format(py_partb.expenditure_other) }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="tl b">Total</td>
+            <td class="b code">{{ "{:,.0f}".format(cy_partb.expenditure_total) }}</td>
+            {% if py_partb %}
+            <td class="b code">{{ "{:,.0f}".format(py_partb.expenditure_total) }}</td>
+            {% elif py %}
+            <td class="b code">{{ "{:,.0f}".format(py.total_gross_expenditure) }}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td class="tl ttu b">Net income / (expenditure)</td>
+            <td class="b code">{{ "{:,.0f}".format(cy_partb.income_total_income_and_endowments - cy_partb.expenditure_total) }}</td>
+            {% if py_partb %}
+            <td class="b code">{{ "{:,.0f}".format(py_partb.income_total_income_and_endowments - py_partb.expenditure_total) }}</td>
+            {% elif py %}
+            <td class="b code">{{ "{:,.0f}".format(py.total_gross_income - py.total_gross_expenditure) }}</td>
+            {% endif %}
+        </tr>
+    </tbody>
+</table>
+{% endcall %}

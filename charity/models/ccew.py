@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import models
 
 
@@ -157,6 +159,19 @@ class CCEWCharity(models.Model):
         help_text="Indicates whether the charity owns or leases any land or buildings. True, False, NULL (not known)",
     )
 
+    def current_year(self):
+        return CCEWCharityARPartA.objects.filter(
+            registered_charity_number=self.registered_charity_number,
+            fin_period_end_date=self.latest_acc_fin_period_end_date,
+        ).first()
+
+    def previous_year(self):
+        return CCEWCharityARPartA.objects.filter(
+            registered_charity_number=self.registered_charity_number,
+            fin_period_end_date=self.latest_acc_fin_period_start_date
+            - timedelta(days=1),
+        ).first()
+
 
 class CCEWCharityAnnualReturnHistory(models.Model):
     date_of_extract = models.DateField(
@@ -179,6 +194,7 @@ class CCEWCharityAnnualReturnHistory(models.Model):
     fin_period_end_date = models.DateField(
         null=True,
         blank=True,
+        db_index=True,
         help_text="The end date of the financial period which is detailed for the charity.",
     )
     ar_cycle_reference = models.CharField(
@@ -475,6 +491,12 @@ class CCEWCharityARPartA(models.Model):
         help_text="Number of Volunteers. The trustees' estimate of the number of people who undertook voluntary work in the UK for the charity during the year. The number shown is a head count and not expressed as full-time equivalents. Charities are invited to provide an estimate of volunteer numbers in their Annual Return but are not obliged to do so. Where a number is provided by the charity, including zero, that number is displayed.",
     )
 
+    def partb(self):
+        return CCEWCharityARPartB.objects.filter(
+            registered_charity_number=self.registered_charity_number,
+            fin_period_end_date=self.fin_period_end_date,
+        ).first()
+
 
 class CCEWCharityARPartB(models.Model):
     date_of_extract = models.DateField(
@@ -511,6 +533,7 @@ class CCEWCharityARPartB(models.Model):
     fin_period_end_date = models.DateField(
         null=True,
         blank=True,
+        db_index=True,
         help_text="The end date of the financial period which is detailed for the charity.",
     )
     ar_due_date = models.DateField(
@@ -721,6 +744,48 @@ class CCEWCharityARPartB(models.Model):
         blank=True,
         help_text="Consolidated accounts bring together the resources of the charity and the subsidiaries under its control in one statement. These subsidiaries may be non-charitable and to exist for purposes that benefit the parent charity e.g. fund-raising. If set to 1 the accounts are consolidated.",
     )
+
+    @property
+    def income_donations(self):
+        return self.income_donations_and_legacies - (
+            self.income_legacies + self.income_endowments
+        )
+
+    @property
+    def expenditure_other_raising_funds(self):
+        return self.expenditure_raising_funds - self.expenditure_investment_management
+
+    @property
+    def expenditure_other_charitable_activities(self):
+        return (
+            self.expenditure_charitable_expenditure
+            - self.expenditure_grants_institution
+        )
+
+    @property
+    def assets_current(self):
+        return self.assets_other_assets
+
+    @property
+    def assets_other_current(self):
+        return self.assets_other_assets - (
+            self.assets_cash + self.assets_current_investment
+        )
+
+    @property
+    def assets_net_current(self):
+        return self.assets_current - self.creditors_one_year_total_current
+
+    @property
+    def assets_less_current_liabilities(self):
+        return self.assets_total_fixed + self.assets_net_current
+
+    @property
+    def assets_total_excluding_pension(self):
+        return (
+            self.assets_total_assets_and_liabilities
+            - self.defined_benefit_pension_scheme
+        )
 
 
 class CCEWCharityAreaOfOperation(models.Model):
