@@ -174,7 +174,9 @@ class CharityFinancial(models.Model):
     def exp_gen(self):
         """Expenditure on generating funds"""
         if self.exp_total and self.has_ccew_partb:
-            return self.exp_total - (self.exp_other + self.exp_gov + self.exp_charble)
+            return self.exp_total - (
+                (self.exp_other or 0) + (self.exp_gov or 0) + (self.exp_charble or 0)
+            )
 
     @property
     def reserves_months(self):
