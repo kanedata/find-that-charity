@@ -787,6 +787,19 @@ class CCEWCharityARPartB(models.Model):
             - self.defined_benefit_pension_scheme
         )
 
+    @property
+    def scale(self):
+        max_value = max(
+            abs(self.income_total_income_and_endowments),
+            abs(self.expenditure_total),
+            abs(self.funds_total),
+        )
+        if max_value > 10_000_000:
+            return 1_000_000
+        if max_value > 10_000:
+            return 1_000
+        return 1
+
 
 class CCEWCharityAreaOfOperation(models.Model):
     date_of_extract = models.DateField(

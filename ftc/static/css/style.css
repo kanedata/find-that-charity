@@ -12,6 +12,11 @@
     font-variant-numeric: tabular-nums;
 }
 
+.entry-content table.financial-table th,
+.entry-content table.financial-table td {
+    border-color: rgba(0, 0, 0, .05);
+}
+
 .entry-content table.w-auto {
     width: auto;
 }

@@ -13,6 +13,7 @@ from findthatcharity.utils import (
     a_or_an,
     format_currency,
     list_to_string,
+    number_format,
     pluralise,
     regex_search,
     str_format,
@@ -137,6 +138,7 @@ def environment(**options):
             "str_format": str_format,
             "a_or_an": a_or_an,
             "markdown": markdownify,
+            "number_format": number_format,
         }
     )
     return env

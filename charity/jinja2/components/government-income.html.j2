@@ -1,5 +1,10 @@
 {% call org_panel("Income from government", org) %}
 
+{% if cy.charity_receives_govt_funding_contracts 
+    or cy.charity_receives_govt_funding_grants
+    or (py and py.charity_receives_govt_funding_contracts)
+    or (py and py.charity_receives_govt_funding_grants)
+ %}
 <table class="table collapse financial-table">
     <thead>
         <tr>
@@ -55,4 +60,8 @@
         {% endif %}
     </tbody>
 </table>
+{% else %}
+<p class="measure-wide">According to data returned to the Charity Commission, this charity did not receive 
+income from government grants or contracts in either the current or previous years.</p>
+{% endif %}
 {% endcall %}

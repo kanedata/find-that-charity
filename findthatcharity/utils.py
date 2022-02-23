@@ -167,6 +167,18 @@ def format_currency(amount, currency="GBP", int_format="¤#,##0"):
     )
 
 
+def number_format(value, scale=1):
+    if value is None:
+        return "-"
+    format_ = "{:,.0f}"
+    if scale > 1:
+        format_ = "{:,.1f}"
+    if value < 0:
+        format_ = "(" + format_ + ")"
+        value = abs(value)
+    return format_.format(value / float(scale))
+
+
 def str_format(value, format="{}"):
     return format.format(value)
 
