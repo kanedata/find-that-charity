@@ -39,6 +39,7 @@ class GenderPayGap(models.Model):
     MaleTopQuartile = models.FloatField(null=True, blank=True)
     FemaleTopQuartile = models.FloatField(null=True, blank=True)
     CompanyLinkToGPGInfo = models.URLField(null=True, blank=True, max_length=1000)
+    CompanyWebsite = models.URLField(null=True, blank=True, max_length=1000)
     ResponsiblePerson = models.CharField(max_length=255, null=True, blank=True)
     EmployerSize = models.CharField(
         max_length=255,
