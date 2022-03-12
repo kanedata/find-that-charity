@@ -102,7 +102,7 @@ packaging==20.9
     # via bleach
 parse==1.19.0
     # via requests-html
-pillow==9.0.0
+pillow==9.0.1
     # via django-markdownx
 psycopg2==2.8.6
     # via -r requirements.in
