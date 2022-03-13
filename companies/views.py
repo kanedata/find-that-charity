@@ -11,10 +11,9 @@ from ftc.models import (
 
 
 def company_detail(request, company_number, filetype="html"):
-    # company = get_object_or_404(Company, CompanyNumber=company_number)
-    company = Company.objects.filter(CompanyNumber=company_number).first()
+    company = get_object_or_404(Company, CompanyNumber=company_number)
 
-    vocab, _ = Vocabulary.objects.get(title="Companies House SIC Codes")
+    vocab = Vocabulary.objects.get(title="Companies House SIC Codes")
     sic_codes = {
         entry.code: entry
         for entry in VocabularyEntries.objects.filter(vocabulary=vocab)
