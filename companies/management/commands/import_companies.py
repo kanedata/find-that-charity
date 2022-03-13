@@ -241,7 +241,11 @@ class Command(CSVScraper):
                     "addressCountry": record.get("RegAddress_Country"),
                     "postalCode": record.get("RegAddress_PostCode"),
                     "telephone": None,
-                    "alternateName": record["previous_names"],
+                    "alternateName": [
+                        n["CompanyName"]
+                        for n in record.get("previous_names", [])
+                        if n.get("CompanyName")
+                    ],
                     "email": None,
                     "description": None,
                     "organisationType": [o.slug for o in orgtypes],
