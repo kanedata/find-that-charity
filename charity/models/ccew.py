@@ -160,12 +160,16 @@ class CCEWCharity(models.Model):
     )
 
     def current_year(self):
+        if not self.latest_acc_fin_period_start_date:
+            return None
         return CCEWCharityARPartA.objects.filter(
             registered_charity_number=self.registered_charity_number,
             fin_period_end_date=self.latest_acc_fin_period_end_date,
         ).first()
 
     def previous_year(self):
+        if not self.latest_acc_fin_period_start_date:
+            return None
         return CCEWCharityARPartA.objects.filter(
             registered_charity_number=self.registered_charity_number,
             fin_period_end_date=self.latest_acc_fin_period_start_date
@@ -747,19 +751,20 @@ class CCEWCharityARPartB(models.Model):
 
     @property
     def income_donations(self):
-        return self.income_donations_and_legacies - (
-            self.income_legacies + self.income_endowments
+        return (self.income_donations_and_legacies or 0) - (
+            (self.income_legacies or 0) + (self.income_endowments or 0)
         )
 
     @property
     def expenditure_other_raising_funds(self):
-        return self.expenditure_raising_funds - self.expenditure_investment_management
+        return (self.expenditure_raising_funds or 0) - (
+            self.expenditure_investment_management or 0
+        )
 
     @property
     def expenditure_other_charitable_activities(self):
-        return (
-            self.expenditure_charitable_expenditure
-            - self.expenditure_grants_institution
+        return (self.expenditure_charitable_expenditure or 0) - (
+            self.expenditure_grants_institution or 0
         )
 
     @property
@@ -768,31 +773,30 @@ class CCEWCharityARPartB(models.Model):
 
     @property
     def assets_other_current(self):
-        return self.assets_other_assets - (
-            self.assets_cash + self.assets_current_investment
+        return (self.assets_other_assets or 0) - (
+            (self.assets_cash or 0) + (self.assets_current_investment or 0)
         )
 
     @property
     def assets_net_current(self):
-        return self.assets_current - self.creditors_one_year_total_current
+        return (self.assets_current or 0) - (self.creditors_one_year_total_current or 0)
 
     @property
     def assets_less_current_liabilities(self):
-        return self.assets_total_fixed + self.assets_net_current
+        return (self.assets_total_fixed or 0) + (self.assets_net_current or 0)
 
     @property
     def assets_total_excluding_pension(self):
-        return (
-            self.assets_total_assets_and_liabilities
-            - self.defined_benefit_pension_scheme
+        return (self.assets_total_assets_and_liabilities or 0) - (
+            self.defined_benefit_pension_scheme or 0
         )
 
     @property
     def scale(self):
         max_value = max(
-            abs(self.income_total_income_and_endowments),
-            abs(self.expenditure_total),
-            abs(self.funds_total),
+            abs((self.income_total_income_and_endowments or 0)),
+            abs((self.expenditure_total or 0)),
+            abs((self.funds_total or 0)),
         )
         if max_value > 10_000_000:
             return 1_000_000

@@ -32,11 +32,13 @@
             <td class="bn">{{ "{:.1%}".format(cy.income_from_government_contracts / cy.total_gross_income|float) }}</td>
             <td class="bn">{% if py and py.income_from_government_contracts %}{{ "{:.1%}".format(py.income_from_government_contracts / py.total_gross_income|float) }}{% endif %}</td>
         </tr>
+        {% if cy.count_govt_contracts or (py and py.count_govt_contracts) %}
         <tr>
             <td class="bn tl">Number of government contracts</td>
-            <td class="bn">{{ "{:,.0f}".format(cy.count_govt_contracts) }}</td>
+            <td class="bn">{% if cy.count_govt_contracts %}{{ "{:,.0f}".format(cy.count_govt_contracts) }}{% endif %}</td>
             <td class="bn">{% if py and py.count_govt_contracts %}{{ "{:,.0f}".format(py.count_govt_contracts) }}{% endif %}</td>
         </tr>
+        {% endif %}
         {% endif %}
         {% if cy.charity_receives_govt_funding_grants %}
         <tr>
@@ -52,16 +54,18 @@
             <td class="bn">{{ "{:.1%}".format(cy.income_from_government_grants / cy.total_gross_income|float) }}</td>
             <td class="bn">{% if py and py.income_from_government_grants %}{{ "{:.1%}".format(py.income_from_government_grants / py.total_gross_income|float) }}{% endif %}</td>
         </tr>
+        {% if cy.count_govt_grants or (py and py.count_govt_grants) %}
         <tr>
             <td class="bn tl">Number of government grants</td>
-            <td class="bn">{{ "{:,.0f}".format(cy.count_govt_grants) }}</td>
+            <td class="bn">{% if cy.count_govt_grants %}{{ "{:,.0f}".format(cy.count_govt_grants) }}{% endif %}</td>
             <td class="bn">{% if py and py.count_govt_grants %}{{ "{:,.0f}".format(py.count_govt_grants) }}{% endif %}</td>
         </tr>
+        {% endif %}
         {% endif %}
     </tbody>
 </table>
 {% else %}
 <p class="measure-wide">According to data returned to the Charity Commission, this charity did not receive 
-income from government grants or contracts in either the current or previous years.</p>
+income from government grants or contracts in {{ cy.fin_period_end_date.year }} (the latest year with data available){% if py %} or {{ py.fin_period_end_date.year }}{% endif %}.</p>
 {% endif %}
 {% endcall %}
