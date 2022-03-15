@@ -130,7 +130,11 @@
         </tr>
         <tr>
             <td class="tl b">Total</td>
+            {% if cy_partb.expenditure_total %}
             <td class="b code">{{ cy_partb.expenditure_total|number_format(cy_partb.scale) }}</td>
+            {% else %}
+            <td class="b code">{{ cy.total_gross_expenditure|number_format(cy_partb.scale) }}</td>
+            {% endif %}
             {% if py_partb %}
             <td class="b code">{{ py_partb.expenditure_total|number_format(cy_partb.scale) }}</td>
             {% elif py %}
@@ -142,7 +146,11 @@
         </tr>
         <tr>
             <td class="tl ttu b">Net income / (expenditure)</td>
+            {% if cy_partb.income_total_income_and_endowments and cy_partb.expenditure_total %}
             <td class="b code">{{ (cy_partb.income_total_income_and_endowments - cy_partb.expenditure_total)|number_format(cy_partb.scale) }}</td>
+            {% else %}
+            <td class="b code">{{ (cy.total_gross_income - cy.total_gross_expenditure)|number_format(cy_partb.scale) }}</td>
+            {% endif %}
             {% if py_partb %}
             <td class="b code">{{ (py_partb.income_total_income_and_endowments - py_partb.expenditure_total)|number_format(cy_partb.scale) }}</td>
             {% elif py %}
