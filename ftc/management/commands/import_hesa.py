@@ -1,9 +1,6 @@
+import csv
 import datetime
 import io
-from collections import defaultdict
-
-from django.utils.text import slugify
-from openpyxl import load_workbook
 
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation
@@ -34,6 +31,20 @@ class Command(CSVScraper):
         ],
     }
     orgtypes = ["Higher Education Institution", "University"]
+
+    def parse_file(self, response, source_url):
+
+        try:
+            csv_text = response.text
+        except AttributeError:
+            csv_text = response.body.decode(self.encoding)
+
+        with io.StringIO(csv_text) as a:
+            csvreader = csv.DictReader(
+                a, fieldnames=["INSTID", "UKPRN", "ProviderName"]
+            )
+            for k, row in enumerate(csvreader):
+                self.parse_row(row)
 
     def parse_row(self, record):
 
