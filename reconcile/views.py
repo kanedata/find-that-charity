@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from findthatcharity.jinja2 import get_orgtypes
 from ftc.documents import FullOrganisation
-from ftc.models import Organisation, OrganisationType
+from ftc.models import Organisation, OrganisationType, Vocabulary
 from reconcile.query import do_extend_query, do_reconcile_query
 
 
@@ -94,11 +94,49 @@ def propose_properties(request):
 
     limit = int(request.GET.get("limit", "500"))
 
+    organisation_properties = Organisation.get_fields_as_properties()
+
+    vocabulary_properties = [
+        {"id": "vocab-" + v.slug, "name": v.title, "group": "Vocabulary"}
+        for v in Vocabulary.objects.all()
+        if v.entries.count() > 0
+    ]
+
+    ccew_properties = [
+        {
+            "id": "ccew-parta-total_gross_expenditure",
+            "name": "Total Expenditure",
+            "group": "Charity",
+        },
+        {
+            "id": "ccew-partb-count_employees",
+            "name": "Number of staff",
+            "group": "Charity",
+        },
+        {
+            "id": "ccew-partb-expenditure_charitable_expenditure",
+            "name": "Charitable expenditure",
+            "group": "Charity",
+        },
+        {
+            "id": "ccew-partb-expenditure_grants_institution",
+            "name": "Grantmaking expenditure",
+            "group": "Charity",
+        },
+        {
+            "id": "ccew-gd-charitable_objects",
+            "name": "Objects",
+            "group": "Charity",
+        },
+    ]
+
     return JsonResponse(
         {
             "limit": limit,
             "type": type_,
-            "properties": Organisation.get_fields_as_properties(),
+            "properties": organisation_properties
+            + vocabulary_properties
+            + ccew_properties,
         }
     )
 

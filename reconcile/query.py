@@ -4,10 +4,16 @@ import os
 
 from django.utils.text import slugify
 
+from charity.models import (
+    CCEWCharityARPartA,
+    CCEWCharityARPartB,
+    CCEWCharityGoverningDocument,
+)
 from findthatcharity.jinja2 import get_orgtypes
 from findthatcharity.utils import to_titlecase
 from ftc.documents import FullOrganisation
 from ftc.models import Organisation
+from ftc.models.organisation_classification import OrganisationClassification
 
 with open(os.path.join(os.path.dirname(__file__), "query.json")) as a:
     RECONCILE_QUERY = json.load(a)
@@ -76,16 +82,69 @@ def do_reconcile_query(
 
 def do_extend_query(ids, properties):
     result = {"meta": [], "rows": {}}
-    all_fields = {f["id"]: f for f in Organisation.get_fields_as_properties()}
-    fields = [p["id"] for p in properties if p["id"] in all_fields.keys()]
-    result["meta"] = [all_fields[f] for f in fields]
-    for r in Organisation.objects.filter(org_id__in=ids).values("org_id", *fields):
-        result["rows"][r["org_id"]] = {k: v for k, v in r.items() if k in fields}
+    all_fields = [p["id"] for p in properties]
+
+    # get organisation data
+    all_organisation_fields = {
+        f["id"]: f for f in Organisation.get_fields_as_properties()
+    }
+    organisation_fields = [
+        p["id"] for p in properties if p["id"] in all_organisation_fields.keys()
+    ]
+    result["meta"] = [all_organisation_fields[f] for f in organisation_fields]
+    for r in Organisation.objects.filter(org_id__in=ids).values(
+        "org_id", *organisation_fields
+    ):
+        result["rows"][r["org_id"]] = {
+            k: v for k, v in r.items() if k in organisation_fields
+        }
+
+    # get vocabulary data
+    vocab_fields = [
+        f.replace("vocab-", "") for f in all_fields if f.startswith("vocab-")
+    ]
+    for entry in OrganisationClassification.objects.filter(
+        org_id__in=ids, vocabulary__vocabulary__slug__in=vocab_fields
+    ).all():
+        vocab_slug = entry.vocabulary.vocabulary.slug
+        if entry.org_id not in result["rows"]:
+            result["rows"][entry.org_id] = {}
+        if "vocab-" + vocab_slug not in result["rows"][entry.org_id]:
+            result["rows"][entry.org_id]["vocab-" + vocab_slug] = []
+        result["rows"][entry.org_id]["vocab-" + vocab_slug].append(
+            entry.vocabulary.title
+        )
+
+    # get charity data
+    ccew_fields = {}
+    for f in all_fields:
+        if f.startswith("ccew-"):
+            table, field_name = f.replace("ccew-", "").split("-", 1)
+            ccew_fields.setdefault(table, []).append(field_name)
+    ccew_ids = [i.replace("GB-CHC-", "") for i in ids if i.startswith("GB-CHC-")]
+
+    tables = (
+        ("parta", CCEWCharityARPartA, {"latest_fin_period_submitted_ind": True}),
+        ("partb", CCEWCharityARPartB, {"latest_fin_period_submitted_ind": True}),
+        ("gd", CCEWCharityGoverningDocument, {}),
+    )
+
+    for table, model, default_filters in tables:
+        if ccew_fields.get(table):
+            for r in model.objects.filter(
+                registered_charity_number__in=ccew_ids,
+                **default_filters,
+            ).values("registered_charity_number", *ccew_fields[table]):
+                org_id = "GB-CHC-" + str(r["registered_charity_number"])
+                if org_id not in result["rows"]:
+                    result["rows"][org_id] = {}
+                for f in ccew_fields[table]:
+                    result["rows"][org_id][f"ccew-{table}-{f}"] = r.get(f)
 
     # add in rows for any data that is missing
     for i in ids:
         if i not in result["rows"]:
-            result["rows"][i] = {k: None for k in fields}
+            result["rows"][i] = {k: None for k in all_fields}
 
     return result
 
