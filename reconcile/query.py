@@ -5,6 +5,7 @@ import os
 from django.utils.text import slugify
 
 from charity.models import (
+    CCEWCharityAreaOfOperation,
     CCEWCharityARPartA,
     CCEWCharityARPartB,
     CCEWCharityGoverningDocument,
@@ -126,7 +127,8 @@ def do_extend_query(ids, properties):
     tables = (
         ("parta", CCEWCharityARPartA, {"latest_fin_period_submitted_ind": True}),
         ("partb", CCEWCharityARPartB, {"latest_fin_period_submitted_ind": True}),
-        ("gd", CCEWCharityGoverningDocument, {}),
+        ("gd", CCEWCharityGoverningDocument, {"linked_charity_number": 0}),
+        ("aoo", CCEWCharityAreaOfOperation, {"linked_charity_number": 0}),
     )
 
     for table, model, default_filters in tables:
@@ -139,7 +141,15 @@ def do_extend_query(ids, properties):
                 if org_id not in result["rows"]:
                     result["rows"][org_id] = {}
                 for f in ccew_fields[table]:
-                    result["rows"][org_id][f"ccew-{table}-{f}"] = r.get(f)
+                    fieldname = f"ccew-{table}-{f}"
+                    if result["rows"][org_id].get(fieldname):
+                        if not isinstance(result["rows"][org_id][fieldname], list):
+                            result["rows"][org_id][fieldname] = [
+                                result["rows"][org_id][fieldname]
+                            ]
+                        result["rows"][org_id][fieldname].append(r.get(f))
+                    else:
+                        result["rows"][org_id][fieldname] = r.get(f)
 
     # add in rows for any data that is missing
     for i in ids:

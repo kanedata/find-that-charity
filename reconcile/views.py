@@ -128,6 +128,11 @@ def propose_properties(request):
             "name": "Objects",
             "group": "Charity",
         },
+        {
+            "id": "ccew-aoo-geographic_area_description",
+            "name": "Area of Operation",
+            "group": "Charity",
+        },
     ]
 
     return JsonResponse(
