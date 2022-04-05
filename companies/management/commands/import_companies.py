@@ -119,9 +119,7 @@ class Command(CSVScraper):
             for f in z.infolist():
                 self.logger.info("Opening: {}".format(f.filename))
                 with z.open(f) as csvfile:
-                    reader = csv.DictReader(
-                        io.TextIOWrapper(csvfile, encoding="latin1")
-                    )
+                    reader = csv.DictReader(io.TextIOWrapper(csvfile, encoding="utf8"))
                     for row in tqdm.tqdm(reader):
                         self.parse_row(row)
         response = None
