@@ -23,7 +23,7 @@
     {% if grants_received|length > max_grants %}
     <p>Received {{ "grant"|pluralise(grants_received|length) }}. Showing most recent {{ max_grants }} grants.</p>
     {% endif %}
-    <p>View this organisation's grants on <a class="link dark-blue underline-hover" href="https://grantnav.threesixtygiving.org/recipient/{{ org.org_id }}">GrantNav</a>.</p>
+    <p>View this organisation's grants on <a class="link dark-blue underline-hover" href="https://grantnav.threesixtygiving.org/search?query=%2A&default_field=%2A&sort=_score+desc{% for o in org.orgIDs %}&recipientOrganization={{ o }}{% endfor %}">GrantNav</a>.</p>
     <table class="table collapse">
       <thead>
         <tr>
@@ -70,7 +70,7 @@
     between {{ earliest_grant }} and {{ latest_grant }}.
     {% endif %}
     
-    <p>View this organisation's grants on <a class="link dark-blue underline-hover" href="https://grantnav.threesixtygiving.org/funder/{{ org.org_id }}">GrantNav</a>.</p>
+    <p>View this organisation's grants on <a class="link dark-blue underline-hover" href="https://grantnav.threesixtygiving.org/search?query=%2A&default_field=%2A&sort=_score+desc{% for o in grants_given|map(attribute="fundingOrganization_id")|unique %}&fundingOrganization={{ o }}{% endfor %}">GrantNav</a>.</p>
 
     <table class="table collapse w-auto financial-table">
       <tbody>
