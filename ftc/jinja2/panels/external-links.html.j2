@@ -5,7 +5,7 @@
 </div>
 
 {% set links = org.get_links()|list %}
-{% if links %}
+{% if links or wikidata %}
 <article class="message is-info">
     <h4 class="ma0 pa0">More about this organisation</h4>
     <p class="f6 gray">Find that Charity is not responsible for the content of external websites</p>
@@ -18,7 +18,35 @@
                 </a>
             </li>
             {% endfor %}
+            {% if wikidata %}
+            {% for twitter in wikidata.values_list('twitter', flat=True).distinct() %}
+            {% if twitter %}
+            <li class="w-100 mb2">
+                Twitter: <a class="link dark-blue underline" href="https://twitter.com/{{ twitter }}" target="_blank">
+                @{{ twitter }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            {% for wiki in wikidata.values_list('wikipedia_url', flat=True).distinct() %}
+            {% if wiki %}
+            <li class="w-100 mb2">
+                <a class="link dark-blue underline" href="{{ wiki }}" target="_blank">
+                Wikipedia<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
         </ul>
+        {% if wikidata %}
+        {% for wikidata_id in wikidata.values_list('wikidata_id', flat=True).distinct() %}
+        <p class="f6 gray">Twitter and Wikipedia links from Wikidata</p>
+        <a class="link dark-blue underline db" href="{{ wikidata_id }}" target="_blank">
+            <img src="{{ static('images/Wikidata_Stamp_Rec_Light.svg') }}" alt="Wikidata logo" class="db mb2 mw4" />
+        </a>
+        {% endfor %}
+        {% endif %}
     </div>
 </article>
 {% endif %}

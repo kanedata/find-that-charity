@@ -7,6 +7,7 @@ class Command(BaseCommand):
         "gender_pay_gap",
         "360giving",
         "cqc",
+        "wikidata",
     ]
 
     def handle(self, *args, **options):

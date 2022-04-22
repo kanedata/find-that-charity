@@ -1,7 +1,6 @@
 import csv
 from collections import defaultdict
 
-from django.conf import settings
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -16,7 +15,7 @@ from ftc.query import (
     get_organisation,
     random_query,
 )
-from other_data.models import CQCProvider, Grant
+from other_data.models import CQCProvider, Grant, WikiDataItem
 
 
 # site homepage
@@ -74,6 +73,7 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
         )
         .order_by("-awardDate")
         .all(),
+        wikidata=WikiDataItem.objects.filter(org_id__in=related_orgs.orgIDs).all(),
     )
 
     additional_data["grants_given_by_year"] = defaultdict(

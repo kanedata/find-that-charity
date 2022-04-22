@@ -9,6 +9,7 @@ from .cqc import (
 )
 from .gender_pay_gap import GenderPayGap
 from .threesixtygiving import Grant
+from .wikidata import WikiDataItem
 
 __all__ = (
     CQCProviderType,
@@ -20,4 +21,5 @@ __all__ = (
     CQCLocation,
     GenderPayGap,
     Grant,
+    WikiDataItem,
 )
