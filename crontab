@@ -34,4 +34,7 @@ SHELL=/bin/bash
 # regenerate the elasticsearch index - every night
 0 4 * * * dokku dokku --rm run ftc python ./manage.py es_index
 
+# randomly tweet every hour
+47 * * * * dokku dokku --rm run ftc python ./manage.py tweet
+
 ### PLACE ALL CRON TASKS ABOVE, DO NOT REMOVE THE WHITESPACE AFTER THIS LINE
