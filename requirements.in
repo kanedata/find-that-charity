@@ -35,3 +35,4 @@ sentry-sdk
 urllib3>=1.26.5
 pydantic>=1.7.4
 babel
+tweepy

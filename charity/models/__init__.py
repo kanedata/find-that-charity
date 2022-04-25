@@ -81,6 +81,12 @@ class Charity(models.Model):
                 return True
         return False
 
+    @property
+    def charity_number(self):
+        return (
+            self.id.replace("GB-CHC-", "").replace("GB-SC-", "").replace("GB-NIC-", "")
+        )
+
 
 class CharityName(models.Model):
     charity = models.ForeignKey(
