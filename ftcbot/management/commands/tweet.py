@@ -74,7 +74,7 @@ class Command(BaseCommand):
             char["website"] = "http://" + char["website"]
 
         # return the tweet format
-        return "{title} [{regno}] {website}{income}".format(**char)
+        return "{title} {website} ({regno})".format(**char)
 
     def handle(self, *args, **options):
         charity = self.get_random_charity()
