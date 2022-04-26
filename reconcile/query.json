@@ -64,19 +64,23 @@
                                 "active": false
                             }
                         },
-                        "weight": 0.9
+                        "weight": 0.8
                     },
                     {
                         "filter": {
                             "terms": {
-                                "source": ["ccew", "ccni", "oscr"]
+                                "source": [
+                                    "ccew",
+                                    "ccni",
+                                    "oscr"
+                                ]
                             }
                         },
                         "weight": 5
                     },
                     {
                         "field_value_factor": {
-                            "field": "latest_income",
+                            "field": "latestIncome",
                             "modifier": "log2p",
                             "missing": 1
                         }
