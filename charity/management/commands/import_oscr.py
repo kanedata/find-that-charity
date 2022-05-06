@@ -2,10 +2,8 @@ import csv
 import datetime
 import io
 import zipfile
-from turtle import title
 
 import tqdm
-from django.db import connection
 from django.utils.text import slugify
 
 from charity.management.commands._oscr_sql import UPDATE_OSCR
