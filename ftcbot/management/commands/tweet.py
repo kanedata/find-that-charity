@@ -24,10 +24,13 @@ class Command(BaseCommand):
     def get_random_charity(self):
         q = FullOrganisation.search().from_dict(
             random_query(True, "registered-charity")
-        )[0]
+        )[:100]
         result = q.execute()
         for r in result:
-            return Charity.objects.get(id=r["org_id"])
+            try:
+                return Charity.objects.get(id=r["org_id"])
+            except (Charity.DoesNotExist):
+                pass
 
     def get_twitter_id(self, charity):
         wikidata = WikiDataItem.objects.filter(org_id=charity.id).first()
