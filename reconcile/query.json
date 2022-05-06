@@ -79,10 +79,10 @@
                         "weight": 5
                     },
                     {
-                        "field_value_factor": {
-                            "field": "latestIncome",
-                            "modifier": "log2p",
-                            "missing": 1
+                        "script_score": {
+                            "script": {
+                                "source": "if((doc['latestIncome'].size()==0) || Objects.isNull(doc['latestIncome'].value) || (doc['latestIncome'].value <= 1)){1}else{Math.log(doc['latestIncome'].value)}"
+                            }
                         }
                     }
                 ]
