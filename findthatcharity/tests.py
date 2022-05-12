@@ -56,3 +56,9 @@ class IndexViewTests(ftc.tests.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Find that Charity", html=True)
         self.assertContains(response, "Source publisher", html=True)
+
+
+class TestClacks(ftc.tests.TestCase):
+    def test_xheader_exists(self):
+        response = self.client.get(reverse("about"))
+        self.assertEqual(response["X-Clacks-Overhead"], "GNU Terry Pratchett")
