@@ -53,10 +53,6 @@ charset-normalizer==2.0.12
     #   requests
 click==8.1.2
     # via black
-colorama==0.4.4
-    # via
-    #   -r requirements.txt
-    #   tqdm
 cssselect==1.1.0
     # via
     #   -r requirements.txt
@@ -171,7 +167,7 @@ parse==1.19.0
     #   requests-html
 pathspec==0.9.0
     # via black
-pillow==9.1.0
+pillow==9.1.1
     # via
     #   -r requirements.txt
     #   django-markdownx
