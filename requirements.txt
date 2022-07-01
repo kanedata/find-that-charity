@@ -117,7 +117,7 @@ openpyxl==3.0.9
     # via -r requirements.in
 parse==1.19.0
     # via requests-html
-pillow==9.1.0
+pillow==9.1.1
     # via django-markdownx
 psycopg2==2.9.3
     # via -r requirements.in
