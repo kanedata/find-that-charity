@@ -6,7 +6,7 @@ class Command(BaseCommand):
     scrapers = [
         "casc",
         "gor",
-        "grid",
+        "ror",
         "hesa",
         "lae",
         "lani",
@@ -30,5 +30,5 @@ class Command(BaseCommand):
         for scraper in scrapers_to_run:
             try:
                 management.call_command(scraper)
-            except Exception as err:
+            except Exception:
                 self.stdout.write(self.style.ERROR("Command {} failed".format(scraper)))

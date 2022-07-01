@@ -17,7 +17,7 @@ SELECT ?item ?itemLabel ?charity ?article ?articlename ?twitter ?facebook ?grid 
 
 class Command(HTMLScraper):
     name = "wd"
-    allowed_domains = ["gender-pay-gap.service.gov.uk"]
+    allowed_domains = ["query.wikidata.org"]
     start_urls = [
         "https://query.wikidata.org/sparql",
     ]

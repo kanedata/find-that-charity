@@ -93,6 +93,9 @@ EXTERNAL_LINKS = {
     "XI-GRID": [
         ["https://www.grid.ac/institutes/{}", "Global Research Identifier Database"],
     ],
+    "XI-ROR": [
+        ["https://ror.org/{}", "Research Organization Registry"],
+    ],
 }
 
 
