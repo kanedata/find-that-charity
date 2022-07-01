@@ -5,7 +5,8 @@ UPDATE_CCEW[
 ] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
     postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
-    company_number, activities, source, first_added, last_updated, income, spending, latest_fye)
+    company_number, activities, source, first_added, last_updated, income, spending, latest_fye, 
+    scrape_id, spider)
 select distinct on(c.registered_charity_number)
     CONCAT('GB-CHC-', c.registered_charity_number) as "id",
     c.charity_name as "name",
@@ -33,7 +34,9 @@ select distinct on(c.registered_charity_number)
     NOW() as "last_updated",
     c.latest_income as income,
     c.latest_expenditure as spending,
-    c.latest_acc_fin_period_end_date as latest_fye
+    c.latest_acc_fin_period_end_date as latest_fye,
+    %(scrape_id)s as "scrape_id",
+    %(spider_name)s as "spider"
 from charity_ccewcharity c
     left outer join charity_ccewcharitygoverningdocument cgd
         on c.organisation_number = cgd.organisation_number
@@ -62,7 +65,18 @@ set "name" = EXCLUDED.name,
     last_updated = EXCLUDED.last_updated,
     income = COALESCE(EXCLUDED.income, cc.income),
     spending = COALESCE(EXCLUDED.spending, cc.spending),
-    latest_fye = COALESCE(EXCLUDED.latest_fye, cc.latest_fye)
+    latest_fye = COALESCE(EXCLUDED.latest_fye, cc.latest_fye),
+    scrape_id = EXCLUDED.scrape_id,
+    spider = EXCLUDED.spider
+"""
+
+UPDATE_CCEW[
+    "Mark missing charities as inactive"
+] = """
+update charity_charity as cc
+set active = false
+where spider = %(spider_name)s
+    and scrape_id != %(scrape_id)s
 """
 
 UPDATE_CCEW[
@@ -143,10 +157,10 @@ UPDATE_CCEW[
 ] = """
 update charity_charity
 set employees = cf.employees,
-	volunteers = cf.volunteers 
+    volunteers = cf.volunteers 
 from charity_charityfinancial cf 
 where charity_charity.id = cf.charity_id
-	and charity_charity.latest_fye = cf.fyend;
+    and charity_charity.latest_fye = cf.fyend;
 """
 
 UPDATE_CCEW[
@@ -155,11 +169,11 @@ UPDATE_CCEW[
 update charity_charity
 set trustees = t.trustees
 from (
-	select CONCAT('GB-CHC-', registered_charity_number) as "charity_id",
-		COUNT(*) as trustees
-	from charity_ccewcharitytrustee
-	where linked_charity_number = 0
-	group by charity_id
+    select CONCAT('GB-CHC-', registered_charity_number) as "charity_id",
+        COUNT(*) as trustees
+    from charity_ccewcharitytrustee
+    where linked_charity_number = 0
+    group by charity_id
 ) as t
 where charity_charity.id = t.charity_id;
 """

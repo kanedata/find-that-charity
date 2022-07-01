@@ -5,7 +5,8 @@ UPDATE_OSCR[
 ] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
     postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
-    company_number, activities, source, first_added, last_updated, income, spending, latest_fye, dual_registered)
+    company_number, activities, source, first_added, last_updated, income, spending, latest_fye,
+    dual_registered, scrape_id, spider)
 select cc.org_id as org_id,
     cc.data->>'Charity Name' as "name",
     cc.data->>'Constitutional Form' as constitution,
@@ -27,7 +28,9 @@ select cc.org_id as org_id,
     (cc.data->>'Most recent year income')::int as income,
     (cc.data->>'Charitable activities spending')::int + (cc.data->>'Raising funds spending')::int + (cc.data->>'Other spending')::int as spending,
     to_date(cc.data->>'Year End', 'YYYY-MM-DD') as latest_fye,
-    null as dual_registered
+    null as dual_registered,
+    cc.scrape_id as "scrape_id",
+    cc.spider as "spider"
 from charity_charityraw cc
 where cc.spider = %(spider_name)s
 on conflict (id) do update
@@ -49,7 +52,18 @@ set "name" = EXCLUDED.name,
     last_updated = EXCLUDED.last_updated,
     income = EXCLUDED.income,
     spending = EXCLUDED.spending,
-    latest_fye = EXCLUDED.latest_fye;
+    latest_fye = EXCLUDED.latest_fye,
+    scrape_id = EXCLUDED.scrape_id,
+    spider = EXCLUDED.spider;
+"""
+
+UPDATE_OSCR[
+    "Mark missing charities as inactive"
+] = """
+update charity_charity as cc
+set active = false
+where spider = %(spider_name)s
+    and scrape_id != %(scrape_id)s
 """
 
 UPDATE_OSCR[
@@ -115,9 +129,9 @@ UPDATE_OSCR[
 update charity_charity 
 set dual_registered = true 
 where id in (
-	select org_id_a
-	from ftc_organisationlink fo 
-	where fo.source_id = 'dual_registered'
+    select org_id_a
+    from ftc_organisationlink fo 
+    where fo.source_id = 'dual_registered'
 )
 and source = %(spider_name)s;
 """

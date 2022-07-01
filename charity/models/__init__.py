@@ -45,6 +45,12 @@ class Charity(models.Model):
     volunteers = models.IntegerField(null=True, blank=True)
     trustees = models.IntegerField(null=True, blank=True)
     dual_registered = models.BooleanField(null=True, blank=True)
+    scrape = models.ForeignKey(
+        "ftc.Scrape",
+        related_name="charities",
+        on_delete=models.DO_NOTHING,
+    )
+    spider = models.CharField(max_length=200, db_index=True)
 
     areas_of_operation = models.ManyToManyField("AreaOfOperation")
 
