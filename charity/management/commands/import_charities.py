@@ -18,3 +18,4 @@ class Command(BaseCommand):
         management.call_command("import_ukcat")
         management.call_command("update_orgids")
         management.call_command("update_geodata")
+        management.call_command("calculate_scale")

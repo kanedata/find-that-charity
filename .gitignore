@@ -1,6 +1,7 @@
 # data
 
 data/
+*.csv
 
 # test data
 !*/tests/data/

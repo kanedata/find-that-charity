@@ -13,10 +13,10 @@
         {% if loop.first %}<strong>{{a.title}}</strong>
         {% else %}{{ a.title }}
         {% endif %}
-        {% if a.code and a.code|length < 10 %}<code>{{ a.code }}</code>{% endif %} &raquo;
+        {% if a.code and a.code|length < 10 and (a.code != a.title|slugify) %}<code>{{ a.code }}</code>{% endif %} &raquo;
         {% endfor %}
         {{ entry.vocabulary.title }} 
-        {% if entry.vocabulary.code and entry.vocabulary.code|length < 10 %}<code>{{ entry.vocabulary.code }}</code>{% endif %}
+        {% if entry.vocabulary.code and entry.vocabulary.code|length < 10 and (entry.vocabulary.code != entry.vocabulary.title|slugify) %}<code>{{ entry.vocabulary.code }}</code>{% endif %}
       </li>
     {% endfor %}
     </ul>
