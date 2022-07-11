@@ -80,7 +80,29 @@ where spider = %(spider_name)s
 """
 
 UPDATE_CCEW[
-    "Insert into charity financial"
+    "Insert annual return history into charity financial"
+] = """
+insert into charity_charityfinancial as cf (charity_id, fyend, fystart, income, spending, account_type)
+select DISTINCT ON ("org_id", "fyend") a.*
+from (
+    select CONCAT('GB-CHC-', c.registered_charity_number) as org_id,
+        c.fin_period_end_date as "fyend",
+        c.fin_period_start_date as "fystart",
+        c.total_gross_income as "income",
+        c.total_gross_expenditure as "spending",
+        'basic' as "account_type"
+    from charity_ccewcharityannualreturnhistory c
+    where "total_gross_income" is not null
+) as a
+on conflict (charity_id, fyend) do update
+set fystart = EXCLUDED.fystart,
+    income = EXCLUDED.income,
+    spending = EXCLUDED.spending,
+    account_type = cf.account_type;
+"""
+
+UPDATE_CCEW[
+    "Insert parta into charity financial"
 ] = """
 insert into charity_charityfinancial as cf (charity_id, fyend, fystart, income, spending, volunteers, account_type)
 select DISTINCT ON ("org_id", "fyend") a.*
