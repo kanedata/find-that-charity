@@ -221,6 +221,18 @@ class CharityRaw(models.Model):
         return "{} {}".format(self.spider, self.org_id)
 
 
+class CharityAddressHistory(models.Model):
+    org_id = models.CharField(max_length=255, db_index=True)
+    address_md5 = models.TextField(null=True, blank=True, db_index=True)
+    address = models.TextField(null=True, blank=True, db_index=True)
+    postcode = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    first_added = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("org_id", "address_md5")
+
+
 class AreaOfOperation(models.Model):
     aootype = models.CharField(max_length=1, null=True, blank=True)
     aookey = models.IntegerField(null=True, blank=True)

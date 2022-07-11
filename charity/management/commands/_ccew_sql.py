@@ -1,11 +1,41 @@
 UPDATE_CCEW = {}
 
 UPDATE_CCEW[
+    "Update archive addresses"
+] = """
+with addresses as (
+select CONCAT('GB-CHC-', c.registered_charity_number) as "org_id",
+    NULLIF(concat_ws(', ',
+        c."charity_contact_address1",
+        c."charity_contact_address2",
+        c."charity_contact_address3",
+        c."charity_contact_address4",
+        c."charity_contact_address5"
+    ), '') as address,
+    c.charity_contact_postcode as postcode
+from charity_ccewcharity c
+where linked_charity_number = 0
+)
+insert into charity_charityaddresshistory (org_id, address_md5, address, postcode, first_added, last_updated)
+select org_id,
+    md5(lower(coalesce(address, '')::text || coalesce(postcode, '')::text)) as address_md5,
+    address,
+    postcode,
+    NOW() as first_added,
+    NOW() as last_updated
+from addresses
+where address is not null or postcode is not null
+on conflict (org_id, address_md5) do update
+set first_added = charity_charityaddresshistory.first_added,
+    last_updated = EXCLUDED.last_updated
+"""
+
+UPDATE_CCEW[
     "Insert into charity table"
 ] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
     postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
-    company_number, activities, source, first_added, last_updated, income, spending, latest_fye, 
+    company_number, activities, source, first_added, last_updated, income, spending, latest_fye,
     scrape_id, spider)
 select distinct on(c.registered_charity_number)
     CONCAT('GB-CHC-', c.registered_charity_number) as "id",
@@ -68,6 +98,22 @@ set "name" = EXCLUDED.name,
     latest_fye = COALESCE(EXCLUDED.latest_fye, cc.latest_fye),
     scrape_id = EXCLUDED.scrape_id,
     spider = EXCLUDED.spider
+"""
+
+UPDATE_CCEW[
+    "Add missing addresses"
+] = """
+update charity_charity c
+set address = last_address.address,
+    postcode = last_address.postcode
+from (
+    select distinct on (org_id) org_id, address, postcode
+    from charity_charityaddresshistory cc
+    order by org_id, last_updated desc
+) as last_address
+where last_address.org_id = c.id
+    and c.address is null
+    and c.postcode is null
 """
 
 UPDATE_CCEW[
@@ -179,8 +225,8 @@ UPDATE_CCEW[
 ] = """
 update charity_charity
 set employees = cf.employees,
-    volunteers = cf.volunteers 
-from charity_charityfinancial cf 
+    volunteers = cf.volunteers
+from charity_charityfinancial cf
 where charity_charity.id = cf.charity_id
     and charity_charity.latest_fye = cf.fyend;
 """
