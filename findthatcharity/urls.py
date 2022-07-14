@@ -16,6 +16,7 @@ Including another URLconf
 import django_sql_dashboard
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic.base import TemplateView
 
 import addtocsv.views
 import charity.urls
@@ -28,6 +29,10 @@ from api.endpoints import api
 handler404 = "findthatcharity.views.missing_page_handler"
 
 urlpatterns = [
+    path(
+        "robots.txt",
+        TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
+    ),
     path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls, name="about"),
     path("", ftc.views.index, name="index"),
