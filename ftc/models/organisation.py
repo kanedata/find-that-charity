@@ -3,6 +3,7 @@ import re
 from collections import defaultdict
 
 from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.urls import reverse
 from django_better_admin_arrayfield.models.fields import ArrayField
@@ -203,6 +204,7 @@ class Organisation(models.Model):
         blank=True,
         null=True,
     )
+    search_vector = SearchVectorField(null=True)
 
     class Meta:
         unique_together = (
@@ -214,6 +216,7 @@ class Organisation(models.Model):
             GinIndex(fields=["linked_orgs"]),
             GinIndex(fields=["alternateName"]),
             GinIndex(fields=["organisationType"]),
+            GinIndex(fields=["search_vector"]),
         ]
 
     def __str__(self):

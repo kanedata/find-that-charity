@@ -66,6 +66,9 @@ class Command(BaseScraper):
         # run the update_orgids scraper
         management.call_command("update_orgids")
 
+        # run the postgres version
+        # Organisation.objects.update(search_vector=SearchVector('name', weight="A") + SearchVector("alternateName", weight="B"))
+
         # create new index
         next_index = PATTERN.replace("*", str(self.scrape.id))
         self.logger.info("New index name: {}".format(next_index))

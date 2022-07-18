@@ -22,7 +22,7 @@ from other_data.models import CQCProvider, Grant, WikiDataItem
 # site homepage
 def index(request):
     if "q" in request.GET:
-        return orgid_type(request, filetype=request.GET.get("filetype", "html"))
+        return org_search(request, filetype=request.GET.get("filetype", "html"))
 
     context = dict(
         examples={
@@ -138,7 +138,7 @@ class Echo:
         return value
 
 
-def orgid_type(request, orgtype=None, source=None, filetype="html"):
+def org_search(request, orgtype=None, source=None, filetype="html"):
     base_query = None
     download_url = request.build_absolute_uri() + "&filetype=csv"
     s = OrganisationSearch()
@@ -202,7 +202,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         )
         return response
 
-    s.run_es(with_pagination=True, with_aggregation=True)
+    s.run_db(with_pagination=True, with_aggregation=True)
     page_number = request.GET.get("page")
     try:
         page_obj = s.paginator.get_page(page_number)

@@ -1,7 +1,8 @@
 import copy
 
+from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Func, Q
+from django.db.models import Case, Count, F, Func, Q, Value, When
 from django.shortcuts import Http404
 from elasticsearch_dsl import A
 
@@ -259,6 +260,8 @@ class OrganisationSearch:
 
     def run_db(self, with_pagination=False, with_aggregation=False):
         db_filter = []
+        search_query = None
+        order_by = "name"
         if self.base_orgtype:
             db_filter.append(Q(organisationType__contains=self.base_orgtype))
         if self.other_orgtypes:
@@ -266,7 +269,8 @@ class OrganisationSearch:
         if self.source:
             db_filter.append(Q(source__id__in=self.source))
         if self.term:
-            db_filter.append(Q(name__search=self.term))
+            search_query = SearchQuery(self.term)
+            db_filter.append(Q(search_vector=search_query))
         if self.active is True or self.active is False:
             db_filter.append(Q(active=self.active))
 
@@ -279,12 +283,35 @@ class OrganisationSearch:
                 | Q(locations__geoCode__in=self.location)
             )
 
-        # self.query = Organisation.objects.filter(**{k: v for k, v in db_filter.items()})
         self.query = Organisation.objects.filter(*db_filter)
+
+        if search_query:
+            search_rank = SearchRank(F("search_vector"), search_query)
+            income_rank = (
+                Func(
+                    Func(F("latestIncome") + 1, function="log"),
+                    0,
+                    function="coalesce",
+                )
+                + 1
+            )
+            active_rank = Case(
+                When(active=True, then=Value(1.0)),
+                When(active=False, then=Value(0.7)),
+                default=Value(1.0),
+            )
+
+            self.query = self.query.annotate(
+                rank=search_rank * income_rank * active_rank,
+                search_rank=search_rank,
+                income_rank=income_rank,
+                active_rank=active_rank,
+            )
+            order_by = "-rank"
 
         if with_pagination:
             self.paginator = Paginator(
-                self.query.order_by("name"), self.results_per_page
+                self.query.order_by(order_by), self.results_per_page
             )
 
         if with_aggregation:
@@ -302,3 +329,17 @@ class OrganisationSearch:
                 .annotate(records=Count("source"))
                 .order_by("-records")
             )
+
+            self.aggregation["by_active"] = {
+                "active": 0,
+                "inactive": 0,
+            }
+            for record in (
+                self.query.values("active")
+                .annotate(records=Count("active"))
+                .order_by("-records")
+            ):
+                if record["active"]:
+                    self.aggregation["by_active"]["active"] = record["records"]
+                else:
+                    self.aggregation["by_active"]["inactive"] = record["records"]
