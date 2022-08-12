@@ -71,6 +71,7 @@ class Command(CSVScraper):
         super().__init__(*args, **kwargs)
         self.raw_records = []
         self.vocabularies = {}
+        self.seen_org_ids = set()
         for f in self.vocab_fields:
             v, _ = Vocabulary.objects.get_or_create(
                 slug="{}_{}".format(self.name, f.lower()),
@@ -170,6 +171,10 @@ class Command(CSVScraper):
 
         org_ids = [self.get_org_id(record)]
 
+        if org_ids[0] in self.seen_org_ids:
+            self.logger.debug("Skipping duplicate org: {}".format(org_ids[0]))
+            return
+
         self.raw_records.append(record)
 
         for v in self.vocabularies:
@@ -228,6 +233,8 @@ class Command(CSVScraper):
                 }
             )
         )
+
+        self.seen_org_ids.add(self.get_org_id(record))
 
     def close_spider(self):
         super(Command, self).close_spider()
