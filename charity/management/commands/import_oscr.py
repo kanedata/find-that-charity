@@ -91,11 +91,13 @@ class Command(CSVScraper):
         )
         if existing_id:
             return existing_id
-        new_vocab = VocabularyEntries.objects.create(
-            title=entry_title,
+        new_vocab, _ = VocabularyEntries.objects.get_or_create(
             vocabulary=self.vocabularies[vocab]["vocabulary"],
-            current=True,
             code=slugify(entry_title),
+            defaults=dict(
+                title=entry_title,
+                current=True,
+            ),
         )
         self.vocabularies[vocab]["entries"][entry_title] = new_vocab.id
         return new_vocab.id
