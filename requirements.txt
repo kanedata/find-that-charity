@@ -8,43 +8,52 @@ appdirs==1.4.4
     # via
     #   pyppeteer
     #   requests-cache
-asgiref==3.5.0
+asgiref==3.5.2
     # via django
 attrs==21.4.0
     # via
     #   cattrs
     #   requests-cache
-babel==2.10.1
+babel==2.10.3
     # via -r requirements.in
+backports-zoneinfo==0.2.1
+    # via django
 bcp-reader==0.1.1
     # via -r requirements.in
 beautifulsoup4==4.11.1
     # via bs4
-bleach==5.0.0
+black==22.6.0
+    # via -r requirements.in
+bleach==5.0.1
     # via django-sql-dashboard
 bs4==0.0.1
     # via requests-html
-cattrs==1.10.0
+cattrs==22.1.0
     # via requests-cache
-certifi==2021.10.8
+certifi==2022.6.15
     # via
     #   elasticsearch
     #   pyppeteer
     #   requests
     #   sentry-sdk
-charset-normalizer==2.0.12
+charset-normalizer==2.1.0
     # via requests
-colorama==0.4.4
-    # via tqdm
+click==8.1.3
+    # via black
+colorama==0.4.5
+    # via
+    #   click
+    #   tqdm
 cssselect==1.1.0
     # via pyquery
 decorator==5.1.1
     # via validators
-dj-database-url==0.5.0
+dj-database-url==1.0.0
     # via -r requirements.in
-django==3.2.13
+django==4.1
     # via
     #   -r requirements.in
+    #   dj-database-url
     #   django-cors-headers
     #   django-filter
     #   django-markdownx
@@ -53,19 +62,19 @@ django==3.2.13
     #   django-sql-dashboard
 django-better-admin-arrayfield==1.4.2
     # via -r requirements.in
-django-composite-foreignkey==1.1.0
+django-composite-foreignkey @ git+https://github.com/kanedata/django-composite-foreignkey.git
     # via -r requirements.in
-django-cors-headers==3.11.0
+django-cors-headers==3.13.0
     # via -r requirements.in
 django-elasticsearch-dsl==7.2.2
     # via -r requirements.in
-django-environ==0.8.1
+django-environ==0.9.0
     # via -r requirements.in
-django-filter==21.1
+django-filter==22.1
     # via -r requirements.in
-django-markdownx==3.0.1
+django-markdownx==4.0.0b1
     # via -r requirements.in
-django-ninja==0.17.0
+django-ninja==0.19.1
     # via -r requirements.in
 django-prettyjson==0.4.1
     # via -r requirements.in
@@ -73,27 +82,33 @@ django-sql-dashboard==1.1
     # via -r requirements.in
 django-widget-tweaks==1.4.12
     # via -r requirements.in
-elasticsearch==7.17.3
+elasticsearch==7.17.4
     # via elasticsearch-dsl
 elasticsearch-dsl==7.4.0
     # via django-elasticsearch-dsl
 et-xmlfile==1.1.0
     # via openpyxl
+exceptiongroup==1.0.0rc8
+    # via cattrs
 fake-useragent==0.1.11
     # via requests-html
+flake8==5.0.4
+    # via -r requirements.in
 gunicorn==20.1.0
     # via -r requirements.in
-humanize==4.0.0
+humanize==4.3.0
     # via -r requirements.in
 idna==3.3
     # via requests
-importlib-metadata==4.11.3
+importlib-metadata==4.12.0
     # via
     #   markdown
     #   pyppeteer
-inflect==5.5.2
+inflect==6.0.0
     # via -r requirements.in
-jinja2==3.1.1
+isort==5.10.1
+    # via -r requirements.in
+jinja2==3.1.2
     # via -r requirements.in
 lml==0.1.0
     # via pyexcel-io
@@ -103,30 +118,41 @@ lxml==4.6.5
     #   pyexcel-ezodf
     #   pyexcel-ods3
     #   pyquery
-markdown==3.3.6
+markdown==3.4.1
     # via
     #   django-markdownx
     #   django-sql-dashboard
 markupsafe==2.1.1
     # via jinja2
+mccabe==0.7.0
+    # via flake8
+mypy-extensions==0.4.3
+    # via black
 oauthlib==3.2.0
     # via
     #   requests-oauthlib
     #   tweepy
-openpyxl==3.0.9
+openpyxl==3.0.10
     # via -r requirements.in
 parse==1.19.0
     # via requests-html
-pillow==9.1.1
+pathspec==0.9.0
+    # via black
+pillow==9.2.0
     # via django-markdownx
+platformdirs==2.5.2
+    # via black
 psycopg2==2.9.3
     # via -r requirements.in
+pycodestyle==2.9.1
+    # via flake8
 pycountry==22.3.5
     # via -r requirements.in
-pydantic==1.9.0
+pydantic==1.9.2
     # via
     #   -r requirements.in
     #   django-ninja
+    #   inflect
 pyee==8.2.2
     # via pyppeteer
 pyexcel-ezodf==0.3.4
@@ -135,6 +161,8 @@ pyexcel-io==0.6.6
     # via pyexcel-ods3
 pyexcel-ods3==0.6.1
     # via -r requirements.in
+pyflakes==2.5.0
+    # via flake8
 pyppeteer==1.0.2
     # via requests-html
 pyquery==1.4.3
@@ -143,26 +171,27 @@ python-dateutil==2.8.2
     # via elasticsearch-dsl
 python-dotenv==0.20.0
     # via -r requirements.in
-pytz==2022.1
-    # via
-    #   babel
-    #   django
+pytz==2022.2
+    # via babel
 pyyaml==6.0
     # via -r requirements.in
-requests==2.27.1
+requests==2.28.1
     # via
     #   -r requirements.in
     #   requests-cache
     #   requests-html
+    #   requests-mock
     #   requests-oauthlib
     #   tweepy
-requests-cache==0.9.4
+requests-cache==0.9.5
     # via -r requirements.in
 requests-html==0.10.0
     # via -r requirements.in
+requests-mock==1.9.3
+    # via -r requirements.in
 requests-oauthlib==1.3.1
     # via tweepy
-sentry-sdk==1.7.1
+sentry-sdk==1.9.4
     # via -r requirements.in
 six==1.16.0
     # via
@@ -171,9 +200,8 @@ six==1.16.0
     #   django-prettyjson
     #   elasticsearch-dsl
     #   python-dateutil
+    #   requests-mock
     #   url-normalize
-    #   validators
-    #   w3lib
 soupsieve==2.3.2.post1
     # via beautifulsoup4
 sqlparse==0.4.2
@@ -182,17 +210,23 @@ standardjson==0.3.1
     # via django-prettyjson
 titlecase==2.3
     # via -r requirements.in
+tomli==2.0.1
+    # via black
 tqdm==4.64.0
     # via
     #   -r requirements.in
     #   pyppeteer
-tweepy==4.8.0
+tweepy==4.10.0
     # via -r requirements.in
-typing-extensions==4.2.0
-    # via pydantic
+typing-extensions==4.3.0
+    # via
+    #   black
+    #   pydantic
+tzdata==2022.1
+    # via django
 url-normalize==1.4.3
     # via requests-cache
-urllib3==1.26.9
+urllib3==1.26.11
     # via
     #   -r requirements.in
     #   elasticsearch
@@ -200,17 +234,17 @@ urllib3==1.26.9
     #   requests
     #   requests-cache
     #   sentry-sdk
-validators==0.18.2
+validators==0.20.0
     # via -r requirements.in
-w3lib==1.22.0
+w3lib==2.0.1
     # via requests-html
 webencodings==0.5.1
     # via bleach
 websockets==10.3
     # via pyppeteer
-whitenoise==6.0.0
+whitenoise==6.2.0
     # via -r requirements.in
-zipp==3.8.0
+zipp==3.8.1
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
