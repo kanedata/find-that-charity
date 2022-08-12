@@ -248,6 +248,8 @@ IGNORE_DOMAINS = (
     "mac.com",
     "waitrose.com",
     "gmail.co.uk",
+    "facebook.com",
+    "gov.uk",
 )
 
 DASHBOARD_ROW_LIMIT = 1000
