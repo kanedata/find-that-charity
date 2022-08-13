@@ -205,6 +205,12 @@ class Organisation(models.Model):
         null=True,
     )
     search_vector = SearchVectorField(null=True)
+    priority = ArrayField(
+        models.BigIntegerField(null=True, blank=True, db_index=True),
+        blank=True,
+        null=True,
+        verbose_name="Organisation priority",
+    )
 
     class Meta:
         unique_together = (

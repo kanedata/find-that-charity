@@ -17,9 +17,11 @@ def index(request, orgtype="all"):
     if orgtype == "all":
         orgtypes = []
     elif isinstance(orgtype, str):
-        orgtypes = [OrganisationType.objects.get(slug=o) for o in orgtype.split("+")]
+        orgtypes = [
+            OrganisationType.objects.get(slug=o).slug for o in orgtype.split("+")
+        ]
     elif isinstance(orgtype, list):
-        orgtypes = [OrganisationType.objects.get(slug=o) for o in orgtype]
+        orgtypes = [OrganisationType.objects.get(slug=o).slug for o in orgtype]
 
     queries = request.POST.get("queries", request.GET.get("queries"))
     if queries:

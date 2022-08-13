@@ -1,11 +1,11 @@
 Find that charity
 ================
 
-Elasticsearch-powered search engine for looking for charities and other non-profit organisations. Allows for:
+Search engine for looking for charities and other non-profit organisations. Allows for:
 
 - importing data nearly 20 sources in the UK, ensuring that duplicates
   are matched to one record.
-- An elasticsearch index that can be queried.
+- A database index that can be queried.
 - [Org-ids](http://org-id.guide/about) are added to organisations.
 - Reconciliation API for searching organisations, based on an optimised search query.
 - Facility for uploading a CSV of charity names and adding the (best guess) at a
@@ -21,14 +21,12 @@ Installation
 4. Install requirements (`pip install -r requirements.txt`)
 5. [Install postgres](https://www.postgresql.org/download/)
 6. Start postgres
-7. [Install elasticsearch 7](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html) - you may need to increase available memory (see below)
-8. Start elasticsearch
-9. Create `.env` file in root directory. Contents based on `.env.example`.
-10. Create the database tables (`python ./manage.py migrate && python ./manage.py createcachetable`)
-11. Import data on charities (`python ./manage.py import_charities`)
-12. Import data on nonprofit companies (`python ./manage.py import_companies`)
-13. Import data on other non-profit organisations (`python ./manage.py import_all`)
-14. Add organisations to elasticsearch index (`python ./manage.py es_index`) - (Don't use the default `search_index` command as this won't setup aliases correctly)
+7. Create `.env` file in root directory. Contents based on `.env.example`.
+8. Create the database tables (`python ./manage.py migrate && python ./manage.py createcachetable`)
+9. Import data on charities (`python ./manage.py import_charities`)
+10. Import data on nonprofit companies (`python ./manage.py import_companies`)
+11. Import data on other non-profit organisations (`python ./manage.py import_all`)
+12. Add organisations to text search index (`python ./manage.py update_index`)
 
 Dokku Installation
 ------------------
@@ -45,22 +43,6 @@ dokku apps:create ftc
 sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git postgres
 dokku postgres:create ftc-db
 dokku postgres:link ftc-db ftc
-
-# elasticsearch
-sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
-export ELASTICSEARCH_IMAGE="elasticsearch"
-export ELASTICSEARCH_IMAGE_VERSION="7.7.1"
-dokku elasticsearch:create ftc-es
-dokku elasticsearch:link ftc-es ftc
-# configure elasticsearch 7:
-# https://github.com/dokku/dokku-elasticsearch/issues/72#issuecomment-510771763
-
-# setup elasticsearch increased memory (might be needed)
-nano /var/lib/dokku/services/elasticsearch/ftc-es/config/jvm.options
-# replace `-Xms512m` with `-Xms2g`
-# replace `-Xms512m` with `-Xmx2g`
-# restart elasticsearch
-dokku elasticsearch:restart ftc-es
 
 # SSL
 sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
@@ -92,7 +74,7 @@ dokku run ftc python ./manage.py charity_setup
 dokku run ftc python ./manage.py import_charities
 dokku run ftc python ./manage.py import_companies
 dokku run ftc python ./manage.py import_all
-dokku run ftc python ./manage.py es_index
+dokku run ftc python ./manage.py update_index
 ```
 
 ### 4. Set up scheduled task for running tasks on a regular basis
@@ -141,8 +123,8 @@ SHELL=/bin/bash
 # import other data sources - Saturday night
 0 0 * * 0 dokku dokku --rm run ftc python ./manage.py import_other_data
 
-# regenerate the elasticsearch index - every night
-0 4 * * * dokku dokku --rm run ftc python ./manage.py es_index
+# regenerate the database index - every night
+0 4 * * * dokku dokku --rm run ftc python ./manage.py update_index
 
 # randomly tweet every hour
 47 * * * * dokku dokku --rm run ftc python ./manage.py tweet
@@ -158,43 +140,6 @@ is run using the following command:
 
 ```sh
 python ./manage.py import_charities
-```
-
-### Data model
-
-The data is imported into elasticsearch in the following format:
-
-```json
-{
-  "charity_number": "12355",
-  "ccew_number": "12355",
-  "oscr_number": "SC1235",
-  "ccni_number": "NIC100012",
-  "active": true,
-  "names": [
-    {"name": "Charity Name", "type": "registered name", "source": "ccew"}
-  ],
-  "known_as": "Charity Name",
-  "geo": {
-    "areas": ["gss_codes"],
-    "postcode": "PO54 0DE",
-    "latlng": [0.0, 50.0]
-  },
-  "url": "http://www.url.org.uk/",
-  "domain": "url.org.uk",
-  "latest_income": 12345,
-  "company_number": [
-    {"number": "00121212", "source": "ccew"}
-  ],
-  "parent": "124566",
-  "ccew_link": "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber=12355&SubsidiaryNumber=0",
-  "oscr_link": "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number=SC1235",
-  "ccni_link": "http://www.charitycommissionni.org.uk/charity-details/?regid=100012&subid=0",
-  "org-ids": ["GB-COH-00121212", "GB-CHC-12355", "GB-SC-SC1235", "GB-NIC-100012"],
-  "date_registered": "2001-01-01T00:00:00",
-  "date_removed": null,
-  "last_modified": "2018-02-11T22:49:15"
-}
 ```
 
 Server

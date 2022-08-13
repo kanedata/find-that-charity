@@ -202,9 +202,12 @@ def get_domain(url):
         return None
     if not url.startswith("http"):
         url = "http://" + url
-    domain = urlparse(url).netloc
+    try:
+        domain = urlparse(url).netloc
+    except ValueError:
+        return None
     if domain.startswith("www."):
         domain = domain[4:]
     if domain in IGNORE_DOMAINS:
-        return "IGNORED {}".format(url)
+        return None
     return domain

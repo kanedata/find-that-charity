@@ -38,7 +38,7 @@ The intended audience for findthatcharity is people in the UK who want to solve 
 
 Findthatcharity consists of four parts:
 
-- A **database** - currently powered by [elasticsearch](https://www.elastic.co/products/elasticsearch). The database aims to bring together registers of non-profit organisations in one place, and crucially link between them, so you can tell when a record for a charity refers to the same organisations as a company. It's important to note that this database doesn't aim to *be* the register of these organisations - those are still held by the regulators of these organisations. But it does aim to bring together a single copy (or *cache*) of these registers, a snapshot at a particular point in time.
+- A **database** - currently powered by postgres. The database aims to bring together registers of non-profit organisations in one place, and crucially link between them, so you can tell when a record for a charity refers to the same organisations as a company. It's important to note that this database doesn't aim to *be* the register of these organisations - those are still held by the regulators of these organisations. But it does aim to bring together a single copy (or *cache*) of these registers, a snapshot at a particular point in time.
 
 - A set of **web scrapers** designed to find data on non-profit organisations from publicly available registers and transform these organisations records into a common format so they can be cached in the database. The common format is based on the `Organization` element of the [360Giving data standard](http://standard.threesixtygiving.org/en/latest/#). The web scrapers are found in the `ftc/management/commands` and `charity/management/commands` folders, and all start with `import_`.
 

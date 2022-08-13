@@ -1,14 +1,9 @@
-import copy
-
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.core.paginator import Paginator
-from django.db.models import Case, Count, F, Func, Q, Value, When
+from django.db.models import Count, F, Func, Q
 from django.shortcuts import Http404
-from elasticsearch_dsl import A
 
-from ftc.documents import DSEPaginator, FullOrganisation
-from ftc.models import Organisation, RelatedOrganisation
-from reconcile.query import RECONCILE_QUERY
+from ftc.models import Organisation, RelatedOrganisation, OrganisationGroup
 
 
 def get_organisation(org_id):
@@ -86,7 +81,6 @@ class OrganisationSearch:
         self.aggregation = {}
 
         self.set_criteria(**kwargs)
-        self.es_query = copy.deepcopy(RECONCILE_QUERY)
 
     def set_criteria(
         self,
@@ -114,7 +108,10 @@ class OrganisationSearch:
                 elif isinstance(t, list):
                     values = []
                     for v in t:
-                        values.extend(v.split("+"))
+                        if isinstance(v, str):
+                            values.extend(v.split("+"))
+                        else:
+                            values.append(v)
                     setattr(self, k, values)
 
         if active is True or active is False:
@@ -149,115 +146,6 @@ class OrganisationSearch:
             orgtypes.extend(self.other_orgtypes)
         return orgtypes
 
-    def run_es(self, with_pagination=False, with_aggregation=False):
-        """
-        Fetch the reconciliation query and insert the query term
-        """
-
-        params = {}
-
-        sort_by = False
-        if self.term:
-            for param in self.es_query["params"]:
-                params[param] = self.term
-        else:
-            self.es_query["inline"]["query"]["function_score"]["query"]["bool"][
-                "must"
-            ] = {"match_all": {}}
-            # first two functions reference the {{name}} parameter
-            self.es_query["inline"]["query"]["function_score"][
-                "functions"
-            ] = self.es_query["inline"]["query"]["function_score"]["functions"][2:]
-            sort_by = "sortname"
-
-        # add postcode
-        if self.postcode:
-            self.es_query["inline"]["query"]["function_score"]["functions"].append(
-                {"filter": {"match": {"postalCode": "{{postcode}}"}}, "weight": 2}
-            )
-            params["postcode"] = self.postcode
-
-        # add domain searching
-        if self.domain:
-            self.es_query["inline"]["query"]["function_score"]["functions"].append(
-                {"filter": {"term": {"domain": "{{domain}}"}}, "weight": 200000}
-            )
-            params["domain"] = self.domain
-
-        filter_ = []
-        # check for base organisation type
-        if self.base_orgtype:
-            filter_.append({"terms": {"organisationType": self.base_orgtype}})
-
-        # check for other organisation types
-        if self.other_orgtypes:
-            filter_.append({"terms": {"organisationType": self.other_orgtypes}})
-
-        # check for source
-        if self.source:
-            filter_.append({"terms": {"source": self.source}})
-
-        # check for location
-        if self.location:
-            filter_.append({"terms": {"location": self.location}})
-
-        # check for active or inactive organisations
-        if self.active is True:
-            filter_.append({"match": {"active": True}})
-        elif self.active is False:
-            filter_.append({"match": {"active": False}})
-
-        if filter_:
-            self.es_query["inline"]["query"]["function_score"]["query"]["bool"][
-                "filter"
-            ] = filter_
-
-        q = (
-            FullOrganisation.search()
-            .from_dict(self.es_query["inline"])
-            .params(track_total_hits=True)
-            .index(FullOrganisation._default_index())
-        )
-        if sort_by:
-            q = q.sort(sort_by)
-
-        if with_aggregation:
-            by_source = A("terms", field="source", size=150)
-            by_orgtype = A("terms", field="organisationType", size=150)
-            by_active = A("terms", field="active", size=150)
-            by_location = A("terms", field="location", size=1000)
-            q.aggs.bucket("by_source", by_source)
-            q.aggs.bucket("by_orgtype", by_orgtype)
-            q.aggs.bucket("by_active", by_active)
-            q.aggs.bucket("by_location", by_location)
-
-        self.query = q.execute(params=params)
-        if with_pagination:
-            self.paginator = DSEPaginator(q, self.results_per_page, params=params)
-
-        if with_aggregation:
-            self.aggregation["by_source"] = [
-                {"source": b["key"], "records": b["doc_count"]}
-                for b in self.query.aggregations["by_source"]["buckets"]
-            ]
-            self.aggregation["by_orgtype"] = [
-                {"orgtype": b["key"], "records": b["doc_count"]}
-                for b in self.query.aggregations["by_orgtype"]["buckets"]
-            ]
-            self.aggregation["by_location"] = {
-                b["key"]: b["doc_count"]
-                for b in self.query.aggregations["by_location"]["buckets"]
-            }
-            self.aggregation["by_active"] = {
-                "active": 0,
-                "inactive": 0,
-            }
-            for b in self.query.aggregations["by_active"]["buckets"]:
-                if b["key"]:
-                    self.aggregation["by_active"]["active"] = b["doc_count"]
-                else:
-                    self.aggregation["by_active"]["inactive"] = b["doc_count"]
-
     def run_db(self, with_pagination=False, with_aggregation=False):
         db_filter = []
         search_query = None
@@ -267,7 +155,7 @@ class OrganisationSearch:
         if self.other_orgtypes:
             db_filter.append(Q(organisationType__contains=self.other_orgtypes))
         if self.source:
-            db_filter.append(Q(source__id__in=self.source))
+            db_filter.append(Q(source__contains=self.source))
         if self.term:
             search_query = SearchQuery(self.term)
             db_filter.append(Q(search_vector=search_query))
@@ -276,36 +164,14 @@ class OrganisationSearch:
 
         # check for location
         if self.location:
-            db_filter.append(
-                Q(locations__geo_laua__in=self.location)
-                | Q(locations__geo_rgn__in=self.location)
-                | Q(locations__geo_ctry__in=self.location)
-                | Q(locations__geoCode__in=self.location)
-            )
+            db_filter.append(Q(locations__contains=self.location))
 
-        self.query = Organisation.objects.filter(*db_filter)
+        self.query = OrganisationGroup.objects.filter(*db_filter)
 
         if search_query:
             search_rank = SearchRank(F("search_vector"), search_query)
-            income_rank = (
-                Func(
-                    Func(F("latestIncome") + 1, function="log"),
-                    0,
-                    function="coalesce",
-                )
-                + 1
-            )
-            active_rank = Case(
-                When(active=True, then=Value(1.0)),
-                When(active=False, then=Value(0.7)),
-                default=Value(1.0),
-            )
-
             self.query = self.query.annotate(
-                rank=search_rank * income_rank * active_rank,
-                search_rank=search_rank,
-                income_rank=income_rank,
-                active_rank=active_rank,
+                rank=search_rank * F("search_scale"),
             )
             order_by = "-rank"
 
@@ -313,9 +179,11 @@ class OrganisationSearch:
             self.paginator = Paginator(
                 self.query.order_by(order_by), self.results_per_page
             )
+        else:
+            self.paginator = Paginator(self.query.order_by(order_by), 1)
 
         if with_aggregation:
-            self.aggregation["by_orgtype"] = (
+            self.aggregation["by_orgtype"] = list(
                 self.query.annotate(
                     orgtype=Func(F("organisationType"), function="unnest")
                 )
@@ -324,11 +192,25 @@ class OrganisationSearch:
                 .order_by("-records")
             )
 
-            self.aggregation["by_source"] = (
-                self.query.values("source")
+            self.aggregation["by_source"] = [
+                {"source": r["by_source"], "records": r["records"]}
+                for r in self.query.annotate(
+                    by_source=Func(F("source"), function="unnest")
+                )
+                .values("by_source")
                 .annotate(records=Count("source"))
                 .order_by("-records")
-            )
+            ]
+
+            self.aggregation["by_location"] = {
+                r["location"]: r["records"]
+                for r in self.query.annotate(
+                    location=Func(F("locations"), function="unnest")
+                )
+                .values("location")
+                .annotate(records=Count("locations"))
+                .order_by("-records")
+            }
 
             self.aggregation["by_active"] = {
                 "active": 0,

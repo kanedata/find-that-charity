@@ -1,5 +1,6 @@
 from ftc.models.organisation import EXTERNAL_LINKS, Organisation
 from ftc.models.organisation_classification import OrganisationClassification
+from ftc.models.organisation_group import OrganisationGroup
 from ftc.models.organisation_link import OrganisationLink
 from ftc.models.organisation_location import OrganisationLocation
 from ftc.models.organisation_type import OrganisationType
@@ -13,6 +14,7 @@ from ftc.models.vocabulary import Vocabulary, VocabularyEntries
 __all__ = [
     "Organisation",
     "EXTERNAL_LINKS",
+    "OrganisationGroup",
     "OrganisationClassification",
     "OrganisationLink",
     "OrganisationLocation",

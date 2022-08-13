@@ -31,8 +31,8 @@ SHELL=/bin/bash
 # import other data sources - Saturday night
 0 0 * * 0 dokku dokku --rm run ftc python ./manage.py import_other_data
 
-# regenerate the elasticsearch index - every night
-0 4 * * * dokku dokku --rm run ftc python ./manage.py es_index
+# regenerate the database index - every night
+0 4 * * * dokku dokku --rm run ftc python ./manage.py update_index
 
 # randomly tweet every hour
 47 * * * * dokku dokku --rm run ftc python ./manage.py tweet

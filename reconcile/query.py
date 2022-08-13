@@ -1,7 +1,3 @@
-import copy
-import json
-import os
-
 from charity.models import (
     CCEWCharityAreaOfOperation,
     CCEWCharityARPartA,
@@ -10,12 +6,9 @@ from charity.models import (
 )
 from findthatcharity.jinja2 import get_orgtypes
 from findthatcharity.utils import normalise_name, to_titlecase
-from ftc.documents import FullOrganisation
+from ftc.query import OrganisationSearch
 from ftc.models import Organisation
 from ftc.models.organisation_classification import OrganisationClassification
-
-with open(os.path.join(os.path.dirname(__file__), "query.json")) as a:
-    RECONCILE_QUERY = json.load(a)
 
 
 def do_reconcile_query(
@@ -34,15 +27,15 @@ def do_reconcile_query(
 
     properties = {p["pid"]: p["v"] for p in properties}
 
-    query_template, params = recon_query(
-        query,
-        orgtypes=orgtypes,
+    s = OrganisationSearch(
+        other_orgtypes=orgtypes,
+        term=query,
         postcode=properties.get("postalCode"),
         domain=properties.get("domain"),
     )
-    q = FullOrganisation.search().from_dict(query_template)[:limit]
-    result = q.execute(params=params)
+    s.run_db()
     all_orgtypes = get_orgtypes()
+    result = sorted(list(o for o in s.query), key=lambda o: o.rank, reverse=True)
 
     return {
         "result": [
@@ -55,19 +48,17 @@ def do_reconcile_query(
                 ),
                 "type": [
                     {
-                        "id": o.organisationTypePrimary,
-                        "name": all_orgtypes[o.organisationTypePrimary].title,
+                        "id": o.organisationTypePrimary.slug,
+                        "name": o.organisationTypePrimary.title,
                     }
                 ]
                 + [
                     {"id": ot, "name": all_orgtypes[ot].title}
                     for ot in o.organisationType
-                    if ot != o.organisationTypePrimary and ot in all_orgtypes
+                    if ot != o.organisationTypePrimary.slug and ot in all_orgtypes
                 ],
-                "score": o.meta.score,
-                "match": (normalise_name(o.name) == normalise_name(query))
-                and (o.meta.score == result.hits.max_score)
-                and (k == 0),
+                "score": o.rank,
+                "match": (normalise_name(o.name) == normalise_name(query)) and (k == 0),
             }
             for k, o in enumerate(result)
         ]
@@ -150,60 +141,6 @@ def do_extend_query(ids, properties):
             result["rows"][i] = {k: None for k in all_fields}
 
     return result
-
-
-def recon_query(
-    term=None,
-    orgtypes="all",
-    other_orgtypes=None,
-    postcode=None,
-    domain=None,
-    source=None,
-):
-    """
-    Fetch the reconciliation query and insert the query term
-    """
-    json_q = copy.deepcopy(RECONCILE_QUERY)
-
-    params = {}
-
-    if term:
-        for param in json_q["params"]:
-            params[param] = term
-    else:
-        json_q["inline"]["query"]["function_score"]["query"]["bool"]["must"] = {
-            "match_all": {}
-        }
-
-    # add postcode
-    if postcode:
-        json_q["inline"]["query"]["function_score"]["functions"].append(
-            {"filter": {"match": {"postalCode": "{{postcode}}"}}, "weight": 2}
-        )
-        params["postcode"] = postcode
-
-    # add domain searching
-    if domain:
-        json_q["inline"]["query"]["function_score"]["functions"].append(
-            {"filter": {"term": {"domain": "{{domain}}"}}, "weight": 200000}
-        )
-        params["domain"] = domain
-
-    # check for organisation type
-    filter_ = []
-    if orgtypes and orgtypes != "all":
-        if not isinstance(orgtypes, list):
-            orgtypes = [orgtypes]
-        filter_.append({"terms": {"organisationType": [o.slug for o in orgtypes]}})
-
-    # check for source
-    if source:
-        filter_.append({"term": {"source": source}})
-
-    if filter_:
-        json_q["inline"]["query"]["function_score"]["query"]["bool"]["filter"] = filter_
-
-    return (json_q["inline"], params)
 
 
 def autocomplete_query(term, orgtype="all"):

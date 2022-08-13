@@ -1,7 +1,16 @@
+import math
+
 from django.urls import reverse
+from django.db.models import Q
 
 from .organisation import EXTERNAL_LINKS, Organisation
 from .organisation_type import OrganisationType
+from .organisation_link import OrganisationLink
+from .organisation_location import OrganisationLocation
+
+SCALE_DEFAULT = 1.0
+SCALE_MINIMUM = 0.1
+SCALE_INACTIVE = 0.7
 
 
 class RelatedOrganisation:
@@ -50,6 +59,44 @@ class RelatedOrganisation:
         return list(set(sources))
 
     @property
+    def source_ids(self):
+        sources = list(self.get_all("source_id"))
+        sources.extend(
+            list(
+                OrganisationLink.objects.filter(
+                    Q(org_id_a__in=self.orgIDs) | Q(org_id_b__in=self.orgIDs)
+                ).values_list("source_id", flat=True)
+            )
+        )
+        return list(set(sources))
+
+    @property
+    def geocodes(self):
+        location_fields = [
+            "geo_iso",
+            "geo_oa11",
+            "geo_cty",
+            "geo_laua",
+            "geo_ward",
+            "geo_ctry",
+            "geo_rgn",
+            "geo_pcon",
+            "geo_ttwa",
+            "geo_lsoa11",
+            "geo_msoa11",
+            "geo_lep1",
+            "geo_lep2",
+        ]
+        geocodes = set()
+        locations = OrganisationLocation.objects.filter(org_id__in=self.orgIDs)
+        for location in locations:
+            for field in location_fields:
+                value = getattr(location, field, None)
+                if value and not value.endswith("999999"):
+                    geocodes.add(value)
+        return list(geocodes)
+
+    @property
     def org_links(self):
         org_links = []
         for o in self.records:
@@ -73,6 +120,23 @@ class RelatedOrganisation:
             return None
         return {}
 
+    def search_scale(self):
+        scaling = SCALE_DEFAULT
+        income_vals = [
+            max([income, 1]) for income in self.get_all("latestIncome") if income
+        ]
+
+        if income_vals:
+            scaling = math.log(max(income_vals)) + 1
+
+        if not self.active:
+            scaling = scaling * SCALE_INACTIVE
+
+        if not scaling or scaling < SCALE_MINIMUM:
+            return SCALE_MINIMUM
+
+        return scaling
+
     def get_all(self, field):
         seen = set()
         for r in self.records:
@@ -87,7 +151,7 @@ class RelatedOrganisation:
     def prioritise_orgs(self, orgs):
         # Decide what order a list of organisations should go in,
         # based on their priority
-        return sorted(orgs, key=lambda o: o.get_priority())
+        return sorted(orgs, key=lambda o: o.priority)
 
     def get_links(self):
         links_seen = set()

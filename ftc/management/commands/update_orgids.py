@@ -1,3 +1,4 @@
+from ftc.models import OrgidScheme
 from ftc.management.commands._base_scraper import BaseScraper
 
 UPDATE_ORGIDS_SQL = {
@@ -58,6 +59,18 @@ UPDATE_ORGIDS_SQL = {
         set linked_orgs = string_to_array(org_id, '')
         where linked_orgs is null;
     """,
+    "Update priorities field": """
+    with priorities as (select ARRAY[{}] as prefixes)
+    update ftc_organisation o
+    set priority = array[
+        case when active then 0 else 1 end,
+        coalesce(array_position(priorities.prefixes, org_id_scheme_id), 99),
+        coalesce(extract(epoch from o."dateRegistered"), 0)
+    ]
+    from priorities;
+    """.format(
+        ",".join([f"'{p}'" for p in OrgidScheme.PRIORITIES])
+    ),
 }
 
 

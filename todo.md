@@ -26,7 +26,7 @@
     - create DB
     - setup cache tables
     - populate DB (import_all)
-    - create and populate elasticsearch (`python findthatcharity/manage.py es_index`)
+    - create and populate elasticsearch (`python findthatcharity/manage.py update_index`)
     - something on static urls?
 - set up ongoing tasks
     - populate DB
