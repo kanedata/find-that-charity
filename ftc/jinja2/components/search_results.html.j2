@@ -43,9 +43,23 @@
     </h4>
     <div class="cf mb2">
         {{ orgid_link(result.org_id, large=True) }}
+        {% if result.orgIDs|length > 10 %}
+        {% for o in result.orgIDs[:10] if o != result.org_id %}
+        {{ orgid_link(o) }}
+        {% endfor %}
+        <details>
+            <summary class="f6 pointer">
+            Additional identifiers
+            </summary>
+            {% for o in result.orgIDs[10:] if o != result.org_id %}
+            {{ orgid_link(o) }}
+            {% endfor %}
+        </details>
+        {% else %}
         {% for o in result.orgIDs if o != result.org_id %}
         {{ orgid_link(o) }}
         {% endfor %}
+        {% endif %}
     </div>
     <div class="cf">
         {% for k in result.organisationType if k != result.organisationTypePrimary %}
