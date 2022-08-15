@@ -8,13 +8,10 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 
 from charity.models import Charity
 from ftc.models import Organisation, OrganisationType, RelatedOrganisation, Source
-from .models.organisation_group import OrganisationGroup
-from ftc.query import (
-    OrganisationSearch,
-    get_linked_organisations,
-    get_organisation,
-)
+from ftc.query import OrganisationSearch, get_linked_organisations, get_organisation
 from other_data.models import CQCProvider, Grant, WikiDataItem
+
+from .models.organisation_group import OrganisationGroup
 
 
 # site homepage
@@ -167,18 +164,18 @@ def org_search(request, orgtype=None, source=None, filetype="html"):
         columns = {
             "org_id": "id",
             "name": "name",
-            "charityNumber": "charityNumber",
-            "companyNumber": "companyNumber",
+            # "charityNumber": "charityNumber",
+            # "companyNumber": "companyNumber",
             "postalCode": "postalCode",
-            "url": "url",
-            "latestIncome": "latestIncome",
-            "latestIncomeDate": "latestIncomeDate",
-            "dateRegistered": "dateRegistered",
-            "dateRemoved": "dateRemoved",
+            # "url": "url",
+            # "latestIncome": "latestIncome",
+            # "latestIncomeDate": "latestIncomeDate",
+            # "dateRegistered": "dateRegistered",
+            # "dateRemoved": "dateRemoved",
             "active": "active",
-            "dateModified": "dateModified",
+            # "dateModified": "dateModified",
             "orgIDs": "orgIDs",
-            "linked_orgs": "linked_orgs",
+            # "linked_orgs": "linked_orgs",
             "organisationType": "organisationType",
             "organisationTypePrimary__title": "organisationTypePrimary",
             "source": "source",

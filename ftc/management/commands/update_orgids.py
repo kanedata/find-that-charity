@@ -1,5 +1,5 @@
-from ftc.models import OrgidScheme
 from ftc.management.commands._base_scraper import BaseScraper
+from ftc.models import OrgidScheme
 
 UPDATE_ORGIDS_SQL = {
     "Add linked orgIDs": """

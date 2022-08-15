@@ -2,9 +2,10 @@
 
 import django.contrib.postgres.indexes
 import django.contrib.postgres.search
-from django.db import migrations, models
 import django.db.models.deletion
 import django_better_admin_arrayfield.models.fields
+from django.db import migrations, models
+
 import ftc.models.orgid
 
 

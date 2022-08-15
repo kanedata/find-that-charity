@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count, F, Func, Q
 from django.shortcuts import Http404
 
-from ftc.models import Organisation, RelatedOrganisation, OrganisationGroup
+from ftc.models import Organisation, OrganisationGroup, RelatedOrganisation
 
 
 def get_organisation(org_id):

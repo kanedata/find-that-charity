@@ -1,12 +1,12 @@
 import math
 
-from django.urls import reverse
 from django.db.models import Q
+from django.urls import reverse
 
 from .organisation import EXTERNAL_LINKS, Organisation
-from .organisation_type import OrganisationType
 from .organisation_link import OrganisationLink
 from .organisation_location import OrganisationLocation
+from .organisation_type import OrganisationType
 
 SCALE_DEFAULT = 1.0
 SCALE_MINIMUM = 0.1

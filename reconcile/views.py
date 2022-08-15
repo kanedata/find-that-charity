@@ -5,8 +5,8 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from ftc.query import OrganisationSearch
 from ftc.models import Organisation, Vocabulary
+from ftc.query import OrganisationSearch
 from reconcile.query import do_extend_query, do_reconcile_query
 
 

@@ -6,9 +6,9 @@ from charity.models import (
 )
 from findthatcharity.jinja2 import get_orgtypes
 from findthatcharity.utils import normalise_name, to_titlecase
-from ftc.query import OrganisationSearch
 from ftc.models import Organisation
 from ftc.models.organisation_classification import OrganisationClassification
+from ftc.query import OrganisationSearch
 
 
 def do_reconcile_query(

@@ -4,8 +4,8 @@ from django.core.management.base import BaseCommand
 
 from charity.models import Charity
 from findthatcharity.utils import to_titlecase
-from ftc.models.organisation import EXTERNAL_LINKS
 from ftc.models import OrganisationGroup
+from ftc.models.organisation import EXTERNAL_LINKS
 from other_data.models import WikiDataItem
 
 
