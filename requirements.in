@@ -1,7 +1,6 @@
 django
 django-better-admin-arrayfield
 django-cors-headers
-django-elasticsearch-dsl
 django-environ
 django-prettyjson
 django-filter

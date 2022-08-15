@@ -25,49 +25,11 @@ def get_linked_organisations(org_id):
     return RelatedOrganisation(related_orgs)
 
 
-def random_query(active=False, orgtype=None, aggregate=False, source=None):
-    query = {
-        "query": {
-            "function_score": {
-                "query": {"bool": {"must": []}},
-                "boost": "5",
-                "random_score": {},
-                "boost_mode": "multiply",
-            }
-        }
-    }
-    if active:
-        query["query"]["function_score"]["query"]["bool"]["must"].append(
-            {"match": {"active": True}}
-        )
-
-    if orgtype and orgtype != [""]:
-        if not isinstance(orgtype, list):
-            orgtype = [orgtype]
-        query["query"]["function_score"]["query"]["bool"]["must"].append(
-            {"terms": {"organisationType": orgtype}}
-        )
-
-    if source and source != [""]:
-        if not isinstance(source, list):
-            source = [source]
-        query["query"]["function_score"]["query"]["bool"]["must"].append(
-            {"terms": {"sources": source}}
-        )
-
-    if aggregate:
-        query["aggs"] = {
-            "group_by_type": {"terms": {"field": "organisationType", "size": 500}},
-            "group_by_source": {"terms": {"field": "sources", "size": 500}},
-        }
-
-    return query
-
-
 class OrganisationSearch:
     def __init__(self, results_per_page=25, **kwargs):
         self.results_per_page = results_per_page
         self.term = None
+        self.prefix = None
         self.base_orgtype = None
         self.other_orgtypes = None
         self.source = None
@@ -92,9 +54,12 @@ class OrganisationSearch:
         domain=None,
         postcode=None,
         location=None,
+        prefix=None,
     ):
         if term and isinstance(term, str):
             self.term = term
+        elif prefix and isinstance(prefix, str):
+            self.prefix = prefix
 
         for t, k in [
             (base_orgtype, "base_orgtype"),
@@ -132,6 +97,8 @@ class OrganisationSearch:
             self.set_criteria(location=request.GET.getlist("location"))
         if "q" in request.GET:
             self.set_criteria(term=request.GET["q"])
+        elif "prefix" in request.GET:
+            self.set_criteria(prefix=request.GET["prefix"])
         if request.GET.get("active", "").lower().startswith("t"):
             self.set_criteria(active=True)
         elif request.GET.get("active", "").lower().startswith("f"):
@@ -146,25 +113,34 @@ class OrganisationSearch:
             orgtypes.extend(self.other_orgtypes)
         return orgtypes
 
-    def run_db(self, with_pagination=False, with_aggregation=False):
+    def run_db(self, with_pagination=False, with_aggregation=False, loose=False):
         db_filter = []
         search_query = None
         order_by = "name"
         if self.base_orgtype:
             db_filter.append(Q(organisationType__contains=self.base_orgtype))
         if self.other_orgtypes:
-            db_filter.append(Q(organisationType__contains=self.other_orgtypes))
+            db_filter.append(Q(organisationType__overlap=self.other_orgtypes))
         if self.source:
-            db_filter.append(Q(source__contains=self.source))
+            db_filter.append(Q(source__overlap=self.source))
         if self.term:
-            search_query = SearchQuery(self.term)
+            if loose:
+                term = self.term.split()
+                if term:
+                    search_query = SearchQuery(term.pop())
+                    for t in term:
+                        search_query |= SearchQuery(t)
+            else:
+                search_query = SearchQuery(self.term)
             db_filter.append(Q(search_vector=search_query))
+        if self.prefix:
+            db_filter.append(Q(name__istartswith=self.prefix))
         if self.active is True or self.active is False:
             db_filter.append(Q(active=self.active))
 
         # check for location
         if self.location:
-            db_filter.append(Q(locations__contains=self.location))
+            db_filter.append(Q(locations__overlap=self.location))
 
         self.query = OrganisationGroup.objects.filter(*db_filter)
 
@@ -180,7 +156,7 @@ class OrganisationSearch:
                 self.query.order_by(order_by), self.results_per_page
             )
         else:
-            self.paginator = Paginator(self.query.order_by(order_by), 1)
+            self.query = self.query.order_by(order_by)
 
         if with_aggregation:
             self.aggregation["by_orgtype"] = list(

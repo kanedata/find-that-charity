@@ -5,30 +5,20 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from findthatcharity.jinja2 import get_orgtypes
-from ftc.documents import FullOrganisation
-from ftc.models import Organisation, OrganisationType, Vocabulary
+from ftc.query import OrganisationSearch
+from ftc.models import Organisation, Vocabulary
 from reconcile.query import do_extend_query, do_reconcile_query
 
 
 @csrf_exempt
 def index(request, orgtype="all"):
 
-    if orgtype == "all":
-        orgtypes = []
-    elif isinstance(orgtype, str):
-        orgtypes = [
-            OrganisationType.objects.get(slug=o).slug for o in orgtype.split("+")
-        ]
-    elif isinstance(orgtype, list):
-        orgtypes = [OrganisationType.objects.get(slug=o).slug for o in orgtype]
-
     queries = request.POST.get("queries", request.GET.get("queries"))
     if queries:
         queries = json.loads(queries)
         results = {}
         for query_id, query in queries.items():
-            results[query_id] = do_reconcile_query(**query, orgtypes=orgtypes)
+            results[query_id] = do_reconcile_query(**query, orgtypes=orgtype)
         return JsonResponse(results)
 
     extend = request.POST.get("extend", request.GET.get("extend"))
@@ -36,7 +26,7 @@ def index(request, orgtype="all"):
         extend = json.loads(extend)
         return JsonResponse(do_extend_query(**extend))
 
-    return JsonResponse(service_spec(request, orgtypes=orgtypes))
+    return JsonResponse(service_spec(request, orgtypes=orgtype))
 
 
 def service_spec(request, orgtypes=None):
@@ -150,42 +140,28 @@ def propose_properties(request):
 
 @csrf_exempt
 def suggest(request, orgtype=None):
-    SUGGEST_NAME = "name_complete"
-
     prefix = request.GET.get("prefix")
     # cursor = request.GET.get("cursor")
     if not prefix:
         raise Http404("Prefix must be supplied")
-    q = FullOrganisation.search()
-
-    if not orgtype or orgtype == "all":
-        orgtype = []
-    orgtype.extend(request.GET.getlist("orgtype"))
-
-    completion = {"field": "complete_names", "fuzzy": {"fuzziness": 1}}
-    if orgtype:
-        completion["contexts"] = dict(organisationType=orgtype)
-    else:
-        all_orgtypes = get_orgtypes()
-        completion["contexts"] = dict(organisationType=[o for o in all_orgtypes.keys()])
-
-    q = q.suggest(SUGGEST_NAME, prefix, completion=completion).source(
-        ["org_id", "name", "organisationType"]
-    )
-    result = q.execute()
-
+    q = OrganisationSearch()
+    q.set_criteria_from_request(request)
+    q.run_db()
+    results = q.query.order_by("-search_scale").values(
+        "name", "org_id", "organisationType"
+    )[:10]
     return JsonResponse(
         {
             "result": [
                 {
-                    "id": r["_source"]["org_id"],
-                    "name": r["_source"]["name"],
+                    "id": r["org_id"],
+                    "name": r["name"],
                     "url": request.build_absolute_uri(
-                        reverse("orgid_html", kwargs={"org_id": r["_source"]["org_id"]})
+                        reverse("orgid_html", kwargs={"org_id": r["org_id"]})
                     ),
-                    "orgtypes": list(r["_source"]["organisationType"]),
+                    "orgtypes": list(r["organisationType"]),
                 }
-                for r in result.suggest[SUGGEST_NAME][0]["options"]
+                for r in results
             ]
         }
     )

@@ -4,7 +4,6 @@
 - tests
 - ✔ better data source info - download URL, last modified date
 - ✔ charity names to proper case
-- ✔ elasticsearch indexing needs to be quicker
 
 ## Autocomplete API
 
@@ -26,11 +25,9 @@
     - create DB
     - setup cache tables
     - populate DB (import_all)
-    - create and populate elasticsearch (`python findthatcharity/manage.py update_index`)
     - something on static urls?
 - set up ongoing tasks
     - populate DB
-    - repopulate elasticsearch
 
 ## Better charity pages
 

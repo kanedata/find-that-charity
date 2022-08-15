@@ -4,9 +4,8 @@ from django.core.management.base import BaseCommand
 
 from charity.models import Charity
 from findthatcharity.utils import to_titlecase
-from ftc.documents import FullOrganisation
 from ftc.models.organisation import EXTERNAL_LINKS
-from ftc.query import random_query
+from ftc.models import OrganisationGroup
 from other_data.models import WikiDataItem
 
 
@@ -22,15 +21,18 @@ class Command(BaseCommand):
         )
 
     def get_random_charity(self):
-        q = FullOrganisation.search().from_dict(
-            random_query(True, "registered-charity")
-        )[:100]
-        result = q.execute()
-        for r in result:
-            try:
-                return Charity.objects.get(id=r["org_id"])
-            except (Charity.DoesNotExist):
-                pass
+        org = (
+            OrganisationGroup.objects.filter(
+                organisationTypePrimary="registered-charity",
+                active=True,
+            )
+            .order_by("?")
+            .first()
+        )
+        try:
+            return Charity.objects.get(id=org.org_id)
+        except (Charity.DoesNotExist):
+            return None
 
     def get_twitter_id(self, charity):
         wikidata = WikiDataItem.objects.filter(org_id=charity.id).first()

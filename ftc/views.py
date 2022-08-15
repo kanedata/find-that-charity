@@ -5,16 +5,14 @@ from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
-from elasticsearch.exceptions import RequestError
 
 from charity.models import Charity
-from ftc.documents import FullOrganisation
 from ftc.models import Organisation, OrganisationType, RelatedOrganisation, Source
+from .models.organisation_group import OrganisationGroup
 from ftc.query import (
     OrganisationSearch,
     get_linked_organisations,
     get_organisation,
-    random_query,
 )
 from other_data.models import CQCProvider, Grant, WikiDataItem
 
@@ -118,13 +116,15 @@ def get_orgid_canon(request, org_id):
 def get_random_org(request):
     """Get a random charity record"""
     # filetype = request.GET.get("filetype", "html")
-    active = request.GET.get("active", False)
-    q = FullOrganisation.search().from_dict(random_query(active, "registered-charity"))[
-        0
-    ]
-    result = q.execute()
-    for r in result:
-        return JsonResponse(r.__dict__["_d_"])
+    active = request.GET.get("active", "f").lower().startswith("t")
+    query = OrganisationGroup.objects.filter(
+        organisationTypePrimary="registered-charity"
+    )
+    if active:
+        query = query.filter(active=True)
+    org = query.order_by("?").first()
+    related_orgs = get_linked_organisations(org.org_id)
+    return JsonResponse(related_orgs.to_json(request=request))
 
 
 # https://docs.djangoproject.com/en/3.1/howto/outputting-csv/#streaming-csv-files
@@ -204,17 +204,7 @@ def org_search(request, orgtype=None, source=None, filetype="html"):
 
     s.run_db(with_pagination=True, with_aggregation=True)
     page_number = request.GET.get("page")
-    try:
-        page_obj = s.paginator.get_page(page_number)
-    except RequestError:
-        return render(
-            request,
-            "error.html.j2",
-            {
-                "message": "Results not available, please try another search",
-            },
-            status=501,
-        )
+    page_obj = s.paginator.get_page(page_number)
 
     return render(
         request,

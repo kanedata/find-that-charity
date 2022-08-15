@@ -70,7 +70,6 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "ftcbot.apps.FtcbotConfig",
     "companies.apps.CompaniesConfig",
-    "django_elasticsearch_dsl",
     "django.contrib.postgres",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -151,12 +150,6 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": "findthatcharity_cache",
     }
-}
-
-# Elasticsearch
-
-ELASTICSEARCH_DSL = {
-    "default": {"hosts": os.environ.get("ELASTICSEARCH_URL")},
 }
 
 # 360Giving datastore url

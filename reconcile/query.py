@@ -35,34 +35,55 @@ def do_reconcile_query(
     )
     s.run_db()
     all_orgtypes = get_orgtypes()
-    result = sorted(list(o for o in s.query), key=lambda o: o.rank, reverse=True)
 
-    return {
-        "result": [
-            {
-                "id": o.org_id,
-                "name": "{} ({}){}".format(
-                    to_titlecase(o.name),
-                    o.org_id,
-                    "" if o.active else " [INACTIVE]",
-                ),
-                "type": [
-                    {
-                        "id": o.organisationTypePrimary.slug,
-                        "name": o.organisationTypePrimary.title,
-                    }
-                ]
-                + [
-                    {"id": ot, "name": all_orgtypes[ot].title}
-                    for ot in o.organisationType
-                    if ot != o.organisationTypePrimary.slug and ot in all_orgtypes
-                ],
-                "score": o.rank,
-                "match": (normalise_name(o.name) == normalise_name(query)) and (k == 0),
-            }
-            for k, o in enumerate(result)
-        ]
-    }
+    def get_results(s):
+        return sorted(
+            list(
+                o
+                for o in s.query.values(
+                    "org_id",
+                    "name",
+                    "active",
+                    "organisationTypePrimary",
+                    "organisationType",
+                    "rank",
+                )[:limit]
+            ),
+            key=lambda o: o["rank"],
+            reverse=True,
+        )
+
+    def get_result(result, k):
+        org_type = all_orgtypes[result["organisationTypePrimary"]]
+        return {
+            "id": result["org_id"],
+            "name": "{} ({}){}".format(
+                to_titlecase(result["name"]),
+                result["org_id"],
+                "" if result["active"] else " [INACTIVE]",
+            ),
+            "type": [
+                {
+                    "id": org_type.slug,
+                    "name": org_type.title,
+                }
+            ]
+            + [
+                {"id": ot, "name": all_orgtypes[ot].title}
+                for ot in result["organisationType"]
+                if ot != org_type.slug and ot in all_orgtypes
+            ],
+            "score": result["rank"],
+            "match": (normalise_name(result["name"]) == normalise_name(query))
+            and (k == 0),
+        }
+
+    results = get_results(s)
+    if not results:
+        s.run_db(loose=True)
+        results = get_results(s)
+
+    return {"result": [get_result(o, k) for k, o in enumerate(results)]}
 
 
 def do_extend_query(ids, properties):
