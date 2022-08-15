@@ -134,7 +134,7 @@ class OrganisationSearch:
                 search_query = SearchQuery(self.term)
             db_filter.append(Q(search_vector=search_query))
         if self.prefix:
-            db_filter.append(Q(name__istartswith=self.prefix))
+            db_filter.append(Q(name__icontains=self.prefix.strip()))
         if self.active is True or self.active is False:
             db_filter.append(Q(active=self.active))
 
