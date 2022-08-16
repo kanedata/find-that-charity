@@ -43,6 +43,8 @@ colorama==0.4.5
     # via
     #   click
     #   tqdm
+coverage==6.4.4
+    # via -r requirements.in
 cssselect==1.1.0
     # via pyquery
 decorator==5.1.1
