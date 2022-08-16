@@ -6,6 +6,10 @@ data/
 # test data
 !*/tests/data/
 !*/tests/data/*.zip
+!*/tests/data/*.csv
+!*/tests/fixtures/
+!*/tests/fixtures/*.zip
+!*/tests/fixtures/*.csv
 
 # djangofiles
 /static/
