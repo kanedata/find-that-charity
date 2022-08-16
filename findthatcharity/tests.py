@@ -151,7 +151,7 @@ class IndexViewTests(ftc.tests.TestCase):
 
         response = self.client.get(reverse("index") + "?q=organisation&filetype=csv")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response["content-type"], "text/csv")
+        self.assertTrue("text/csv" in response["content-type"])
         self.assertContains(response, "name")
 
     def test_about(self):
