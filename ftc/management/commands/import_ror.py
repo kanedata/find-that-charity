@@ -51,7 +51,7 @@ ROR includes identifiers and metadata for more than 100,000 organizations. ROR i
             response.json()
             .get("hits", {})
             .get("hits", [])[0]
-            .get("files", [])[0]
+            .get("files", [])[-1]
             .get("links", {})
             .get("self")
         )
