@@ -151,7 +151,9 @@ class RelatedOrganisation:
     def prioritise_orgs(self, orgs):
         # Decide what order a list of organisations should go in,
         # based on their priority
-        return sorted(orgs, key=lambda o: o.priority)
+        return sorted(
+            orgs, key=lambda o: o.priority if isinstance(o.priority, int) else 1
+        )
 
     def get_links(self):
         links_seen = set()
