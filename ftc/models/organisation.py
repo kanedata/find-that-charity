@@ -1,6 +1,7 @@
 import datetime
 import re
 from collections import defaultdict
+from typing import Counter
 
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
@@ -96,6 +97,9 @@ EXTERNAL_LINKS = {
     ],
     "XI-ROR": [
         ["https://ror.org/{}", "Research Organization Registry"],
+    ],
+    "XI-WIKIDATA": [
+        ["https://www.wikidata.org/wiki/{}", "Wikidata"],
     ],
 }
 
@@ -301,7 +305,7 @@ class Organisation(models.Model):
                 obj["sameAs"] = self.sameAs
         return obj
 
-    def get_links(self):
+    def _get_links(self):
         if self.url:
             yield (self.cleanUrl, self.displayUrl, self.org_id)
         if not self.orgIDs:
@@ -310,6 +314,15 @@ class Organisation(models.Model):
             links = EXTERNAL_LINKS.get(o.scheme, [])
             for link in links:
                 yield (link[0].format(o.id), link[1], o)
+
+    def get_links(self):
+        links = list(self._get_links())
+        link_counts = Counter(elem[1] for elem in links)
+        for link in links:
+            if link_counts[link[1]] > 1:
+                yield (link[0], f"{link[1]} ({link[2].id})", link[2])
+            else:
+                yield link
 
     @property
     def sameAs(self):

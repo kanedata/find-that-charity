@@ -28,6 +28,15 @@
             </li>
             {% endif %}
             {% endfor %}
+            {% for facebook in wikidata.values_list('facebook', flat=True).distinct() %}
+            {% if facebook %}
+            <li class="w-100 mb2">
+                Facebook: <a class="link dark-blue underline" href="https://facebook.com/{{ facebook }}" target="_blank">
+                facebook.com/{{ facebook }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
             {% for wiki in wikidata.values_list('wikipedia_url', flat=True).distinct() %}
             {% if wiki %}
             <li class="w-100 mb2">
@@ -41,10 +50,12 @@
         </ul>
         {% if wikidata %}
         {% for wikidata_id in wikidata.values_list('wikidata_id', flat=True).distinct() %}
-        <p class="f6 gray">Twitter and Wikipedia links from Wikidata</p>
+        {% if loop.first %}
+        <p class="f6 gray">Twitter, Facebook and Wikipedia links from Wikidata</p>
         <a class="link dark-blue underline db" href="{{ wikidata_id }}" target="_blank">
             <img src="{{ static('images/Wikidata_Stamp_Rec_Light.svg') }}" alt="Wikidata logo" class="db mb2 mw4" />
         </a>
+        {% endif %}
         {% endfor %}
         {% endif %}
     </div>
