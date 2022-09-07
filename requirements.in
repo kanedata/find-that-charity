@@ -1,12 +1,12 @@
-django<4
+django
 django-better-admin-arrayfield
 django-cors-headers
 django-elasticsearch-dsl
 django-environ
 django-prettyjson
 django-filter
-django-markdownx
-django-composite-foreignkey
+django-markdownx>=4.0.0b1
+git+https://github.com/kanedata/django-composite-foreignkey.git#egg=django-composite-foreignkey
 django-widget-tweaks
 dj-database-url
 django-ninja
@@ -31,8 +31,13 @@ PyYAML
 lxml==4.6.5
 pycountry
 sentry-sdk
-# websockets>=9.1
 urllib3>=1.26.5
 pydantic>=1.7.4
 babel
 tweepy
+black
+isort
+flake8
+requests-mock
+coverage
+django-debug-toolbar

@@ -46,4 +46,5 @@ urlpatterns = [
     path("reconcile", reconcile.views.index, {"orgtype": "registered-charity"}),
     path("dashboard/", include(django_sql_dashboard.urls)),
     path("markdownx/", include("markdownx.urls")),
+    path("__debug__/", include("debug_toolbar.urls")),
 ]
