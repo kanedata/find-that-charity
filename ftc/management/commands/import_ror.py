@@ -51,7 +51,7 @@ ROR includes identifiers and metadata for more than 100,000 organizations. ROR i
             response.json()
             .get("hits", {})
             .get("hits", [])[0]
-            .get("files", [])[0]
+            .get("files", [])[-1]
             .get("links", {})
             .get("self")
         )
@@ -66,7 +66,7 @@ ROR includes identifiers and metadata for more than 100,000 organizations. ROR i
                     continue
                 self.logger.info("Opening: {}".format(name))
                 with z.open(name) as json_data:
-                    data = json.load(json_data, encoding="utf-8")
+                    data = json.load(json_data)
                     rowcount = 0
                     for k, i in enumerate(data):
 

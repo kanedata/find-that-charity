@@ -1,0 +1,545 @@
+{
+    "aggregations": {
+        "access_right": {
+            "buckets": [
+                {
+                    "doc_count": 3,
+                    "key": "open"
+                }
+            ],
+            "doc_count_error_upper_bound": 0,
+            "sum_other_doc_count": 0
+        },
+        "file_type": {
+            "buckets": [
+                {
+                    "doc_count": 3,
+                    "key": "zip"
+                }
+            ],
+            "doc_count_error_upper_bound": 0,
+            "sum_other_doc_count": 0
+        },
+        "keywords": {
+            "buckets": [
+                {
+                    "doc_count": 3,
+                    "key": "PID"
+                },
+                {
+                    "doc_count": 3,
+                    "key": "ROR"
+                },
+                {
+                    "doc_count": 2,
+                    "key": "Affiliation"
+                },
+                {
+                    "doc_count": 2,
+                    "key": "Open Infrastructure"
+                },
+                {
+                    "doc_count": 2,
+                    "key": "Persistent Identifier"
+                },
+                {
+                    "doc_count": 1,
+                    "key": "Organization Identifier"
+                },
+                {
+                    "doc_count": 1,
+                    "key": "affiliation"
+                },
+                {
+                    "doc_count": 1,
+                    "key": "institution identifier"
+                },
+                {
+                    "doc_count": 1,
+                    "key": "open infrastructure"
+                },
+                {
+                    "doc_count": 1,
+                    "key": "organization identifier"
+                }
+            ],
+            "doc_count_error_upper_bound": 0,
+            "sum_other_doc_count": 1
+        },
+        "type": {
+            "buckets": [
+                {
+                    "doc_count": 3,
+                    "key": "dataset",
+                    "subtype": {
+                        "buckets": [],
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0
+                    }
+                }
+            ],
+            "doc_count_error_upper_bound": 0,
+            "sum_other_doc_count": 0
+        }
+    },
+    "hits": {
+        "hits": [
+            {
+                "conceptdoi": "10.5281/zenodo.6347574",
+                "conceptrecid": "6347574",
+                "created": "2022-06-17T15:07:41.543813+00:00",
+                "doi": "10.5281/zenodo.6657125",
+                "files": [
+                    {
+                        "bucket": "25d4f93f-6854-4dd4-9954-173197e7fad7",
+                        "checksum": "md5:88307ac74fad1c388f4987c00d09f769",
+                        "key": "v1.0-2022-03-17-ror-data.json.zip",
+                        "links": {
+                            "self": "https://zenodo.org/api/files/25d4f93f-6854-4dd4-9954-173197e7fad7/v1.0-2022-03-17-ror-data.json.zip"
+                        },
+                        "size": 20378730,
+                        "type": "zip"
+                    },
+                    {
+                        "bucket": "25d4f93f-6854-4dd4-9954-173197e7fad7",
+                        "checksum": "md5:045f3edcb72e323a742e88bf81361a26",
+                        "key": "v1.1-2022-06-16-ror-data.zip",
+                        "links": {
+                            "self": "https://zenodo.org/api/files/25d4f93f-6854-4dd4-9954-173197e7fad7/v1.1-2022-06-16-ror-data.zip"
+                        },
+                        "size": 20454781,
+                        "type": "zip"
+                    }
+                ],
+                "id": 6657125,
+                "links": {
+                    "badge": "https://zenodo.org/badge/doi/10.5281/zenodo.6657125.svg",
+                    "bucket": "https://zenodo.org/api/files/25d4f93f-6854-4dd4-9954-173197e7fad7",
+                    "conceptbadge": "https://zenodo.org/badge/doi/10.5281/zenodo.6347574.svg",
+                    "conceptdoi": "https://doi.org/10.5281/zenodo.6347574",
+                    "doi": "https://doi.org/10.5281/zenodo.6657125",
+                    "html": "https://zenodo.org/record/6657125",
+                    "latest": "https://zenodo.org/api/records/6657125",
+                    "latest_html": "https://zenodo.org/record/6657125",
+                    "self": "https://zenodo.org/api/records/6657125"
+                },
+                "metadata": {
+                    "access_right": "open",
+                    "access_right_category": "success",
+                    "communities": [
+                        {
+                            "id": "ror-data"
+                        }
+                    ],
+                    "contributors": [
+                        {
+                            "affiliation": "Research Organization Registry",
+                            "name": "Buttrick, Adam",
+                            "orcid": "0000-0003-1507-1031",
+                            "type": "DataManager"
+                        },
+                        {
+                            "affiliation": "Crossref",
+                            "name": "Datta, Esha",
+                            "type": "ProjectMember"
+                        },
+                        {
+                            "affiliation": "California Digital Library",
+                            "name": "Gould, Maria",
+                            "orcid": "0000-0002-2916-3423",
+                            "type": "ProjectManager"
+                        },
+                        {
+                            "affiliation": "Argonne National Laboratory",
+                            "name": "Lundvick, Nicholas",
+                            "orcid": "0000-0002-7614-2449",
+                            "type": "DataCurator"
+                        },
+                        {
+                            "affiliation": "DataCite",
+                            "name": "Krznarich, Elizabeth",
+                            "orcid": "0000-0001-6622-4910",
+                            "type": "ProjectLeader"
+                        },
+                        {
+                            "affiliation": "US Department of Energy Office of Scientific and Technical Information",
+                            "name": "Robinson, Carly",
+                            "orcid": "0000-0002-8523-1478",
+                            "type": "DataCurator"
+                        },
+                        {
+                            "affiliation": "American Physical Society",
+                            "name": "Smith, Arthur P.",
+                            "orcid": "0000-0002-6035-7736",
+                            "type": "DataCurator"
+                        },
+                        {
+                            "affiliation": "Ludwig-Maximilians-Universit\u00e4t M\u00fcnchen",
+                            "name": "Spenger, Martin",
+                            "orcid": "0000-0002-8841-5985",
+                            "type": "DataCurator"
+                        },
+                        {
+                            "affiliation": "Digital Research Alliance of Canada",
+                            "name": "Stathis, Kelly",
+                            "orcid": "0000-0001-6133-4045",
+                            "type": "DataCurator"
+                        }
+                    ],
+                    "creators": [
+                        {
+                            "name": "Research Organization Registry"
+                        }
+                    ],
+                    "description": "<p>Data dump from the Research Organization Registry (ROR), a community-led registry of open identifiers for research organizations.</p>\n\n<p>The latest version of the ROR data dump is v1.1. Release v1.1 contains ROR IDs and metadata for 102,742&nbsp;research organizations in JSON format. <a href=\"https://github.com/ror-community/ror-updates/releases/tag/v1.1\">See the release notes</a>.</p>\n\n<p>Beginning with its&nbsp;<a href=\"https://doi.org/10.5281/zenodo.6347575\">March 2022 release</a>, ROR is curated independently from GRID. Semantic versioning beginning with v1.0 was added to reflect this departure from GRID. The existing data structure was not changed.</p>\n\n<p>From March 2022 onward, data releases are versioned as follows:</p>\n\n<ul>\n\t<li><strong>Minor versions (ex 1.1, 1.2, 1.3):</strong>&nbsp;Contain changes to data, such as a new records and updates to existing records. No changes to the data model/structure.</li>\n\t<li><strong>Patch versions (ex 1.0.1):</strong>&nbsp;Used infrequently to correct errors in a release. No changes to the data model/structure.</li>\n\t<li><strong>Major versions (ex 1.x, 2.x, 3.x):</strong>&nbsp;Contains changes to data model/structure, as well as the data itself. Major versions will be released with significant advance notice.</li>\n</ul>\n\n<p>For convenience, the date is also include in the release file name, ex: v1.0-2022-03-15-ror-data.zip.</p>",
+                    "doi": "10.5281/zenodo.6657125",
+                    "keywords": [
+                        "ROR",
+                        "persistent identifier",
+                        "organization identifier",
+                        "PID",
+                        "affiliation",
+                        "open infrastructure",
+                        "institution identifier"
+                    ],
+                    "license": {
+                        "id": "CC-PDDC"
+                    },
+                    "publication_date": "2022-06-16",
+                    "related_identifiers": [
+                        {
+                            "identifier": "10.5281/zenodo.5534443",
+                            "relation": "isNewVersionOf",
+                            "resource_type": "dataset",
+                            "scheme": "doi"
+                        },
+                        {
+                            "identifier": "10.5281/zenodo.4929693",
+                            "relation": "isNewVersionOf",
+                            "resource_type": "dataset",
+                            "scheme": "doi"
+                        },
+                        {
+                            "identifier": "10.5281/zenodo.6347575",
+                            "relation": "isNewVersionOf",
+                            "resource_type": "dataset",
+                            "scheme": "doi"
+                        },
+                        {
+                            "identifier": "10.5281/zenodo.6347574",
+                            "relation": "isVersionOf",
+                            "scheme": "doi"
+                        }
+                    ],
+                    "relations": {
+                        "version": [
+                            {
+                                "count": 2,
+                                "index": 1,
+                                "is_last": true,
+                                "last_child": {
+                                    "pid_type": "recid",
+                                    "pid_value": "6657125"
+                                },
+                                "parent": {
+                                    "pid_type": "recid",
+                                    "pid_value": "6347574"
+                                }
+                            }
+                        ]
+                    },
+                    "resource_type": {
+                        "title": "Dataset",
+                        "type": "dataset"
+                    },
+                    "title": "ROR Data",
+                    "version": "v1.1"
+                },
+                "owners": [
+                    73440
+                ],
+                "revision": 2,
+                "stats": {
+                    "downloads": 1313.0,
+                    "unique_downloads": 570.0,
+                    "unique_views": 522.0,
+                    "version_downloads": 2814.0,
+                    "version_unique_downloads": 1381.0,
+                    "version_unique_views": 1366.0,
+                    "version_views": 1675.0,
+                    "version_volume": 57390312106.0,
+                    "views": 665.0,
+                    "volume": 26801838376.0
+                },
+                "updated": "2022-06-18T01:50:56.502037+00:00"
+            },
+            {
+                "conceptdoi": "10.5281/zenodo.5534442",
+                "conceptrecid": "5534442",
+                "created": "2021-09-28T14:26:55.018466+00:00",
+                "doi": "10.5281/zenodo.5534443",
+                "files": [
+                    {
+                        "bucket": "6b2024bb-b37f-4a01-a78a-6d90f9d0cb90",
+                        "checksum": "md5:37b1d62df1bf7f3d80c2b71eee3fcf64",
+                        "key": "2021-09-23-ror-data.zip",
+                        "links": {
+                            "self": "https://zenodo.org/api/files/6b2024bb-b37f-4a01-a78a-6d90f9d0cb90/2021-09-23-ror-data.zip"
+                        },
+                        "size": 20449899,
+                        "type": "zip"
+                    }
+                ],
+                "id": 5534443,
+                "links": {
+                    "badge": "https://zenodo.org/badge/doi/10.5281/zenodo.5534443.svg",
+                    "bucket": "https://zenodo.org/api/files/6b2024bb-b37f-4a01-a78a-6d90f9d0cb90",
+                    "conceptbadge": "https://zenodo.org/badge/doi/10.5281/zenodo.5534442.svg",
+                    "conceptdoi": "https://doi.org/10.5281/zenodo.5534442",
+                    "doi": "https://doi.org/10.5281/zenodo.5534443",
+                    "html": "https://zenodo.org/record/5534443",
+                    "latest": "https://zenodo.org/api/records/5534443",
+                    "latest_html": "https://zenodo.org/record/5534443",
+                    "self": "https://zenodo.org/api/records/5534443"
+                },
+                "metadata": {
+                    "access_right": "open",
+                    "access_right_category": "success",
+                    "communities": [
+                        {
+                            "id": "ror-data"
+                        }
+                    ],
+                    "contributors": [
+                        {
+                            "affiliation": "California Digital Library",
+                            "name": "Gould, Maria",
+                            "type": "ContactPerson"
+                        },
+                        {
+                            "affiliation": "Crossref",
+                            "name": "Datta, Esha",
+                            "type": "ProjectLeader"
+                        }
+                    ],
+                    "creators": [
+                        {
+                            "name": "Research Organization Registry"
+                        }
+                    ],
+                    "description": "<p>Data dump from the Research Organization Registry (ROR), a community-led registry of open identifiers for research organizations.</p>\n\n<p>Contains ROR IDs and metadata for 102,392 research organizations in JSON format.</p>",
+                    "doi": "10.5281/zenodo.5534443",
+                    "keywords": [
+                        "ROR",
+                        "Persistent Identifier",
+                        "PID",
+                        "Affiliation",
+                        "Open Infrastructure"
+                    ],
+                    "license": {
+                        "id": "CC-PDDC"
+                    },
+                    "publication_date": "2021-09-23",
+                    "related_identifiers": [
+                        {
+                            "identifier": "10.6084/m9.figshare.16685428",
+                            "relation": "isDerivedFrom",
+                            "scheme": "doi"
+                        },
+                        {
+                            "identifier": "10.5281/zenodo.4929693",
+                            "relation": "isNewVersionOf",
+                            "scheme": "doi"
+                        },
+                        {
+                            "identifier": "10.6084/m9.figshare.14390717",
+                            "relation": "isNewVersionOf",
+                            "scheme": "doi"
+                        },
+                        {
+                            "identifier": "10.5281/zenodo.5534442",
+                            "relation": "isVersionOf",
+                            "scheme": "doi"
+                        }
+                    ],
+                    "relations": {
+                        "version": [
+                            {
+                                "count": 1,
+                                "index": 0,
+                                "is_last": true,
+                                "last_child": {
+                                    "pid_type": "recid",
+                                    "pid_value": "5534443"
+                                },
+                                "parent": {
+                                    "pid_type": "recid",
+                                    "pid_value": "5534442"
+                                }
+                            }
+                        ]
+                    },
+                    "resource_type": {
+                        "title": "Dataset",
+                        "type": "dataset"
+                    },
+                    "title": "ROR Data 2021-09-23"
+                },
+                "owners": [
+                    73440
+                ],
+                "revision": 2,
+                "stats": {
+                    "downloads": 1201.0,
+                    "unique_downloads": 710.0,
+                    "unique_views": 865.0,
+                    "version_downloads": 1201.0,
+                    "version_unique_downloads": 710.0,
+                    "version_unique_views": 865.0,
+                    "version_views": 985.0,
+                    "version_volume": 24560328699.0,
+                    "views": 985.0,
+                    "volume": 24560328699.0
+                },
+                "updated": "2021-09-29T01:48:28.585418+00:00"
+            },
+            {
+                "conceptdoi": "10.5281/zenodo.4929692",
+                "conceptrecid": "4929692",
+                "created": "2021-06-11T20:34:10.985321+00:00",
+                "doi": "10.5281/zenodo.4929693",
+                "files": [
+                    {
+                        "bucket": "ee5e3ae8-81a1-4f49-88ea-6feb09d4d0ac",
+                        "checksum": "md5:3b89efb42b8d6c821758289fe9d075f1",
+                        "key": "2021-03-25-ror-data.zip",
+                        "links": {
+                            "self": "https://zenodo.org/api/files/ee5e3ae8-81a1-4f49-88ea-6feb09d4d0ac/2021-03-25-ror-data.zip"
+                        },
+                        "size": 19731095,
+                        "type": "zip"
+                    }
+                ],
+                "id": 4929693,
+                "links": {
+                    "badge": "https://zenodo.org/badge/doi/10.5281/zenodo.4929693.svg",
+                    "bucket": "https://zenodo.org/api/files/ee5e3ae8-81a1-4f49-88ea-6feb09d4d0ac",
+                    "conceptbadge": "https://zenodo.org/badge/doi/10.5281/zenodo.4929692.svg",
+                    "conceptdoi": "https://doi.org/10.5281/zenodo.4929692",
+                    "doi": "https://doi.org/10.5281/zenodo.4929693",
+                    "html": "https://zenodo.org/record/4929693",
+                    "latest": "https://zenodo.org/api/records/4929693",
+                    "latest_html": "https://zenodo.org/record/4929693",
+                    "self": "https://zenodo.org/api/records/4929693"
+                },
+                "metadata": {
+                    "access_right": "open",
+                    "access_right_category": "success",
+                    "communities": [
+                        {
+                            "id": "ror-data"
+                        }
+                    ],
+                    "contributors": [
+                        {
+                            "affiliation": "California Digital Library",
+                            "name": "Gould, Maria",
+                            "type": "ContactPerson"
+                        },
+                        {
+                            "affiliation": "Crossref",
+                            "name": "Datta, Esha",
+                            "type": "ProjectLeader"
+                        }
+                    ],
+                    "creators": [
+                        {
+                            "name": "Research Organization Registry"
+                        }
+                    ],
+                    "description": "<p>Data dump from the Research Organization Registry (ROR), a community-led registry of open identifiers for research organizations.</p>\n\n<p>Contains ROR IDs and metadata for 100,467 research organizations in JSON format.</p>",
+                    "doi": "10.5281/zenodo.4929693",
+                    "keywords": [
+                        "ROR",
+                        "Persistent Identifier",
+                        "PID",
+                        "Organization Identifier",
+                        "Affiliation",
+                        "Open Infrastructure"
+                    ],
+                    "license": {
+                        "id": "CC-PDDC"
+                    },
+                    "publication_date": "2021-03-25",
+                    "related_identifiers": [
+                        {
+                            "identifier": "10.6084/m9.figshare.14390717",
+                            "relation": "isIdenticalTo",
+                            "resource_type": "dataset",
+                            "scheme": "doi"
+                        },
+                        {
+                            "identifier": "10.6084/m9.figshare.14316596",
+                            "relation": "isDerivedFrom",
+                            "resource_type": "dataset",
+                            "scheme": "doi"
+                        },
+                        {
+                            "identifier": "10.5281/zenodo.5534443",
+                            "relation": "isPreviousVersionOf",
+                            "scheme": "doi"
+                        },
+                        {
+                            "identifier": "10.5281/zenodo.4929692",
+                            "relation": "isVersionOf",
+                            "scheme": "doi"
+                        }
+                    ],
+                    "relations": {
+                        "version": [
+                            {
+                                "count": 1,
+                                "index": 0,
+                                "is_last": true,
+                                "last_child": {
+                                    "pid_type": "recid",
+                                    "pid_value": "4929693"
+                                },
+                                "parent": {
+                                    "pid_type": "recid",
+                                    "pid_value": "4929692"
+                                }
+                            }
+                        ]
+                    },
+                    "resource_type": {
+                        "title": "Dataset",
+                        "type": "dataset"
+                    },
+                    "title": "ROR Data 2021-03-25"
+                },
+                "owners": [
+                    73440
+                ],
+                "revision": 3,
+                "stats": {
+                    "downloads": 433.0,
+                    "unique_downloads": 220.0,
+                    "unique_views": 181.0,
+                    "version_downloads": 433.0,
+                    "version_unique_downloads": 220.0,
+                    "version_unique_views": 181.0,
+                    "version_views": 203.0,
+                    "version_volume": 8543564135.0,
+                    "views": 203.0,
+                    "volume": 8543564135.0
+                },
+                "updated": "2021-09-28T14:44:03.885181+00:00"
+            }
+        ],
+        "total": 3
+    },
+    "links": {
+        "self": "https://zenodo.org/api/records/?sort=mostrecent&communities=ror-data&page=1&size=10"
+    }
+}

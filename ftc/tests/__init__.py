@@ -33,8 +33,33 @@ class TestCase(django.test.TestCase):
         Organisation.objects.create(
             org_id="GB-CHC-1234",
             orgIDs=["GB-CHC-1234"],
+            linked_orgs=["GB-CHC-1234"],
             description="Test description",
             name="Test organisation",
+            active=True,
+            organisationTypePrimary=ot,
+            source=s,
+            scrape=scrape,
+            organisationType=[ot.slug, ot2.slug],
+        )
+        Organisation.objects.create(
+            org_id="GB-CHC-5",
+            orgIDs=["GB-CHC-5", "GB-CHC-6"],
+            linked_orgs=["GB-CHC-5", "GB-CHC-6"],
+            description="Test description",
+            name="Test organisation 2",
+            active=True,
+            organisationTypePrimary=ot,
+            source=s,
+            scrape=scrape,
+            organisationType=[ot.slug, ot2.slug],
+        )
+        Organisation.objects.create(
+            org_id="GB-CHC-6",
+            orgIDs=["GB-CHC-5", "GB-CHC-6"],
+            linked_orgs=["GB-CHC-5", "GB-CHC-6"],
+            description="Test description",
+            name="Test organisation 3",
             active=True,
             organisationTypePrimary=ot,
             source=s,

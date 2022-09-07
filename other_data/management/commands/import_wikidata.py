@@ -14,6 +14,8 @@ SELECT ?item ?itemLabel ?charity ?article ?articlename ?twitter ?facebook ?grid 
 }  ORDER BY ?itemLabel
 """
 
+WIKIDATA_API_URL = "https://www.wikidata.org/w/api.php?action=wbgetentities&ids={}&languages=en&format=json&sitefilter=enwiki&props=sitelinks/urls|aliases|claims"
+
 
 class Command(HTMLScraper):
     name = "wd"
@@ -83,7 +85,60 @@ class Command(HTMLScraper):
             "grid_id": "XI-GRID-{}".format(row.get("grid"))
             if row.get("grid")
             else None,
-            "spider": "wd",
+            "spider": self.name,
             "scrape": self.scrape,
         }
         self.add_record(WikiDataItem, result)
+
+    def close_spider(self):
+
+        wikidata_ids = [set()]
+        self.cursor.execute(
+            """
+        select * from (
+            select unnest("ftc_organisation"."orgIDs") as "org_id"
+            from "ftc_organisation"
+        ) as a
+        where a."org_id" ilike 'XI-WIKIDATA-%'"""
+        )
+        for k, row in enumerate(self.cursor):
+            if len(wikidata_ids[-1]) >= 40:
+                wikidata_ids.append(set())
+            wikidata_ids[-1].add(row[0].split("-")[-1])
+
+        def get_property(entity, prop_id):
+            if entity.get("claims", {}).get(prop_id, {}):
+                value = (
+                    entity.get("claims", {})
+                    .get(prop_id, {})[0]
+                    .get("mainsnak")
+                    .get("datavalue")
+                    .get("value")
+                )
+                if isinstance(value, list) and value:
+                    return value[0]
+                return value
+            return None
+
+        for wikidata_ids_set in wikidata_ids:
+            r = self.session.get(WIKIDATA_API_URL.format("|".join(wikidata_ids_set)))
+            r.raise_for_status()
+            data = r.json()
+
+            for entity_id, entity in data["entities"].items():
+                grid_id = get_property(entity, "P2427")
+                result = {
+                    "org_id": "XI-WIKIDATA-{}".format(entity_id),
+                    "wikidata_id": f"http://www.wikidata.org/entity/{entity_id}",
+                    "wikipedia_url": entity.get("sitelinks", {})
+                    .get("enwiki", {})
+                    .get("url"),
+                    "twitter": get_property(entity, "P2002"),
+                    "facebook": get_property(entity, "P2013"),
+                    "grid_id": "XI-GRID-{}".format(grid_id) if grid_id else None,
+                    "spider": self.name,
+                    "scrape": self.scrape,
+                }
+                self.add_record(WikiDataItem, result)
+
+        return super().close_spider()
