@@ -57,6 +57,10 @@ ALLOWED_HOSTS = (
     if os.environ.get("ALLOWED_HOSTS")
     else []
 )
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
 
 # Application definition
 
@@ -70,6 +74,7 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "ftcbot.apps.FtcbotConfig",
     "companies.apps.CompaniesConfig",
+    "debug_toolbar",
     "django.contrib.postgres",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -90,6 +95,7 @@ MIDDLEWARE = [
     "findthatcharity.middleware.XCLacksMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

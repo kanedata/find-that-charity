@@ -2,6 +2,7 @@ import math
 
 from django.db.models import Q
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from .organisation import EXTERNAL_LINKS, Organisation
 from .organisation_link import OrganisationLink
@@ -26,7 +27,7 @@ class RelatedOrganisation:
     def orgIDs(self):
         return list(set(self.get_all("orgIDs")))
 
-    @property
+    @cached_property
     def names(self):
         names = {}
         for r in self.records:
@@ -35,7 +36,7 @@ class RelatedOrganisation:
                     names[n.lower().strip()] = n
         return names
 
-    @property
+    @cached_property
     def alternateName(self):
         names = self.get_all("all_names")
         return list(
@@ -48,17 +49,17 @@ class RelatedOrganisation:
             )
         )
 
-    @property
+    @cached_property
     def name(self):
         return self.names.get(self.records[0].name.lower(), self.records[0].name)
 
-    @property
+    @cached_property
     def sources(self):
         sources = list(self.get_all("source"))
         sources.extend([o.source for o in self.org_links])
         return list(set(sources))
 
-    @property
+    @cached_property
     def source_ids(self):
         sources = list(self.get_all("source_id"))
         sources.extend(
@@ -70,22 +71,22 @@ class RelatedOrganisation:
         )
         return list(set(sources))
 
-    @property
+    @cached_property
     def geocodes(self):
         location_fields = [
             "geo_iso",
-            "geo_oa11",
+            # "geo_oa11",
             "geo_cty",
             "geo_laua",
             "geo_ward",
             "geo_ctry",
             "geo_rgn",
             "geo_pcon",
-            "geo_ttwa",
+            # "geo_ttwa",
             "geo_lsoa11",
             "geo_msoa11",
-            "geo_lep1",
-            "geo_lep2",
+            # "geo_lep1",
+            # "geo_lep2",
         ]
         geocodes = set()
         locations = OrganisationLocation.objects.filter(org_id__in=self.orgIDs)
@@ -96,7 +97,7 @@ class RelatedOrganisation:
                     geocodes.add(value)
         return list(geocodes)
 
-    @property
+    @cached_property
     def org_links(self):
         org_links = []
         for o in self.records:
@@ -163,7 +164,7 @@ class RelatedOrganisation:
                     yield link
                 links_seen.add(link[1])
 
-    @property
+    @cached_property
     def sameAs(self):
         return [
             reverse("orgid_html", kwargs=dict(org_id=o))
@@ -171,11 +172,11 @@ class RelatedOrganisation:
             if o != self.org_id
         ]
 
-    @property
+    @cached_property
     def activeRecords(self):
         return [r for r in self.records if r.active]
 
-    @property
+    @cached_property
     def inactiveRecords(self):
         return [r for r in self.records if not r.active]
 

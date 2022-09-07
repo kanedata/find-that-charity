@@ -1,6 +1,7 @@
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.forms.models import model_to_dict
+from django.utils.functional import cached_property
 
 from .ccew import (
     CCEWCharity,
@@ -68,6 +69,7 @@ class Charity(models.Model):
             linked_charity_number=0,
         ).first()
 
+    @cached_property
     def financial_json(self):
         return [
             {
@@ -80,14 +82,14 @@ class Charity(models.Model):
             for f in self.financial.order_by("fyend").all()
         ]
 
-    @property
+    @cached_property
     def has_ccew_partb(self):
         for f in self.financial.all():
             if f.has_ccew_partb:
                 return True
         return False
 
-    @property
+    @cached_property
     def charity_number(self):
         return (
             self.id.replace("GB-CHC-", "").replace("GB-SC-", "").replace("GB-NIC-", "")

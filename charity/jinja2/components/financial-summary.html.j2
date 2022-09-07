@@ -1,5 +1,5 @@
-{% if charity.financial.count() %}
-  {% set finances = charity.financial.order_by('fyend').all() %}
+{% set finances = charity.financial_json %}
+{% if finances %}
   {% call org_panel("Charity financial history", org) %}
       <div class="w-100 cf" id="charity-financials">
       <div class="w-100 w-50-ns fl pr4-ns">

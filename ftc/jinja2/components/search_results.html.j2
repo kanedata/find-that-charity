@@ -62,8 +62,8 @@
         {% endif %}
     </div>
     <div class="cf">
-        {% for k in result.organisationType if k != result.organisationTypePrimary %}
-        <a class="f6 bg-light-gray br1 pv1 ph2 link near-black dib mr2 mb2 fl" href="{{ url('orgid_type', kwargs=dict(orgtype=k)) }}">{{ orgtypes[k].title }}</a>
+        {% for k in result.organisationType.all() if k != result.organisationTypePrimary %}
+        <a class="f6 bg-light-gray br1 pv1 ph2 link near-black dib mr2 mb2 fl" href="{{ url('orgid_type', kwargs=dict(orgtype=k.slug)) }}">{{ k.title }}</a>
         {% endfor %}
     </div>
 </div>

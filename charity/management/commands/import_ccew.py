@@ -6,7 +6,6 @@ import zipfile
 
 import psycopg2
 import tqdm
-from django.db import connection
 
 from charity.management.commands._ccew_sql import UPDATE_CCEW
 from charity.models import (
@@ -134,30 +133,25 @@ class Command(BaseScraper):
                     )
                 yield [k] + list(row.values())
 
-        with connection.cursor() as cursor:
-            reader = csv.DictReader(
-                io.TextIOWrapper(csvfile, encoding="utf8"),
-                delimiter="\t",
-                escapechar="\\",
-                quoting=csv.QUOTE_NONE,
-            )
-            self.logger.info(
-                "Starting table insert [{}]".format(db_table._meta.db_table)
-            )
-            db_table.objects.all().delete()
-            statement = """INSERT INTO "{table}" ("{fields}") VALUES %s;""".format(
-                table=db_table._meta.db_table,
-                fields='", "'.join(["id"] + list(reader.fieldnames)),
-            )
-            psycopg2.extras.execute_values(
-                cursor,
-                statement,
-                get_data(reader, len(reader.fieldnames) + 1),
-                page_size=page_size,
-            )
-            self.logger.info(
-                "Finished table insert [{}]".format(db_table._meta.db_table)
-            )
+        reader = csv.DictReader(
+            io.TextIOWrapper(csvfile, encoding="utf8"),
+            delimiter="\t",
+            escapechar="\\",
+            quoting=csv.QUOTE_NONE,
+        )
+        self.logger.info("Starting table insert [{}]".format(db_table._meta.db_table))
+        db_table.objects.all().delete()
+        statement = """INSERT INTO "{table}" ("{fields}") VALUES %s;""".format(
+            table=db_table._meta.db_table,
+            fields='", "'.join(["id"] + list(reader.fieldnames)),
+        )
+        psycopg2.extras.execute_values(
+            self.cursor,
+            statement,
+            get_data(reader, len(reader.fieldnames) + 1),
+            page_size=page_size,
+        )
+        self.logger.info("Finished table insert [{}]".format(db_table._meta.db_table))
 
     def close_spider(self):
 

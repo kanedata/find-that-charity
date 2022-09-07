@@ -25,6 +25,13 @@ from ftc.models import Organisation, OrganisationType, OrgidScheme, Source
 from geo.models import GeoLookup
 from jinja2 import Environment
 
+DEFAULT_AREA_TYPES = [
+    "ctry",
+    "rgn",
+    "la",
+    "iso",
+]
+
 
 def get_orgtypes():
     cache_key = "orgtypes"
@@ -85,14 +92,14 @@ def get_orgidschemes():
     return value
 
 
-def get_locations():
+def get_locations(areatypes=DEFAULT_AREA_TYPES):
     cache_key = "locationnames"
     value = cache.get(cache_key)
     if value:
         return value
     if GeoLookup._meta.db_table in connection.introspection.table_names():
         value = {}
-        for s in GeoLookup.objects.all():
+        for s in GeoLookup.objects.filter(geoCodeType__in=areatypes):
             if s.geoCodeType not in value:
                 value[s.geoCodeType] = {}
             value[s.geoCodeType][s.geoCode] = s.name

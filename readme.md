@@ -174,3 +174,11 @@ Future development:
 
 - upload a CSV file and reconcile each row with a charity
 - allow updating a charity with additional possible names
+
+Testing
+-------
+
+```
+coverage run manage.py tests && coverage html
+python -m http.server -d htmlcov 8001
+```

@@ -10,7 +10,9 @@ from ftc.models.related_organisation import RelatedOrganisation
 
 
 class OrganisationGroup(models.Model):
-    org_id = OrgidField(db_index=True, verbose_name="Organisation Identifier")
+    org_id = OrgidField(
+        db_index=True, verbose_name="Organisation Identifier", primary_key=True
+    )
     orgIDs = ArrayField(
         OrgidField(blank=True),
         verbose_name="Other organisation identifiers",
@@ -33,10 +35,8 @@ class OrganisationGroup(models.Model):
         verbose_name="Website domain",
     )
     active = models.BooleanField(null=True, blank=True, verbose_name="Active")
-    organisationType = ArrayField(
-        models.CharField(max_length=255, blank=True),
-        blank=True,
-        null=True,
+    organisationType = models.ManyToManyField(
+        "OrganisationType",
         verbose_name="Other organisation types",
     )
     organisationTypePrimary = models.ForeignKey(
@@ -59,18 +59,12 @@ class OrganisationGroup(models.Model):
     )
     search_vector = SearchVectorField(null=True)
     search_scale = models.FloatField(null=False, default=1, db_index=True)
-    scrape = models.ForeignKey(
-        "Scrape",
-        related_name="organisation_groups",
-        on_delete=models.DO_NOTHING,
-    )
-    spider = models.CharField(max_length=200, db_index=True, default="update_index")
 
     class Meta:
         indexes = [
             GinIndex(fields=["orgIDs"]),
             GinIndex(fields=["alternateName"]),
-            GinIndex(fields=["organisationType"]),
+            # GinIndex(fields=["organisationType"]),
             GinIndex(fields=["locations"]),
             GinIndex(fields=["search_vector"]),
         ]
@@ -97,13 +91,12 @@ class OrganisationGroup(models.Model):
                 )
             ),
             active=org.active,
-            organisationType=list(org.get_all("organisationType")),
             organisationTypePrimary_id=org.organisationTypePrimary_id,
             source=org.source_ids,
             locations=org.geocodes,
             search_scale=org.search_scale(),
         )
-        return cls(**org_group)
+        return cls(**org_group), org
 
     def __str__(self):
         return "%s %s" % (self.organisationTypePrimary.title, self.org_id)

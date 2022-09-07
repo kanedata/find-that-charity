@@ -2,6 +2,7 @@ import csv
 from collections import defaultdict
 
 from django.http import JsonResponse, StreamingHttpResponse
+from django.db import connection
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -138,78 +139,80 @@ class Echo:
 def org_search(request, orgtype=None, source=None, filetype="html"):
     base_query = None
     download_url = request.build_absolute_uri() + "&filetype=csv"
-    s = OrganisationSearch()
+    with connection.cursor() as cursor:
+        cursor.execute("set work_mem='1GB'")
+        s = OrganisationSearch()
 
-    if orgtype:
-        base_query = get_object_or_404(OrganisationType, slug=orgtype)
-        s.set_criteria(base_orgtype=orgtype)
-        download_url = (
-            reverse("orgid_type_download", kwargs={"orgtype": orgtype})
-            + "?"
-            + request.GET.urlencode()
+        if orgtype:
+            base_query = get_object_or_404(OrganisationType, slug=orgtype)
+            s.set_criteria(base_orgtype=orgtype)
+            download_url = (
+                reverse("orgid_type_download", kwargs={"orgtype": orgtype})
+                + "?"
+                + request.GET.urlencode()
+            )
+        elif source:
+            base_query = get_object_or_404(Source, id=source)
+            s.set_criteria(source=source)
+            download_url = (
+                reverse("orgid_source_download", kwargs={"source": source})
+                + "?"
+                + request.GET.urlencode()
+            )
+
+        # add additional criteria from the get params
+        s.set_criteria_from_request(request)
+
+        if filetype == "csv":
+            columns = {
+                "org_id": "id",
+                "name": "name",
+                # "charityNumber": "charityNumber",
+                # "companyNumber": "companyNumber",
+                "postalCode": "postalCode",
+                # "url": "url",
+                # "latestIncome": "latestIncome",
+                # "latestIncomeDate": "latestIncomeDate",
+                # "dateRegistered": "dateRegistered",
+                # "dateRemoved": "dateRemoved",
+                "active": "active",
+                # "dateModified": "dateModified",
+                "orgIDs": "orgIDs",
+                # "linked_orgs": "linked_orgs",
+                "organisationType": "organisationType",
+                "organisationTypePrimary__title": "organisationTypePrimary",
+                "source": "source",
+            }
+
+            def stream():
+                buffer_ = Echo()
+                writer = csv.writer(buffer_)
+                yield writer.writerow(columns.values())
+                s.run_db()
+                res = s.query.values_list(*columns.keys()).order_by("org_id").iterator()
+                prev_id = None
+                for r in res:
+                    if r[0] != prev_id:
+                        yield writer.writerow(r)
+                    prev_id = r[0]
+
+            response = StreamingHttpResponse(stream(), content_type="text/csv")
+            response["Content-Disposition"] = 'attachment; filename="{}.csv"'.format(
+                base_query.slug if base_query else "findthatcharity-search-results"
+            )
+            return response
+
+        s.run_db(with_pagination=True, with_aggregation=True)
+        page_number = request.GET.get("page")
+        page_obj = s.paginator.get_page(page_number)
+
+        return render(
+            request,
+            "orgtype.html.j2",
+            {
+                "res": page_obj,
+                "base_query": base_query,
+                "download_url": download_url,
+                "search": s,
+            },
         )
-    elif source:
-        base_query = get_object_or_404(Source, id=source)
-        s.set_criteria(source=source)
-        download_url = (
-            reverse("orgid_source_download", kwargs={"source": source})
-            + "?"
-            + request.GET.urlencode()
-        )
-
-    # add additional criteria from the get params
-    s.set_criteria_from_request(request)
-
-    if filetype == "csv":
-        columns = {
-            "org_id": "id",
-            "name": "name",
-            # "charityNumber": "charityNumber",
-            # "companyNumber": "companyNumber",
-            "postalCode": "postalCode",
-            # "url": "url",
-            # "latestIncome": "latestIncome",
-            # "latestIncomeDate": "latestIncomeDate",
-            # "dateRegistered": "dateRegistered",
-            # "dateRemoved": "dateRemoved",
-            "active": "active",
-            # "dateModified": "dateModified",
-            "orgIDs": "orgIDs",
-            # "linked_orgs": "linked_orgs",
-            "organisationType": "organisationType",
-            "organisationTypePrimary__title": "organisationTypePrimary",
-            "source": "source",
-        }
-
-        def stream():
-            buffer_ = Echo()
-            writer = csv.writer(buffer_)
-            yield writer.writerow(columns.values())
-            s.run_db()
-            res = s.query.values_list(*columns.keys()).order_by("org_id")
-            prev_id = None
-            for r in res:
-                if r[0] != prev_id:
-                    yield writer.writerow(r)
-                prev_id = r[0]
-
-        response = StreamingHttpResponse(stream(), content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="{}.csv"'.format(
-            base_query.slug if base_query else "findthatcharity-search-results"
-        )
-        return response
-
-    s.run_db(with_pagination=True, with_aggregation=True)
-    page_number = request.GET.get("page")
-    page_obj = s.paginator.get_page(page_number)
-
-    return render(
-        request,
-        "orgtype.html.j2",
-        {
-            "res": page_obj,
-            "base_query": base_query,
-            "download_url": download_url,
-            "search": s,
-        },
-    )

@@ -1,5 +1,3 @@
-from email.policy import default
-
 import psycopg2
 from django.conf import settings
 from tqdm import tqdm

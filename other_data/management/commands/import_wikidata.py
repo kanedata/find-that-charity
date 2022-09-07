@@ -1,5 +1,3 @@
-from django.db import connection
-
 from ftc.management.commands._base_scraper import HTMLScraper
 from other_data.models import WikiDataItem
 
@@ -95,19 +93,18 @@ class Command(HTMLScraper):
     def close_spider(self):
 
         wikidata_ids = [set()]
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-            select * from (
-                select unnest("ftc_organisation"."orgIDs") as "org_id"
-                from "ftc_organisation"
-            ) as a
-            where a."org_id" ilike 'XI-WIKIDATA-%'"""
-            )
-            for k, row in enumerate(cursor):
-                if len(wikidata_ids[-1]) >= 40:
-                    wikidata_ids.append(set())
-                wikidata_ids[-1].add(row[0].split("-")[-1])
+        self.cursor.execute(
+            """
+        select * from (
+            select unnest("ftc_organisation"."orgIDs") as "org_id"
+            from "ftc_organisation"
+        ) as a
+        where a."org_id" ilike 'XI-WIKIDATA-%'"""
+        )
+        for k, row in enumerate(self.cursor):
+            if len(wikidata_ids[-1]) >= 40:
+                wikidata_ids.append(set())
+            wikidata_ids[-1].add(row[0].split("-")[-1])
 
         def get_property(entity, prop_id):
             if entity.get("claims", {}).get(prop_id, {}):

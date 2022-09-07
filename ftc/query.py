@@ -1,9 +1,14 @@
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Func, Q
+from django.db.models import Count, F, Func, Q, Subquery
 from django.shortcuts import Http404
 
-from ftc.models import Organisation, OrganisationGroup, RelatedOrganisation
+from ftc.models import (
+    Organisation,
+    OrganisationGroup,
+    RelatedOrganisation,
+    OrganisationType,
+)
 
 
 def get_organisation(org_id):
@@ -118,9 +123,19 @@ class OrganisationSearch:
         search_query = None
         order_by = "name"
         if self.base_orgtype:
-            db_filter.append(Q(organisationType__contains=self.base_orgtype))
+            base_orgtype_query = (
+                OrganisationGroup.organisationType.through.objects.filter(
+                    organisationtype_id__in=self.base_orgtype
+                ).values("organisationgroup_id")
+            )
+            db_filter.append(Q(org_id__in=Subquery(base_orgtype_query)))
         if self.other_orgtypes:
-            db_filter.append(Q(organisationType__overlap=self.other_orgtypes))
+            other_orgtypes_query = (
+                OrganisationGroup.organisationType.through.objects.filter(
+                    organisationtype_id__in=self.other_orgtypes
+                ).values("organisationgroup_id")
+            )
+            db_filter.append(Q(org_id__in=Subquery(other_orgtypes_query)))
         if self.source:
             db_filter.append(Q(source__overlap=self.source))
         if self.term:
@@ -142,7 +157,11 @@ class OrganisationSearch:
         if self.location:
             db_filter.append(Q(locations__overlap=self.location))
 
-        self.query = OrganisationGroup.objects.filter(*db_filter)
+        self.query = (
+            OrganisationGroup.objects.filter(*db_filter)
+            .prefetch_related("organisationTypePrimary")
+            .prefetch_related("organisationType")
+        )
 
         if search_query:
             search_rank = SearchRank(F("search_vector"), search_query)
@@ -160,32 +179,33 @@ class OrganisationSearch:
 
         if with_aggregation:
             self.aggregation["by_orgtype"] = list(
-                self.query.annotate(
-                    orgtype=Func(F("organisationType"), function="unnest")
-                )
-                .values("orgtype")
-                .annotate(records=Count("*"))
+                OrganisationType.objects.filter(organisationgroup__in=self.query)
+                .annotate(orgtype=F("slug"))
+                .annotate(records=Count("orgtype"))
+                .values("orgtype", "records")
                 .order_by("-records")
             )
 
             self.aggregation["by_source"] = [
                 {"source": r["by_source"], "records": r["records"]}
-                for r in self.query.annotate(
-                    by_source=Func(F("source"), function="unnest")
+                for r in (
+                    self.query.annotate(by_source=Func(F("source"), function="unnest"))
+                    .values("by_source")
+                    .annotate(records=Count("source"))
+                    .order_by("-records")
                 )
-                .values("by_source")
-                .annotate(records=Count("source"))
-                .order_by("-records")
             ]
 
             self.aggregation["by_location"] = {
                 r["location"]: r["records"]
-                for r in self.query.annotate(
-                    location=Func(F("locations"), function="unnest")
+                for r in (
+                    self.query.annotate(
+                        location=Func(F("locations"), function="unnest")
+                    )
+                    .values("location")
+                    .annotate(records=Count("locations"))
+                    .order_by("-records")
                 )
-                .values("location")
-                .annotate(records=Count("locations"))
-                .order_by("-records")
             }
 
             self.aggregation["by_active"] = {
