@@ -8,7 +8,7 @@
 {% block bodyscripts %}
 {{ super() }}
 <script>
-    const FINANCES = {{ charity.financial_json()|tojson }};
+    const FINANCES = {{ charity.financial_json|tojson }};
 </script>
 <script src="{{ static('js/charts.js') }}"></script>
 {% endblock %}
