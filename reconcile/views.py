@@ -158,7 +158,10 @@ def suggest(request, orgtype=None):
 
     if not orgtype or orgtype == "all":
         orgtype = []
-    orgtype.extend(request.GET.getlist("orgtype"))
+    for o in request.GET.getlist("orgtype"):
+        if o == "all":
+            continue
+        orgtype.append(o)
 
     completion = {"field": "complete_names", "fuzzy": {"fuzziness": 1}}
     if orgtype:
