@@ -64,17 +64,17 @@ class Command(BaseScraper):
 
         # setup database connection
         self.logger.info("Connecting to database")
-        self.connection = psycopg2.connect(options["db_con"])
-        self.cursor = self.connection.cursor()
+        self.tsg_connection = psycopg2.connect(options["db_con"])
+        self.tsg_cursor = self.tsg_connection.cursor()
 
         # run the query
         self.logger.info("Executing query")
-        self.cursor.execute(self.query)
+        self.tsg_cursor.execute(self.query)
 
         # go through and save the grants
         self.logger.info("Iterating over results")
-        columns = [desc[0] for desc in self.cursor.description]
-        for row in tqdm(self.cursor):
+        columns = [desc[0] for desc in self.tsg_cursor.description]
+        for row in tqdm(self.tsg_cursor):
             self.parse_row(dict(zip(columns, row)))
 
         # close the spider

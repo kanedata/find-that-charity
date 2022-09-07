@@ -9,7 +9,7 @@ import requests
 import requests_cache
 import validators
 from django.core.management.base import BaseCommand
-from django.db import connection
+from django.db import connection, transaction
 from django.utils.text import slugify
 
 from ftc.management.commands._db_logger import ScrapeHandler
@@ -102,6 +102,7 @@ class BaseScraper(BaseCommand):
         self.logger.addHandler(self.scrape_logger)
 
         self.post_sql = {"update_domains": UPDATE_DOMAINS}
+        self.cursor = connection.cursor()
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -117,12 +118,14 @@ class BaseScraper(BaseCommand):
         self.session = requests.Session()
 
     def handle(self, *args, **options):
-        try:
-            self.run_scraper(*args, **options)
-        except Exception as err:
-            self.logger.exception(err)
-            self.scrape_logger.teardown()
-            raise
+        with transaction.atomic():
+            try:
+                self.run_scraper(*args, **options)
+            except Exception as err:
+                self.logger.exception(err)
+                self.scrape_logger.teardown()
+                raise
+        self.cursor.close()
 
     def run_scraper(self, *args, **options):
         # set up cache if we're caching
@@ -183,30 +186,29 @@ class BaseScraper(BaseCommand):
                     model.__name__,
                 )
             )
-            with connection.cursor() as cursor:
-                delete_sql = """
-                    DELETE
-                    FROM "{db_table}"
-                    WHERE (
-                        "{db_table}"."spider" = %s
-                        AND NOT ("{db_table}"."scrape_id" = %s)
-                    );
-                """.format(
-                    db_table=model._meta.db_table
+            delete_sql = """
+                DELETE
+                FROM "{db_table}"
+                WHERE (
+                    "{db_table}"."spider" = %s
+                    AND NOT ("{db_table}"."scrape_id" = %s)
+                );
+            """.format(
+                db_table=model._meta.db_table
+            )
+            self.cursor.execute(
+                delete_sql,
+                [
+                    self.name,
+                    self.scrape.id,
+                ],
+            )
+            self.logger.info(
+                "Deleted {:,.0f} previous {} records".format(
+                    self.cursor.rowcount,
+                    model.__name__,
                 )
-                cursor.execute(
-                    delete_sql,
-                    [
-                        self.name,
-                        self.scrape.id,
-                    ],
-                )
-                self.logger.info(
-                    "Deleted {:,.0f} previous {} records".format(
-                        cursor.rowcount,
-                        model.__name__,
-                    )
-                )
+            )
 
         # do any SQL actions after the data has been included
         self.execute_sql_statements(self.post_sql)
@@ -216,20 +218,19 @@ class BaseScraper(BaseCommand):
         self.scrape_logger.teardown()
 
     def execute_sql_statements(self, sqls):
-        with connection.cursor() as cursor:
-            for sql_name, sql in sqls.items():
-                self.logger.info("Starting SQL: {}".format(sql_name))
-                cursor.execute(
-                    sql,
-                    {
-                        "spider_name": self.name,
-                        "scrape_id": self.scrape.id,
-                        "source_id": self.source.id
-                        if getattr(self, "source", None)
-                        else None,
-                    },
-                )
-                self.logger.info("Finished SQL: {}".format(sql_name))
+        for sql_name, sql in sqls.items():
+            self.logger.info("Starting SQL: {}".format(sql_name))
+            self.cursor.execute(
+                sql,
+                {
+                    "spider_name": self.name,
+                    "scrape_id": self.scrape.id,
+                    "source_id": self.source.id
+                    if getattr(self, "source", None)
+                    else None,
+                },
+            )
+            self.logger.info("Finished SQL: {}".format(sql_name))
 
     def add_org_record(self, record):
         self.add_record(Organisation, record)

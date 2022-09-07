@@ -1,5 +1,4 @@
 import tqdm
-from django.db import connection
 from django.utils.text import slugify
 
 from ftc.management.commands._base_scraper import BaseScraper
@@ -78,23 +77,22 @@ class Command(BaseScraper):
             self.scales[s] = ve
 
         self.logger.info("Calculating scale")
-        with connection.cursor() as cursor:
-            cursor.execute(BASE_SQL)
-            columns = [col[0] for col in cursor.description]
-            for row in tqdm.tqdm(cursor):
-                row = dict(zip(columns, row))
-                row["scale"] = self.calculate_scale(row)
-                if row["scale"]:
-                    self.add_record(
-                        OrganisationClassification,
-                        dict(
-                            org_id=row["org_id"],
-                            spider=self.name,
-                            scrape=self.scrape,
-                            source=self.source,
-                            vocabulary=self.scales[row["scale"]],
-                        ),
-                    )
+        self.cursor.execute(BASE_SQL)
+        columns = [col[0] for col in self.cursor.description]
+        for row in tqdm.tqdm(self.cursor):
+            row = dict(zip(columns, row))
+            row["scale"] = self.calculate_scale(row)
+            if row["scale"]:
+                self.add_record(
+                    OrganisationClassification,
+                    dict(
+                        org_id=row["org_id"],
+                        spider=self.name,
+                        scrape=self.scrape,
+                        source=self.source,
+                        vocabulary=self.scales[row["scale"]],
+                    ),
+                )
 
         # close the spider
         self.close_spider()
