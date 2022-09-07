@@ -91,7 +91,7 @@ UPDATE_ORGIDS_SQL = {
         where linked_orgs is null;
     """,
     "Update priorities field": """
-    with priorities as (select ARRAY[{}] as prefixes)
+    with priorities as (select ARRAY[{}]::varchar[] as prefixes)
     update ftc_organisation o
     set priority = array[
         case when active then 0 else 1 end,
