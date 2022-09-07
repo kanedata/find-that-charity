@@ -2,7 +2,7 @@ import csv
 import io
 from urllib.parse import urlparse
 
-from ftc.management.commands._base_scraper import UPDATE_DOMAINS, HTMLScraper
+from ftc.management.commands._base_scraper import HTMLScraper
 from other_data.models import GenderPayGap
 
 EXCLUDE_ADDRESS = [
@@ -95,7 +95,6 @@ class Command(HTMLScraper):
         super().__init__(*args, **kwargs)
         self.post_sql = {
             "update_websites": UPDATE_WEBSITES,
-            "update_domains": UPDATE_DOMAINS,
         }
 
     def parse_file(self, response, source_url):
