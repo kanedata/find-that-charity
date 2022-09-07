@@ -5,7 +5,7 @@ Search engine for looking for charities and other non-profit organisations. Allo
 
 - importing data nearly 20 sources in the UK, ensuring that duplicates
   are matched to one record.
-- A database index that can be queried.
+- An elasticsearch index that can be queried.
 - [Org-ids](http://org-id.guide/about) are added to organisations.
 - Reconciliation API for searching organisations, based on an optimised search query.
 - Facility for uploading a CSV of charity names and adding the (best guess) at a
@@ -21,12 +21,14 @@ Installation
 4. Install requirements (`pip install -r requirements.txt`)
 5. [Install postgres](https://www.postgresql.org/download/)
 6. Start postgres
-7. Create `.env` file in root directory. Contents based on `.env.example`.
-8. Create the database tables (`python ./manage.py migrate && python ./manage.py createcachetable`)
-9. Import data on charities (`python ./manage.py import_charities`)
-10. Import data on nonprofit companies (`python ./manage.py import_companies`)
-11. Import data on other non-profit organisations (`python ./manage.py import_all`)
-12. Add organisations to text search index (`python ./manage.py update_index`)
+7. [Install elasticsearch 7](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html) - you may need to increase available memory (see below)
+8. Start elasticsearch
+9. Create `.env` file in root directory. Contents based on `.env.example`.
+10. Create the database tables (`python ./manage.py migrate && python ./manage.py createcachetable`)
+11. Import data on charities (`python ./manage.py import_charities`)
+12. Import data on nonprofit companies (`python ./manage.py import_companies`)
+13. Import data on other non-profit organisations (`python ./manage.py import_all`)
+14. Add organisations to elasticsearch index (`python ./manage.py es_index`) - (Don't use the default `search_index` command as this won't setup aliases correctly)
 
 Dokku Installation
 ------------------
@@ -43,6 +45,22 @@ dokku apps:create ftc
 sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git postgres
 dokku postgres:create ftc-db
 dokku postgres:link ftc-db ftc
+
+# elasticsearch
+sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
+export ELASTICSEARCH_IMAGE="elasticsearch"
+export ELASTICSEARCH_IMAGE_VERSION="7.7.1"
+dokku elasticsearch:create ftc-es
+dokku elasticsearch:link ftc-es ftc
+# configure elasticsearch 7:
+# https://github.com/dokku/dokku-elasticsearch/issues/72#issuecomment-510771763
+
+# setup elasticsearch increased memory (might be needed)
+nano /var/lib/dokku/services/elasticsearch/ftc-es/config/jvm.options
+# replace `-Xms512m` with `-Xms2g`
+# replace `-Xms512m` with `-Xmx2g`
+# restart elasticsearch
+dokku elasticsearch:restart ftc-es
 
 # SSL
 sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
@@ -74,62 +92,7 @@ dokku run ftc python ./manage.py charity_setup
 dokku run ftc python ./manage.py import_charities
 dokku run ftc python ./manage.py import_companies
 dokku run ftc python ./manage.py import_all
-dokku run ftc python ./manage.py update_index
-```
-
-### 4. Set up scheduled task for running tasks on a regular basis
-
-On dokku server add a cron file at `/etc/cron.d/ftc`
-
-```bash
-nano /etc/cron.d/ftc
-```
-
-Then paste in the [file contents](crontab), and press `CTRL+X` then `Y` to save.
-
-File contents:
-
-```bash
-# server cron jobs
-MAILTO="mail@example.com"
-PATH=/usr/local/bin:/usr/bin:/bin
-SHELL=/bin/bash
-
-# m   h   dom mon dow   username command
-# *   *   *   *   *     dokku    command to be executed
-# -   -   -   -   -
-# |   |   |   |   |
-# |   |   |   |   +----- day of week (0 - 6) (Sunday=0)
-# |   |   |   +------- month (1 - 12)
-# |   |   +--------- day of month (1 - 31)
-# |   +----------- hour (0 - 23)
-# +----------- min (0 - 59)
-
-### KEEP SORTED IN TIME ORDER
-
-### PLACE ALL CRON TASKS BELOW
-
-# import everything else - every night
-0 1 * * * dokku dokku --rm run ftc python ./manage.py import_all
-
-# import charities - Thursday night
-# import_oscr is run first because it seems to time out in the middle of the night
-0 20 * * 4 dokku dokku --rm run ftc python ./manage.py import_oscr
-0 2 * * 0-5 dokku dokku --rm run ftc python ./manage.py import_charities
-
-# import companies - Friday night
-0 2 * * 6 dokku dokku --rm run ftc python ./manage.py import_companies
-
-# import other data sources - Saturday night
-0 0 * * 0 dokku dokku --rm run ftc python ./manage.py import_other_data
-
-# regenerate the database index - every night
-0 4 * * * dokku dokku --rm run ftc python ./manage.py update_index
-
-# randomly tweet every hour
-47 * * * * dokku dokku --rm run ftc python ./manage.py tweet
-
-### PLACE ALL CRON TASKS ABOVE, DO NOT REMOVE THE WHITESPACE AFTER THIS LINE
+dokku run ftc python ./manage.py es_index
 ```
 
 Fetching data

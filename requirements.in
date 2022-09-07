@@ -1,6 +1,7 @@
 django
 django-better-admin-arrayfield
 django-cors-headers
+django-elasticsearch-dsl
 django-environ
 django-prettyjson
 django-filter
@@ -27,12 +28,11 @@ titlecase
 psycopg2
 bcp-reader
 PyYAML
-lxml==4.6.5
+lxml
 pycountry
 sentry-sdk
-# websockets>=9.1
-urllib3>=1.26.5
-pydantic>=1.7.4
+urllib3
+pydantic
 babel
 tweepy
 black
@@ -41,4 +41,3 @@ flake8
 requests-mock
 coverage
 django-debug-toolbar
-django-elasticsearch-dsl
