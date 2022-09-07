@@ -20,7 +20,7 @@ EXTERNAL_LINKS = {
             "Charity Commission England and Wales",
         ],
         ["https://charitybase.uk/charities/{}", "CharityBase"],
-        ["http://opencharities.org/charities/{}", "OpenCharities"],
+        # ["http://opencharities.org/charities/{}", "OpenCharities"],
         ["https://givingisgreat.org/charitydetail/?regNo={}", "Giving is Great"],
         [
             "http://www.charitychoice.co.uk/charities/search?t=qsearch&q={}",
@@ -95,6 +95,9 @@ EXTERNAL_LINKS = {
     ],
     "XI-ROR": [
         ["https://ror.org/{}", "Research Organization Registry"],
+    ],
+    "XI-WIKIDATA": [
+        ["https://www.wikidata.org/wiki/{}", "Wikidata"],
     ],
 }
 
