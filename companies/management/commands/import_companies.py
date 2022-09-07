@@ -44,6 +44,7 @@ class Command(CSVScraper):
         CompanyCategoryChoices.RS,  # "Registered Society"
         CompanyCategoryChoices.RC,  # "Royal Charter Company"
         CompanyCategoryChoices.SCIO,  # "Scottish Charitable Incorporated Organisation"
+        CompanyCategoryChoices.PRIVATE_UNLIMITED,  # "Private Unlimited"
     ]
     id_field = "CompanyNumber"
     date_fields = [
