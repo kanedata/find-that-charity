@@ -95,53 +95,6 @@ dokku run ftc python ./manage.py import_all
 dokku run ftc python ./manage.py es_index
 ```
 
-Fetching data
--------------
-
-This step fetches data on charities in England, Wales and Scotland. The command
-is run using the following command:
-
-```sh
-python ./manage.py import_charities
-```
-
-### Data model
-
-The data is imported into elasticsearch in the following format:
-
-```json
-{
-  "charity_number": "12355",
-  "ccew_number": "12355",
-  "oscr_number": "SC1235",
-  "ccni_number": "NIC100012",
-  "active": true,
-  "names": [
-    {"name": "Charity Name", "type": "registered name", "source": "ccew"}
-  ],
-  "known_as": "Charity Name",
-  "geo": {
-    "areas": ["gss_codes"],
-    "postcode": "PO54 0DE",
-    "latlng": [0.0, 50.0]
-  },
-  "url": "http://www.url.org.uk/",
-  "domain": "url.org.uk",
-  "latest_income": 12345,
-  "company_number": [
-    {"number": "00121212", "source": "ccew"}
-  ],
-  "parent": "124566",
-  "ccew_link": "http://apps.charitycommission.gov.uk/Showcharity/RegisterOfCharities/SearchResultHandler.aspx?RegisteredCharityNumber=12355&SubsidiaryNumber=0",
-  "oscr_link": "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number=SC1235",
-  "ccni_link": "http://www.charitycommissionni.org.uk/charity-details/?regid=100012&subid=0",
-  "org-ids": ["GB-COH-00121212", "GB-CHC-12355", "GB-SC-SC1235", "GB-NIC-100012"],
-  "date_registered": "2001-01-01T00:00:00",
-  "date_removed": null,
-  "last_modified": "2018-02-11T22:49:15"
-}
-```
-
 Server
 ------
 
@@ -174,3 +127,11 @@ Future development:
 
 - upload a CSV file and reconcile each row with a charity
 - allow updating a charity with additional possible names
+
+Testing
+-------
+
+```sh
+coverage run manage.py test && coverage html
+python -m http.server -d htmlcov --bind 127.0.0.1 8001
+```
