@@ -57,10 +57,7 @@
         </details>
         {% else %}
         {% for o in result.orgIDs if o != result.org_id %}
-        {% for o in result.orgIDs if o != result.org_id %}
         {{ orgid_link(o) }}
-        {{ orgid_link(o) }}
-        {% endfor %}
         {% endfor %}
         {% endif %}
     </div>
