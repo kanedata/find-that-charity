@@ -1,7 +1,17 @@
-from django.urls import reverse
+import math
 
-from .organisation import EXTERNAL_LINKS, Organisation
-from .organisation_type import OrganisationType
+from django.db.models import Q
+from django.urls import reverse
+from django.utils.functional import cached_property
+
+from ftc.models.organisation import EXTERNAL_LINKS, Organisation
+from ftc.models.organisation_link import OrganisationLink
+from ftc.models.organisation_location import OrganisationLocation
+from ftc.models.organisation_type import OrganisationType
+
+SCALE_DEFAULT = 1.0
+SCALE_MINIMUM = 0.1
+SCALE_INACTIVE = 0.7
 
 
 class RelatedOrganisation:
@@ -13,11 +23,11 @@ class RelatedOrganisation:
         orgs = Organisation.objects.filter(linked_orgs__contains=[org_id])
         return cls(orgs)
 
-    @property
+    @cached_property
     def orgIDs(self):
         return list(set(self.get_all("orgIDs")))
 
-    @property
+    @cached_property
     def names(self):
         names = {}
         for r in self.records:
@@ -26,7 +36,7 @@ class RelatedOrganisation:
                     names[n.lower().strip()] = n
         return names
 
-    @property
+    @cached_property
     def alternateName(self):
         names = self.get_all("all_names")
         return list(
@@ -39,22 +49,78 @@ class RelatedOrganisation:
             )
         )
 
-    @property
+    @cached_property
     def name(self):
         return self.names.get(self.records[0].name.lower(), self.records[0].name)
 
-    @property
+    @cached_property
     def sources(self):
         sources = list(self.get_all("source"))
         sources.extend([o.source for o in self.org_links])
         return list(set(sources))
 
-    @property
+    @cached_property
+    def source_ids(self):
+        sources = list(self.get_all("source_id"))
+        sources.extend(
+            list(
+                OrganisationLink.objects.filter(
+                    Q(org_id_a__in=self.orgIDs) | Q(org_id_b__in=self.orgIDs)
+                ).values_list("source_id", flat=True)
+            )
+        )
+        return list(set(sources))
+
+    @cached_property
+    def geocodes(self):
+        location_fields = [
+            "geo_iso",
+            # "geo_oa11",
+            "geo_cty",
+            "geo_laua",
+            "geo_ward",
+            "geo_ctry",
+            "geo_rgn",
+            "geo_pcon",
+            # "geo_ttwa",
+            "geo_lsoa11",
+            "geo_msoa11",
+            # "geo_lep1",
+            # "geo_lep2",
+        ]
+        geocodes = set()
+        locations = OrganisationLocation.objects.filter(org_id__in=self.orgIDs)
+        for location in locations:
+            for field in location_fields:
+                value = getattr(location, field, None)
+                if value and not value.endswith("999999"):
+                    geocodes.add(value)
+        return list(geocodes)
+
+    @cached_property
     def org_links(self):
         org_links = []
         for o in self.records:
             org_links.extend(o.org_links)
         return list(set(org_links))
+
+    @cached_property
+    def search_scale(self):
+        scaling = SCALE_DEFAULT
+        income_vals = [
+            max([income, 1]) for income in self.get_all("latestIncome") if income
+        ]
+
+        if income_vals:
+            scaling = math.log(max(income_vals)) + 1
+
+        if not self.active:
+            scaling = scaling * SCALE_INACTIVE
+
+        if not scaling or scaling < SCALE_MINIMUM:
+            return SCALE_MINIMUM
+
+        return scaling
 
     def __getattr__(self, key, *args):
         return getattr(self.records[0], key, *args)
@@ -97,7 +163,7 @@ class RelatedOrganisation:
                     yield link
                 links_seen.add(link[1])
 
-    @property
+    @cached_property
     def sameAs(self):
         return [
             reverse("orgid_html", kwargs=dict(org_id=o))
@@ -105,11 +171,11 @@ class RelatedOrganisation:
             if o != self.org_id
         ]
 
-    @property
+    @cached_property
     def activeRecords(self):
         return [r for r in self.records if r.active]
 
-    @property
+    @cached_property
     def inactiveRecords(self):
         return [r for r in self.records if not r.active]
 

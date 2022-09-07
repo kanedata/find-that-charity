@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ftc.documents import FullOrganisation
+from ftc.documents import OrganisationGroup
 from ftc.models import Organisation
 
 # from django.test import TestCase
@@ -21,5 +21,5 @@ class TestDocuments(TestCase):
         )
         for n1, n2 in names:
             o = Organisation(name=n1)
-            d = FullOrganisation()
+            d = OrganisationGroup()
             assert d.prepare_sortname(o) == n2

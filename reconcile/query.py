@@ -12,7 +12,7 @@ from charity.models import (
 )
 from findthatcharity.jinja2 import get_orgtypes
 from findthatcharity.utils import to_titlecase
-from ftc.documents import FullOrganisation
+from ftc.documents import OrganisationGroup
 from ftc.models import Organisation
 from ftc.models.organisation_classification import OrganisationClassification
 
@@ -47,7 +47,7 @@ def do_reconcile_query(
         postcode=properties.get("postalCode"),
         domain=properties.get("domain"),
     )
-    q = FullOrganisation.search().from_dict(query_template)[:limit]
+    q = OrganisationGroup.search().from_dict(query_template)[:limit]
     result = q.execute(params=params)
     all_orgtypes = get_orgtypes()
 

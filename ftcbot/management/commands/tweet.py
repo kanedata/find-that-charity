@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 from charity.models import Charity
 from findthatcharity.utils import to_titlecase
-from ftc.documents import FullOrganisation
+from ftc.documents import OrganisationGroup
 from ftc.models.organisation import EXTERNAL_LINKS
 from ftc.query import random_query
 from other_data.models import WikiDataItem
@@ -22,7 +22,7 @@ class Command(BaseCommand):
         )
 
     def get_random_charity(self):
-        q = FullOrganisation.search().from_dict(
+        q = OrganisationGroup.search().from_dict(
             random_query(True, "registered-charity")
         )[:100]
         result = q.execute()
@@ -86,7 +86,8 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Tweet: {}".format(tweet_text)))
 
         # create the tweet
-        self.create_api_client()
-        self.client.create_tweet(
-            text=tweet_text,
-        )
+        if not settings.DEBUG:
+            self.create_api_client()
+            self.client.create_tweet(
+                text=tweet_text,
+            )

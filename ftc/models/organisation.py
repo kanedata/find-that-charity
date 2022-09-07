@@ -201,6 +201,12 @@ class Organisation(models.Model):
         related_name="organisations",
         on_delete=models.DO_NOTHING,
     )
+    priority = ArrayField(
+        models.BigIntegerField(null=True, blank=True, db_index=True),
+        blank=True,
+        null=True,
+        verbose_name="Organisation priority",
+    )
     spider = models.CharField(max_length=200, db_index=True)
     org_id_scheme = models.ForeignKey(
         "OrgidScheme",

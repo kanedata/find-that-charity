@@ -5,8 +5,8 @@ from django.db.models import Count, F, Func, Q
 from django.shortcuts import Http404
 from elasticsearch_dsl import A
 
-from ftc.documents import DSEPaginator, FullOrganisation
-from ftc.models import Organisation, RelatedOrganisation
+from ftc.documents import DSEPaginator, OrganisationGroup
+from ftc.models import Organisation, OrganisationLocation, RelatedOrganisation
 from reconcile.query import RECONCILE_QUERY
 
 
@@ -198,7 +198,7 @@ class OrganisationSearch:
 
         # check for location
         if self.location:
-            filter_.append({"terms": {"location": self.location}})
+            filter_.append({"terms": {"locations": self.location}})
 
         # check for active or inactive organisations
         if self.active is True:
@@ -212,10 +212,10 @@ class OrganisationSearch:
             ] = filter_
 
         q = (
-            FullOrganisation.search()
+            OrganisationGroup.search()
             .from_dict(self.es_query["inline"])
             .params(track_total_hits=True)
-            .index(FullOrganisation._default_index())
+            .index(OrganisationGroup._default_index())
         )
         if sort_by:
             q = q.sort(sort_by)
@@ -224,7 +224,7 @@ class OrganisationSearch:
             by_source = A("terms", field="source", size=150)
             by_orgtype = A("terms", field="organisationType", size=150)
             by_active = A("terms", field="active", size=150)
-            by_location = A("terms", field="location", size=1000)
+            by_location = A("terms", field="locations", size=1000)
             q.aggs.bucket("by_source", by_source)
             q.aggs.bucket("by_orgtype", by_orgtype)
             q.aggs.bucket("by_active", by_active)
@@ -272,14 +272,15 @@ class OrganisationSearch:
 
         # check for location
         if self.location:
-            db_filter.append(
-                Q(locations__geo_laua__in=self.location)
-                | Q(locations__geo_rgn__in=self.location)
-                | Q(locations__geo_ctry__in=self.location)
-                | Q(locations__geoCode__in=self.location)
-            )
+            location_filter = OrganisationLocation.objects.filter(
+                Q(geo_iso__in=self.location)
+                | Q(geo_laua__in=self.location)
+                | Q(geo_rgn__in=self.location)
+                | Q(geo_ctry__in=self.location)
+                | Q(geoCode__in=self.location)
+            ).values("org_id")
+            db_filter.append(Q(org_id__in=location_filter))
 
-        # self.query = Organisation.objects.filter(**{k: v for k, v in db_filter.items()})
         self.query = Organisation.objects.filter(*db_filter)
 
         if with_pagination:

@@ -81,7 +81,7 @@
                     {
                         "script_score": {
                             "script": {
-                                "source": "if((doc['latestIncome'].size()==0) || Objects.isNull(doc['latestIncome'].value) || (doc['latestIncome'].value <= 1)){1}else{Math.log(doc['latestIncome'].value)}"
+                                "source": "doc['search_scale'].value"
                             }
                         }
                     }

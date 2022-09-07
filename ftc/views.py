@@ -8,7 +8,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from elasticsearch.exceptions import RequestError
 
 from charity.models import Charity
-from ftc.documents import FullOrganisation
+from ftc.documents import OrganisationGroup
 from ftc.models import Organisation, OrganisationType, RelatedOrganisation, Source
 from ftc.query import (
     OrganisationSearch,
@@ -119,9 +119,9 @@ def get_random_org(request):
     """Get a random charity record"""
     # filetype = request.GET.get("filetype", "html")
     active = request.GET.get("active", False)
-    q = FullOrganisation.search().from_dict(random_query(active, "registered-charity"))[
-        0
-    ]
+    q = OrganisationGroup.search().from_dict(
+        random_query(active, "registered-charity")
+    )[0]
     result = q.execute()
     for r in result:
         return JsonResponse(r.__dict__["_d_"])

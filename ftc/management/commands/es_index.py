@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 from django.core import management
 
-from ftc.documents import FullOrganisation
+from ftc.documents import OrganisationGroup
 from ftc.management.commands._base_scraper import BaseScraper
 
 ALIAS = "full-organisation-load"
@@ -11,14 +11,14 @@ PATTERN = ALIAS + "-*"
 REQUEST_TIMEOUT = 3600
 
 
-class FullOrganisationAlias(FullOrganisation):
+class OrganisationGroupAlias(OrganisationGroup):
     def __init__(self, alias=None, *args, **kwargs):
-        super(FullOrganisationAlias, self).__init__(*args, **kwargs)
+        super(OrganisationGroupAlias, self).__init__(*args, **kwargs)
         if alias:
             self.alias_index = alias
 
     def _prepare_action(self, object_instance, action):
-        result = super(FullOrganisationAlias, self)._prepare_action(
+        result = super(OrganisationGroupAlias, self)._prepare_action(
             object_instance, action
         )
         result["_index"] = self._get_index()
@@ -27,7 +27,7 @@ class FullOrganisationAlias(FullOrganisation):
     def _get_index(self, index=None, required=True):
         if hasattr(self, "alias_index"):
             return self.alias_index
-        return super(FullOrganisationAlias, self)._get_index(index, required)
+        return super(OrganisationGroupAlias, self)._get_index(index, required)
 
 
 class Command(BaseScraper):
@@ -71,7 +71,7 @@ class Command(BaseScraper):
         self.logger.info("New index name: {}".format(next_index))
 
         # create an instance of the doc with the right index
-        doc = FullOrganisationAlias(alias=next_index)
+        doc = OrganisationGroupAlias(alias=next_index)
 
         # get the low level connection
         es = doc._get_connection()
@@ -123,7 +123,7 @@ class Command(BaseScraper):
         # delete any previous indexes
         self.logger.info("Delete previous indices")
         for index in es.indices.get("*"):
-            if index != next_index:
+            if index != next_index and index.startswith(ALIAS):
                 es.indices.delete(index=index)
         self.logger.info("Delete previous indices - done")
 

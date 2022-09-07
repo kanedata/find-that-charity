@@ -1,4 +1,3 @@
-import re
 from itertools import groupby
 from math import ceil
 
@@ -11,7 +10,8 @@ from django_elasticsearch_dsl.search import Search
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl.connections import get_connection
 
-from .models import Organisation, RelatedOrganisation
+from findthatcharity.utils import get_domain, normalise_name
+from ftc.models import Organisation, RelatedOrganisation
 
 
 class SearchWithTemplate(Search):
@@ -83,7 +83,7 @@ class DSEPaginator(Paginator):
 
 
 @registry.register_document
-class FullOrganisation(Document):
+class OrganisationGroup(Document):
 
     org_id = fields.KeywordField()
     complete_names = fields.CompletionField(
@@ -93,14 +93,17 @@ class FullOrganisation(Document):
     )
     orgIDs = fields.KeywordField()
     ids = fields.KeywordField()
-    alternateName = fields.TextField()
+    # name = fields.TextField()  # Indexed from the model
     sortname = fields.KeywordField()
+    alternateName = fields.TextField()
+    # postalCode = fields.KeywordField()  # Indexed from the model
+    domain = fields.KeywordField()
+    # active = fields.BooleanField()  # Indexed from the model
     organisationType = fields.KeywordField()
     organisationTypePrimary = fields.KeywordField()
     source = fields.KeywordField()
-    domain = fields.KeywordField()
-    location = fields.KeywordField()
-    latestIncome = fields.IntegerField()
+    locations = fields.KeywordField()
+    search_scale = fields.FloatField()
 
     @classmethod
     def search(cls, using=None, index=None):
@@ -110,6 +113,35 @@ class FullOrganisation(Document):
             doc_type=[cls],
             model=cls.django.model,
         )
+
+    @classmethod
+    def from_orgid(cls, org_id):
+        orgs = Organisation.objects.filter(linked_orgs__contains=[org_id])
+        return cls.from_orgs(orgs)
+
+    @classmethod
+    def from_orgs(cls, orgs):
+        org = RelatedOrganisation(orgs)
+        org_group = dict(
+            org_id=org.org_id,
+            orgIDs=org.orgIDs,
+            name=org.name,
+            sortname=normalise_name(org.name),
+            alternateName=org.alternateName,
+            postalCode=org.postalCode,
+            domain=list(
+                filter(
+                    lambda item: item is not None,
+                    [get_domain(link) for link in org.get_all("url")],
+                )
+            ),
+            active=org.active,
+            organisationTypePrimary_id=org.organisationTypePrimary_id,
+            source=org.source_ids,
+            locations=org.geocodes,
+            search_scale=org.search_scale,
+        )
+        return cls(**org_group), org
 
     class Index:
         # Name of the Elasticsearch index
@@ -126,25 +158,34 @@ class FullOrganisation(Document):
         return list(words)
 
     def _prepare_action(self, object_instance, action):
-        result = super(FullOrganisation, self)._prepare_action(object_instance, action)
+        result = super(OrganisationGroup, self)._prepare_action(object_instance, action)
         result["_id"] = object_instance.org_id
         return result
+
+    def prepare_org_id(self, instance):
+        return str(instance.org_id)
 
     def prepare_orgIDs(self, instance):
         return instance.orgIDs
 
     def prepare_ids(self, instance):
-        return [o.id for o in instance.orgIDs]
+        return [o.id for o in instance.orgIDs] + [
+            o.id.lstrip("0") for o in instance.orgIDs if o.id.lstrip("0") != o.id
+        ]
 
     def prepare_alternateName(self, instance):
         return instance.alternateName
 
     def prepare_sortname(self, instance):
-        n = re.sub("[^0-9a-zA-Z ]+", "", instance.name.lower().strip())
-        if n.startswith("the "):
-            n = n[4:]
-        n = re.sub(" +", " ", n).strip()
-        return n
+        return normalise_name(instance.name)
+
+    def prepare_domain(self, instance):
+        return list(
+            filter(
+                lambda item: item is not None,
+                [get_domain(link) for link in instance.get_all("url")],
+            )
+        )
 
     def prepare_organisationType(self, instance):
         return list(instance.get_all("organisationType"))
@@ -152,20 +193,14 @@ class FullOrganisation(Document):
     def prepare_organisationTypePrimary(self, instance):
         return instance.organisationTypePrimary_id
 
-    def prepare_domain(self, instance):
-        return instance.domain
+    def prepare_locations(self, instance):
+        return instance.geocodes
 
-    def prepare_location(self, instance):
-        return instance.allGeoCodes
-
-    def prepare_latestIncome(self, instance):
-        return instance.latestIncome
+    def prepare_search_scale(self, instance):
+        return instance.search_scale
 
     def prepare_source(self, instance):
         return list(instance.get_all("source_id"))
-
-    def prepare_org_id(self, instance):
-        return str(instance.org_id)
 
     def get_queryset(self):
         """

@@ -6,7 +6,7 @@ from django.shortcuts import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from findthatcharity.jinja2 import get_orgtypes
-from ftc.documents import FullOrganisation
+from ftc.documents import OrganisationGroup
 from ftc.models import Organisation, OrganisationType, Vocabulary
 from reconcile.query import do_extend_query, do_reconcile_query
 
@@ -154,7 +154,7 @@ def suggest(request, orgtype=None):
     # cursor = request.GET.get("cursor")
     if not prefix:
         raise Http404("Prefix must be supplied")
-    q = FullOrganisation.search()
+    q = OrganisationGroup.search()
 
     if not orgtype or orgtype == "all":
         orgtype = []
