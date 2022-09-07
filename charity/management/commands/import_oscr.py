@@ -71,6 +71,7 @@ class Command(CSVScraper):
         super().__init__(*args, **kwargs)
         self.raw_records = []
         self.vocabularies = {}
+        self.seen_org_ids = set()
         for f in self.vocab_fields:
             v, _ = Vocabulary.objects.get_or_create(
                 slug="{}_{}".format(self.name, f.lower()),
@@ -91,11 +92,13 @@ class Command(CSVScraper):
         )
         if existing_id:
             return existing_id
-        new_vocab = VocabularyEntries.objects.create(
-            title=entry_title,
+        new_vocab, _ = VocabularyEntries.objects.get_or_create(
             vocabulary=self.vocabularies[vocab]["vocabulary"],
-            current=True,
             code=slugify(entry_title),
+            defaults=dict(
+                title=entry_title,
+                current=True,
+            ),
         )
         self.vocabularies[vocab]["entries"][entry_title] = new_vocab.id
         return new_vocab.id
@@ -129,7 +132,9 @@ class Command(CSVScraper):
             self.orgtype_cache["registered-charity"],
             self.orgtype_cache["registered-charity-scotland"],
         ]
-        if record.get("Regulatory Type") == "Cross Border":
+        if record.get("Regulatory Type") == record.get("Activities"):
+            pass
+        elif record.get("Regulatory Type") == "Cross Border":
             org_types.append(self.add_org_type("Cross Border Charity"))
         elif record.get("Regulatory Type") != "Standard" and record.get(
             "Regulatory Type"
@@ -167,6 +172,10 @@ class Command(CSVScraper):
             org_types.append(self.add_org_type(record.get("Constitutional Form")))
 
         org_ids = [self.get_org_id(record)]
+
+        if org_ids[0] in self.seen_org_ids:
+            self.logger.debug("Skipping duplicate org: {}".format(org_ids[0]))
+            return
 
         self.raw_records.append(record)
 
@@ -226,6 +235,8 @@ class Command(CSVScraper):
                 }
             )
         )
+
+        self.seen_org_ids.add(self.get_org_id(record))
 
     def close_spider(self):
         super(Command, self).close_spider()
