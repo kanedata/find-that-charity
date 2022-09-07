@@ -57,6 +57,10 @@ ALLOWED_HOSTS = (
     if os.environ.get("ALLOWED_HOSTS")
     else []
 )
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
 
 # Application definition
 
@@ -71,6 +75,7 @@ INSTALLED_APPS = [
     "ftcbot.apps.FtcbotConfig",
     "companies.apps.CompaniesConfig",
     "django_elasticsearch_dsl",
+    "debug_toolbar",
     "django.contrib.postgres",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -93,6 +98,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.common.CommonMiddleware",
     # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -248,6 +254,8 @@ IGNORE_DOMAINS = (
     "mac.com",
     "waitrose.com",
     "gmail.co.uk",
+    "facebook.com",
+    "gov.uk",
 )
 
 DASHBOARD_ROW_LIMIT = 1000
