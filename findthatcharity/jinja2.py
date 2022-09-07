@@ -26,13 +26,6 @@ from ftc.models import Organisation, OrganisationType, OrgidScheme, Source
 from geo.models import GeoLookup
 from jinja2 import Environment
 
-DEFAULT_AREA_TYPES = [
-    "ctry",
-    "rgn",
-    "la",
-    "iso",
-]
-
 
 def get_orgtypes():
     cache_key = "orgtypes"
