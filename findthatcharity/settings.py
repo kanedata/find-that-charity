@@ -252,6 +252,12 @@ IGNORE_DOMAINS = (
     "facebook.com",
     "gov.uk",
 )
+DEFAULT_AREA_TYPES = [
+    "ctry",
+    "rgn",
+    "la",
+    "iso",
+]
 
 DASHBOARD_ROW_LIMIT = 1000
 DASHBOARD_ENABLE_FULL_EXPORT = True

@@ -4,9 +4,8 @@ from urllib.parse import urlparse
 import babel.numbers
 import inflect
 import titlecase
+from django.conf import settings
 from django.utils.text import slugify
-
-from findthatcharity.settings import IGNORE_DOMAINS
 
 VOWELS = re.compile("[AEIOUYaeiouy]")
 ORD_NUMBERS_RE = re.compile(r"([0-9]+(?:st|nd|rd|th))")
@@ -208,6 +207,6 @@ def get_domain(url):
         return None
     if domain.startswith("www."):
         domain = domain[4:]
-    if domain in IGNORE_DOMAINS:
+    if domain in settings.IGNORE_DOMAINS:
         return None
     return domain

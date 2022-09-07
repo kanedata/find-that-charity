@@ -4,14 +4,14 @@ from django.urls import reverse
 
 import ftc.tests
 from findthatcharity.utils import (
-    list_to_string,
-    to_titlecase,
     format_currency,
     get_domain,
-    str_format,
+    list_to_string,
     normalise_name,
     number_format,
     regex_search,
+    str_format,
+    to_titlecase,
 )
 
 

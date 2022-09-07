@@ -29,7 +29,7 @@
 <select class="js-choices w-100" style="max-width: 100%" multiple name="orgtype">
     <option value="">Organisation type</option>
     <optgroup label="Main organisation types">
-    {% for t in search.aggregation.by_orgtype if orgtypes[t.orgtype].is_keytype() and search.base_orgtype != t.orgtype %}
+    {% for t in search.aggregation.by_orgtype if t.orgtype in orgtypes and orgtypes[t.orgtype].is_keytype() and search.base_orgtype != t.orgtype %}
         <option value="{{ t.orgtype }}" {% if search.other_orgtypes and t.orgtype in search.other_orgtypes %}selected="selected"{% endif %}>
             {{ orgtypes[t.orgtype].title }}
             <span class="mid-gray">({{ "{:,.0f}".format(t.records) }})</span>
@@ -37,7 +37,7 @@
     {% endfor %}
     </optgroup>
     <optgroup label="Other organisation types">
-    {% for t in search.aggregation.by_orgtype if not orgtypes[t.orgtype].is_keytype() and search.base_orgtype != t.orgtype %}
+    {% for t in search.aggregation.by_orgtype if t.orgtype in orgtypes and not orgtypes[t.orgtype].is_keytype() and search.base_orgtype != t.orgtype %}
         <option value="{{ t.orgtype }}" {% if search.other_orgtypes and t.orgtype in search.other_orgtypes %}selected="selected"{% endif %}>
             {{ orgtypes[t.orgtype].title }}
             <span class="mid-gray">({{ "{:,.0f}".format(t.records) }})</span>

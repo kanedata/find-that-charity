@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.db.models import Count, F, Func
@@ -92,7 +93,7 @@ def get_orgidschemes():
     return value
 
 
-def get_locations(areatypes=DEFAULT_AREA_TYPES):
+def get_locations(areatypes=settings.DEFAULT_AREA_TYPES):
     cache_key = "locationnames"
     value = cache.get(cache_key)
     if value:
