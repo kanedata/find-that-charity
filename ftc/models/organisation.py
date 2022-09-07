@@ -6,8 +6,8 @@ from typing import Counter
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.urls import reverse
-from django_better_admin_arrayfield.models.fields import ArrayField
 from django.utils.functional import cached_property
+from django_better_admin_arrayfield.models.fields import ArrayField
 
 from ftc.models.organisation_classification import OrganisationClassification
 from ftc.models.organisation_link import OrganisationLink
