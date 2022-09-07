@@ -25,39 +25,6 @@ from ftc.models import (
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
-UPDATE_DOMAINS = """
-    update ftc_organisation
-    set domain = lower(substring(email from '@(.*)$'))
-    where lower(substring(email from '@(.*)$')) not in (
-        'gmail.com', 'hotmail.com', 'btinternet.com',
-        'hotmail.co.uk', 'yahoo.co.uk', 'outlook.com',
-        'aol.com', 'btconnect.com', 'yahoo.com',
-        'googlemail.com', 'ntlworld.com',
-        'talktalk.net',
-        'sky.com',
-        'live.co.uk',
-        'ntlworld.com',
-        'tiscali.co.uk',
-        'icloud.com',
-        'btopenworld.com',
-        'blueyonder.co.uk',
-        'virginmedia.com',
-        'nhs.net',
-        'me.com',
-        'msn.com',
-        'talk21.com',
-        'aol.co.uk',
-        'mail.com',
-        'live.com',
-        'virgin.net',
-        'ymail.com',
-        'mac.com',
-        'waitrose.com',
-        'gmail.co.uk'
-    )
-        and spider = %(spider_name)s;
-    """
-
 
 class BaseScraper(BaseCommand):
 
@@ -101,7 +68,7 @@ class BaseScraper(BaseCommand):
         self.scrape_logger.setLevel(logging.INFO)
         self.logger.addHandler(self.scrape_logger)
 
-        self.post_sql = {"update_domains": UPDATE_DOMAINS}
+        self.post_sql = {}
         self.cursor = connection.cursor()
 
     def add_arguments(self, parser):

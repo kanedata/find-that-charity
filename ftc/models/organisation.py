@@ -7,6 +7,7 @@ from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django_better_admin_arrayfield.models.fields import ArrayField
 from django.utils.functional import cached_property
 
@@ -202,6 +203,12 @@ class Organisation(models.Model):
         related_name="organisations",
         on_delete=models.DO_NOTHING,
     )
+    priority = ArrayField(
+        models.BigIntegerField(null=True, blank=True, db_index=True),
+        blank=True,
+        null=True,
+        verbose_name="Organisation priority",
+    )
     spider = models.CharField(max_length=200, db_index=True)
     org_id_scheme = models.ForeignKey(
         "OrgidScheme",
@@ -233,7 +240,7 @@ class Organisation(models.Model):
     def __str__(self):
         return "%s %s" % (self.organisationTypePrimary.title, self.org_id)
 
-    @property
+    @cached_property
     def org_links(self):
         return OrganisationLink.objects.filter(
             models.Q(org_id_a=self.org_id) | models.Q(org_id_b=self.org_id)
@@ -330,7 +337,7 @@ class Organisation(models.Model):
             else:
                 yield link
 
-    @property
+    @cached_property
     def sameAs(self):
         return [
             reverse("orgid_html", kwargs=dict(org_id=o))
@@ -338,7 +345,7 @@ class Organisation(models.Model):
             if o != self.org_id
         ]
 
-    @property
+    @cached_property
     def cleanUrl(self):
         if not self.url:
             return None
@@ -346,7 +353,7 @@ class Organisation(models.Model):
             return "http://" + self.url
         return self.url
 
-    @property
+    @cached_property
     def displayUrl(self):
         if not self.url:
             return None
@@ -357,7 +364,7 @@ class Organisation(models.Model):
             url = url[:-1]
         return url
 
-    @property
+    @cached_property
     def sortedAlternateName(self):
         if not self.alternateName:
             return []
@@ -392,7 +399,7 @@ class Organisation(models.Model):
                     continue
                 yield [location_type, location.geoCode]
 
-    @property
+    @cached_property
     def allGeoCodes(self):
 
         location_fields = [
@@ -435,7 +442,7 @@ class Organisation(models.Model):
                 locations[location_type][location.geo_iso].add(location.geoCode)
         return locations
 
-    @property
+    @cached_property
     def location(self):
         locations = []
         for location in self.locations:
@@ -453,7 +460,7 @@ class Organisation(models.Model):
             )
         return locations
 
-    @property
+    @cached_property
     def lat_lngs(self):
         return_lat_lngs = []
         for location in self.locations:
@@ -466,7 +473,7 @@ class Organisation(models.Model):
                 )
         return return_lat_lngs
 
-    @property
+    @cached_property
     def hq(self):
         for location in self.locations:
             if (

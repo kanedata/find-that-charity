@@ -88,7 +88,8 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Tweet: {}".format(tweet_text)))
 
         # create the tweet
-        self.create_api_client()
-        self.client.create_tweet(
-            text=tweet_text,
-        )
+        if not settings.DEBUG:
+            self.create_api_client()
+            self.client.create_tweet(
+                text=tweet_text,
+            )

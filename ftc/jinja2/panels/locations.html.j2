@@ -1,11 +1,11 @@
-{% if org.locations.exists() or org.postalCode %}
+{% if org.locations or org.postalCode %}
 {% call org_panel("Locations", org) %}
 <div class="w-100 fl">
     <div id="locationmap" class="h6 h7-l"></div>
 </div>
 <div class="w-100 fl ph3 ">
     <p class="f6 gray measure">Depending on the data source, location may describe the headquarters of the organisation rather than the area it operates in.</p>
-    {% if org.locations.exists() %}
+    {% if org.locations %}
         {% for areatype, countries in org.locations_group()|dictsort %}
         {% for country, areas in countries|dictsort|selectattr(0, "equalto", 'GB') %}
         {% if loop.first %}

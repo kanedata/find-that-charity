@@ -2,6 +2,37 @@ from ftc.management.commands._base_scraper import BaseScraper
 from ftc.models import OrgidScheme
 
 UPDATE_ORGIDS_SQL = {
+    "update domains": """
+    update ftc_organisation
+    set domain = lower(substring(email from '@(.*)$'))
+    where lower(substring(email from '@(.*)$')) not in (
+        'gmail.com', 'hotmail.com', 'btinternet.com',
+        'hotmail.co.uk', 'yahoo.co.uk', 'outlook.com',
+        'aol.com', 'btconnect.com', 'yahoo.com',
+        'googlemail.com', 'ntlworld.com',
+        'talktalk.net',
+        'sky.com',
+        'live.co.uk',
+        'ntlworld.com',
+        'tiscali.co.uk',
+        'icloud.com',
+        'btopenworld.com',
+        'blueyonder.co.uk',
+        'virginmedia.com',
+        'nhs.net',
+        'me.com',
+        'msn.com',
+        'talk21.com',
+        'aol.co.uk',
+        'mail.com',
+        'live.com',
+        'virgin.net',
+        'ymail.com',
+        'mac.com',
+        'waitrose.com',
+        'gmail.co.uk'
+    )
+    """,
     "Add linked orgIDs": """
         update ftc_organisation o
         set "linked_orgs" = a.linked_orgs

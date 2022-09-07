@@ -4,10 +4,10 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 
-from .organisation import EXTERNAL_LINKS, Organisation
-from .organisation_link import OrganisationLink
-from .organisation_location import OrganisationLocation
-from .organisation_type import OrganisationType
+from ftc.models.organisation import EXTERNAL_LINKS, Organisation
+from ftc.models.organisation_link import OrganisationLink
+from ftc.models.organisation_location import OrganisationLocation
+from ftc.models.organisation_type import OrganisationType
 
 SCALE_DEFAULT = 1.0
 SCALE_MINIMUM = 0.1
@@ -23,7 +23,7 @@ class RelatedOrganisation:
         orgs = Organisation.objects.filter(linked_orgs__contains=[org_id])
         return cls(orgs)
 
-    @property
+    @cached_property
     def orgIDs(self):
         return list(set(self.get_all("orgIDs")))
 
@@ -104,23 +104,7 @@ class RelatedOrganisation:
             org_links.extend(o.org_links)
         return list(set(org_links))
 
-    def __getattr__(self, key, *args):
-        return getattr(self.records[0], key, *args)
-
-    def first(self, field, justvalue=False):
-        for r in self.records:
-            if getattr(r, field, None):
-                if justvalue:
-                    return getattr(r, field)
-                return {
-                    "value": getattr(r, field),
-                    "orgid": r.org_id,
-                    "source": r.source,
-                }
-        if justvalue:
-            return None
-        return {}
-
+    @cached_property
     def search_scale(self):
         scaling = SCALE_DEFAULT
         income_vals = [
@@ -137,6 +121,23 @@ class RelatedOrganisation:
             return SCALE_MINIMUM
 
         return scaling
+
+    def __getattr__(self, key, *args):
+        return getattr(self.records[0], key, *args)
+
+    def first(self, field, justvalue=False):
+        for r in self.records:
+            if getattr(r, field, None):
+                if justvalue:
+                    return getattr(r, field)
+                return {
+                    "value": getattr(r, field),
+                    "orgid": r.org_id,
+                    "source": r.source,
+                }
+        if justvalue:
+            return None
+        return {}
 
     def get_all(self, field):
         seen = set()
