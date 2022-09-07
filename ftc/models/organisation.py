@@ -236,7 +236,12 @@ class Organisation(models.Model):
 
     @cached_property
     def classifications(self):
-        classes = OrganisationClassification.objects.filter(org_id=self.org_id).all()
+        classes = (
+            OrganisationClassification.objects.prefetch_related("vocabulary")
+            .prefetch_related("vocabulary__vocabulary")
+            .filter(org_id=self.org_id)
+            .all()
+        )
         return {
             vocab: [v for v in classes if v.vocabulary.vocabulary == vocab]
             for vocab in set(v.vocabulary.vocabulary for v in classes)
