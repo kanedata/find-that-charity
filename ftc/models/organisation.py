@@ -1,11 +1,13 @@
 import datetime
 import re
 from collections import defaultdict
+from typing import Counter
 
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.urls import reverse
 from django_better_admin_arrayfield.models.fields import ArrayField
+from django.utils.functional import cached_property
 
 from ftc.models.organisation_classification import OrganisationClassification
 from ftc.models.organisation_link import OrganisationLink
@@ -222,17 +224,17 @@ class Organisation(models.Model):
     def __str__(self):
         return "%s %s" % (self.organisationTypePrimary.title, self.org_id)
 
-    @property
+    @cached_property
     def org_links(self):
         return OrganisationLink.objects.filter(
             models.Q(org_id_a=self.org_id) | models.Q(org_id_b=self.org_id)
         )
 
-    @property
+    @cached_property
     def locations(self):
-        return OrganisationLocation.objects.filter(org_id=self.org_id)
+        return OrganisationLocation.objects.filter(org_id=self.org_id).all()
 
-    @property
+    @cached_property
     def classifications(self):
         classes = OrganisationClassification.objects.filter(org_id=self.org_id).all()
         return {
@@ -295,7 +297,7 @@ class Organisation(models.Model):
                 obj["sameAs"] = self.sameAs
         return obj
 
-    def get_links(self):
+    def _get_links(self):
         if self.url:
             yield (self.cleanUrl, self.displayUrl, self.org_id)
         if not self.orgIDs:
@@ -305,7 +307,16 @@ class Organisation(models.Model):
             for link in links:
                 yield (link[0].format(o.id), link[1], o)
 
-    @property
+    def get_links(self):
+        links = list(self._get_links())
+        link_counts = Counter(elem[1] for elem in links)
+        for link in links:
+            if link_counts[link[1]] > 1:
+                yield (link[0], f"{link[1]} ({link[2].id})", link[2])
+            else:
+                yield link
+
+    @cached_property
     def sameAs(self):
         return [
             reverse("orgid_html", kwargs=dict(org_id=o))
@@ -313,7 +324,7 @@ class Organisation(models.Model):
             if o != self.org_id
         ]
 
-    @property
+    @cached_property
     def cleanUrl(self):
         if not self.url:
             return None
@@ -321,7 +332,7 @@ class Organisation(models.Model):
             return "http://" + self.url
         return self.url
 
-    @property
+    @cached_property
     def displayUrl(self):
         if not self.url:
             return None
@@ -332,7 +343,7 @@ class Organisation(models.Model):
             url = url[:-1]
         return url
 
-    @property
+    @cached_property
     def sortedAlternateName(self):
         if not self.alternateName:
             return []
@@ -355,7 +366,7 @@ class Organisation(models.Model):
             "K04000001": ["E92000001", "W92000004"],  # England and Wales
         }
 
-        for location in self.locations.all():
+        for location in self.locations:
             if re.match("[ENWSK][0-9]{8}", location.geoCode):
                 location_type = OrganisationLocation.LocationTypes(
                     location.locationType
@@ -367,7 +378,7 @@ class Organisation(models.Model):
                     continue
                 yield [location_type, location.geoCode]
 
-    @property
+    @cached_property
     def allGeoCodes(self):
 
         location_fields = [
@@ -387,7 +398,7 @@ class Organisation(models.Model):
         ]
 
         locations = set()
-        for location in self.locations.all():
+        for location in self.locations:
             for f in location_fields:
                 value = getattr(location, f, None)
                 if value and not value.endswith("999999"):
@@ -397,7 +408,7 @@ class Organisation(models.Model):
     def locations_group(self):
         locations = defaultdict(lambda: defaultdict(set))
 
-        for location in self.locations.all():
+        for location in self.locations:
             location_type = OrganisationLocation.LocationTypes(
                 location.locationType
             ).label
@@ -410,10 +421,10 @@ class Organisation(models.Model):
                 locations[location_type][location.geo_iso].add(location.geoCode)
         return locations
 
-    @property
+    @cached_property
     def location(self):
         locations = []
-        for location in self.locations.all():
+        for location in self.locations:
             if location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE:
                 geocode = location.geo_laua
             else:
@@ -428,10 +439,10 @@ class Organisation(models.Model):
             )
         return locations
 
-    @property
+    @cached_property
     def lat_lngs(self):
         return_lat_lngs = []
-        for location in self.locations.all():
+        for location in self.locations:
             if location.geo_lat and location.geo_long:
                 location_type = OrganisationLocation.LocationTypes(
                     location.locationType
@@ -441,9 +452,9 @@ class Organisation(models.Model):
                 )
         return return_lat_lngs
 
-    @property
+    @cached_property
     def hq(self):
-        for location in self.locations.all():
+        for location in self.locations:
             if (
                 location.locationType
                 == OrganisationLocation.LocationTypes.REGISTERED_OFFICE
