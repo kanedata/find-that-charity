@@ -1,8 +1,11 @@
 import re
+from urllib.parse import urlparse
 
 import babel.numbers
 import inflect
 import titlecase
+from django.conf import settings
+from django.utils.text import slugify
 
 VOWELS = re.compile("[AEIOUYaeiouy]")
 ORD_NUMBERS_RE = re.compile(r"([0-9]+(?:st|nd|rd|th))")
@@ -185,3 +188,25 @@ def str_format(value, format="{}"):
 
 def a_or_an(value):
     return p.a(value).split()[0]
+
+
+def normalise_name(n):
+    stopwords = ["the", "of", "in", "uk", "ltd", "limited"]
+    n = slugify(n)
+    return " ".join([w for w in n.split("-") if w not in stopwords])
+
+
+def get_domain(url):
+    if not url:
+        return None
+    if not url.startswith("http"):
+        url = "http://" + url
+    try:
+        domain = urlparse(url).netloc
+    except ValueError:
+        return None
+    if domain.startswith("www."):
+        domain = domain[4:]
+    if domain in settings.IGNORE_DOMAINS:
+        return None
+    return domain
