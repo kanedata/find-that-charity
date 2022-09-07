@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.db.models import Count, F, Func
@@ -85,14 +86,14 @@ def get_orgidschemes():
     return value
 
 
-def get_locations():
+def get_locations(areatypes=settings.DEFAULT_AREA_TYPES):
     cache_key = "locationnames"
     value = cache.get(cache_key)
     if value:
         return value
     if GeoLookup._meta.db_table in connection.introspection.table_names():
         value = {}
-        for s in GeoLookup.objects.all():
+        for s in GeoLookup.objects.filter(geoCodeType__in=areatypes):
             if s.geoCodeType not in value:
                 value[s.geoCodeType] = {}
             value[s.geoCodeType][s.geoCode] = s.name
