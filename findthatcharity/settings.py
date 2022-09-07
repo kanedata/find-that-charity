@@ -19,10 +19,13 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 load_dotenv()
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get("DEBUG", "true").lower().startswith("t")
 
-if os.environ.get("SENTRY_DSN"):
+
+if os.environ.get("SENTRY_DSN") and not DEBUG:
     environment = "production"
-    if os.environ.get("DEBUG", "true").lower().startswith("t"):
+    if DEBUG:
         environment = "development"
     sentry_sdk.init(
         dsn=os.environ.get("SENTRY_DSN"),
@@ -48,9 +51,6 @@ PROJECT_NAME = "Find that Charity"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "true").lower().startswith("t")
 
 ALLOWED_HOSTS = (
     os.environ.get("ALLOWED_HOSTS").split(";")
