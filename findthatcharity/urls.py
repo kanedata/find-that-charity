@@ -34,7 +34,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
     path("accounts/", include("django.contrib.auth.urls")),
-    path("admin/", admin.site.urls, name="about"),
+    path("admin/", admin.site.urls, name="admin"),
     path("", ftc.views.index, name="index"),
     path("about", ftc.views.about, name="about"),
     path("adddata/", addtocsv.views.index, name="csvtool"),

@@ -1,39 +1,55 @@
 from typing import List
 
-from django.core.paginator import Paginator
 from django.shortcuts import Http404, get_object_or_404
-from ninja import NinjaAPI, Query, Schema
+from ninja import Router, Query
 
-from api.filters import OrganisationFilter, OrganisationIn
+from api.filters import OrganisationIn
 from api.schema import Organisation as OrganisationOut
 from api.schema import Source as SourceOut
+from api.schema import (
+    ResultError,
+    OrganisationListResultSuccess,
+    # OrganisationResultSuccess,
+)
 from ftc.models import Organisation
 from ftc.query import get_linked_organisations as query_linked_organisations
-from ftc.query import get_organisation as query_organisation
+from ftc.query import get_organisation as query_organisation, OrganisationSearch
 
-api = NinjaAPI(
-    title="Find that Charity API",
-    description="Search for information about charities and other non-profit organisations",
-    version="1.0",
+organisation_router = Router()
+
+
+@organisation_router.get(
+    "/",
+    response={200: OrganisationListResultSuccess, 404: ResultError},
+    summary="Search for organisations",
 )
+def get_organisation_list(
+    request,
+    filters: OrganisationIn = Query({}),
+):
+    s = OrganisationSearch(
+        results_per_page=filters.limit,
+    )
+    s.set_criteria(
+        term=filters.term,
+        source=filters.source,
+        active=filters.active,
+        domain=filters.domain,
+        postcode=filters.postcode,
+        location=filters.location,
+        other_orgtypes=filters.organisationType,
+    )
+    s.run_es(with_pagination=True)
+    response = s.paginator.page(filters.page)
+    results = [hit.__dict__["_d_"] for hit in response.object_list]
+    return {
+        "success": True,
+        "data": results,
+    }
 
 
-class ResultError(Schema):
-    error: str
-    params: dict
-
-
-@api.get("/organisations", response={200: List[OrganisationOut], 404: ResultError})
-def get_organisation_list(request, filters: OrganisationIn = Query({})):
-    filters = filters.dict()
-    f = OrganisationFilter(request.GET, queryset=Organisation.objects.all())
-    paginator = Paginator(f.qs, filters["limit"])
-    response = paginator.page(filters["page"])
-    return response.object_list
-
-
-@api.get(
-    "/organisations/{organisation_id}",
+@organisation_router.get(
+    "/{organisation_id}",
     response={200: OrganisationOut, 404: ResultError},
 )
 def get_organisation(request, organisation_id: str):
@@ -43,8 +59,8 @@ def get_organisation(request, organisation_id: str):
         return 404, {"error": str(e), "params": {"organisation_id": organisation_id}}
 
 
-@api.get(
-    "/organisations/{organisation_id}/linked",
+@organisation_router.get(
+    "/{organisation_id}/linked",
     response={200: List[OrganisationOut], 404: ResultError},
 )
 def get_linked_organisations(request, organisation_id: str):
@@ -55,8 +71,8 @@ def get_linked_organisations(request, organisation_id: str):
         return 404, {"error": str(e), "params": {"organisation_id": organisation_id}}
 
 
-@api.get(
-    "/organisations/{organisation_id}/source",
+@organisation_router.get(
+    "/{organisation_id}/source",
     response={200: SourceOut, 404: ResultError},
 )
 def get_organisation_source(request, organisation_id: str):

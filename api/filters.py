@@ -19,6 +19,12 @@ class OrganisationFilter(filters.FilterSet):
 
 
 class OrganisationIn(Schema):
+    term: str = None
+    source: List[str] = None
+    active: bool = None
+    domain: str = None
+    postcode: str = None
+    location: List[str] = None
     organisationType: List[str] = None
     active: bool = True
     page: int = 1

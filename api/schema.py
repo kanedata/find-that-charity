@@ -22,6 +22,21 @@ class OrgIdScheme(Schema):
     priority: int = None
 
 
+class OrganisationGroup(Schema):
+    org_id: str
+    orgIDs: List[str] = None
+    linked_orgs: List[str] = None
+    name: str = None
+    alternateName: List[str] = None
+    active: bool = None
+    domain: List[str] = None
+    organisationType: List[str] = None
+    organisationTypePrimary: str = None
+    postalCode: str = None
+    source: List[str] = None
+    locations: List[str] = None
+
+
 class Organisation(Schema):
     org_id: str
     orgIDs: List[str] = None
@@ -71,3 +86,19 @@ class Organisation(Schema):
     geo_lep2: str = None
     geo_lat: float = None
     geo_long: float = None
+
+
+class ResultError(Schema):
+    success: bool = False
+    error: str
+    params: dict
+
+
+class OrganisationListResultSuccess(Schema):
+    success: bool = True
+    data: List[OrganisationGroup]
+
+
+class OrganisationResultSuccess(Schema):
+    success: bool = True
+    data: Organisation
