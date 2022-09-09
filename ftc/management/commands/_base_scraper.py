@@ -39,6 +39,7 @@ class BaseScraper(BaseCommand):
         OrganisationLink,
         OrganisationLocation,
     ]
+    expected_records = 1
 
     postcode_regex = re.compile(
         r"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"
@@ -60,7 +61,7 @@ class BaseScraper(BaseCommand):
 
         # set up logging
         self.logger = logging.getLogger("ftc.{}".format(self.name))
-        self.scrape_logger = ScrapeHandler(self.scrape)
+        self.scrape_logger = ScrapeHandler(self.scrape, self.expected_records)
         scrape_log_format = logging.Formatter(
             "{levelname} {asctime} [{name}] {message}", style="{"
         )
@@ -504,6 +505,11 @@ class CSVScraper(BaseScraper):
             csvreader = csv.DictReader(a)
             for k, row in enumerate(csvreader):
                 self.parse_row(row)
+
+
+class SQLRunner(BaseScraper):
+    expected_records = 0
+    pass
 
 
 class HTMLScraper(BaseScraper):

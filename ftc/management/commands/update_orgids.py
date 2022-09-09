@@ -1,4 +1,4 @@
-from ftc.management.commands._base_scraper import BaseScraper
+from ftc.management.commands._base_scraper import SQLRunner
 from ftc.models import OrgidScheme
 
 UPDATE_ORGIDS_SQL = {
@@ -105,7 +105,7 @@ UPDATE_ORGIDS_SQL = {
 }
 
 
-class Command(BaseScraper):
+class Command(SQLRunner):
     help = "Find linked orgIDs"
     name = "update_orgids"
     models_to_delete = []

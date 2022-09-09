@@ -4,9 +4,10 @@ from ftc.models import Scrape
 
 
 class ScrapeHandler(logging.StreamHandler):
-    def __init__(self, scrape):
+    def __init__(self, scrape, expected_records=1):
         logging.StreamHandler.__init__(self)
         self.scrape = scrape
+        self.expected_records = expected_records
 
     def emit(self, record):
         msg = self.format(record)
@@ -16,7 +17,7 @@ class ScrapeHandler(logging.StreamHandler):
         self.scrape.save()
 
     def teardown(self):
-        if self.scrape.items == 0:
+        if self.expected_records and (self.scrape.items == 0):
             self.scrape.status = Scrape.ScrapeStatus.FAILED
         elif self.scrape.errors > 0:
             self.scrape.status = Scrape.ScrapeStatus.ERRORS

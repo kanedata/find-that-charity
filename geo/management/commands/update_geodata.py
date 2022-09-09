@@ -1,4 +1,4 @@
-from ftc.management.commands._base_scraper import BaseScraper
+from ftc.management.commands._base_scraper import SQLRunner
 
 UPDATE_GEODATA_SQL = {
     "Remove blank postcodes": """
@@ -178,7 +178,7 @@ UPDATE_GEODATA_SQL = {
 }
 
 
-class Command(BaseScraper):
+class Command(SQLRunner):
     help = "Update geodata on organisations"
     name = "update_geodata"
     models_to_delete = []
