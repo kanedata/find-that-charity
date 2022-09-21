@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 
 import django.test
 from django.utils import timezone
@@ -8,6 +9,11 @@ from ftc.models import Organisation, OrganisationType, Scrape, Source
 
 class TestCase(django.test.TestCase):
     def setUp(self):
+        # setup elasticsearch patcher
+        self.es_patcher = patch("ftc.documents.get_connection")
+        self.addCleanup(self.es_patcher.stop)
+        self.mock_es = self.es_patcher.start()
+
         ot = OrganisationType.objects.create(title="Registered Charity")
         ot2 = OrganisationType.objects.create(
             title="Registered Charity (England and Wales)"
