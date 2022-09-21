@@ -87,8 +87,8 @@
         </tr>
         <tr>
             <td class="bn tl">Amounts falling due within one year</td>
-            <td class="bn code">{{ cy_partb.creditors_one_year_total_current|number_format(cy_partb.scale * -1) }}</td>
-            <td class="bn code">{% if py_partb %}{{ py_partb.creditors_one_year_total_current|number_format(cy_partb.scale * -1) }}{% endif %}</td>
+            <td class="bn code">{{ (cy_partb.creditors_one_year_total_current * -1)|number_format(cy_partb.scale) }}</td>
+            <td class="bn code">{% if py_partb %}{{ (py_partb.creditors_one_year_total_current * -1)|number_format(cy_partb.scale) }}{% endif %}</td>
         </tr>
         <tr>
             <td class="bn tl ttu b">Net current assets</td>
@@ -111,8 +111,8 @@
         </tr>
         <tr>
             <td class="bn tl">Amounts falling due after one year</td>
-            <td class="bn code">{{ cy_partb.creditors_falling_due_after_one_year|number_format(cy_partb.scale * -1) }}</td>
-            <td class="bn code">{% if py_partb %}{{ py_partb.creditors_falling_due_after_one_year|number_format(cy_partb.scale * -1) }}{% endif %}</td>
+            <td class="bn code">{{ (cy_partb.creditors_falling_due_after_one_year * -1)|number_format(cy_partb.scale) }}</td>
+            <td class="bn code">{% if py_partb %}{{ (py_partb.creditors_falling_due_after_one_year * -1)|number_format(cy_partb.scale) }}{% endif %}</td>
         </tr>
         <tr>
             <td colspan="3"></td>
