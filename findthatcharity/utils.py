@@ -170,12 +170,14 @@ def format_currency(amount, currency="GBP", int_format="¤#,##0"):
     )
 
 
-def number_format(value, scale=1):
+def number_format(value, scale=1, negative=False):
     if value is None or value == 0:
         return "-"
     format_ = "{:,.0f}"
     if scale > 1:
         format_ = "{:,.1f}"
+    if negative:
+        value = -value
     if value < 0:
         format_ = "(" + format_ + ")"
         value = abs(value)

@@ -18,49 +18,57 @@
         </tr>
     </thead>
     <tbody>
-        {% if cy.charity_receives_govt_funding_contracts %}
         <tr>
             <td class="bn ttu tl b" colspan="3">Contracts with government</td>
         </tr>
+        {% if cy.charity_receives_govt_funding_contracts or (py and py.charity_receives_govt_funding_contracts) %}
         <tr>
             <td class="bn tl">Income from government contracts</td>
-            <td class="bn">{{ "{:,.0f}".format(cy.income_from_government_contracts) }}</td>
-            <td class="bn">{% if py and py.income_from_government_contracts %}{{ "{:,.0f}".format(py.income_from_government_contracts) }}{% endif %}</td>
+            <td class="bn">{{ cy.income_from_government_contracts|number_format() }}</td>
+            <td class="bn">{% if py  %}{{ py.income_from_government_contracts|number_format() }}{% endif %}</td>
         </tr>
         <tr>
             <td class="bn tl">Government contracts as % of total income</td>
-            <td class="bn">{% if cy and cy.total_gross_income %}{{ "{:.1%}".format(cy.income_from_government_contracts / cy.total_gross_income|float) }}{% endif %}</td>
-            <td class="bn">{% if py and py.total_gross_income and py.income_from_government_contracts %}{{ "{:.1%}".format(py.income_from_government_contracts / py.total_gross_income|float) }}{% endif %}</td>
+            <td class="bn">{% if cy and cy.total_gross_income and cy.income_from_government_contracts %}{{ "{:.1%}".format(cy.income_from_government_contracts / cy.total_gross_income|float) }}{% else %}-{% endif %}</td>
+            <td class="bn">{% if py and py.total_gross_income and py.income_from_government_contracts %}{{ "{:.1%}".format(py.income_from_government_contracts / py.total_gross_income|float) }}{% else %}-{% endif %}</td>
         </tr>
         {% if cy.count_govt_contracts or (py and py.count_govt_contracts) %}
         <tr>
             <td class="bn tl">Number of government contracts</td>
-            <td class="bn">{% if cy.count_govt_contracts %}{{ "{:,.0f}".format(cy.count_govt_contracts) }}{% endif %}</td>
-            <td class="bn">{% if py and py.count_govt_contracts %}{{ "{:,.0f}".format(py.count_govt_contracts) }}{% endif %}</td>
+            <td class="bn">{% if cy and cy.count_govt_contracts %}{{ cy.count_govt_contracts|number_format() }}{% else %}-{% endif %}</td>
+            <td class="bn">{% if py and py.count_govt_contracts %}{{ py.count_govt_contracts|number_format() }}{% else %}-{% endif %}</td>
         </tr>
         {% endif %}
+        {% else %}
+        <tr>
+            <td class="bn tl" colspan="3">None recorded</td>
+        </tr>
         {% endif %}
-        {% if cy.charity_receives_govt_funding_grants %}
         <tr>
             <td class="bn ttu tl b" colspan="3">Government grants</td>
         </tr>
+        {% if cy.charity_receives_govt_funding_grants or (py and py.charity_receives_govt_funding_grants) %}
         <tr>
             <td class="bn tl">Income from government grants</td>
-            <td class="bn">{{ "{:,.0f}".format(cy.income_from_government_grants) }}</td>
-            <td class="bn">{% if py and py.income_from_government_grants %}{{ "{:,.0f}".format(py.income_from_government_grants) }}{% endif %}</td>
+            <td class="bn">{% if cy and cy.income_from_government_grants %}{{ cy.income_from_government_grants|number_format() }}{% else %}-{% endif %}</td>
+            <td class="bn">{% if py and py.income_from_government_grants %}{{ py.income_from_government_grants|number_format() }}{% else %}-{% endif %}</td>
         </tr>
         <tr>
             <td class="bn tl">Government grants as % of total income</td>
-            <td class="bn">{% if cy and cy.total_gross_income %}{{ "{:.1%}".format(cy.income_from_government_grants / cy.total_gross_income|float) }}{% endif %}</td>
-            <td class="bn">{% if py and py.total_gross_income and py.income_from_government_grants %}{{ "{:.1%}".format(py.income_from_government_grants / py.total_gross_income|float) }}{% endif %}</td>
+            <td class="bn">{% if cy and cy.total_gross_income and cy.income_from_government_grants %}{{ "{:.1%}".format(cy.income_from_government_grants / cy.total_gross_income|float) }}{% else %}-{% endif %}</td>
+            <td class="bn">{% if py and py.total_gross_income and py.income_from_government_grants %}{{ "{:.1%}".format(py.income_from_government_grants / py.total_gross_income|float) }}{% else %}-{% endif %}</td>
         </tr>
         {% if cy.count_govt_grants or (py and py.count_govt_grants) %}
         <tr>
             <td class="bn tl">Number of government grants</td>
-            <td class="bn">{% if cy.count_govt_grants %}{{ "{:,.0f}".format(cy.count_govt_grants) }}{% endif %}</td>
-            <td class="bn">{% if py and py.count_govt_grants %}{{ "{:,.0f}".format(py.count_govt_grants) }}{% endif %}</td>
+            <td class="bn">{% if cy and cy.count_govt_grants %}{{ cy.count_govt_grants|number_format() }}{% else %}-{% endif %}</td>
+            <td class="bn">{% if py and py.count_govt_grants %}{{ py.count_govt_grants|number_format() }}{% else %}-{% endif %}</td>
         </tr>
         {% endif %}
+        {% else %}
+        <tr>
+            <td class="bn tl" colspan="3">None recorded</td>
+        </tr>
         {% endif %}
     </tbody>
 </table>
