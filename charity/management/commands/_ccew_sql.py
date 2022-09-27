@@ -415,7 +415,7 @@ where ot.title = 'Registered Charity'
 """
 
 UPDATE_CCEW[
-    "Insert into organisation link table"
+    "Insert companies into organisation link table"
 ] = """
 insert into "ftc_organisationlink" (
     org_id_a,
@@ -432,6 +432,26 @@ select cc.id as org_id_a,
 from charity_charity cc
 where company_number not in ('01234567', '12345678', '00000000')
     and cc.source = %(source_id)s
+"""
+
+UPDATE_CCEW[
+    "Insert into organisation link table"
+] = """
+insert into "ftc_organisationlink" (
+    org_id_a,
+    org_id_b,
+    spider,
+    scrape_id,
+    source_id
+)
+select distinct 'GB-CHC-' || registered_charity_number as org_id_a,
+    'GB-CHC-' || assoc_registered_charity_number as org_id_b,
+    %(spider_name)s as spider,
+    %(scrape_id)s as scrape_id,
+    %(source_id)s as source_id
+from charity_ccewcharityeventhistory
+where registered_charity_number != assoc_registered_charity_number
+    and linked_charity_number = 0
 """
 
 UPDATE_CCEW[
