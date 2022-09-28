@@ -1,3 +1,4 @@
+import argparse
 import logging
 
 from django.conf import settings
@@ -37,25 +38,21 @@ class Command(BaseScraper):
     def add_arguments(self, parser):
         parser.add_argument(
             "--parallel",
-            action="store_true",
-            dest="parallel",
+            action=argparse.BooleanOptionalAction,
             help="Run populate/rebuild update multi threaded",
+            default=getattr(settings, "ELASTICSEARCH_DSL_PARALLEL", False),
         )
         parser.add_argument(
-            "--no-parallel",
-            action="store_false",
-            dest="parallel",
-            help="Run populate/rebuild update single threaded",
-        )
-        parser.set_defaults(
-            parallel=getattr(settings, "ELASTICSEARCH_DSL_PARALLEL", False)
-        )
-        parser.add_argument(
-            "--no-count",
-            action="store_false",
+            "--count",
+            action=argparse.BooleanOptionalAction,
+            help="Include a total count in the summary log line",
             default=True,
-            dest="count",
-            help="Do not include a total count in the summary log line",
+        )
+        parser.add_argument(
+            "--update-orgids",
+            action=argparse.BooleanOptionalAction,
+            help="Run `update_orgids` before indexing",
+            default=True,
         )
 
     def run_scraper(self, *args, **options):
@@ -64,7 +61,8 @@ class Command(BaseScraper):
         self.logging_setup()
 
         # run the update_orgids scraper
-        management.call_command("update_orgids")
+        if options["update_orgids"]:
+            management.call_command("update_orgids")
 
         # create new index
         next_index = PATTERN.replace("*", str(self.scrape.id))
