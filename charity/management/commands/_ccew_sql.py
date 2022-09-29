@@ -435,26 +435,6 @@ where company_number not in ('01234567', '12345678', '00000000')
 """
 
 UPDATE_CCEW[
-    "Insert into organisation link table"
-] = """
-insert into "ftc_organisationlink" (
-    org_id_a,
-    org_id_b,
-    spider,
-    scrape_id,
-    source_id
-)
-select distinct 'GB-CHC-' || registered_charity_number as org_id_a,
-    'GB-CHC-' || assoc_registered_charity_number as org_id_b,
-    %(spider_name)s as spider,
-    %(scrape_id)s as scrape_id,
-    %(source_id)s as source_id
-from charity_ccewcharityeventhistory
-where registered_charity_number != assoc_registered_charity_number
-    and linked_charity_number = 0
-"""
-
-UPDATE_CCEW[
     "Insert into organisation location table"
 ] = """
 insert into ftc_organisationlocation (
