@@ -56,7 +56,7 @@
       {% for row in result.row_lists %}
       <tr>
         {% for item in row %}
-        <td class="{{ item|get_type }}">{% if item is None %}<span class="null">- null -</span>{% else %}{{ item|format_cell_value }}{% endif %}</td>
+        <td class="{{ item|get_type|slugify }}">{% if item is None %}<span class="null">- null -</span>{% else %}{{ item|format_cell_value }}{% endif %}</td>
         {% endfor %}
       </tr>
       {% endfor %}

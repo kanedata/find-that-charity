@@ -2,9 +2,7 @@
 
 {% block extra_head %}
 <style>
-  {
-    % include "django_sql_dashboard/_css.html" %
-  }
+  {% include "django_sql_dashboard/_css.html" %}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"
   integrity="sha512-i9pd5Q6ntCp6LwSgAZDzsrsOlE8SN+H5E0T5oumSXWQz5l1Oc4Kb5ZrXASfyjjqtc6Mg6xWbu+ePbbmiEPJlDg=="
@@ -78,7 +76,9 @@
   .sql-dashboard .query-results table th.int,
   .sql-dashboard .query-results table td.int,
   .sql-dashboard .query-results table th.float,
-  .sql-dashboard .query-results table td.float {
+  .sql-dashboard .query-results table td.float,
+  .sql-dashboard .query-results table th.decimal,
+  .sql-dashboard .query-results table td.decimal {
     text-align: right;
     font-variant-numeric: tabular-nums;
   }
