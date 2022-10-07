@@ -61,6 +61,18 @@
                     charity</a>.</div>
         </div>
     </section>
+    <section class="w-100 cf mv5">
+        <h3 class="w-100 pa0 mv2">Data dashboards</h3>
+        <div class="">
+            {% for dashboard, editable in dashboards %}
+            <div class="bg-light-gray near-black fl dib mb2 mr2 f5">
+                <a class="link near-black underline-hover pa2 dib fl" href="{{ dashboard.get_absolute_url() }}">
+                    {{ dashboard.title }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
     <div class="mv5 cf">
         <h3>Types of organisation available</h3>
         <div class="">

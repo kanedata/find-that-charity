@@ -5,6 +5,7 @@ from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django_sql_dashboard.models import Dashboard
 from elasticsearch.exceptions import RequestError
 
 from charity.models import Charity
@@ -35,6 +36,23 @@ def index(request):
         },
         term="",
     )
+
+    if request.user.is_anonymous:
+        context["dashboards"] = [
+            (dashboard, False)
+            for dashboard in Dashboard.objects.filter(
+                view_policy=Dashboard.ViewPolicies.PUBLIC
+            )
+            .select_related("owned_by", "view_group", "edit_group")
+            .all()
+        ]
+    else:
+        context["dashboards"] = [
+            (dashboard, dashboard.user_can_edit(request.user))
+            for dashboard in Dashboard.get_visible_to_user(request.user).select_related(
+                "owned_by", "view_group", "edit_group"
+            )
+        ]
     return render(request, "index.html.j2", context)
 
 
