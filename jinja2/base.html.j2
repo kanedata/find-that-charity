@@ -1,85 +1,102 @@
 {% set default_title = 'Find that Charity' %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Archivo:400,700|Raleway:400,700|Material+Icons">
-    <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
-    <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
-    <link rel="stylesheet" href="{{ static('css/style.css') }}" />
-    {% block headscripts %}
-    {% endblock %}
-    <title>{{ (title or default_title)|striptags }}{% block title %}{% endblock %}</title>
-  </head>
-  <body class="home w-100 sans-serif near-black base-font bg-wavy">
-    <header class="body header-font normal ph3 ph5-ns pt4 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
-      <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
-          <a href="{{ url('about') }}" class="white logo underline double underline-yellow">About</a>
-            | <a href="{{ url('about') }}#data-sources" class="white logo underline double underline-yellow">Data sources</a>
-            | <a href="{{ url('about') }}#privacy" class="white logo underline double underline-yellow">Privacy</a>
-          {% if request.user.is_superuser %}
-            | <a href="{{ url('admin:index') }}" class="white logo underline double underline-yellow">Admin</a>
-          {% endif %}
-      </div>
-      <h1 class="{% if frontpage %}f-subheadline-ns{% endif %} tracked-tight f1 lh-title mv0 logo normal">
-        <a href="{{ url('index') }}" class="link moon-gray underline-yellow underline">
-          {{ default_title }}
-        </a>
-      </h1>
-    </header>
-    <main class="ph0 bg-white cf">
-      {% block header %}
-      <header class="fl w-100 ph3 ph5-ns entry-content lh-copy f4">
-        {% if (heading or title) not in [None, default_title] and (heading or title) %}
-        <h2 class="f2-ns mt4 mb0 f3 lh-solid normal">
-          {{ (heading or title)|safe }}
-        </h2>
-        {% if subtitle %}
-        <h3 class="f3-ns f4 lh-solid mv0 normal gray">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css" />
+  <link rel="stylesheet" href="{{ static('css/fonts.css') }}" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
+  <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
+  <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
+  <link rel="stylesheet" href="{{ static('css/style.css') }}" />
+  {% block headscripts %}
+  {% endblock %}
+  <title>{{ (title or default_title)|striptags }}{% block title %}{% endblock %}</title>
+</head>
+
+<body class="home w-100 sans-serif near-black base-font bg-wavy">
+  <header class="body header-font normal ph3 ph5-ns pt4 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
+    <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
+      <a href="{{ url('about') }}" class="white logo underline double underline-yellow">About</a>
+      | <a href="{{ url('about') }}#data-sources" class="white logo underline double underline-yellow">Data sources</a>
+      | <a href="{{ url('about') }}#privacy" class="white logo underline double underline-yellow">Privacy</a>
+      {% if request.user.is_superuser %}
+      | <a href="{{ url('admin:index') }}" class="white logo underline double underline-yellow">Admin</a>
+      {% endif %}
+    </div>
+    <h1 class="{% if frontpage %}f-subheadline-ns{% endif %} tracked-tight f1 lh-title mv0 logo normal">
+      <a href="{{ url('index') }}" class="link moon-gray underline-yellow underline">
+        {{ default_title }}
+      </a>
+    </h1>
+  </header>
+  <main class="ph0 bg-white cf">
+    {% block header %}
+    <header class="fl w-100 ph3 ph5-ns entry-content lh-copy f4">
+      {% if (heading or title) not in [None, default_title] and (heading or title) %}
+      <h2 class="f2-ns mt4 mb0 f3 lh-solid normal">
+        {{ (heading or title)|safe }}
+      </h2>
+      {% if subtitle %}
+      <h3 class="f3-ns f4 lh-solid mv0 normal gray">
         {{ subtitle|safe }}
-        </h3>
-        {% endif %}
-        {% endif %}
-      </header>
-      {% endblock %}
-      <section id="content" class="{% block sectionstyles %}fl w-100 ph3 pv5 ph5-ns lh-copy f4 entry-content{% endblock %}">
-        {% block content %}{% endblock %}
-      </section>
-    </main>
-    <footer id="contentinfo" class="body ph3 ph5-ns db pv5 moon-gray bg-near-black">
-      <div class="w-100">
-        <div class="w-100 w-third-l fr-l">
-          <p class="mv2 pa0 f6">
-            Find that Charity combines data from a number of different <a href="{{ url('about') }}#data-sources" class="link yellow underline-hover">data sources</a>
-            published by official regulators of organisations. Those regulators provide the most up-to-date and official versions of the data and should be contacted in
-            the event of any issues with the data on this site.
-          </p>
-        </div>
-        <div class="w-100 w-two-thirds-l">
-          <p class="mv2 pa0">
-              <strong>Find that Charity</strong>
-              | <a href="{{ url('about') }}" class="link yellow underline-hover">About</a>
-              | <a href="{{ url('about') }}#data-sources" class="link yellow underline-hover">Data sources</a>
-              | <a href="{{ url('about') }}#privacy" class="link yellow underline-hover">Privacy</a>
-              | <a href="https://findthatpostcode.uk/" target="_blank" class="link yellow underline-hover">Find that postcode</a>
-          </p>
-          <div class="mv2 pa0">              
-            Supported by <a href="http://www.threesixtygiving.org/" target="_blank" class="link yellow underline-hover">360Giving</a> |
-            <a href="https://github.com/drkane/find-that-charity" target="_blank" class="link yellow underline-hover" title="View code on Github">Code</a> [<a href="https://github.com/drkane/find-that-charity/blob/main/LICENSE" target="_blank" class="link yellow underline-hover">MIT License</a>] |
-            <a href="https://m.do.co/c/395b3c814647" target="_blank" class="link yellow underline-hover" title="DigitalOcean referral link">Powered by DigitalOcean</a>
-          </div>
-          <p class="mv2 pa0">© {{now.year}} <a href="https://dkane.net/" class="link yellow underline-hover">Kane Data Limited</a></p>
-          <p class="mv2 pa0 f7">
-            Kane Data Limited is registered as a company in England (company number <a href="https://find-and-update.company-information.service.gov.uk/company/14015213" target="_blank" class="link yellow">14015213</a>)
-          </p>
-        </div>
-      </div>
-    </footer>
-    {% block bodyscripts %}
+      </h3>
+      {% endif %}
+      {% endif %}
+    </header>
     {% endblock %}
-    <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-    <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade" /></noscript>
-  </body>
+    <section id="content"
+      class="{% block sectionstyles %}fl w-100 ph3 pv5 ph5-ns lh-copy f4 entry-content{% endblock %}">
+      {% block content %}{% endblock %}
+    </section>
+  </main>
+  <footer id="contentinfo" class="body ph3 ph5-ns db pv5 moon-gray bg-near-black">
+    <div class="w-100">
+      <div class="w-100 w-third-l fr-l">
+        <p class="mv2 pa0 f6">
+          Find that Charity combines data from a number of different <a href="{{ url('about') }}#data-sources"
+            class="link yellow underline-hover">data sources</a>
+          published by official regulators of organisations. Those regulators provide the most up-to-date and official
+          versions of the data and should be contacted in
+          the event of any issues with the data on this site.
+        </p>
+      </div>
+      <div class="w-100 w-two-thirds-l">
+        <p class="mv2 pa0">
+          <strong>Find that Charity</strong>
+          | <a href="{{ url('about') }}" class="link yellow underline-hover">About</a>
+          | <a href="{{ url('about') }}#data-sources" class="link yellow underline-hover">Data sources</a>
+          | <a href="{{ url('about') }}#privacy" class="link yellow underline-hover">Privacy</a>
+          | <a href="https://findthatpostcode.uk/" target="_blank" class="link yellow underline-hover">Find that
+            postcode</a>
+        </p>
+        <div class="mv2 pa0">
+          Supported by <a href="http://www.threesixtygiving.org/" target="_blank"
+            class="link yellow underline-hover">360Giving</a> |
+          <a href="https://github.com/drkane/find-that-charity" target="_blank" class="link yellow underline-hover"
+            title="View code on Github">Code</a> [<a
+            href="https://github.com/drkane/find-that-charity/blob/main/LICENSE" target="_blank"
+            class="link yellow underline-hover">MIT License</a>] |
+          <a href="https://m.do.co/c/395b3c814647" target="_blank" class="link yellow underline-hover"
+            title="DigitalOcean referral link">Powered by DigitalOcean</a>
+        </div>
+        <p class="mv2 pa0">© {{now.year}} <a href="https://dkane.net/" class="link yellow underline-hover">Kane Data
+            Limited</a></p>
+        <p class="mv2 pa0 f7">
+          Kane Data Limited is registered as a company in England (company number <a
+            href="https://find-and-update.company-information.service.gov.uk/company/14015213" target="_blank"
+            class="link yellow">14015213</a>)
+        </p>
+      </div>
+    </div>
+  </footer>
+  {% block bodyscripts %}
+  {% endblock %}
+  <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt=""
+      referrerpolicy="no-referrer-when-downgrade" /></noscript>
+</body>
+
 </html>

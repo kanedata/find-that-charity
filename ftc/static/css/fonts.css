@@ -1,0 +1,30 @@
+/* latin */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('/static/fonts/Archivo-Regular.ttf') format("truetype");
+}
+/* latin */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('/static/fonts/Archivo-Bold.ttf') format("truetype");
+}
+/* latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/static/fonts/Raleway-Regular.ttf') format("truetype");
+}
+/* latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/static/fonts/Raleway-Bold.ttf') format("truetype");
+}

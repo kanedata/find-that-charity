@@ -1,19 +1,31 @@
 {% extends 'base.html' %}
 
 {% block extra_head %}
-<style>{% include "django_sql_dashboard/_css.html" %}</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js" integrity="sha512-i9pd5Q6ntCp6LwSgAZDzsrsOlE8SN+H5E0T5oumSXWQz5l1Oc4Kb5ZrXASfyjjqtc6Mg6xWbu+ePbbmiEPJlDg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css" integrity="sha512-xIf9AdJauwKIVtrVRZ0i4nHP61Ogx9fSRAkCLecmE2dL/U8ioWpDvFCAy4dcfecN72HHB9+7FfQj3aiO68aaaw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/sql/sql.min.js" integrity="sha512-dfObApt1XdGl62IJLrjbIOc9QtnRORA5TCwdnJkSj6C/KjwMz2L/Sc4WlcrgAuWoY+n5xTf6NMMojoUOlgwjug==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+  {
+    % include "django_sql_dashboard/_css.html" %
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"
+  integrity="sha512-i9pd5Q6ntCp6LwSgAZDzsrsOlE8SN+H5E0T5oumSXWQz5l1Oc4Kb5ZrXASfyjjqtc6Mg6xWbu+ePbbmiEPJlDg=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css"
+  integrity="sha512-xIf9AdJauwKIVtrVRZ0i4nHP61Ogx9fSRAkCLecmE2dL/U8ioWpDvFCAy4dcfecN72HHB9+7FfQj3aiO68aaaw=="
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/sql/sql.min.js"
+  integrity="sha512-dfObApt1XdGl62IJLrjbIOc9QtnRORA5TCwdnJkSj6C/KjwMz2L/Sc4WlcrgAuWoY+n5xTf6NMMojoUOlgwjug=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
   .sql-dashboard {
     font-family: 'Raleway', sans-serif;
   }
+
   .sql-dashboard h1 {
     font-family: 'Archivo', sans-serif;
     font-size: 3rem;
     font-weight: 400;
   }
+
   .sql-dashboard .btn {
     appearance: button;
     background-color: rgb(255, 255, 0);
@@ -26,6 +38,7 @@
     transition-property: background-color;
     transition-timing-function: ease-in-out
   }
+
   .sql-dashboard .query-results {
     overflow-x: auto;
     overflow-y: auto;
@@ -40,32 +53,48 @@
     padding-right: 0px;
     padding-bottom: 64px;
   }
+
   .sql-dashboard .query-results table {
     font-size: 0.9rem;
     font-family: 'Raleway', sans-serif;
     line-height: 1.2;
     width: auto;
   }
+
   .sql-dashboard .query-results table tbody tr:nth-child(even) {
     background-color: #f2f2f2;
   }
+
   .sql-dashboard .query-results table thead tr {
     background-color: rgb(17, 17, 17);
     color: #ccc;
   }
+
   .sql-dashboard .query-results table th,
   .sql-dashboard .query-results table td {
     text-align: left;
   }
+
+  .sql-dashboard .query-results table th.int,
+  .sql-dashboard .query-results table td.int,
+  .sql-dashboard .query-results table th.float,
+  .sql-dashboard .query-results table td.float {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
   .sql-dashboard .query-results table th .dropdown-menu-icon {
     float: right;
   }
+
   .sql-dashboard .dashboard-columns {
     font-family: 'Raleway', sans-serif;
   }
-  .sql-dashboard .dashboard-columns > li > p {
-    font-family: Consolas,monaco,monospace;
+
+  .sql-dashboard .dashboard-columns>li>p {
+    font-family: Consolas, monaco, monospace;
   }
+
   .CodeMirror {
     border: 1px solid #eee;
     height: auto;
@@ -78,12 +107,12 @@
 
 {% block bodyscripts %}
 <script>
-document.querySelectorAll("textarea[name='sql']").forEach((el) => {
-  CodeMirror.fromTextArea(el, {
-    mode: 'sql',
-    lineWrapping: true,
-    lineNumbers: true,
+  document.querySelectorAll("textarea[name='sql']").forEach((el) => {
+    CodeMirror.fromTextArea(el, {
+      mode: 'sql',
+      lineWrapping: true,
+      lineNumbers: true,
+    });
   });
-});
 </script>
 {% endblock %}
