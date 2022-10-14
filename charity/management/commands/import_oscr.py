@@ -7,7 +7,7 @@ import tqdm
 from django.utils.text import slugify
 
 from charity.management.commands._oscr_sql import UPDATE_OSCR
-from charity.models import CharityRaw
+from charity.models import CharityRaw, CharityFinancial
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import (
     Organisation,
@@ -18,21 +18,69 @@ from ftc.models import (
 )
 from ftc.models.vocabulary import VocabularyEntries
 
+STANDARD_FIELD_NAMES = [
+    "Charity Number",
+    "Charity Name",
+    "Registered Date",
+    "Known As",
+    "Charity Status",
+    "Notes",
+    "Postcode",
+    "Constitutional Form",
+    "Previous Constitutional Form 1",
+    "Geographical Spread",
+    "Main Operating Location",
+    "Purposes",
+    "Beneficiaries",
+    "Activities",
+    "Objectives",
+    "Principal Office/Trustees Address",
+    "Website",
+    "Most recent year income",
+    "Most recent year expenditure",
+    "Mailing cycle",
+    "Year End",
+    "Date annual return received",
+    "Next year end date",
+    "Donations and legacies income",
+    "Charitable activities income",
+    "Other trading activities income",
+    "Investments income",
+    "Other income",
+    "Raising funds spending",
+    "Charitable activities spending",
+    "Other spending",
+    "Parent charity name",
+    "Parent charity number",
+    "Parent charity country of registration",
+    "Designated religious body",
+    "Regulatory Type",
+]
+
 
 class Command(CSVScraper):
     name = "oscr"
     allowed_domains = ["oscr.org.uk", "githubusercontent.com"]
     start_urls = [
+        "https://www.oscr.org.uk/umbraco/Surface/FormsSurface/Charity5YearsRegDownload",
         "https://www.oscr.org.uk/umbraco/Surface/FormsSurface/CharityRegDownload",
         "https://www.oscr.org.uk/umbraco/Surface/FormsSurface/CharityFormerRegDownload",
     ]
     org_id_prefix = "GB-SC"
     id_field = "Charity Number"
-    date_fields = ["Registered Date", "Year End", "Ceased Date"]
+    date_fields = [
+        "Registered Date",
+        "Year End",
+        "Ceased Date",
+        "Date annual return received",
+        "Next year end date",
+    ]
     date_format = {
-        "Registered Date": "%d/%m/%Y %H:%M",
-        "Ceased Date": "%d/%m/%Y %H:%M",
+        "Registered Date": "%d/%m/%Y",
+        "Ceased Date": "%d/%m/%Y",
         "Year End": "%d/%m/%Y",
+        "Date annual return received": "%d/%m/%Y",
+        "Next year end date": "%d/%m/%Y",
     }
     source = {
         "title": "Office of Scottish Charity Regulator Charity Register Download",
@@ -112,13 +160,85 @@ class Command(CSVScraper):
         for f in z.infolist():
             self.logger.info("Opening: {}".format(f.filename))
             with z.open(f) as csvfile:
-                reader = csv.DictReader(io.TextIOWrapper(csvfile, encoding="utf8"))
-                rowcount = 0
-                for row in reader:
-                    rowcount += 1
-
-                    self.parse_row(row)
+                if "5Years" in f.filename:
+                    reader = csv.DictReader(
+                        io.TextIOWrapper(csvfile, encoding="utf8"),
+                        fieldnames=STANDARD_FIELD_NAMES,
+                    )
+                    records = {}
+                    for row in tqdm.tqdm(reader):
+                        record = self.parse_row_fiveyear(row)
+                        if record:
+                            records[(record.charity_id, record.fyend)] = record
+                    CharityFinancial.objects.bulk_create(
+                        records.values(),
+                        update_conflicts=True,
+                        unique_fields=["charity_id", "fyend"],
+                        update_fields=[
+                            "income",
+                            "spending",
+                            "account_type",
+                            "inc_total",
+                            "inc_other",
+                            "inc_invest",
+                            "inc_char",
+                            "inc_vol",
+                            "inc_fr",
+                            "exp_total",
+                            "exp_vol",
+                            "exp_charble",
+                            "exp_other",
+                        ],
+                    )
+                else:
+                    reader = csv.DictReader(io.TextIOWrapper(csvfile, encoding="utf8"))
+                    for row in reader:
+                        self.parse_row(row)
         z.close()
+
+    def clean_fields(self, record):
+        record = {k.strip(): v for k, v in record.items()}
+        return super().clean_fields(record)
+
+    def parse_row_fiveyear(self, record):
+        record = self.clean_fields(record)
+        if not record.get("Year End"):
+            return
+        total_spending = (
+            int(record.get("Charitable activities spending", 0))
+            + int(record.get("Raising funds spending", 0))
+            + int(record.get("Other spending", 0))
+        )
+
+        financial_record = CharityFinancial(
+            charity_id=self.get_org_id(record),
+            fyend=record.get("Year End"),
+            income=(
+                None
+                if record.get("Most recent year income") is None
+                else int(record.get("Most recent year income"))
+            ),
+            spending=(
+                None
+                if record.get("Most recent year expenditure") is None
+                else int(record.get("Most recent year expenditure"))
+            ),
+            account_type=("basic_oscr" if not total_spending else "detailed_oscr"),
+        )
+        if financial_record.account_type == "detailed_oscr":
+            financial_record.inc_total = financial_record.income
+            financial_record.inc_other = int(record.get("Other income"))
+            financial_record.inc_invest = int(record.get("Investments income"))
+            financial_record.inc_char = int(record.get("Charitable activities income"))
+            financial_record.inc_vol = int(record.get("Donations and legacies income"))
+            financial_record.inc_fr = int(record.get("Other trading activities income"))
+            financial_record.exp_total = total_spending
+            financial_record.exp_vol = int(record.get("Raising funds spending"))
+            financial_record.exp_charble = int(
+                record.get("Charitable activities spending")
+            )
+            financial_record.exp_other = int(record.get("Other spending"))
+        return financial_record
 
     def parse_row(self, record):
 
@@ -220,6 +340,7 @@ class Command(CSVScraper):
                     "latestIncome": int(record["Most recent year income"])
                     if record.get("Most recent year income")
                     else None,
+                    "latestIncomeDate": record.get("Year End"),
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("Registered Date"),
                     "dateRemoved": record.get("Ceased Date"),

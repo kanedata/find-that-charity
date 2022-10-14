@@ -26,7 +26,7 @@ select cc.org_id as org_id,
      NOW() as "first_added",
      NOW() as "last_updated",
     (cc.data->>'Most recent year income')::int as income,
-    (cc.data->>'Charitable activities spending')::int + (cc.data->>'Raising funds spending')::int + (cc.data->>'Other spending')::int as spending,
+    (cc.data->>'Most recent year expenditure')::int as spending,
     to_date(cc.data->>'Year End', 'YYYY-MM-DD') as latest_fye,
     null as dual_registered,
     cc.scrape_id as "scrape_id",
@@ -70,8 +70,8 @@ UPDATE_OSCR[
     "Insert into charity financial"
 ] = """
 insert into charity_charityfinancial as cf (charity_id, fyend, income, inc_total, inc_other, inc_invest, inc_char, inc_vol, inc_fr,
-    exp_total, exp_vol, exp_charble, exp_other, account_type)
-select cc.org_id as org_id,
+    spending, exp_total, exp_vol, exp_charble, exp_other, account_type)
+select cc.org_id as charity_id,
     to_date(cc.data->>'Year End', 'YYYY-MM-DD') as fyend,
     (cc.data->>'Most recent year income')::int as income,
     case when cc.data->>'Charitable activities spending' is not null then (cc.data->>'Most recent year income')::int else null end as inc_total,
@@ -80,6 +80,7 @@ select cc.org_id as org_id,
     (cc.data->>'Charitable activities income')::int as inc_char,
     (cc.data->>'Donations and legacies income')::int as inc_vol,
     (cc.data->>'Other trading activities income')::int as inc_fr,
+    (cc.data->>'Most recent year expenditure')::int as income,
     (cc.data->>'Charitable activities spending')::int + (cc.data->>'Raising funds spending')::int + (cc.data->>'Other spending')::int as exp_total,
     (cc.data->>'Raising funds spending')::int as exp_vol,
     (cc.data->>'Charitable activities spending')::int as exp_charble,
@@ -126,11 +127,11 @@ on conflict (charity_id, name) do nothing;
 UPDATE_OSCR[
     "Add dual registered flag"
 ] = """
-update charity_charity 
-set dual_registered = true 
+update charity_charity
+set dual_registered = true
 where id in (
     select org_id_a
-    from ftc_organisationlink fo 
+    from ftc_organisationlink fo
     where fo.source_id = 'dual_registered'
 )
 and source = %(spider_name)s;

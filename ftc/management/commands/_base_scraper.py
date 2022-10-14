@@ -301,6 +301,8 @@ class BaseScraper(BaseCommand):
         return "-".join([self.org_id_prefix, str(record.get(self.id_field))])
 
     def clean_fields(self, record):
+        record = {k.strip(): v for k, v in record.items()}
+
         for f in record.keys():
             # clean blank values
             if record[f] == "":
@@ -318,6 +320,13 @@ class BaseScraper(BaseCommand):
                             record.get(f).strip(), date_format
                         )
                 except ValueError:
+                    self.logger.warn(
+                        "Could not convert date field {} with value '{}' (expected format '{}')".format(
+                            f,
+                            record[f],
+                            date_format,
+                        )
+                    )
                     record[f] = None
 
             # clean boolean fields
