@@ -1,5 +1,5 @@
-{% set finances = charity.financial_json %}
-{% if finances %}
+{% set events = charity.events %}
+{% if events %}
   {% call org_panel("Charity financial history", org) %}
       <div class="w-100 cf" id="charity-financials">
       <div class="w-100 w-50-ns fl pr4-ns">
@@ -9,38 +9,24 @@
           <th>Income (£)</th>
           <th>Spending (£)</th>
         </tr>
-      {% if org.dateRegistered %}
+      {% for event in events %}
         <tr>
-          <td colspan="">
-            {{ "{:%Y-%m-%d}".format(org.dateRegistered) }}
+          <td>{{ event.fyend }}</td>
+          {% if event.event %}
+          <td colspan="2" class="tr">
+            <span class="gray">{{ event.event }}</span><br>
           </td>
-          <td colspan="2" class="tc">
-            <span class="gray">(Registered as a charity)</span><br>
-          </td>
-        </tr>
-      {% endif %}
-      {% for f in finances|sort(attribute='fyend') %}
-        <tr>
-          <td>{{ f.fyend }}</td>
-          <td>{{ "{:,.0f}".format(f.income) }}</td>
-          <td>{% if f.spending %}{{ "{:,.0f}".format(f.spending) }}{% endif %}</td>
+          {% else %}
+          <td>{{ "{:,.0f}".format(event.income) }}</td>
+          <td>{% if event.spending %}{{ "{:,.0f}".format(event.spending) }}{% endif %}</td>
+          {% endif %}
         </tr>
       {% endfor %}
-      {% if org.dateRemoved %}
-        <tr>
-          <td colspan="">
-            {{ "{:%d %B %Y}".format(org.dateRemoved) }}
-          </td>
-          <td colspan="2" class="tl">
-            <span class="gray">(Removed from the register)</span>
-          </td>
-        </tr>
-      {% endif %}
       </table>
       </div>
       
       <div class="w-100 w-50-ns fl">
-      {% if finances|length > 1 %}
+      {% if events|length > 1 %}
       <canvas id="financeChart" width="400" height="350" class="measure"></canvas>
       {% endif %}
       </div>

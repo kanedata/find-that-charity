@@ -1,0 +1,30 @@
+{% set related_charities = charity.related_charities %}
+{% if related_charities %}
+{% call org_panel("Related charities", org) %}
+<table>
+  <thead>
+    <tr>
+      <th>Registered charity</th>
+      <th>Event</th>
+      <th>Date</th>
+      <th>Associated charity</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for related_charity in related_charities %}
+    <tr>
+      <td>
+        {{ related_charity.registered_charity_number }}
+        {% if related_charity.linked_charity_number != 0 %}
+        -{{ related_charity.linked_charity_number }}
+        {% endif %}
+      </td>
+      <td>{{ related_charity.event_type }}</td>
+      <td>{{ related_charity.date_of_event }}</td>
+      <td>{{ related_charity.assoc_registered_charity_number }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endcall %}
+{% endif %}

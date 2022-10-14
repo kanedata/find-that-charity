@@ -37,6 +37,11 @@ insert into charity_charity as cc (id, name, constitution , geographical_spread,
     postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
     company_number, activities, source, first_added, last_updated, income, spending, latest_fye,
     scrape_id, spider)
+with earliest_event as (
+    select e.organisation_number, min(e.date_of_event) as earliest_date
+    from charity_ccewcharityeventhistory e
+    group by e.organisation_number
+)
 select distinct on(c.registered_charity_number)
     CONCAT('GB-CHC-', c.registered_charity_number) as "id",
     c.charity_name as "name",
@@ -52,7 +57,7 @@ select distinct on(c.registered_charity_number)
     c.charity_contact_postcode as postcode,
     c.charity_contact_phone as "phone",
     c.charity_registration_status = 'Registered' as active,
-    c.date_of_registration as "date_registered",
+    coalesce(ee.earliest_date, c.date_of_registration) as "date_registered",
     c.date_of_removal as "date_removed",
     ceh.reason as "removal_reason",
     c.charity_contact_web as "web",
@@ -74,6 +79,8 @@ from charity_ccewcharity c
         on c.organisation_number = ceh.organisation_number
             and ceh.date_of_event = c.date_of_removal
             and ceh.event_type = 'Removed'
+    left outer join earliest_event ee
+        on c.organisation_number = ee.organisation_number
 where c.linked_charity_number = 0
 on conflict (id) do update
 set "name" = EXCLUDED.name,

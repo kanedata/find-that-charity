@@ -1,3 +1,4 @@
+from copy import copy
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.forms.models import model_to_dict
@@ -94,6 +95,78 @@ class Charity(models.Model):
         return (
             self.id.replace("GB-CHC-", "").replace("GB-SC-", "").replace("GB-NIC-", "")
         )
+
+    @cached_property
+    def events(self):
+        events = copy(self.financial_json)
+        if not events:
+            return []
+
+        ccew_record = self.ccew_record()
+        print(ccew_record)
+        if ccew_record:
+            for event in CCEWCharityEventHistory.objects.filter(
+                linked_charity_number=0,
+                registered_charity_number=self.charity_number,
+                event_type__in=[
+                    "CIO registration",
+                    "Previously excepted registration",
+                    "Removed",
+                    "Re-registered",
+                    "Standard registration",
+                ],
+            ):
+                events.append(
+                    {
+                        "fyend": event.date_of_event.isoformat(),
+                        "event": "Registered as a charity"
+                        if event.event_type == "Standard registration"
+                        else event.event_type,
+                    }
+                )
+        else:
+            if self.date_registered:
+                events.append(
+                    {
+                        "fyend": self.date_registered.isoformat(),
+                        "event": "Registered as a charity",
+                    }
+                )
+            if self.date_removed:
+                events.append(
+                    {
+                        "fyend": self.date_removed.isoformat(),
+                        "event": "Removed",
+                    }
+                )
+        return sorted(events, key=lambda e: e["fyend"])
+
+    @cached_property
+    def related_charities(self):
+        if self.id.startswith("GB-CHC-"):
+            return (
+                CCEWCharityEventHistory.objects.filter(
+                    models.Q(
+                        linked_charity_number=0,
+                        registered_charity_number=self.charity_number,
+                    )
+                    | models.Q(
+                        assoc_registered_charity_number=self.charity_number,
+                    )
+                )
+                .filter(
+                    event_type__in=[
+                        "Asset transfer in",
+                        "Asset transfer out",
+                    ]
+                )
+                .exclude(
+                    registered_charity_number=models.F(
+                        "assoc_registered_charity_number"
+                    )
+                )
+                .all()
+            )
 
 
 class CharityName(models.Model):
