@@ -1,3 +1,4 @@
+import requests
 import tweepy
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -69,12 +70,16 @@ class Command(BaseCommand):
 
         # if a website exists then use it
         if charity.web and charity.web != "":
-            char["website"] = charity.web
-
-        # correct common misformed URL in websites
-        # @todo - make this a bit more robust
-        if char["website"][0:4] != "http":
-            char["website"] = "http://" + char["website"]
+            # check for status code 200
+            try:
+                website = charity.web
+                if not website.startswith("http"):
+                    website = "http://" + website
+                r = requests.get(website)
+                r.raise_for_status()
+                char["website"] = website
+            except (requests.HTTPError, requests.exceptions.ConnectionError):
+                pass
 
         # return the tweet format
         return "{title} {website} ({regno})".format(**char)
