@@ -1,4 +1,5 @@
 from copy import copy
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.forms.models import model_to_dict

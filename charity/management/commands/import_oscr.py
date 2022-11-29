@@ -7,7 +7,7 @@ import tqdm
 from django.utils.text import slugify
 
 from charity.management.commands._oscr_sql import UPDATE_OSCR
-from charity.models import CharityRaw, CharityFinancial
+from charity.models import CharityFinancial, CharityRaw
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import (
     Organisation,
