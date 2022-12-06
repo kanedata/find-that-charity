@@ -58,7 +58,9 @@ ALLOWED_HOSTS = (
     else []
 )
 ENFORCE_HOST = (
-    os.environ.get("ENFORCE_HOST").split(";") if os.environ.get("ENFORCE_HOST") else []
+    os.environ.get("ENFORCE_HOST").split(";")
+    if os.environ.get("ENFORCE_HOST")
+    else None
 )
 INTERNAL_IPS = [
     "127.0.0.1",
