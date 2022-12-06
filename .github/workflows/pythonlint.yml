@@ -4,21 +4,15 @@ jobs:
   django-lint:
 
     runs-on: ubuntu-latest
-
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: ["3.10"]
-    
     env:
       SECRET_KEY: 1234567890
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version-file: 'runtime.txt'
     - name: psycopg2 prerequisites
       run: sudo apt-get install libxml2-dev libxslt-dev python3-dev libpq-dev
     - name: Install dependencies
