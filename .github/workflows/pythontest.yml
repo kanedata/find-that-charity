@@ -16,22 +16,19 @@ jobs:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: ["3.10"]
     
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost/github_actions
       SECRET_KEY: 1234567890
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+    - uses: actions/checkout@v3
+    - name: Parse Python version
+      run: sed  s/python-// runtime.txt | head > .python-version
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version-file: '.python-version'
     - name: psycopg2 prerequisites
       run: sudo apt-get install libxml2-dev libxslt-dev python3-dev libpq-dev
     - name: Install dependencies
