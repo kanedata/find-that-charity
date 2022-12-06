@@ -57,6 +57,7 @@ ALLOWED_HOSTS = (
     if os.environ.get("ALLOWED_HOSTS")
     else []
 )
+ENFORCE_HOST = ALLOWED_HOSTS[0] if ALLOWED_HOSTS and not DEBUG else None
 INTERNAL_IPS = [
     "127.0.0.1",
     "localhost",
@@ -95,6 +96,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "findthatcharity.middleware.XCLacksMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "enforce_host.EnforceHostMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
