@@ -104,7 +104,6 @@ class Charity(models.Model):
             return []
 
         ccew_record = self.ccew_record()
-        print(ccew_record)
         if ccew_record:
             for event in CCEWCharityEventHistory.objects.filter(
                 linked_charity_number=0,
