@@ -110,6 +110,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "findthatcharity.middleware.FTCLoggingMiddleware",
 ]
 
 ROOT_URLCONF = "findthatcharity.urls"
@@ -224,6 +225,8 @@ LOGGING = {
     },
     "root": {"handlers": ["console"], "level": "INFO"},
 }
+# Separate logging of requests
+LOGGING_DB = os.environ.get("LOGGING_DB")
 
 CORS_ALLOW_ALL_ORIGINS = True
 

@@ -42,3 +42,5 @@ requests-mock
 coverage
 django-debug-toolbar
 django-enforce-host
+ua-parser
+sqlite-utils

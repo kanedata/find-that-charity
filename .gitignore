@@ -28,3 +28,5 @@ node_modules/
 
 # IDE metadata
 .idea/
+
+logs/
