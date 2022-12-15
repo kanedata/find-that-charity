@@ -1,4 +1,3 @@
-from compositefk.fields import CompositeForeignKey
 from django.db import models
 
 from ftc.models import OrgidField
@@ -151,13 +150,10 @@ class CQCProvider(models.Model):
         blank=True,
         db_index=True,
     )
-    brand = CompositeForeignKey(
-        "CQCBrand",
-        on_delete=models.DO_NOTHING,
-        to_fields={"id": "brand_id", "scrape_id": "scrape_id"},
-        null=True,
-        blank=True,
-    )
+
+    @property
+    def locations(self):
+        return CQCLocation.objects.filter(provider_id=self.id, scrape=self.scrape)
 
 
 class CQCBrand(models.Model):
@@ -301,13 +297,5 @@ class CQCLocation(models.Model):
         null=True,
         blank=True,
         db_index=True,
-    )
-    provider = CompositeForeignKey(
-        "CQCProvider",
-        related_name="locations",
-        on_delete=models.DO_NOTHING,
-        to_fields={"id": "provider_id", "scrape_id": "scrape_id"},
-        null=True,
-        blank=True,
     )
     classification = models.ManyToManyField("ftc.VocabularyEntries")

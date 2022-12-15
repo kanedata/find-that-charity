@@ -68,8 +68,6 @@ django==4.1.4
     #   django-sql-dashboard
 django-better-admin-arrayfield==1.4.2
     # via -r requirements.in
-django-composite-foreignkey @ git+https://github.com/kanedata/django-composite-foreignkey.git
-    # via -r requirements.in
 django-cors-headers==3.13.0
     # via -r requirements.in
 django-debug-toolbar==3.6.0

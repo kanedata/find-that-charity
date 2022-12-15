@@ -6,7 +6,6 @@ django-environ
 django-prettyjson
 django-filter
 django-markdownx>=4.0.0b1
-git+https://github.com/kanedata/django-composite-foreignkey.git#egg=django-composite-foreignkey
 django-widget-tweaks
 dj-database-url
 django-ninja
