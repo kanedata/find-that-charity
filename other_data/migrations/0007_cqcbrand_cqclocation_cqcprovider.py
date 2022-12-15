@@ -287,9 +287,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "brand",
-                    models.CharField(
-                        blank=True, max_length=255, null=True
-                    ),
+                    models.CharField(blank=True, max_length=255, null=True),
                 ),
                 (
                     "scrape",
@@ -593,9 +591,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "provider",
-                    models.CharField(
-                        blank=True, max_length=255, null=True
-                    ),
+                    models.CharField(blank=True, max_length=255, null=True),
                 ),
                 (
                     "scrape",
