@@ -41,6 +41,7 @@
 <script type="application/ld+json">
 {{ org.schema_dot_org(request)|tojson(indent=4) }}
 </script>
+<link rel="canonical" href="{{ request.build_absolute_uri(url('orgid_html', kwargs={'org_id': org.org_id})) }}" />
 {% endblock %}
 
 {% block bodyscripts %}
