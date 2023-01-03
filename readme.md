@@ -15,7 +15,7 @@ Elasticsearch-powered search engine for looking for charities and other non-prof
 Installation
 ------------
 
-1. [Clone repository](https://github.com/drkane/find-that-charity)
+1. [Clone repository](https://github.com/kanedata/find-that-charity)
 2. Create virtual environment (`python -m venv env`)
 3. Activate virtual environment (`env/bin/activate` or `env/Scripts\activate`)
 4. Install requirements (`pip install -r requirements.txt`)

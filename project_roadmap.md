@@ -1,7 +1,7 @@
 # About findthatcharity
 
 [Website](https://findthatcharity.uk/) | 
-[Github](https://github.com/drkane/find-that-charity) |
+[Github](https://github.com/kanedata/find-that-charity) |
 [David Kane](https://drkane.co.uk/) |
 [360Giving](https://www.threesixtygiving.org/)
 
@@ -77,14 +77,14 @@ Findthatcharity's unique place in this ecosystem is based on a number of factors
 
 ## 6. Roadmap
 
-The [current alpha version](https://github.com/drkane/find-that-charity/releases/tag/v0.1) of findthatcharity focuses on organisations registered with the UK's three main charity regulators - the Charity Commission for England and Wales, the Scottish Charity Regulator and the Charity Commission for Northern Ireland. It produces a search engine for these organisations, with a reconciliation API for use with OpenRefine, and a proof-of-concept tool for adding data to a CSV. The alpha version was launched in 2017. 
+The [current alpha version](https://github.com/kanedata/find-that-charity/releases/tag/v0.1) of findthatcharity focuses on organisations registered with the UK's three main charity regulators - the Charity Commission for England and Wales, the Scottish Charity Regulator and the Charity Commission for Northern Ireland. It produces a search engine for these organisations, with a reconciliation API for use with OpenRefine, and a proof-of-concept tool for adding data to a CSV. The alpha version was launched in 2017. 
 
 ### 5.1 Beta version
 
-The next stage is to move the tool to a beta version. This builds on the concept of the alpha version to improve the usefulness and reliability of the tools. Improvements targeted for [this release](https://github.com/drkane/find-that-charity/milestone/1) include:
+The next stage is to move the tool to a beta version. This builds on the concept of the alpha version to improve the usefulness and reliability of the tools. Improvements targeted for [this release](https://github.com/kanedata/find-that-charity/milestone/1) include:
 
 - Moving from only looking at charities to include a range of non-profit organisation types, based on the [org-id register](http://org-id.guide/results?structure=all&coverage=GB&sector=all).
-- Move data scrapers to a separate repository, to improve maintainability. The new [find-that-charity-scrapers repository](https://github.com/drkane/find-that-charity-scrapers) has been created, and the scrapers have been rewritten to use the [scrapy](https://scrapy.org/) library.
+- Move data scrapers to a separate repository, to improve maintainability. The new [find-that-charity-scrapers repository](https://github.com/kanedata/find-that-charity-scrapers) has been created, and the scrapers have been rewritten to use the [scrapy](https://scrapy.org/) library.
 - Improve branding, licencing and look and feel of the site.
 - Ensure tools and API are robust enough for public use.
 
@@ -92,8 +92,8 @@ The next stage is to move the tool to a beta version. This builds on the concept
 
 After the beta version is completed, the roadmap for the future of findthatcharity includes plans for the following:
 
-- Increasing the number of data sources. A [list of potential data sources](https://github.com/drkane/find-that-charity-scrapers/issues?q=is%3Aissue+is%3Aopen+label%3A%22data+source%22) is maintained in the find-that-charity-scrapers repository.
+- Increasing the number of data sources. A [list of potential data sources](https://github.com/kanedata/find-that-charity-scrapers/issues?q=is%3Aissue+is%3Aopen+label%3A%22data+source%22) is maintained in the find-that-charity-scrapers repository.
 - Adding a tool to allow users to reconcile a list of organisations on the site, without needing to install OpenRefine.
 - Allowing user input to improve the data. For example, the reconciliation process could result in additional alternative names that could be saved against an organisation record, allowing better matching of those records in the future.
 
-[Potential site enhancements are stored as github issues](https://github.com/drkane/find-that-charity/issues?q=is%3Aopen+is%3Aissue+no%3Amilestone).
+[Potential site enhancements are stored as github issues](https://github.com/kanedata/find-that-charity/issues?q=is%3Aopen+is%3Aissue+no%3Amilestone).
