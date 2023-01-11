@@ -12,10 +12,19 @@ select g.data->>'id' as "grant_id",
   g.data->>'currency' as "currency",
   g.data->>'amountAwarded' as "amountAwarded",
   g.data->>'awardDate' as "awardDate",
+  g.data->'plannedDates'->0->>'duration' as "plannedDates_duration",
+  g.data->'plannedDates'->0->>'startDate' as "plannedDates_startDate",
+  g.data->'plannedDates'->0->>'endDate' as "plannedDates_endDate",
   g.data->'recipientOrganization'->0->>'id' as "recipientOrganization_id",
   g.data->'recipientOrganization'->0->>'name' as "recipientOrganization_name",
+  g.additional_data->'recipientOrganizationCanonical'->>'id' as "recipientOrganization_canonical_id",
+  g.additional_data->'recipientOrganizationCanonical'->>'name' as "recipientOrganization_canonical_name",
   g.data->'fundingOrganization'->0->>'id' as "fundingOrganization_id",
   g.data->'fundingOrganization'->0->>'name' as "fundingOrganization_name",
+  g.additional_data->'fundingOrganizationCanonical'->>'id' as "fundingOrganization_canonical_id",
+  g.additional_data->'fundingOrganizationCanonical'->>'name' as "fundingOrganization_canonical_name",
+  g.additional_data->>'TSGFundingOrgType' as "fundingOrganization_type",
+  g.data->'grantProgramme'->0->>'title' as "grantProgramme_title",
   g.source_data->'publisher'->>'prefix' as "publisher_prefix",
   g.source_data->'publisher'->>'name' as "publisher_name",
   g.source_data->>'license' as "license"
@@ -27,8 +36,9 @@ class Command(BaseScraper):
     name = "360g"
     float_fields = [
         "AwardAmount",
+        "plannedDates_duration",
     ]
-    date_fields = ["awardDate"]
+    date_fields = ["awardDate", "plannedDates_startDate", "plannedDates_endDate"]
     source = {
         "title": "360Giving",
         "description": "",
@@ -82,7 +92,9 @@ class Command(BaseScraper):
         self.logger.info("Spider finished")
 
     def parse_row(self, original_row):
-        original_row["awardDate"] = original_row["awardDate"][0:10]
+        for f in self.date_fields:
+            if original_row[f]:
+                original_row[f] = original_row[f][0:10]
         row = self.clean_fields(original_row)
         row["scrape"] = self.scrape
         self.add_record(Grant, row)

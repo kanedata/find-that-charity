@@ -132,11 +132,6 @@ class Command(HTMLScraper):
         for k in row.keys():
             if not row[k]:
                 continue
-            if k in self.float_fields:
-                try:
-                    row[k] = float(row[k])
-                except TypeError:
-                    row[k] = None
             elif k == "SicCodes":
                 row[k] = [v.strip() for v in row[k].split(",") if v.strip()]
             elif k == "EmployerSize":

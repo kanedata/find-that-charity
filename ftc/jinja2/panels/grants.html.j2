@@ -42,13 +42,19 @@
             <a class="link dark-blue underline-hover" href="{{ url('orgid_html', kwargs={'org_id': grant.fundingOrganization_id}) }}">
               {{ grant.fundingOrganization_name }}
             </a>
+            {% if grant.grantProgramme_title %}<br><small>{{ grant.grantProgramme_title }}</small>{% endif %}
           </td>
           <td class="tr v-top">
             <div>{{ orgid_link(grant.fundingOrganization_id) }}</div>
           </td>
-          <td class="tr v-top">{{ grant.amountAwarded|format_currency(grant.currency) }}</td>
+          <td class="tr v-top">
+            {{ grant.amountAwarded|format_currency(grant.currency) }}
+            {% if grant.duration %}<br><small>{{ grant.duration }}</small>{% endif %}
+          </td>
           <td class="tl v-top w-40 f6">
             <a class="link dark-blue underline-hover" href="https://grantnav.threesixtygiving.org/grant/{{ grant.grant_id }}" title="View this grant on 360Giving GrantNav">{{ grant.title }}</a>
+            {% if grant.start_end %}<br>{{ grant.start_end }}{% endif %}
+          </td>
         </tr>
       {% endfor %}
       </tbody>

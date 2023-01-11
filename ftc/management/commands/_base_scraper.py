@@ -31,6 +31,7 @@ class BaseScraper(BaseCommand):
     date_format = DEFAULT_DATE_FORMAT
     date_fields = []
     bool_fields = []
+    float_fields = []
     encoding = "utf8"
     orgtypes = []
     bulk_limit = 10000
@@ -337,6 +338,17 @@ class BaseScraper(BaseCommand):
                         record[f] = False
                     elif val in ["t", "true", "yes", "1", "y"]:
                         record[f] = True
+
+            # clean float fields
+            elif f in self.float_fields:
+                if isinstance(record[f], str):
+                    val = record[f].lower().strip()
+                else:
+                    val = record[f]
+                try:
+                    record[f] = float(val)
+                except (ValueError, TypeError):
+                    record[f] = None
 
             # strip string fields
             elif isinstance(record[f], str):

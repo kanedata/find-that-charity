@@ -83,12 +83,12 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
     additional_data = dict(
         cqc=CQCProvider.objects.filter(org_id__in=related_orgs.orgIDs).all(),
         grants_received=Grant.objects.filter(
-            recipientOrganization_id__in=related_orgs.orgIDs
+            recipientOrganization_canonical_id__in=related_orgs.orgIDs
         )
         .order_by("-awardDate")
         .all(),
         grants_given=Grant.objects.filter(
-            fundingOrganization_id__in=related_orgs.orgIDs
+            fundingOrganization_canonical_id__in=related_orgs.orgIDs
         )
         .order_by("-awardDate")
         .all(),
