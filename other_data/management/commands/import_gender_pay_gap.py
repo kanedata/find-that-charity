@@ -66,8 +66,8 @@ class Command(HTMLScraper):
     date_fields = ["DueDate", "DateSubmitted"]
     bool_fields = ["SubmittedAfterTheDeadline"]
     date_format = {
-        "DueDate": "%d/%m/%Y %H:%M:%S",
-        "DateSubmitted": "%d/%m/%Y %H:%M:%S",
+        "DueDate": "%Y/%m/%d %H:%M:%S",
+        "DateSubmitted": "%Y/%m/%d %H:%M:%S",
     }
     source = {
         "title": "Gender Pay Gap",
