@@ -63,7 +63,7 @@ class Grant(models.Model):
             s += "{} to {}".format(start, end)
         elif self.plannedDates_endDate and self.plannedDates_duration:
             end = self.plannedDates_endDate.strftime("%b %Y")
-            start = self.plannedDates_startDate - relativedelta(
+            start = self.plannedDates_endDate - relativedelta(
                 months=self.plannedDates_duration
             )
             start = start.strftime("%b %Y")
