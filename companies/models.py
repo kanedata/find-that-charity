@@ -149,6 +149,10 @@ class Company(models.Model):
     spider = models.CharField(max_length=200, db_index=True, default="companies")
 
     @property
+    def active(self):
+        return self.CompanyStatus == "Active"
+
+    @property
     def siccodes(self):
         return SICCode.objects.filter(org_id=self.org_id)
 

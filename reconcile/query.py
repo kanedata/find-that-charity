@@ -2,8 +2,6 @@ import copy
 import json
 import os
 
-from django.utils.text import slugify
-
 from charity.models import (
     CCEWCharityAreaOfOperation,
     CCEWCharityARPartA,
@@ -11,7 +9,7 @@ from charity.models import (
     CCEWCharityGoverningDocument,
 )
 from findthatcharity.jinja2 import get_orgtypes
-from findthatcharity.utils import to_titlecase
+from findthatcharity.utils import normalise_name, to_titlecase
 from ftc.documents import OrganisationGroup
 from ftc.models import Organisation
 from ftc.models.organisation_classification import OrganisationClassification
@@ -33,11 +31,6 @@ def do_reconcile_query(
 
     if not isinstance(orgtypes, list) and orgtypes != "all":
         orgtypes = orgtypes.split("+")
-
-    def normalise_name(n):
-        stopwords = ["the", "of", "in", "uk", "ltd", "limited"]
-        n = slugify(n)
-        return " ".join([w for w in n.split("-") if w not in stopwords])
 
     properties = {p["pid"]: p["v"] for p in properties}
 

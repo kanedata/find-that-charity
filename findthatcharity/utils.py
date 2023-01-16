@@ -5,11 +5,11 @@ import babel.numbers
 import inflect
 import titlecase
 from django.conf import settings
-from django.utils.text import slugify
 
 VOWELS = re.compile("[AEIOUYaeiouy]")
 ORD_NUMBERS_RE = re.compile(r"([0-9]+(?:st|nd|rd|th))")
 SENTENCE_SPLIT = re.compile(r"(\. )")
+WORD_BOUNDARY_REGEX = re.compile(r"\b\w+\b")
 
 p = inflect.engine()
 
@@ -193,9 +193,22 @@ def a_or_an(value):
 
 
 def normalise_name(n):
-    stopwords = ["the", "of", "in", "uk", "ltd", "limited"]
-    n = slugify(n)
-    return " ".join([w for w in n.split("-") if w not in stopwords])
+    stopwords = [
+        "the",
+        "of",
+        "in",
+        "uk",
+        "ltd",
+        "limited",
+        "and",
+        "&",
+        "+",
+        "co",
+        "for",
+    ]
+    return " ".join(
+        [w for w in WORD_BOUNDARY_REGEX.findall(n.lower()) if w not in stopwords]
+    ).strip()
 
 
 def get_domain(url):
