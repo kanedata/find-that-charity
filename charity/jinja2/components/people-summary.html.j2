@@ -1,0 +1,42 @@
+{% set events = charity.events %}
+{% if events %}
+  {% call org_panel("Charity people", org) %}
+      <div class="w-100 cf" id="charity-people">
+      <div class="w-100 w-50-ns fl pr4-ns">
+      <table class="table collapse">
+        <tr>
+          <th>Year ending</th>
+          <th>Employees</th>
+          <th>Volunteers</th>
+        </tr>
+      {% for event in events %}
+      {% if event.employees or event.volunteers %}
+        <tr>
+          <td>{{ event.fyend }}</td>
+          <td>{% if event.employees %}{{ "{:,.0f}".format(event.employees) }}{% else %}-{% endif %}</td>
+          <td>{% if event.volunteers %}{{ "{:,.0f}".format(event.volunteers) }}{% else %}-{% endif %}</td>
+        </tr>
+        {% endif%}
+      {% endfor %}
+      </table>
+      </div>
+      
+      <div class="w-100 w-50-ns fl">
+      {% if events|length > 1 %}
+      <figure id="employeesChartFigure" class="dn pa0 mb3 mt0 mh0">
+        <figcaption class="mb1"><span class="b green">Employees</span></figcaption>
+        <canvas id="employeesChart" width="400" height="160" class="measure"></canvas>
+      </figure>
+      <figure id="volunteersChartFigure" class="dn pa0 mb3 mt0 mh0">
+        <figcaption class="mb1"><span class="b blue">Volunteers</span></figcaption>
+        <canvas id="volunteersChart" width="400" height="160" class="measure"></canvas>
+      </figure>
+      {% endif %}
+      <p class="f6 gray measure">
+        Data on employees is only available for financial years where the charity's income was more than £500,000.
+      </p>
+      </div>
+      </div>
+
+    {% endcall %}
+{% endif %}

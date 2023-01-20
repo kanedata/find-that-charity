@@ -1,6 +1,7 @@
 {% from 'components/date_format.html.j2' import format_date %}
 
 {% include 'components/financial-summary.html.j2' %}
+{% include 'components/people-summary.html.j2' %}
 {% set ccew = charity.ccew_record() %}
 {% if ccew %}
     {% set cy = ccew.current_year() %}

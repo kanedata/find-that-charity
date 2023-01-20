@@ -27,7 +27,17 @@
       
       <div class="w-100 w-50-ns fl">
       {% if events|length > 1 %}
-      <canvas id="financeChart" width="400" height="350" class="measure"></canvas>
+      <figure id="financeChartFigure" class="dn pa0 mb3 mt0 mh0">
+        <figcaption class="mb1"><span class="b blue">Income</span> and <span class="b green">Spending</span> </figcaption>
+        <canvas id="financeChart" width="400" height="160" class="measure"></canvas>
+      </figure>
+      <figure id="fundsChartFigure" class="dn pa0 mb3 mt0 mh0">
+        <figcaption class="mb1"><span class="b orange">Funds</span> and <span class="b red">Reserves</span></figcaption>
+        <canvas id="fundsChart" width="400" height="160" class="measure"></canvas>
+      </figure>
+      <p class="f6 gray measure">
+        Data on funds and reserves are only available for financial years where the charity's income was more than £500,000.
+      </p>
       {% endif %}
       </div>
       </div>
