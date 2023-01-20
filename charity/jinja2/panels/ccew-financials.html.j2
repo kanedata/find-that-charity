@@ -1,7 +1,6 @@
 {% from 'components/date_format.html.j2' import format_date %}
 
 {% include 'components/financial-summary.html.j2' %}
-{% include 'components/people-summary.html.j2' %}
 {% set ccew = charity.ccew_record() %}
 {% if ccew %}
     {% set cy = ccew.current_year() %}
@@ -9,6 +8,7 @@
     {% if cy %}
         {% set cy_partb = cy.partb() %}
         {% if py %}{% set py_partb = py.partb() %}{% endif %}
+        {% include 'components/people-summary.html.j2' %}
         {% if cy_partb %}
             {% include 'components/sofa.html.j2' %}
             {% include 'components/balance-sheet.html.j2' %}

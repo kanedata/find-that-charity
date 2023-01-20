@@ -77,7 +77,7 @@ if (FINANCES.filter(f => f['fyend']).length > 1) {
         },
         options: chart_options(),
     });
-    if (FINANCES.filter(f => f['funds_total']) || FINANCES.filter(f => f['reserves'])) {
+    if (FINANCES.filter(f => f['funds_total']).length > 0 || FINANCES.filter(f => f['reserves']).length > 0) {
         document.querySelector('#fundsChartFigure').classList.remove('dn');
         var fundsChart = new Chart('fundsChart', {
             type: 'line',
@@ -104,7 +104,8 @@ if (FINANCES.filter(f => f['fyend']).length > 1) {
             options: chart_options(),
         });
     }
-    if (FINANCES.filter(f => f['employees'])) {
+    if (FINANCES.filter(f => f['employees']).length > 0) {
+        console.log(FINANCES.filter(f => f['employees']))
         document.querySelector('#employeesChartFigure').classList.remove('dn');
         var employeesChart = new Chart('employeesChart', {
             type: 'line',
@@ -123,7 +124,7 @@ if (FINANCES.filter(f => f['fyend']).length > 1) {
             options: chart_options(""),
         });
     }
-    if (FINANCES.filter(f => f['volunteers'])) {
+    if (FINANCES.filter(f => f['volunteers']).length > 0) {
         document.querySelector('#volunteersChartFigure').classList.remove('dn');
         var volunteersChart = new Chart('volunteersChart', {
             type: 'line',

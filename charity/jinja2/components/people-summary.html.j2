@@ -4,20 +4,46 @@
       <div class="w-100 cf" id="charity-people">
       <div class="w-100 w-50-ns fl pr4-ns">
       <table class="table collapse">
-        <tr>
-          <th>Year ending</th>
-          <th>Employees</th>
-          <th>Volunteers</th>
-        </tr>
-      {% for event in events %}
-      {% if event.employees or event.volunteers %}
-        <tr>
-          <td>{{ event.fyend }}</td>
-          <td>{% if event.employees %}{{ "{:,.0f}".format(event.employees) }}{% else %}-{% endif %}</td>
-          <td>{% if event.volunteers %}{{ "{:,.0f}".format(event.volunteers) }}{% else %}-{% endif %}</td>
-        </tr>
-        {% endif%}
-      {% endfor %}
+        <thead>
+          <tr>
+            <th></th>
+            <th>{{ cy.fin_period_end_date.year }}<br>£</th>
+            {% if py_partb %}
+            <th>{{ py_partb.fin_period_end_date.year }}<br>£</th>
+            {% elif py %}
+            <th>{{ py.fin_period_end_date.year }}<br>£</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% if cy_partb %}
+          <tr>
+            <td class="bn tl">Employees</td>
+            <td class="bn">{{ cy_partb.count_employees|number_format() }}</td>
+            <td class="bn">{% if py_partb %}{{ py_partb.count_employees|number_format() }}{% endif %}</td>
+          </tr>
+          <tr>
+            <td class="pl4 tl i">Employees paid more than £60,000</td>
+            <td class="bn">{{ cy.count_salary_band_over_60000|number_format() }}</td>
+            <td class="bn">{% if py %}{{ py.count_salary_band_over_60000|number_format() }}{% endif %}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td class="bn tl">Employees paid more than £60,000</td>
+            <td class="bn">{{ cy.count_salary_band_over_60000|number_format() }}</td>
+            <td class="bn">{% if py %}{{ py.count_salary_band_over_60000|number_format() }}{% endif %}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td class="bn tl">Volunteers</td>
+            <td class="bn">{{ cy.count_volunteers|number_format() }}</td>
+            <td class="bn">{% if py %}{{ py.count_volunteers|number_format() }}{% endif %}</td>
+          </tr>
+          <tr>
+            <td class="bn tl">Trustees</td>
+            <td class="bn">{{ charity.trustees|number_format() }}</td>
+          </tr>
+        </tbody>
       </table>
       </div>
       

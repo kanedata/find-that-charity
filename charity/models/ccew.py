@@ -495,6 +495,28 @@ class CCEWCharityARPartA(models.Model):
         help_text="Number of Volunteers. The trustees' estimate of the number of people who undertook voluntary work in the UK for the charity during the year. The number shown is a head count and not expressed as full-time equivalents. Charities are invited to provide an estimate of volunteer numbers in their Annual Return but are not obliged to do so. Where a number is provided by the charity, including zero, that number is displayed.",
     )
 
+    @property
+    def count_salary_band_over_60000(self):
+        return (
+            (self.count_salary_band_60001_70000 or 0)
+            + (self.count_salary_band_70001_80000 or 0)
+            + (self.count_salary_band_80001_90000 or 0)
+            + (self.count_salary_band_90001_100000 or 0)
+            + (self.count_salary_band_100001_110000 or 0)
+            + (self.count_salary_band_110001_120000 or 0)
+            + (self.count_salary_band_120001_130000 or 0)
+            + (self.count_salary_band_130001_140000 or 0)
+            + (self.count_salary_band_140001_150000 or 0)
+            + (self.count_salary_band_150001_200000 or 0)
+            + (self.count_salary_band_200001_250000 or 0)
+            + (self.count_salary_band_250001_300000 or 0)
+            + (self.count_salary_band_300001_350000 or 0)
+            + (self.count_salary_band_350001_400000 or 0)
+            + (self.count_salary_band_400001_450000 or 0)
+            + (self.count_salary_band_450001_500000 or 0)
+            + (self.count_salary_band_over_500000 or 0)
+        )
+
     def partb(self):
         return CCEWCharityARPartB.objects.filter(
             registered_charity_number=self.registered_charity_number,
