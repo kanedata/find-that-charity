@@ -191,7 +191,6 @@ class Command(HTMLScraper):
                         self.parse_row(row, org_type)
 
     def parse_row(self, record, org_type=None):
-
         record = self.clean_fields(record)
 
         org_types = [

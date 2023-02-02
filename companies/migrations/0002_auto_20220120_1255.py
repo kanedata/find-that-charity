@@ -6,7 +6,6 @@ import ftc.models.orgid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("companies", "0001_initial"),
     ]

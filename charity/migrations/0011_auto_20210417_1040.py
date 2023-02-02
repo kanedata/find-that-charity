@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("charity", "0010_auto_20210403_1729_squashed_0016_delete_ccewdatafile"),
     ]

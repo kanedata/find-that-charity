@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ftc", "0025_alter_organisation_linked_orgs"),
         ("other_data", "0013_wikidataitem"),

@@ -33,7 +33,6 @@ class Command(CSVScraper):
     orgtypes = ["Higher Education Institution", "University"]
 
     def parse_file(self, response, source_url):
-
         try:
             csv_text = response.text
         except AttributeError:
@@ -47,7 +46,6 @@ class Command(CSVScraper):
                 self.parse_row(row)
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
         orgids = [
             "-".join([self.org_id_prefix, str(record["INSTID"])]),

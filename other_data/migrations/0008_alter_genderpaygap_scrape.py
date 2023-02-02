@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ftc", "0017_auto_20210419_1620"),
         ("other_data", "0007_cqcbrand_cqclocation_cqcprovider"),

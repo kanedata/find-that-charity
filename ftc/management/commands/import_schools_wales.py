@@ -67,13 +67,11 @@ class Command(HTMLScraper):
             headers = wb[sheet][0]
             data = wb[sheet][1:]
             for k, row in enumerate(data):
-
                 row = dict(zip(headers, row))
                 row["type"] = sheet
                 self.parse_row(row)
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
 
         address4 = ", ".join(

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("other_data", "0011_alter_cqclocation_classification"),
         ("ftc", "0019_vocabulary_vocabularyentries"),

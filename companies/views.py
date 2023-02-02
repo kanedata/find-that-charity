@@ -54,7 +54,6 @@ def company_detail(request, company_number, filetype="html"):
 
 
 def company_reconcile(request):
-
     queries = request.POST.get("queries", request.GET.get("queries"))
     if queries:
         queries = json.loads(queries)

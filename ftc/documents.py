@@ -84,7 +84,6 @@ class DSEPaginator(Paginator):
 
 @registry.register_document
 class OrganisationGroup(Document):
-
     org_id = fields.KeywordField()
     complete_names = fields.CompletionField(
         contexts=[

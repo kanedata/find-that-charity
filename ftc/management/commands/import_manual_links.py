@@ -267,7 +267,6 @@ class Command(CSVScraper):
         pass
 
     def parse_file(self, response, source):
-
         source = [s for s in self.sources if s["identifier"] == source][0]
 
         if source.get("_parse_csv"):

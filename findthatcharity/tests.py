@@ -132,7 +132,6 @@ class TestUtils(unittest.TestCase):
 
 class IndexViewTests(ftc.tests.TestCase):
     def test_index(self):
-
         response = self.client.get(reverse("index"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Find that Charity", html=True)
@@ -141,21 +140,18 @@ class IndexViewTests(ftc.tests.TestCase):
         self.assertContains(response, "Source publisher")
 
     def test_index_search(self):
-
         response = self.client.get(reverse("index") + "?q=organisation")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Find that Charity", html=True)
         self.assertContains(response, "Search Results")
 
     def test_index_search_csv(self):
-
         response = self.client.get(reverse("index") + "?q=organisation&filetype=csv")
         self.assertEqual(response.status_code, 200)
         self.assertTrue("text/csv" in response["content-type"])
         self.assertContains(response, "name")
 
     def test_about(self):
-
         response = self.client.get(reverse("about"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Find that Charity", html=True)

@@ -30,7 +30,7 @@ class Command(BaseCommand):
         for r in result:
             try:
                 return Charity.objects.get(id=r["org_id"])
-            except (Charity.DoesNotExist):
+            except Charity.DoesNotExist:
                 pass
 
     def get_twitter_id(self, charity):

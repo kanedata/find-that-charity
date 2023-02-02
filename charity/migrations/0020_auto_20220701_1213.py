@@ -20,7 +20,6 @@ def set_proper_defaults(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ftc", "0026_auto_20220701_1149"),
         ("charity", "0019_auto_20220302_1119"),

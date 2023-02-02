@@ -42,7 +42,6 @@ class Command(CSVScraper):
     orgtypes = ["Local Authority"]
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
         org_types = [
             self.orgtype_cache["local-authority"],

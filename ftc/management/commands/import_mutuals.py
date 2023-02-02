@@ -37,7 +37,6 @@ class Command(CSVScraper):
     orgtypes = ["Mutual"]
 
     def parse_row(self, record):
-
         if not hasattr(self, "org_ids_seen"):
             self.org_ids_seen = []
 

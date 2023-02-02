@@ -67,7 +67,6 @@ class Command(HTMLScraper):
                     self.parse_row(record)
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
         if not record.get("organisation name") or not record.get("registration number"):
             return

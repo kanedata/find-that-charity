@@ -69,7 +69,6 @@ ROR includes identifiers and metadata for more than 100,000 organizations. ROR i
                     data = json.load(json_data)
                     rowcount = 0
                     for k, i in enumerate(data):
-
                         # We only want data from certain countries
                         if (
                             i.get("country", {}).get("country_code")
@@ -86,7 +85,6 @@ ROR includes identifiers and metadata for more than 100,000 organizations. ROR i
                         self.parse_row(i)
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
 
         address = []

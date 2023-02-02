@@ -9,7 +9,6 @@ def delete_grid_records(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ftc", "0025_alter_organisation_linked_orgs"),
     ]

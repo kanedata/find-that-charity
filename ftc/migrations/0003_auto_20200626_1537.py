@@ -8,7 +8,6 @@ import ftc.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ftc", "0002_auto_20200624_2135"),
     ]

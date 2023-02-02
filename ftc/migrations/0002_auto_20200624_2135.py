@@ -8,7 +8,6 @@ import ftc.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ftc", "0001_initial"),
     ]

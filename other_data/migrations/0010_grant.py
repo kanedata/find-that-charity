@@ -7,7 +7,6 @@ import ftc.models.orgid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ftc", "0018_alter_organisationlocation_unique_together"),
         ("other_data", "0009_auto_20211007_1158"),

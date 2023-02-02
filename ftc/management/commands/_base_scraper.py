@@ -27,7 +27,6 @@ DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
 
 class BaseScraper(BaseCommand):
-
     date_format = DEFAULT_DATE_FORMAT
     date_fields = []
     bool_fields = []
@@ -516,7 +515,6 @@ class BaseScraper(BaseCommand):
 
 class CSVScraper(BaseScraper):
     def parse_file(self, response, source_url):
-
         try:
             csv_text = response.text
         except AttributeError:
@@ -535,7 +533,6 @@ class SQLRunner(BaseScraper):
 
 class HTMLScraper(BaseScraper):
     def set_session(self, install_cache=False):
-
         if install_cache:
             self.logger.info("Using requests_cache")
             requests_cache.install_cache("http_cache")

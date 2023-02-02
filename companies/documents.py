@@ -7,7 +7,6 @@ from .models import Company
 
 @registry.register_document
 class CompanyDocument(Document):
-
     CompanyNumber = fields.KeywordField(attr="CompanyNumber")
     CompanyStatus = fields.KeywordField(attr="CompanyStatus")
     RegAddress_PostCode = fields.KeywordField(attr="RegAddress_PostCode")

@@ -84,7 +84,6 @@ class Command(HTMLScraper):
         self.logger.info("Latest sheet: {}".format(latest_sheet.title))
         headers = {}
         for k, row in enumerate(latest_sheet.rows):
-
             if not row[0].value:
                 continue
 

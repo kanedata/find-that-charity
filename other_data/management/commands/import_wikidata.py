@@ -91,7 +91,6 @@ class Command(HTMLScraper):
         self.add_record(WikiDataItem, result)
 
     def close_spider(self):
-
         wikidata_ids = [set()]
         self.cursor.execute(
             """

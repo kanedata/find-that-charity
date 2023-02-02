@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("other_data", "0008_alter_genderpaygap_scrape"),
     ]

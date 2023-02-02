@@ -15,7 +15,6 @@ p = inflect.engine()
 
 
 def title_exceptions(word, **kwargs):
-
     word_test = word.strip("(){}<>.")
 
     # lowercase words

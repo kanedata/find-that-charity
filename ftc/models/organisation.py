@@ -372,7 +372,6 @@ class Organisation(models.Model):
         )
 
     def geoCodes(self):
-
         special_cases = {
             "K02000001": [
                 "E92000001",
@@ -399,7 +398,6 @@ class Organisation(models.Model):
 
     @cached_property
     def allGeoCodes(self):
-
         location_fields = [
             "geo_iso",
             "geo_oa11",

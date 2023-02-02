@@ -42,7 +42,6 @@ class Command(CSVScraper):
     orgtypes = ["Government Organisation"]
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
         org_ids = [self.get_org_id(record)]
         if record.get("website"):

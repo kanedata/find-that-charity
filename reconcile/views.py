@@ -13,7 +13,6 @@ from reconcile.query import do_extend_query, do_reconcile_query
 
 @csrf_exempt
 def index(request, orgtype="all"):
-
     if orgtype == "all":
         orgtypes = []
     elif isinstance(orgtype, str):

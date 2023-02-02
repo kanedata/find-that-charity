@@ -79,7 +79,6 @@ class Command(HTMLScraper):
                 self.parse_row(row)
 
     def parse_row(self, record):
-
         if record.get(self.id_field) == "UNKNOWN":
             return
 

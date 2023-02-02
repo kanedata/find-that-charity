@@ -56,7 +56,6 @@ class Command(BaseCommand):
         CSVScraper.parse_file(self, response, source_url)
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
 
         if "Charity_number" in record:

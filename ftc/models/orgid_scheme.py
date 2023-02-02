@@ -2,7 +2,6 @@ from django.db import models
 
 
 class OrgidScheme(models.Model):
-
     PRIORITIES = [
         "GB-CHC",
         "GB-SC",
