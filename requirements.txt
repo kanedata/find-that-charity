@@ -47,6 +47,8 @@ colorama==0.4.6
     # via
     #   click
     #   tqdm
+confusable-homoglyphs==3.2.0
+    # via django-registration
 coverage==7.1.0
     # via -r requirements.in
 cssselect==1.2.0
@@ -64,7 +66,9 @@ django==4.1.6
     #   django-filter
     #   django-markdownx
     #   django-ninja
+    #   django-ninja-apikey
     #   django-prettyjson
+    #   django-registration
     #   django-sql-dashboard
 django-better-admin-arrayfield==1.4.2
     # via -r requirements.in
@@ -83,8 +87,14 @@ django-filter==22.1
 django-markdownx==4.0.0b1
     # via -r requirements.in
 django-ninja==0.20.0
+    # via
+    #   -r requirements.in
+    #   django-ninja-apikey
+django-ninja-apikey==0.1.0
     # via -r requirements.in
 django-prettyjson==0.4.1
+    # via -r requirements.in
+django-registration==3.3
     # via -r requirements.in
 django-sql-dashboard==1.1
     # via -r requirements.in

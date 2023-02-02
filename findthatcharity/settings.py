@@ -90,6 +90,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "markdownx",
     "prettyjson",
+    "django_registration",
+    "ninja_apikey",
     "django_better_admin_arrayfield",
     "django_filters",
     "corsheaders",
@@ -276,7 +278,16 @@ DEFAULT_AREA_TYPES = [
 DASHBOARD_ROW_LIMIT = 1000
 DASHBOARD_ENABLE_FULL_EXPORT = True
 
+ACCOUNT_ACTIVATION_DAYS = 7
+
 TWITTER_CONSUMER_KEY = os.environ.get("TWITTER_CONSUMER_KEY")
 TWITTER_CONSUMER_SECRET = os.environ.get("TWITTER_CONSUMER_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
+
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"

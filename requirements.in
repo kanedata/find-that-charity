@@ -9,6 +9,8 @@ django-markdownx>=4.0.0b1
 django-widget-tweaks
 dj-database-url
 django-ninja
+django-ninja-apikey
+django-registration
 django-sql-dashboard
 whitenoise
 gunicorn

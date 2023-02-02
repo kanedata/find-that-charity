@@ -1,0 +1,19 @@
+{% load widget_tweaks %}
+{% csrf_token %}
+{% for field in form %}
+<div class="mt4">
+    <label class="b mb2 db" id="{{form.username.id_for_label}}">{{field.label}}</label>
+    {{ field|add_class:"w-100 pa2" }}
+    <div class="f6 gray">{{ field.help_text }}</div>
+    {% if field.errors %}
+    <div class="red f6 gray">
+        {% for error in field.errors %}
+        {{ error }}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+<input type="submit" value="{{ button|default:'Submit' }}"
+    class="f5 f4-l button-reset header-font mv4 pv2 ph3 tc bg-animate bg-yellow grow near-black pointer br2-ns br--right-ns  bw2 b--near-black ba" />
