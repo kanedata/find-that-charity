@@ -128,6 +128,9 @@ class Command(BaseCommand):
                     "latestIncome": int(record["Total income"])
                     if record.get("Total income")
                     else None,
+                    "latestSpending": int(record["Total spending"])
+                    if record.get("Total spending")
+                    else None,
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("Date registered"),
                     "dateRemoved": None,

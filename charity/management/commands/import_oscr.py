@@ -340,6 +340,9 @@ class Command(CSVScraper):
                     "latestIncome": int(record["Most recent year income"])
                     if record.get("Most recent year income")
                     else None,
+                    "latestSpending": int(record["Most recent year expenditure"])
+                    if record.get("Most recent year expenditure")
+                    else None,
                     "latestIncomeDate": record.get("Year End"),
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("Registered Date"),

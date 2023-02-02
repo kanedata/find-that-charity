@@ -22,52 +22,88 @@ class OrgIdScheme(Schema):
     priority: int = None
 
 
-class Organisation(Schema):
-    org_id: str
-    orgIDs: List[str] = None
-    linked_orgs: List[str] = None
-    name: str
-    alternateName: List[str] = None
-    charityNumber: str = None
-    companyNumber: str = None
+class Address(Schema):
     streetAddress: str = None
     addressLocality: str = None
     addressRegion: str = None
     addressCountry: str = None
     postalCode: str = None
-    telephone: str = None
-    email: str = None
+
+
+class OrganisationLink(Schema):
+    orgid: str = None
+    url: str = None
+
+
+class OrganisationWebsiteLink(Schema):
+    site: str = None
+    orgid: str = None
+    url: str = None
+
+
+class Location(Schema):
+    id: str = None
+    name: str = None
+    geocode: str = None
+    type: str = None
+
+
+class Organisation(Schema):
+    id: str
+    name: str
+    charityNumber: str = None
+    companyNumber: str = None
     description: str = None
     url: str = None
-    domain: str = None
+
+    # finances
+    latestFinancialYearEnd: datetime.date = None
     latestIncome: int = None
-    latestIncomeDate: datetime.date = None
+    latestSpending: int = None
+    latestEmployees: int = None
+    latestVolunteers: int = None
+    trusteeCount: int = None
+
     dateRegistered: datetime.date = None
     dateRemoved: datetime.date = None
     active: bool = None
-    status: str = None
+
     parent: str = None
-    dateModified: datetime.datetime = None
-    source_id: str
     organisationType: List[str] = None
     organisationTypePrimary: OrganisationType = None
-    # scrape: str = None
-    spider: str = None
-    location: List[dict] = None
-    # org_id_scheme: OrgIdScheme = None
+    alternateName: List[str] = None
+    telephone: str = None
+    email: str = None
 
-    # geography fields
-    geo_oa11: str = None
-    geo_cty: str = None
-    geo_laua: str = None
-    geo_ward: str = None
-    geo_ctry: str = None
-    geo_rgn: str = None
-    geo_pcon: str = None
-    geo_ttwa: str = None
-    geo_lsoa11: str = None
-    geo_msoa11: str = None
-    geo_lep1: str = None
-    geo_lep2: str = None
-    geo_lat: float = None
-    geo_long: float = None
+    location: List[dict] = None
+    address: Address = None
+
+    sources: List[str] = None
+    links: List[OrganisationWebsiteLink] = None
+    orgIDs: List[str] = None
+    linked_records: List[OrganisationLink] = None
+
+    dateModified: datetime.datetime = None
+
+    # domain: str = None
+    # status: str = None
+    # source_id: str
+    # # scrape: str = None
+    # spider: str = None
+    # # org_id_scheme: OrgIdScheme = None
+
+    # # geography fields
+    # geo_oa11: str = None
+    # geo_cty: str = None
+    # geo_laua: str = None
+    # geo_ward: str = None
+    # geo_ctry: str = None
+    # geo_rgn: str = None
+    # geo_pcon: str = None
+    # geo_ttwa: str = None
+    # geo_lsoa11: str = None
+    # geo_msoa11: str = None
+    # geo_lep1: str = None
+    # geo_lep2: str = None
+    # geo_lat: float = None
+    # geo_long: float = None
