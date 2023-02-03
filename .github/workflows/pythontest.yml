@@ -37,7 +37,8 @@ jobs:
         pip install -r requirements.txt
     - name: Run migrations
       run: |
-        python manage.py migrate
+        python manage.py migrate --database=data --noinput
+        python manage.py migrate --database=admin --noinput
         python manage.py collectstatic
     - name: Test with django test
       run: |
