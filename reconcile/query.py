@@ -25,6 +25,7 @@ def do_reconcile_query(
     limit=5,
     properties=[],
     type_strict="should",
+    result_key="result",
 ):
     if not query:
         return []
@@ -32,7 +33,7 @@ def do_reconcile_query(
     if not isinstance(orgtypes, list) and orgtypes != "all":
         orgtypes = orgtypes.split("+")
 
-    properties = {p["pid"]: p["v"] for p in properties}
+    properties = {p["pid"]: p["v"] for p in properties} if properties else {}
 
     query_template, params = recon_query(
         query,
@@ -45,7 +46,7 @@ def do_reconcile_query(
     all_orgtypes = get_orgtypes()
 
     return {
-        "result": [
+        result_key: [
             {
                 "id": o.org_id,
                 "name": "{} ({}){}".format(

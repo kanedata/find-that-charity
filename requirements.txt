@@ -9,7 +9,9 @@ appdirs==1.4.4
     #   pyppeteer
     #   requests-cache
 asgiref==3.6.0
-    # via django
+    # via
+    #   django
+    #   django-ninja-extra
 attrs==22.2.0
     # via
     #   cattrs
@@ -49,6 +51,8 @@ colorama==0.4.6
     #   tqdm
 confusable-homoglyphs==3.2.0
     # via django-registration
+contextlib2==21.6.0
+    # via django-ninja-extra
 coverage==7.1.0
     # via -r requirements.in
 cssselect==1.2.0
@@ -67,6 +71,7 @@ django==4.1.6
     #   django-markdownx
     #   django-ninja
     #   django-ninja-apikey
+    #   django-ninja-extra
     #   django-prettyjson
     #   django-registration
     #   django-sql-dashboard
@@ -88,9 +93,11 @@ django-markdownx==4.0.0b1
     # via -r requirements.in
 django-ninja==0.20.0
     # via
-    #   -r requirements.in
     #   django-ninja-apikey
+    #   django-ninja-extra
 django-ninja-apikey==0.1.0
+    # via -r requirements.in
+django-ninja-extra==0.18.2
     # via -r requirements.in
 django-prettyjson==0.4.1
     # via -r requirements.in
@@ -122,6 +129,8 @@ importlib-metadata==6.0.0
     # via pyppeteer
 inflect==6.0.2
     # via -r requirements.in
+injector==0.19.0
+    # via django-ninja-extra
 isort==5.12.0
     # via -r requirements.in
 jinja2==3.1.2

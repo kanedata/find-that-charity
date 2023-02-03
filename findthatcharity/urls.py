@@ -25,7 +25,7 @@ import findthatcharity.views
 import ftc.urls
 import ftc.views
 import reconcile.urls
-from api.endpoints import api
+from findthatcharity.endpoints import api
 
 handler404 = "findthatcharity.views.missing_page_handler"
 

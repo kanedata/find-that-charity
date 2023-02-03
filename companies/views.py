@@ -1,8 +1,4 @@
-import json
-import urllib.parse
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render, reverse
+from django.shortcuts import get_object_or_404, render
 from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 
@@ -53,18 +49,6 @@ def company_detail(request, company_number, filetype="html"):
     )
 
 
-def company_reconcile(request):
-    queries = request.POST.get("queries", request.GET.get("queries"))
-    if queries:
-        queries = json.loads(queries)
-        results = {}
-        for query_id, query in queries.items():
-            results[query_id] = do_reconcile_query(**query)
-        return JsonResponse(results)
-
-    return JsonResponse(service_spec(request))
-
-
 def do_reconcile_query(
     query,
     orgtypes="all",
@@ -72,11 +56,12 @@ def do_reconcile_query(
     limit=5,
     properties=[],
     type_strict="should",
+    result_key="result",
 ):
     if not query:
         return []
 
-    properties = {p["pid"]: p["v"] for p in properties}
+    properties = {p["pid"]: p["v"] for p in properties} if properties else {}
 
     search_dict = {
         "query": {
@@ -109,7 +94,7 @@ def do_reconcile_query(
     result = s.execute()
 
     return {
-        "result": [
+        result_key: [
             {
                 "id": o.CompanyNumber,
                 "name": "{} ({}){}".format(
@@ -131,35 +116,4 @@ def do_reconcile_query(
             }
             for k, o in enumerate(result)
         ],
-        "normalised_query": normalise_name(query),
-    }
-
-
-def service_spec(request):
-    """Return the default service specification
-
-    Specification found here: https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API#service-metadata
-    """
-
-    return {
-        "name": "Find that Charity Company Reconciliation API",
-        "identifierSpace": "http://org-id.guide",
-        "schemaSpace": "https://schema.org",
-        "view": {
-            "url": urllib.parse.unquote(
-                request.build_absolute_uri(
-                    reverse("company_detail", kwargs={"company_number": "{{id}}"})
-                )
-            )
-        },
-        "preview": {
-            "url": urllib.parse.unquote(
-                request.build_absolute_uri(
-                    reverse("company_detail", kwargs={"company_number": "{{id}}"})
-                )
-            ),
-            "width": 430,
-            "height": 300,
-        },
-        "defaultTypes": [COMPANY_RECON_TYPE],
     }
