@@ -6,23 +6,29 @@
     {% for valid in keys|reverse %}
     {% if not valid.grouper %}
     <details class="mv4">
-        <summary class="pointer">Previous API keys ({{ valid.list|length }})</summary>
+        <summary class="pointer">Expired and revoked API keys ({{ valid.list|length }})</summary>
         {% endif %}
         <table class="table f6">
             <thead>
                 <tr>
                     <th class=""></th>
-                    <th class=" tl"></th>
+                    <th class=" tl">Label</th>
+                    <th class=" tl">Key</th>
                     <th class="">Created</th>
-                    <th class="">Expires</th>
+                    <th class="">Expiry</th>
                     <th class=""></th>
                 </tr>
             </thead>
             <tbody class="f6">
                 {% for key in valid.list %}
                 <tr>
-                    <td class="w3">{{ loop.index }}</td>
-                    <td class="tl">{{ key.label }}</td>
+                    <td class="w3 gray">{{ loop.index }}</td>
+                    <td class="tl w5 {% if not valid.grouper %}strike{% endif %}">{{ key.label }}</td>
+                    <td class="tl">
+                        <span class="code bg-dark-green white pa1 dib {% if not valid.grouper %}strike{% endif %}" title="Full key values are only shown when they are created.">
+                            {{- key.prefix -}}.XXXXXXXXXX…
+                        </span>
+                    </td>
                     <td class="w5"><time datetime="{{ key.created_at.isoformat() }}">{{ key.created_at|naturaltime }}</time>
                     </td>
                     <td class="w5">
@@ -94,6 +100,6 @@
             value="Create new API key"/>
     </form>
     {% else %}
-    <p>You have reached the maximum number of API keys ({{ max_api_keys }}). To add more you need to revoke current ones.</p>
+    <p>You have reached the maximum number of API keys ({{ max_api_keys }}).<br>To add more you need to revoke an existing key.</p>
     {% endif %}
 </section>
