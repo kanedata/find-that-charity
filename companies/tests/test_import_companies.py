@@ -2,7 +2,7 @@ import os
 import re
 
 import requests_mock
-from django.test import SimpleTestCase, TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from requests import Response
 from requests_html import HTMLSession
 
