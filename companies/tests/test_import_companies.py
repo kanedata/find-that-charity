@@ -2,14 +2,16 @@ import os
 import re
 
 import requests_mock
-from django.test import TestCase
+from django.test import TransactionTestCase
 from requests import Response
 from requests_html import HTMLSession
 
 from companies.management.commands.import_companies import Command
 
 
-class TestImportCompanies(TestCase):
+class TestImportCompanies(TransactionTestCase):
+    databases = {"data", "admin"}
+
     def mock_csv_downloads(self, m):
         dirname = os.path.dirname(__file__)
         with open(os.path.join(dirname, "data", "CompaniesHomePage.html")) as a:

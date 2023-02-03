@@ -154,9 +154,12 @@ WSGI_APPLICATION = "findthatcharity.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    "default": dj_database_url.config(env="DATABASE_URL"),
+    "default": {},
+    "admin": dj_database_url.config(env="DATABASE_ADMIN_URL"),
+    "data": dj_database_url.config(env="DATABASE_URL"),
     "dashboard": dj_database_url.config(env="DATABASE_DASHBOARD_URL"),
 }
+DATABASE_ROUTERS = ["findthatcharity.db_router.DBRouter"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Caching in database
@@ -290,4 +293,5 @@ EMAIL_HOST = os.environ.get("EMAIL_HOST")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"
 EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"

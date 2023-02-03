@@ -8,6 +8,8 @@ from ftc.models import Organisation, OrganisationType, Scrape, Source
 
 
 class TestCase(django.test.TestCase):
+    databases = {"data", "admin"}
+
     def setUp(self):
         # setup elasticsearch patcher
         self.es_patcher = patch("ftc.documents.get_connection")

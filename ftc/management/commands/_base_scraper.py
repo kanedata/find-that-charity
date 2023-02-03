@@ -9,7 +9,7 @@ import requests
 import requests_cache
 import validators
 from django.core.management.base import BaseCommand
-from django.db import connection, transaction
+from django.db import connections, transaction
 from django.utils.text import slugify
 
 from ftc.management.commands._db_logger import ScrapeHandler
@@ -70,7 +70,7 @@ class BaseScraper(BaseCommand):
         self.logger.addHandler(self.scrape_logger)
 
         self.post_sql = {}
-        self.cursor = connection.cursor()
+        self.cursor = connections["data"].cursor()
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -86,7 +86,7 @@ class BaseScraper(BaseCommand):
         self.session = requests.Session()
 
     def handle(self, *args, **options):
-        with transaction.atomic():
+        with transaction.atomic("data"):
             try:
                 self.run_scraper(*args, **options)
             except Exception as err:
