@@ -39,6 +39,11 @@ urlpatterns = [
         findthatcharity.views.account_profile,
         name="account_profile",
     ),
+    path(
+        "accounts/profile/apikey",
+        findthatcharity.views.api_key_edit,
+        name="api_key_edit",
+    ),
     path("accounts/", include("django_registration.backends.activation.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls, name="admin"),

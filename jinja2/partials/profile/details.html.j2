@@ -1,0 +1,25 @@
+<section id="details">
+    <h2>Details</h2>
+    <table class="table w-auto">
+        <tr>
+            <th class="tl"><span class="pr4">Username</span></th>
+            <td class="tl">{{ request.user.username}}</td>
+        </tr>
+        <tr>
+            <th class="tl"><span class="pr4">Password</span></th>
+            <td class="tl"><a href="{{ url('password_reset') }}" class="link underline blue">Reset password</a></td>
+        </tr>
+        <tr>
+            <th class="tl"><span class="pr4">First name</span></th>
+            <td class="tl">{{ request.user.first_name }}</td>
+        </tr>
+        <tr>
+            <th class="tl"><span class="pr4">Last name</span></th>
+            <td class="tl">{{ request.user.last_name }}</td>
+        </tr>
+        <tr>
+            <th class="tl"><span class="pr4">Email address</span></th>
+            <td class="tl">{{ request.user.email }}</td>
+        </tr>
+    </table>
+</section>

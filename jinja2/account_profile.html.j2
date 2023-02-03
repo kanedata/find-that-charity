@@ -1,125 +1,30 @@
 {% set frontpage = false %}
 {% extends 'base.html.j2' %}
 
+{% block headscripts %}
+<script src="https://unpkg.com/htmx.org@1.8.5"></script>
+<script src="{{ static('js/copy-text.js') }}"></script>
+<script>
+    htmx.on("htmx:load", function (evt) {
+        setupCopyText();
+    });
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="w-60-l w-100 center" id="content">
     <h1>
         Your profile
         <span class="gray db normal f2">User: {{ request.user.username }}</span>
     </h1>
-    <h2>Details</h2>
-    <table class="table w-auto">
-        <tr>
-            <th class="tl"><span class="pr4">Username</span></th>
-            <td class="tl">{{ request.user.username}}</td>
-        </tr>
-        <tr>
-            <th class="tl"><span class="pr4">Password</span></th>
-            <td class="tl"><a href="#">Reset password</a></td>
-        </tr>
-        <tr>
-            <th class="tl"><span class="pr4">First name</span></th>
-            <td class="tl">{{ request.user.first_name }}</td>
-        </tr>
-        <tr>
-            <th class="tl"><span class="pr4">Last name</span></th>
-            <td class="tl">{{ request.user.last_name }}</td>
-        </tr>
-        <tr>
-            <th class="tl"><span class="pr4">Email address</span></th>
-            <td class="tl">{{ request.user.email }}</td>
-        </tr>
-    </table>
+    {% include 'partials/profile/details.html.j2' %}
     <p>
-        <a href="{{ url('admin:auth_user_change', args=[request.user.id]) }}">Edit profile</a>
-        <a href="{{ url('admin:logout') }}">Log out</a>
+        <a href="{{ url('admin:auth_user_change', args=[request.user.id]) }}" class="link underline f4 b mr4 blue">Edit profile</a>
+        <a href="{{ url('admin:logout') }}" class="link underline f4 b mr4 blue">Log out</a>
     </p>
-    <h2>Billing</h2>
-</div>
-    <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
-    <stripe-pricing-table pricing-table-id="prctbl_1MX3dgFBOJHReeSV0oK6ZBL2"
-        publishable-key="pk_live_51HbP7GFBOJHReeSVszOwKajn0TeGMfRnveNnRIk8ztLHgFhzNDUeKeuy8WHEQbYGHbNbDnc3Eb98vneSLZIE3IrF00tMab25RB">
-    </stripe-pricing-table>
-<div class="w-60-l w-100 center" id="content">
-    <h2>API Keys</h2>
-    {% set keys = request.user.apikey_set.all()|groupby("is_valid") %}
-    <p>API Key values are only shown when they are created. If you have lost your API key please revoke that key and generate a new one.</p>
-    {% for valid in keys|reverse %}
-    {% if not valid.grouper %}
-    <details class="mv4">
-        <summary class="pointer">Previous API keys</summary>
-    {% endif %}
-    <table class="table f6">
-        <thead>
-            <tr>
-                <th class=""></th>
-                <th class=" tl"></th>
-                <th class="">Created</th>
-                <th class="">Expires</th>
-                <th class=""></th>
-            </tr>
-        </thead>
-        <tbody class="f6">
-        {% for key in valid.list %}
-            <tr>
-                <td class="w3">{{ loop.index }}</td>
-                <td class="tl">{{ key.label }}</td>
-                <td class="w5"><time datetime="{{ key.created_at.isoformat() }}">{{ key.created_at|naturaltime }}</time></td>
-                <td class="w5">
-                    {% if key.expires_at %}
-                    <time datetime="{{ key.expires_at.isoformat() }}">{{ key.expires_at|naturaltime }}</time>
-                    {% elif key.revoked %}
-                    <span class="">Revoked</span>
-                    {% else %}
-                    <span class="gray">Does not expire</span>
-                    {% endif %}
-                </td>
-                <td class="w4">
-                    {% if key.is_valid %}
-                    <input type="button" value="Revoke API key" />
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% if not valid.grouper %}
-    </details>
-    {% endif %}
-    {% endfor %}
-    <input type="button" value="Create new API key" />
-    <h2>SQL Dashboard</h2>
-    <p>SQL Dashboard is a tool for creating SQL queries and visualizing the results. You can create a new dashboard or edit an existing one.</p>
-    <h3>Your SQL dashboards</h3>
-    <table class="table f6">
-        <thead>
-            <tr>
-                <th class="f6 tl"></th>
-                <th class="f6 tl"></th>
-                <th class="f6"></th>
-                <th class="f6">Created</th>
-                <th class="f6"></th>
-            </tr>
-        </thead>
-        <tbody class="f6">
-            {% for dashboard in dashboards.visible %}
-            <tr>
-                <td class="tl">
-                    <a href="{{ dashboard.get_absolute_url() }}">{{ dashboard.title }}</a>
-                </td>
-                <td class="tl">{{ dashboard.description }}</td>
-                <td class="tl w4">{{ dashboard.view_summary() }}</td>
-                <td class="w5">
-                    <time datetime="{{ dashboard.created_at.isoformat() }}">{{ dashboard.created_at|naturaltime }}</time>
-                </td>
-                <td class="w3">
-                    {% if dashboard.user_can_edit(request.user) %}
-                    <a href="{{ dashboard.get_edit_url() }}">Edit</a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <hr class="mv5"/>
+    {% include 'partials/profile/apikeys.html.j2' %}
+    <hr class="mv5"/>
+    {% include 'partials/profile/sqldashboard.html.j2' %}
 </div>
 {% endblock %}

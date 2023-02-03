@@ -1,0 +1,99 @@
+<section id="apikeys">
+    <h2>API Keys</h2>
+    {% set keys = request.user.apikey_set.all()|groupby("is_valid") %}
+    <p>API Key values are only shown when they are created. If you have lost your API key please revoke that key and
+        generate a new one.</p>
+    {% for valid in keys|reverse %}
+    {% if not valid.grouper %}
+    <details class="mv4">
+        <summary class="pointer">Previous API keys ({{ valid.list|length }})</summary>
+        {% endif %}
+        <table class="table f6">
+            <thead>
+                <tr>
+                    <th class=""></th>
+                    <th class=" tl"></th>
+                    <th class="">Created</th>
+                    <th class="">Expires</th>
+                    <th class=""></th>
+                </tr>
+            </thead>
+            <tbody class="f6">
+                {% for key in valid.list %}
+                <tr>
+                    <td class="w3">{{ loop.index }}</td>
+                    <td class="tl">{{ key.label }}</td>
+                    <td class="w5"><time datetime="{{ key.created_at.isoformat() }}">{{ key.created_at|naturaltime }}</time>
+                    </td>
+                    <td class="w5">
+                        {% if key.expires_at %}
+                        <time datetime="{{ key.expires_at.isoformat() }}">{{ key.expires_at|naturaltime }}</time>
+                        {% elif key.revoked %}
+                        <span class="">Revoked</span>
+                        {% else %}
+                        <span class="gray">Does not expire</span>
+                        {% endif %}
+                    </td>
+                    <td class="w4">
+                        {% if key.is_valid %}
+                        <form method="post"
+                                hx-post="{{ url('api_key_edit') }}"
+                                hx-swap="outerHTML"
+                                hx-target="#apikeys" >
+                            {{ csrf_input }}
+                            <input type="hidden" name="revoke_key" value="{{ key.pk }}" />
+                            <input type="submit" 
+                                class="btn pa1"
+                                value="Revoke API key"/>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if not valid.grouper %}
+    </details>
+    {% endif %}
+    {% endfor %}
+    {% if new_key %}
+    <div class="bg-washed-green b--green ph3 pv2 br4 ba bw1">
+        <p>
+            Your new key is:
+        </p>
+        <p class="mv0 pv0">
+            <span id="new-api-key" class="code bg-dark-green white pa1">{{ new_key.prefix }}.{{ new_key.key }}</span>
+        </p>
+        <p class="mv0 pv0">
+            <a class="copy-text pointer f6 grow br-pill bg-blue dib pv1 ph3 mt2 white" data-target="{{ new_key.prefix }}.{{ new_key.key }}"
+                title="Copy the key to your clipboard">
+                Copy to clipboard
+                <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 24 24" width="16px" fill="#ffffff">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+                </svg>
+            </a>
+        </p>
+        <p>You should store it somewhere safe: you will not be able to see the key again.</p>
+    </div>
+    {% endif %}
+    {% if new_key_form %}
+    <form method="post"
+            hx-post="{{ url('api_key_edit') }}"
+            hx-swap="outerHTML"
+            hx-target="#apikeys" >
+        {{ csrf_input }}
+        {% if new_key_form %}
+            {{ new_key_form.as_p() }}
+        {% else %}
+            <input type="hidden" name="new_key_form" value="1" />
+        {% endif %}
+        <input type="submit" 
+            class="btn pa2"
+            value="Create new API key"/>
+    </form>
+    {% else %}
+    <p>You have reached the maximum number of API keys ({{ max_api_keys }}). To add more you need to revoke current ones.</p>
+    {% endif %}
+</section>
