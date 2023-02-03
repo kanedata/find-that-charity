@@ -2,7 +2,7 @@ import os
 import re
 
 import requests_mock
-from django.test import TransactionTestCase
+from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from requests import Response
 from requests_html import HTMLSession
 
@@ -10,7 +10,7 @@ from companies.management.commands.import_companies import Command
 
 
 class TestImportCompanies(TransactionTestCase):
-    databases = {"data", "admin"}
+    databases = {"data"}
 
     def mock_csv_downloads(self, m):
         dirname = os.path.dirname(__file__)

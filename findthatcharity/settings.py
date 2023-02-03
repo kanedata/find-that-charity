@@ -154,9 +154,25 @@ WSGI_APPLICATION = "findthatcharity.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {},
-    "admin": dj_database_url.config(env="DATABASE_ADMIN_URL"),
-    "data": dj_database_url.config(env="DATABASE_URL"),
+    "default": {
+        "TEST": {
+            **dj_database_url.config(
+                env="DATABASE_ADMIN_URL",
+            ),
+        },
+    },
+    "admin": dj_database_url.config(
+        env="DATABASE_ADMIN_URL",
+        test_options={
+            "DEPENDENCIES": [],
+        },
+    ),
+    "data": dj_database_url.config(
+        env="DATABASE_URL",
+        test_options={
+            "DEPENDENCIES": [],
+        },
+    ),
     "dashboard": dj_database_url.config(env="DATABASE_DASHBOARD_URL"),
 }
 DATABASE_ROUTERS = ["findthatcharity.db_router.DBRouter"]
