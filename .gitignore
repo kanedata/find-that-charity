@@ -23,6 +23,9 @@ scratchpad/
 
 *.lnk
 
+# include github actions
+!.github/initdb/*.sql
+
 \.vscode/
 node_modules/
 
