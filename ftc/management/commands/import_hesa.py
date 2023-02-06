@@ -40,7 +40,16 @@ class Command(CSVScraper):
 
         with io.StringIO(csv_text) as a:
             csvreader = csv.DictReader(
-                a, fieldnames=["INSTID", "UKPRN", "ProviderName"]
+                a,
+                fieldnames=[
+                    "INSTID",
+                    "UKPRN",
+                    "ProviderName",
+                    "CountryCode",
+                    "CategoryName",
+                    "FE_Provider",
+                    "Rescinded",
+                ],
             )
             for k, row in enumerate(csvreader):
                 self.parse_row(row)
@@ -57,6 +66,9 @@ class Command(CSVScraper):
             self.orgtype_cache["higher-education-institution"],
             self.orgtype_cache["university"],
         ]
+
+        if record["FE_Provider"].strip().lower() == "yes":
+            org_types.append(self.orgtype_cache["further-education-provider"])
 
         self.add_org_record(
             Organisation(
