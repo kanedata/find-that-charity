@@ -12,6 +12,7 @@ from django.core.management.base import BaseCommand
 from django.db import connections, transaction
 from django.utils.text import slugify
 
+from ftc.management.commands._bulk_upsert import bulk_upsert
 from ftc.management.commands._db_logger import ScrapeHandler
 from ftc.models import (
     Organisation,
@@ -39,6 +40,7 @@ class BaseScraper(BaseCommand):
         OrganisationLink,
         OrganisationLocation,
     ]
+    upsert_models = {}
     expected_records = 1
 
     postcode_regex = re.compile(
@@ -78,6 +80,11 @@ class BaseScraper(BaseCommand):
             action="store_true",
             help="Cache request",
         )
+        parser.add_argument(
+            "--debug",
+            action="store_true",
+            help="Run in debug mode",
+        )
 
     def set_session(self, install_cache=False):
         if install_cache:
@@ -86,6 +93,7 @@ class BaseScraper(BaseCommand):
         self.session = requests.Session()
 
     def handle(self, *args, **options):
+        self.debug = options.get("debug")
         with transaction.atomic("data"):
             try:
                 self.run_scraper(*args, **options)
@@ -214,7 +222,22 @@ class BaseScraper(BaseCommand):
         self.logger.info(
             "Saving {:,.0f} {} records".format(len(self.records[model]), model.__name__)
         )
-        model.objects.bulk_create(self.records[model])
+        if model in self.upsert_models:
+            bulk_upsert(
+                model,
+                self.upsert_models[model].get(
+                    "fields",
+                    [
+                        f.get_attname_column()[1]
+                        for f in model._meta.get_fields()
+                        if f.name != "id"
+                    ],
+                ),
+                self.records[model],
+                self.upsert_models[model]["by"],
+            )
+        else:
+            model.objects.bulk_create(self.records[model])
         self.object_count[model] += len(self.records[model])
         self.logger.info(
             "Saved {:,.0f} {} records ({:,.0f} total)".format(

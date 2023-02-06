@@ -83,6 +83,7 @@ class Command(CSVScraper):
         SICCode,
         PreviousName,
     ]
+    bulk_limit = 30_000
 
     def handle(self, *args, **options):
         self.sic_cache = {}
@@ -104,12 +105,13 @@ class Command(CSVScraper):
         for u in self.start_urls:
             response = self.session.get(u)
             response.raise_for_status()
-            for link in response.html.absolute_links:
+            for link in sorted(response.html.absolute_links):
                 if self.zip_regex.match(link):
                     self.logger.info("Fetching: {}".format(link))
                     try:
-                        self.files[link] = self.session.get(link)
-                        self.files[link].raise_for_status()
+                        response = self.session.get(link)
+                        response.raise_for_status()
+                        self.parse_file(response, link)
                     except requests.exceptions.ChunkedEncodingError as err:
                         self.logger.error("Error fetching: {}".format(link))
                         self.logger.error(str(err))

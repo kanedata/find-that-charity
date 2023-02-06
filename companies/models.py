@@ -12,6 +12,14 @@ class SICCode(models.Model):
     )
     spider = models.CharField(max_length=200, db_index=True, default="companies")
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["org_id", "code"],
+                name="unique_sic_code",
+            )
+        ]
+
 
 class PreviousName(models.Model):
     org_id = OrgidField(db_index=True)
@@ -27,6 +35,14 @@ class PreviousName(models.Model):
         return "<Previous name {} for {}>".format(
             self.CompanyName, self.company.CompanyName
         )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["org_id", "CompanyName", "ConDate"],
+                name="unique_previous_name",
+            )
+        ]
 
 
 class AccountCategoryChoices(models.TextChoices):
@@ -92,12 +108,17 @@ class Account(models.Model):
     )
 
     class Meta:
-        unique_together = [["org_id", "financial_year_end"]]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["org_id", "financial_year_end"],
+                name="unique_financial_year_end",
+            )
+        ]
 
 
 class Company(models.Model):
     CompanyName = models.CharField(max_length=255, db_index=True)
-    CompanyNumber = models.CharField(max_length=10, db_index=True)
+    CompanyNumber = models.CharField(max_length=10, db_index=True, unique=True)
     RegAddress_CareOf = models.CharField(max_length=255, null=True, blank=True)
     RegAddress_POBox = models.CharField(max_length=255, null=True, blank=True)
     RegAddress_AddressLine1 = models.CharField(max_length=255, null=True, blank=True)
