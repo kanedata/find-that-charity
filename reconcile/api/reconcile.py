@@ -5,12 +5,12 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import reverse
 from ninja_extra import api_controller, http_get, http_post
 
-# from companies.views import COMPANY_RECON_TYPE
-# from companies.views import do_reconcile_query as do_companies_reconcile_query
 from findthatcharity.jinja2 import get_orgtypes
 from ftc.documents import OrganisationGroup
 from ftc.models import Organisation, OrganisationType, Vocabulary
 from ftc.views import get_org_by_id
+from reconcile.companies import COMPANY_RECON_TYPE
+from reconcile.companies import do_reconcile_query as do_companies_reconcile_query
 from reconcile.query import do_extend_query, do_reconcile_query
 
 from .schema import (
@@ -278,52 +278,52 @@ class API:
     def data_extension(self, request, body: DataExtensionQuery):
         return self._data_extension(request, body)
 
-    # @http_get(
-    #     "/company",
-    #     response={200: ServiceSpec},
-    #     exclude_none=True,
-    #     tags=["Reconciliation (against registered companies)"],
-    # )
-    # def get_company_service_spec(self, request):
-    #     return {
-    #         "versions": ["0.2"],
-    #         "name": "Find that Charity Company Reconciliation API",
-    #         "identifierSpace": "http://org-id.guide",
-    #         "schemaSpace": "https://schema.org",
-    #         "view": {
-    #             "url": urllib.parse.unquote(
-    #                 request.build_absolute_uri(
-    #                     reverse("company_detail", kwargs={"company_number": "{{id}}"})
-    #                 )
-    #             )
-    #         },
-    #         # "preview": {
-    #         #     "width": 430,
-    #         #     "height": 300,
-    #         # },
-    #         "defaultTypes": [COMPANY_RECON_TYPE],
-    #     }
+    @http_get(
+        "/company",
+        response={200: ServiceSpec},
+        exclude_none=True,
+        tags=["Reconciliation (against registered companies)"],
+    )
+    def get_company_service_spec(self, request):
+        return {
+            "versions": ["0.2"],
+            "name": "Find that Charity Company Reconciliation API",
+            "identifierSpace": "http://org-id.guide",
+            "schemaSpace": "https://schema.org",
+            "view": {
+                "url": urllib.parse.unquote(
+                    request.build_absolute_uri(
+                        reverse("company_detail", kwargs={"company_number": "{{id}}"})
+                    )
+                )
+            },
+            # "preview": {
+            #     "width": 430,
+            #     "height": 300,
+            # },
+            "defaultTypes": [COMPANY_RECON_TYPE],
+        }
 
-    # @http_post(
-    #     "/company",
-    #     response={200: ReconciliationResultBatch},
-    #     exclude_none=True,
-    #     tags=["Reconciliation (against registered companies)"],
-    # )
-    # def company_reconcile(self, request, body: ReconciliationQueryBatch):
-    #     return {
-    #         "results": [
-    #             do_companies_reconcile_query(
-    #                 query.query,
-    #                 type=query.type,
-    #                 limit=query.limit,
-    #                 properties=query.properties,
-    #                 type_strict=query.type_strict,
-    #                 result_key="candidates",
-    #             )
-    #             for query in body.queries
-    #         ]
-    #     }
+    @http_post(
+        "/company",
+        response={200: ReconciliationResultBatch},
+        exclude_none=True,
+        tags=["Reconciliation (against registered companies)"],
+    )
+    def company_reconcile(self, request, body: ReconciliationQueryBatch):
+        return {
+            "results": [
+                do_companies_reconcile_query(
+                    query.query,
+                    type=query.type,
+                    limit=query.limit,
+                    properties=query.properties,
+                    type_strict=query.type_strict,
+                    result_key="candidates",
+                )
+                for query in body.queries
+            ]
+        }
 
     @http_get(
         "/{orgtype}",
