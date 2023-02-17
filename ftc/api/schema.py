@@ -107,3 +107,38 @@ class Organisation(Schema):
     # geo_lep2: str = None
     # geo_lat: float = None
     # geo_long: float = None
+
+
+class Company(Schema):
+    CompanyName: str = None
+    CompanyNumber: str = None
+    RegAddress_CareOf: str = None
+    RegAddress_POBox: str = None
+    RegAddress_AddressLine1: str = None
+    RegAddress_AddressLine2: str = None
+    RegAddress_PostTown: str = None
+    RegAddress_County: str = None
+    RegAddress_Country: str = None
+    RegAddress_PostCode: str = None
+    CompanyCategory: str = None
+    CompanyStatus: str = None
+    CountryOfOrigin: str = None
+    DissolutionDate: datetime.date = None
+    IncorporationDate: datetime.date = None
+    Accounts_AccountRefDay: int = None
+    Accounts_AccountRefMonth: int = None
+    Accounts_NextDueDate: datetime.date = None
+    Accounts_LastMadeUpDate: datetime.date = None
+    Accounts_AccountCategory: str = None
+    Returns_NextDueDate: datetime.date = None
+    Returns_LastMadeUpDate: datetime.date = None
+    Mortgages_NumMortCharges: int = None
+    Mortgages_NumMortOutstanding: int = None
+    Mortgages_NumMortPartSatisfied: int = None
+    Mortgages_NumMortSatisfied: int = None
+    LimitedPartnerships_NumGenPartners: int = None
+    LimitedPartnerships_NumLimPartners: int = None
+    URI: str = None
+    ConfStmtNextDueDate: datetime.date = None
+    ConfStmtLastMadeUpDate: datetime.date = None
+    org_id: str = None

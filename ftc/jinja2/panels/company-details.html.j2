@@ -40,10 +40,10 @@
     <span>{{ company.RegAddress_PostCode }}</span>
 </p>
 {% endif %}
-{% if company.siccodes.exists() %}
+{% if company.sic_codes.exists() %}
 <h4><abbr title="Standard Industrial Code">SIC</abbr> Codes</h4>
 <ul>
-    {% for s in company.siccodes.all() %}
+    {% for s in company.sic_codes.all() %}
     <li>
         <code>{{ s.code }}</code>
         {% if s.code in sic_codes %}

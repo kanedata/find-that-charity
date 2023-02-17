@@ -1,11 +1,10 @@
+from charity_django.companies.models import Company
 from django.shortcuts import Http404
 from ninja import Schema
 from ninja_extra import api_controller, http_get
 
-from companies.models import Company
 from ftc.api.organisations import ResultError
-
-from .schema import Company as CompanyOut
+from ftc.api.schema import Company as CompanyOut
 
 
 class CompanyResult(Schema):

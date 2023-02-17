@@ -40,6 +40,7 @@ class BaseScraper(BaseCommand):
         OrganisationLink,
         OrganisationLocation,
     ]
+    model_updates = {}
     upsert_models = {}
     expected_records = 1
 
@@ -237,7 +238,9 @@ class BaseScraper(BaseCommand):
                 self.upsert_models[model]["by"],
             )
         else:
-            model.objects.bulk_create(self.records[model])
+            model.objects.bulk_create(
+                self.records[model], **self.model_updates.get(model, {})
+            )
         self.object_count[model] += len(self.records[model])
         self.logger.info(
             "Saved {:,.0f} {} records ({:,.0f} total)".format(

@@ -1,8 +1,7 @@
 from ninja_extra import NinjaExtraAPI
 
 from charity.api import API as CharityAPI
-from companies.api import API as CompanyAPI
-from ftc.api import API as OrganisationAPI
+from ftc.api import CompanyAPI, OrganisationAPI
 from reconcile.api import API as ReconcileAPI
 
 api = NinjaExtraAPI(

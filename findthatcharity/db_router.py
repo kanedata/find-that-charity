@@ -8,6 +8,7 @@ class DBRouter:
         "api",
         "charity",
         "companies",
+        "charity_django.companies",
         "ftcbot",
         "ftc",
         "geo",

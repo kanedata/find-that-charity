@@ -228,6 +228,7 @@ body {
   .sql-dashboard .query-results table td.decimal {
     text-align: right;
     font-variant-numeric: tabular-nums;
+    font-family: Consolas, monaco, monospace;
   }
 
   .sql-dashboard .query-results table th .dropdown-menu-icon {

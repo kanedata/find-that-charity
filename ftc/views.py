@@ -1,6 +1,7 @@
 import csv
 from collections import defaultdict
 
+from charity_django.companies.models import Company
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -242,5 +243,42 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
             "base_query": base_query,
             "download_url": download_url,
             "search": s,
+        },
+    )
+
+
+@xframe_options_exempt
+def company_detail(request, company_number, filetype="html"):
+    company = get_object_or_404(Company, CompanyNumber=company_number)
+
+    # vocab = Vocabulary.objects.get(title="Companies House SIC Codes")
+    # sic_codes = {
+    #     entry.code: entry
+    #     for entry in VocabularyEntries.objects.filter(vocabulary=vocab)
+    # }
+
+    # fetch any related organisations
+    org = None
+    orgs = list(
+        Organisation.objects.filter(
+            orgIDs__contains=["GB-COH-{}".format(company.CompanyNumber)]
+        )
+    )
+    if orgs:
+        orgs = RelatedOrganisation(orgs)
+        org = orgs.records[0]
+
+    return render(
+        request,
+        "companies/company_detail.html.j2",
+        {
+            "company": company,
+            "heading": "Company {} | {}".format(
+                company.CompanyNumber,
+                company.CompanyName,
+            ),
+            # "sic_codes": sic_codes,
+            "source": Source.objects.get(id="companies"),
+            "org": org,
         },
     )

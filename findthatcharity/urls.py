@@ -20,7 +20,8 @@ from django.views.generic.base import TemplateView
 
 import addtocsv.views
 import charity.urls
-import companies.urls
+
+# import companies.urls
 import findthatcharity.views
 import ftc.urls
 import ftc.views
@@ -53,7 +54,12 @@ urlpatterns = [
     path("api/v1/", api.urls),
     path("orgid/", include(ftc.urls)),
     path("charity/", include(charity.urls)),
-    path("company/", include(companies.urls)),
+    path(
+        "company/<str:company_number>",
+        ftc.views.company_detail,
+        {"filetype": "html"},
+        name="company_detail",
+    ),
     path("reconcile/", include(reconcile.urls)),
     path("reconcile", reconcile.views.index, {"orgtype": "registered-charity"}),
     path("dashboard/", include(django_sql_dashboard.urls)),
