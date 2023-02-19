@@ -6,19 +6,30 @@ jobs:
     runs-on: ubuntu-latest
   
     services:
-      postgres:
+      postgres_data:
         image: postgres:11.6
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: github_actions
+          POSTGRES_DB: github_actions_data
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      postgres_admin:
+        image: postgres:11.6
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions_admin
+        ports:
+          - 5433:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost/github_actions
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/github_actions_data
+      DATABASE_ADMIN_URL: postgres://postgres:postgres@localhost:5433/github_actions_admin
       SECRET_KEY: 1234567890
 
     steps:
@@ -37,7 +48,8 @@ jobs:
         pip install -r requirements.txt
     - name: Run migrations
       run: |
-        python manage.py migrate
+        python manage.py migrate --database=data --noinput
+        python manage.py migrate --database=admin --noinput
         python manage.py collectstatic
     - name: Test with django test
       run: |

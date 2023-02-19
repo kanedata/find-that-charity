@@ -36,7 +36,6 @@ class Command(CSVScraper):
     orgtypes = ["Community Amateur Sports Club", "Sports Club", "Registered Company"]
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
         if "casc_orgid" in record.keys():
             if not hasattr(self, "coynos"):

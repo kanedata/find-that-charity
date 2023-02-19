@@ -24,7 +24,6 @@ class Orgid(str):
 
 
 class OrgidField(models.CharField):
-
     description = "An orgid based on the format here: http://org-id.guide/about"
 
     def __init__(self, *args, **kwargs):

@@ -3,10 +3,10 @@
 {% extends "base.html.j2" %}
 
 {% block headscripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js" integrity="sha256-Fh801SO9gqegfUdkDxyzXzIUPWzO/Vatqj8uN+5xcL4=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.min.js" integrity="sha256-hV6Ff1ZbnLObO8BWHPZs1oA3aPZkX4bnnEKO4nX1sm0=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="{{ static('lib/papaparse/papaparse.min.js') }}"></script>
+<script src="{{ static('lib/crypto-js/core.min.js') }}"></script>
+<script src="{{ static('lib/crypto-js/md5.min.js') }}"></script>
+<script src="{{ static('lib/vue/vue.min.js') }}"></script>
 {% endblock %}
 
 {% block content %}

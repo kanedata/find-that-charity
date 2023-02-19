@@ -5,7 +5,6 @@ from ftc.tests import TestCase
 
 class CharityViewTests(TestCase):
     def test_charity(self):
-
         response = self.client.get(
             reverse("charity_html", kwargs={"regno": "1234"}), follow=True
         )
@@ -20,7 +19,6 @@ class CharityViewTests(TestCase):
         self.assertContains(response, "Test description", html=True)
 
     def test_organisation_404(self):
-
         response = self.client.get(
             reverse("charity_html", kwargs={"regno": "3456"}), follow=True
         )

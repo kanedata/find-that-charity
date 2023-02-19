@@ -5,7 +5,6 @@ from ftc.models import OrgidScheme
 
 
 class Command(BaseCommand):
-
     start_url = "http://org-id.guide/download.json"
 
     def handle(self, *args, **options):

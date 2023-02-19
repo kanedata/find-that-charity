@@ -1,0 +1,37 @@
+{% set frontpage = false %}
+{% extends 'base.html.j2' %}
+{% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
+{% set orgtypes = get_orgtypes() %}
+
+{% block headscripts %}
+<script src="{{ static('lib/htmx/htmx.min.js') }}"></script>
+<script src="{{ static('js/copy-text.js') }}"></script>
+<script>
+    htmx.on("htmx:load", function (evt) {
+        setupCopyText();
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="w-60-l w-100 center" id="content">
+    <h1>
+        Your profile
+        <span class="gray db normal f2">User: {{ request.user.username }}</span>
+    </h1>
+    {% include 'partials/profile/details.html.j2' %}
+    <p>
+        {% if request.user.is_superuser %}
+        <a href="{{ url('admin:index') }}" class="link underline f4 b mr4 blue">Admin area</a>
+        {% endif %}
+        <a href="{{ url('admin:auth_user_change', args=[request.user.id]) }}" class="link underline f4 b mr4 blue">Edit profile</a>
+        <a href="{{ url('admin:logout') }}" class="link underline f4 b mr4 blue">Log out</a>
+    </p>
+    <hr class="mv5"/>
+    {% include 'partials/profile/apikeys.html.j2' %}
+    <hr class="mv5"/>
+    {% include 'partials/profile/tags.html.j2' %}
+    <hr class="mv5"/>
+    {% include 'partials/profile/sqldashboard.html.j2' %}
+</div>
+{% endblock %}

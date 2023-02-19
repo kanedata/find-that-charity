@@ -241,7 +241,6 @@ class Command(CSVScraper):
         return financial_record
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
 
         address, _ = self.split_address(
@@ -340,6 +339,9 @@ class Command(CSVScraper):
                     "latestIncome": int(record["Most recent year income"])
                     if record.get("Most recent year income")
                     else None,
+                    "latestSpending": int(record["Most recent year expenditure"])
+                    if record.get("Most recent year expenditure")
+                    else None,
                     "latestIncomeDate": record.get("Year End"),
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("Registered Date"),
@@ -370,7 +372,9 @@ class Command(CSVScraper):
         self.logger.info("CharityRaw records inserted")
 
         self.logger.info("Deleting old CharityRaw records")
-        CharityRaw.objects.filter(spider__exact=self.name,).exclude(
+        CharityRaw.objects.filter(
+            spider__exact=self.name,
+        ).exclude(
             scrape_id=self.scrape.id,
         ).delete()
         self.logger.info("Old CharityRaw records deleted")
@@ -379,7 +383,6 @@ class Command(CSVScraper):
         self.execute_sql_statements(self.charity_sql)
 
     def get_bulk_create(self):
-
         for record in tqdm.tqdm(self.raw_records):
             yield CharityRaw(
                 org_id=self.get_org_id(record),

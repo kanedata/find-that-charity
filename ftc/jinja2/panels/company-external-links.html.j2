@@ -1,0 +1,24 @@
+<div class="mv3 measure f5">
+    <p>
+        This organisation record is based on data from <a href="#data-source-{{ source.id }}" class="link underline-hover blue b">{{ source.title }}</a> published by {{ source.publisher }}.
+    </p>
+</div>
+
+{# {% set links = company.get_links()|list %} #}
+{% if links %}
+<article class="message is-info">
+    <h4 class="ma0 pa0">More about this organisation</h4>
+    <p class="f6 gray">Find that Charity is not responsible for the content of external websites</p>
+    <div class="message-body">
+        <ul class="mb4 mt2 list mh0 pa0 f5">
+            {% for link in links %}
+            <li class="w-100 mb2">
+                <a class="link dark-blue underline" href="{{ link[0] }}" target="_blank">
+                {{ link[1] }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</article>
+{% endif %}

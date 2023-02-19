@@ -1,0 +1,62 @@
+<section id="sql-dashboard" class="sql-dashboard">
+    <h2>SQL Dashboard</h2>
+    <p>SQL Dashboard is a tool for creating SQL queries and visualizing the results. You can create a new dashboard or edit
+        an existing one.</p>
+    <h3>Your SQL dashboards</h3>
+    <table class="table f6">
+        <thead>
+            <tr>
+                <th class="f6 tl"></th>
+                <th class="f6 tl"></th>
+                <th class="f6"></th>
+                <th class="f6">Created</th>
+                <th class="f6"></th>
+            </tr>
+        </thead>
+        <tbody class="f6">
+            {% for dashboard in dashboards.visible %}
+            <tr>
+                <td class="tl">
+                    <a href="{{ dashboard.get_absolute_url() }}">{{ dashboard.title }}</a>
+                </td>
+                <td class="tl">{{ dashboard.description }}</td>
+                <td class="tl w4">{{ dashboard.view_summary() }}</td>
+                <td class="w5">
+                    <time datetime="{{ dashboard.created_at.isoformat() }}">{{ dashboard.created_at|naturaltime }}</time>
+                </td>
+                <td class="w3">
+                    {% if dashboard.user_can_edit(request.user) %}
+                    <a href="{{ dashboard.get_edit_url() }}">Edit</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h3>Run a query</h3>
+    <form action="{{ url('django_sql_dashboard-index') }}" method="POST">
+        {{ csrf_input }}
+        <textarea style="
+            width: 60%;
+            height: 10em;
+            border: 2px solid #666;
+            padding: 0.5em;
+            " name="sql"></textarea>
+        <p>
+            <input class="btn f5 pa2" type="submit" value="Run query" />
+        </p>
+    </form>
+</section>
+
+<script src="{{ static('lib/codemirror/codemirror.min.js') }}"></script>
+<link rel="stylesheet" href="{{ static('lib/codemirror/codemirror.min.css') }}" />
+<script src="{{ static('lib/codemirror/codemirror.sql.min.js') }}"></script>
+<script>
+    document.querySelectorAll("textarea[name='sql']").forEach((el) => {
+        CodeMirror.fromTextArea(el, {
+            mode: 'sql',
+            lineWrapping: true,
+            lineNumbers: true,
+        });
+    });
+</script>

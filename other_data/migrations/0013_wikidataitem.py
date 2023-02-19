@@ -6,7 +6,6 @@ import ftc.models.orgid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("other_data", "0012_genderpaygap_companywebsite"),
     ]

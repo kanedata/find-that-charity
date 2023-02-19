@@ -28,6 +28,8 @@ MOCK_FILES = (
 
 
 class BaseScraperTests(TestCase):
+    databases = {"data", "admin"}
+
     def test_parse_company_number(self):
         BaseScraper.name = "test"
         scraper = BaseScraper()
@@ -60,6 +62,8 @@ class BaseScraperTests(TestCase):
 
 
 class ScraperTests(TestCase):
+    databases = {"data", "admin"}
+
     def mock_csv_downloads(self, m):
         dirname = os.path.dirname(__file__)
         for url, filename in MOCK_FILES:

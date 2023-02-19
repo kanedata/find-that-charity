@@ -1,24 +1,22 @@
 import datetime
 
+from charity_django.utils.text import list_to_string, regex_search, to_titlecase
 from django.conf import settings
+from django.contrib.humanize.templatetags.humanize import naturalday, naturaltime
 from django.core.cache import cache
-from django.db import connection
+from django.db import connections
 from django.db.models import Count, F, Func
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.text import slugify
-from humanize import naturaldelta
 from markdownx.utils import markdownify
 
 from findthatcharity.utils import (
     a_or_an,
     format_currency,
-    list_to_string,
     number_format,
     pluralise,
-    regex_search,
     str_format,
-    to_titlecase,
     url_remove,
     url_replace,
 )
@@ -32,7 +30,10 @@ def get_orgtypes():
     value = cache.get(cache_key)
     if value:
         return value
-    if OrganisationType._meta.db_table in connection.introspection.table_names():
+    if (
+        OrganisationType._meta.db_table
+        in connections["data"].introspection.table_names()
+    ):
         by_orgtype = {
             ot["orgtype"]: ot["records"]
             for ot in Organisation.objects.annotate(
@@ -60,7 +61,7 @@ def get_sources():
     value = cache.get(cache_key)
     if value:
         return value
-    if Source._meta.db_table in connection.introspection.table_names():
+    if Source._meta.db_table in connections["data"].introspection.table_names():
         value = {
             s.id: s
             for s in Source.objects.all()
@@ -78,7 +79,7 @@ def get_orgidschemes():
     value = cache.get(cache_key)
     if value:
         return value
-    if OrgidScheme._meta.db_table in connection.introspection.table_names():
+    if OrgidScheme._meta.db_table in connections["data"].introspection.table_names():
         value = {s.code: s for s in OrgidScheme.objects.all()}
         cache.set(cache_key, value, 60 * 60)
     else:
@@ -91,7 +92,7 @@ def get_locations(areatypes=settings.DEFAULT_AREA_TYPES):
     value = cache.get(cache_key)
     if value:
         return value
-    if GeoLookup._meta.db_table in connection.introspection.table_names():
+    if GeoLookup._meta.db_table in connections["data"].introspection.table_names():
         value = {}
         for s in GeoLookup.objects.filter(geoCodeType__in=areatypes):
             if s.geoCodeType not in value:
@@ -129,7 +130,8 @@ def environment(**options):
     env.filters.update(
         {
             "regex_search": regex_search,
-            "naturaldelta": lambda x: naturaldelta(x, minimum_unit="milliseconds"),
+            "naturalday": naturalday,
+            "naturaltime": naturaltime,
             "list_to_string": list_to_string,
             "slugify": slugify,
             "titlecase": to_titlecase,

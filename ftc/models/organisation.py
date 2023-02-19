@@ -162,6 +162,18 @@ class Organisation(models.Model):
     latestIncome = models.BigIntegerField(
         null=True, blank=True, verbose_name="Latest income"
     )
+    latestSpending = models.BigIntegerField(
+        null=True, blank=True, verbose_name="Latest expenditure"
+    )
+    latestEmployees = models.BigIntegerField(
+        null=True, blank=True, verbose_name="Latest employees"
+    )
+    latestVolunteers = models.BigIntegerField(
+        null=True, blank=True, verbose_name="Latest volunteers"
+    )
+    trusteeCount = models.BigIntegerField(
+        null=True, blank=True, verbose_name="Count of trustees"
+    )
     latestIncomeDate = models.DateField(
         null=True, blank=True, verbose_name="Latest financial year end"
     )
@@ -235,10 +247,6 @@ class Organisation(models.Model):
         return OrganisationLink.objects.filter(
             models.Q(org_id_a=self.org_id) | models.Q(org_id_b=self.org_id)
         )
-
-    @cached_property
-    def locations(self):
-        return OrganisationLocation.objects.filter(org_id=self.org_id).all()
 
     @cached_property
     def classifications(self):
@@ -364,7 +372,6 @@ class Organisation(models.Model):
         )
 
     def geoCodes(self):
-
         special_cases = {
             "K02000001": [
                 "E92000001",
@@ -391,7 +398,6 @@ class Organisation(models.Model):
 
     @cached_property
     def allGeoCodes(self):
-
         location_fields = [
             "geo_iso",
             "geo_oa11",
@@ -416,21 +422,9 @@ class Organisation(models.Model):
                     locations.add(value)
         return list(locations)
 
-    def locations_group(self):
-        locations = defaultdict(lambda: defaultdict(set))
-
-        for location in self.locations:
-            location_type = OrganisationLocation.LocationTypes(
-                location.locationType
-            ).label
-            if (
-                location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE
-                and location.geo_laua
-            ):
-                locations[location_type][location.geo_iso].add(location.geo_laua)
-            elif location.geoCode:
-                locations[location_type][location.geo_iso].add(location.geoCode)
-        return locations
+    @cached_property
+    def locations(self):
+        return OrganisationLocation.objects.filter(org_id=self.org_id).all()
 
     @cached_property
     def location(self):
@@ -471,3 +465,24 @@ class Organisation(models.Model):
                 == OrganisationLocation.LocationTypes.REGISTERED_OFFICE
             ):
                 return location
+
+    def locations_group(self):
+        locations = defaultdict(lambda: defaultdict(set))
+
+        for location in self.locations:
+            location_type = OrganisationLocation.LocationTypes(
+                location.locationType
+            ).label
+            if (
+                location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE
+                and location.geo_laua
+            ):
+                locations[location_type][location.geo_iso].add(location.geo_laua)
+            elif location.geoCode:
+                locations[location_type][location.geo_iso].add(location.geoCode)
+        return locations
+
+    def __getattr__(self, name):
+        if name.startswith("geo_"):
+            return getattr(self.hq, name, None)
+        return super().__getattr__(name)

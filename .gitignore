@@ -23,6 +23,9 @@ scratchpad/
 
 *.lnk
 
+# include github actions
+!.github/initdb/*.sql
+
 \.vscode/
 node_modules/
 
@@ -30,3 +33,6 @@ node_modules/
 .idea/
 
 logs/
+companies_old/
+
+!*/static/lib/

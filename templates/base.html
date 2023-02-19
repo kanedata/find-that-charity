@@ -5,11 +5,8 @@
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css" />
+    <link rel="stylesheet" href="{% static 'lib/tachyons/tachyons.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
-    <link rel="stylesheet" href="https://dkane.net/theme/css/style.css" />
-    <link rel="stylesheet" href="https://dkane.net/theme/css/pygment.css" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <title>{{ default_title }} - {% block title %}{% endblock %}</title>
     {% block extra_head %}{% endblock %}
@@ -17,11 +14,12 @@
   <body class="home w-100 sans-serif near-black base-font bg-wavy">
     <header class="body header-font normal ph3 ph5-ns pt4 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
       <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
-          <a href="{% url 'about' %}" class="white logo underline double underline-yellow">About</a>
-            | <a href="{% url 'about' %}#data-sources" class="white logo underline double underline-yellow">Data sources</a>
-            | <a href="{% url 'about' %}#privacy" class="white logo underline double underline-yellow">Privacy</a>
-          {% if request.user.is_superuser %}
-            | <a href="{% url 'admin:index' %}" class="white logo underline double underline-yellow">Admin</a>
+        <a href="{% url 'about' %}" class="white logo underline double underline-yellow">About</a> | 
+          {% if request.user.is_authenticated %}
+            <a href="{% url 'account_profile' %}" class="white logo underline double underline-yellow">Profile</a>
+            | <a href="{% url 'admin:logout' %}" class="white logo underline double underline-yellow">Logout</a>
+          {% else %}
+            <a href="{% url 'login' %}" class="white logo underline double underline-yellow">Login</a>
           {% endif %}
       </div>
       <h1 class="{% if frontpage %}f-subheadline-ns{% endif %} tracked-tight f1 lh-title mv0 logo normal">

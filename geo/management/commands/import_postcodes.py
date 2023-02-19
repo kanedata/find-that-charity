@@ -10,7 +10,6 @@ from geo.models import Postcode
 
 
 class Command(BaseScraper):
-
     name = "postcodes"
     bulk_limit = 50000
 
@@ -21,7 +20,6 @@ class Command(BaseScraper):
         )
 
     def run_scraper(self, *args, **options):
-
         # initialise records
         self.records = []
         self.object_count = 0
@@ -58,7 +56,6 @@ class Command(BaseScraper):
         self.close_spider()
 
     def parse_row(self, row):
-
         for k, v in row.items():
             if not v or v == "":
                 row[k] = None

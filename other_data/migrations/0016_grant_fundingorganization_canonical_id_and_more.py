@@ -16,7 +16,6 @@ def forwards_func(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("other_data", "0015_remove_cqclocation_provider_remove_cqcprovider_brand"),
     ]

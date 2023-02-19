@@ -18,9 +18,9 @@
 {% block headscripts %}
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/styles/choices.min.css"
+  href="{{ static('lib/choices/choices.min.css') }}"
 />
-<script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
+<script src="{{ static('lib/choices/choices.min.js') }}"></script>
 {{ super() }}
 {% endblock headscripts %}
 

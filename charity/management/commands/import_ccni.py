@@ -56,7 +56,6 @@ class Command(BaseCommand):
         CSVScraper.parse_file(self, response, source_url)
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
 
         if "Charity_number" in record:
@@ -127,6 +126,9 @@ class Command(BaseCommand):
                     "url": self.parse_url(record.get("Website")),
                     "latestIncome": int(record["Total income"])
                     if record.get("Total income")
+                    else None,
+                    "latestSpending": int(record["Total spending"])
+                    if record.get("Total spending")
                     else None,
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("Date registered"),

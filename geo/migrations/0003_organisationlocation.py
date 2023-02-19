@@ -6,7 +6,6 @@ import ftc.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("geo", "0002_auto_20201001_1234"),
     ]

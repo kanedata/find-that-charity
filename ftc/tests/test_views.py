@@ -5,7 +5,6 @@ from ftc.tests import TestCase
 
 class OrganisationViewTests(TestCase):
     def test_organisation(self):
-
         response = self.client.get(
             reverse("orgid_html", kwargs={"org_id": "GB-CHC-1234"})
         )
@@ -17,7 +16,6 @@ class OrganisationViewTests(TestCase):
         self.assertContains(response, "Test description", html=True)
 
     def test_organisation_json(self):
-
         response = self.client.get(
             reverse("orgid_json", kwargs={"org_id": "GB-CHC-1234"})
         )
@@ -29,14 +27,12 @@ class OrganisationViewTests(TestCase):
         self.assertEqual(response_json["latestEmployees"], None)
 
     def test_organisation_404(self):
-
         response = self.client.get(
             reverse("orgid_html", kwargs={"org_id": "XX-XXX-3456"})
         )
         self.assertEqual(response.status_code, 404)
 
     def test_organisation_json_404(self):
-
         response = self.client.get(
             reverse("orgid_json", kwargs={"org_id": "XX-XXX-3456"})
         )

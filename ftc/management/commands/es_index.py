@@ -56,7 +56,6 @@ class Command(BaseScraper):
         )
 
     def run_scraper(self, *args, **options):
-
         # setup logging to capture elasticsearch output
         self.logging_setup()
 
@@ -128,7 +127,6 @@ class Command(BaseScraper):
         self.scrape_logger.teardown()
 
     def logging_setup(self):
-
         # hook into elasticsearch logger too
         es_logger = logging.getLogger("elasticsearch")
         es_logger.addHandler(self.scrape_logger)

@@ -21,14 +21,15 @@ Installation
 4. Install requirements (`pip install -r requirements.txt`)
 5. [Install postgres](https://www.postgresql.org/download/)
 6. Start postgres
-7. [Install elasticsearch 7](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html) - you may need to increase available memory (see below)
-8. Start elasticsearch
-9. Create `.env` file in root directory. Contents based on `.env.example`.
-10. Create the database tables (`python ./manage.py migrate && python ./manage.py createcachetable`)
-11. Import data on charities (`python ./manage.py import_charities`)
-12. Import data on nonprofit companies (`python ./manage.py import_companies`)
-13. Import data on other non-profit organisations (`python ./manage.py import_all`)
-14. Add organisations to elasticsearch index (`python ./manage.py es_index`) - (Don't use the default `search_index` command as this won't setup aliases correctly)
+7. Create 2 postgres databases - one for admin (eg `ftc_admin` and one for data eg `ftc_data`)
+8. [Install elasticsearch 7](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html) - you may need to increase available memory (see below)
+9. Start elasticsearch
+10. Create `.env` file in root directory. Contents based on `.env.example`.
+11. Create the database tables (`python ./manage.py migrate --database=data && python ./manage.py migrate --database=admin && python ./manage.py createcachetable --database=admin`)
+12. Import data on charities (`python ./manage.py import_charities`)
+13. Import data on nonprofit companies (`python ./manage.py import_companies`)
+14. Import data on other non-profit organisations (`python ./manage.py import_all`)
+15. Add organisations to elasticsearch index (`python ./manage.py es_index`) - (Don't use the default `search_index` command as this won't setup aliases correctly)
 
 Dokku Installation
 ------------------
@@ -43,8 +44,10 @@ dokku apps:create ftc
 
 # postgres
 sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git postgres
-dokku postgres:create ftc-db
-dokku postgres:link ftc-db ftc
+dokku postgres:create ftc-db-data
+dokku postgres:link ftc-db-data ftc --alias "DATABASE_URL"
+dokku postgres:create ftc-db-admin
+dokku postgres:link ftc-db-admin ftc --alias "DATABASE_ADMIN_URL"
 
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
@@ -84,8 +87,9 @@ On Dokku server run:
 
 ```bash
 # setup
-dokku run ftc python ./manage.py migrate
-dokku run ftc python ./manage.py createcachetable
+dokku run ftc python ./manage.py migrate --database=data
+dokku run ftc python ./manage.py migrate --database=admin
+dokku run ftc python ./manage.py createcachetable --database=admin
 
 # run import
 dokku run ftc python ./manage.py charity_setup

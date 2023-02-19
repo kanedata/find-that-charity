@@ -2,6 +2,8 @@ import copy
 import json
 import os
 
+from charity_django.utils.text import to_titlecase
+
 from charity.models import (
     CCEWCharityAreaOfOperation,
     CCEWCharityARPartA,
@@ -9,7 +11,7 @@ from charity.models import (
     CCEWCharityGoverningDocument,
 )
 from findthatcharity.jinja2 import get_orgtypes
-from findthatcharity.utils import normalise_name, to_titlecase
+from findthatcharity.utils import normalise_name
 from ftc.documents import OrganisationGroup
 from ftc.models import Organisation
 from ftc.models.organisation_classification import OrganisationClassification
@@ -25,6 +27,7 @@ def do_reconcile_query(
     limit=5,
     properties=[],
     type_strict="should",
+    result_key="result",
 ):
     if not query:
         return []
@@ -32,7 +35,7 @@ def do_reconcile_query(
     if not isinstance(orgtypes, list) and orgtypes != "all":
         orgtypes = orgtypes.split("+")
 
-    properties = {p["pid"]: p["v"] for p in properties}
+    properties = {p["pid"]: p["v"] for p in properties} if properties else {}
 
     query_template, params = recon_query(
         query,
@@ -45,7 +48,7 @@ def do_reconcile_query(
     all_orgtypes = get_orgtypes()
 
     return {
-        "result": [
+        result_key: [
             {
                 "id": o.org_id,
                 "name": "{} ({}){}".format(

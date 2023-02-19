@@ -11,7 +11,6 @@ GeoSource = namedtuple("GeoSource", ["link", "type", "codefield", "namefield"])
 
 
 class Command(BaseScraper):
-
     name = "geo_lookups"
     bulk_limit = 50000
     GEO_SOURCES = {
@@ -170,7 +169,6 @@ class Command(BaseScraper):
     )
 
     def run_scraper(self, *args, **options):
-
         # initialise records
         self.files = {}
         self.records = {}
@@ -217,7 +215,6 @@ class Command(BaseScraper):
         self.close_spider()
 
     def parse_row(self, row, geocodetype):
-
         for k, v in row.items():
             if not v or v == "":
                 row[k] = None

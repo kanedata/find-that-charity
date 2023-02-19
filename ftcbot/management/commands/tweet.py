@@ -1,10 +1,10 @@
 import requests
 import tweepy
+from charity_django.utils.text import to_titlecase
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from charity.models import Charity
-from findthatcharity.utils import to_titlecase
 from ftc.documents import OrganisationGroup
 from ftc.models.organisation import EXTERNAL_LINKS
 from ftc.query import random_query
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         for r in result:
             try:
                 return Charity.objects.get(id=r["org_id"])
-            except (Charity.DoesNotExist):
+            except Charity.DoesNotExist:
                 pass
 
     def get_twitter_id(self, charity):

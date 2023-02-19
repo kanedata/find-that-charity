@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("other_data", "0002_cqcbrand_cqclocation_cqcprovider"),
     ]

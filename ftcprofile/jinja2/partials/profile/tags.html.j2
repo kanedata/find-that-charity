@@ -1,0 +1,39 @@
+<section id="tagged-organisations" class="sql-dashboard">
+    <h2>Tagged organisations</h2>
+    <p>You can save organisations by "tagging" them on their page.</p>
+    {% if tagged_organisations %}
+    <h3>Your saved organisations</h3>
+    {{ 'organisation'|pluralise(tagged_organisations|length) }} saved
+    <table class="table f6">
+        <thead>
+            <tr>
+                <th class="f6 tl"></th>
+                <th class="f6 tl">Name</th>
+                <th class="f6 tl">Type</th>
+                <th class="f6">Tags</th>
+            </tr>
+        </thead>
+        <tbody class="f6">
+            {% for org, tags in tagged_organisations %}
+            <tr>
+                <td class="tl">
+                    {{ orgid_link(org.org_id, false, copy=false) }}
+                </td>
+                <td class="tl w-100">{{ org.name|titlecase }}</td>
+                <td class="tl">
+                    {{ orgtype_link(org.organisationTypePrimary, large=false) }}
+                    {# {% for ot in org.organisationType if ot != org.organisationTypePrimary.slug %}
+                    {{ orgtype_link(orgtypes[ot], large=false) }}
+                    {% endfor %} #}
+                </td>
+                <td class="tl">
+                    {% for tag in tags %}
+                    <div class="dib nowrap bg-orange f6 pv0 ph1 br1 near-black bn ml2 mb2 fr">{{ tag }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</section>

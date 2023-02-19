@@ -8,7 +8,9 @@ django-filter
 django-markdownx>=4.0.0b1
 django-widget-tweaks
 dj-database-url
-django-ninja
+django-ninja-extra
+django-ninja-apikey
+django-registration
 django-sql-dashboard
 whitenoise
 gunicorn
@@ -43,3 +45,4 @@ django-debug-toolbar
 django-enforce-host
 ua-parser
 sqlite-utils
+git+https://github.com/kanedata/charity-django.git@v0.4.0

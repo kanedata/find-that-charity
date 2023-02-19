@@ -102,7 +102,6 @@ class Command(CSVScraper):
         return s
 
     def parse_row(self, record):
-
         record = self.clean_fields(record)
 
         org_types = [

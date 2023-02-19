@@ -1,0 +1,42 @@
+{% if request.user.is_authenticated %}
+<div id="organisation-tags" class="mv4 w-100 pa2 bg-washed-yellow ba bw2 b--orange f6">
+    <h3 class="f6 ttu ma0 pa0">Your tags</h3>
+    <div class="db w-100 cf pv2">
+    {% if tags %}
+    {% for tag in tags %}
+        <form method="post"
+                hx-post="{{ url('tag_organisation', kwargs={'org_id': org.org_id}) }}"
+                hx-swap="outerHTML"
+                hx-target="#organisation-tags">
+            {{ csrf_input }}
+            <input type="hidden" name="tag" value="{{ tag }}" class="dn pa1">
+            <div class="dib nowrap bg-orange f6 pv1 ph2 br2 near-black bn ml2 mb2 fr">
+                {{ tag }}
+                <button type="submit"
+                    title="Remove tag" 
+                    class="di bn bg-orange near-black pa0 ml2">
+                    &#10006;
+                </button>
+            </div>
+        </form>
+    {% endfor %}
+    {% else %}
+        Save this organisation to your profile by adding tags.<br>Tags are private and only visible to you.
+    {% endif %}
+    </div>
+    <details class="db w-100 f6">
+        <summary class="pointer">Add tags to this organisation</summary>
+        <form method="post"
+                hx-post="{{ url('tag_organisation', kwargs={'org_id': org.org_id}) }}"
+                hx-swap="outerHTML"
+                hx-target="#organisation-tags">
+            {{ csrf_input }}
+            <input type="text" name="tag" placeholder="Add a tag" class="pa1">
+            <button type="submit" 
+                class="btn pa1">
+                Add tag
+            </button>
+        </form>
+    </details>
+</div>
+{% endif %}

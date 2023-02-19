@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     replaces = [
         ("charity", "0010_auto_20210403_1729"),
         ("charity", "0011_ccew_updated_files"),

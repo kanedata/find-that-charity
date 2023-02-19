@@ -70,15 +70,6 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
-    "ftc.apps.FtcConfig",
-    "charity.apps.CharityConfig",
-    "reconcile.apps.ReconcileConfig",
-    "addtocsv.apps.AddtocsvConfig",
-    "geo.apps.GeoConfig",
-    "other_data.apps.OtherDataConfig",
-    "api.apps.ApiConfig",
-    "ftcbot.apps.FtcbotConfig",
-    "companies.apps.CompaniesConfig",
     "django_elasticsearch_dsl",
     "debug_toolbar",
     "django.contrib.postgres",
@@ -88,8 +79,21 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "ftc",
+    "ftcprofile",
+    "charity",
+    "reconcile",
+    "addtocsv",
+    "geo",
+    "other_data",
+    "ftcbot",
+    "charity_django.companies",
     "markdownx",
     "prettyjson",
+    "django_registration",
+    "ninja",
+    "ninja_extra",
+    "ninja_apikey",
     "django_better_admin_arrayfield",
     "django_filters",
     "corsheaders",
@@ -152,9 +156,28 @@ WSGI_APPLICATION = "findthatcharity.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    "default": dj_database_url.config(env="DATABASE_URL"),
+    "default": {
+        "TEST": {
+            **dj_database_url.config(
+                env="DATABASE_ADMIN_URL",
+            ),
+        },
+    },
+    "admin": dj_database_url.config(
+        env="DATABASE_ADMIN_URL",
+        test_options={
+            "DEPENDENCIES": [],
+        },
+    ),
+    "data": dj_database_url.config(
+        env="DATABASE_URL",
+        test_options={
+            "DEPENDENCIES": [],
+        },
+    ),
     "dashboard": dj_database_url.config(env="DATABASE_DASHBOARD_URL"),
 }
+DATABASE_ROUTERS = ["findthatcharity.db_router.DBRouter"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Caching in database
@@ -206,9 +229,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "findthatcharity", "static"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+WHITENOISE_MANIFEST_STRICT = True
 
 LOGGING = {
     "version": 1,
@@ -276,7 +301,20 @@ DEFAULT_AREA_TYPES = [
 DASHBOARD_ROW_LIMIT = 1000
 DASHBOARD_ENABLE_FULL_EXPORT = True
 
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_OPEN = False
+MAX_API_KEYS = 4  # Maximum number of API keys a user can have
+NINJA_DOCS_VIEW = "swagger"
+
 TWITTER_CONSUMER_KEY = os.environ.get("TWITTER_CONSUMER_KEY")
 TWITTER_CONSUMER_SECRET = os.environ.get("TWITTER_CONSUMER_SECRET")
 TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
+
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"

@@ -20,11 +20,10 @@ from django.views.generic.base import TemplateView
 
 import addtocsv.views
 import charity.urls
-import companies.urls
 import ftc.urls
 import ftc.views
 import reconcile.urls
-from api.endpoints import api
+from findthatcharity.endpoints import api
 
 handler404 = "findthatcharity.views.missing_page_handler"
 
@@ -33,15 +32,22 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
+    path("accounts/", include("ftcprofile.urls")),
+    path("accounts/", include("django_registration.backends.activation.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
-    path("admin/", admin.site.urls, name="about"),
+    path("admin/", admin.site.urls, name="admin"),
     path("", ftc.views.index, name="index"),
     path("about", ftc.views.about, name="about"),
     path("adddata/", addtocsv.views.index, name="csvtool"),
     path("api/v1/", api.urls),
     path("orgid/", include(ftc.urls)),
     path("charity/", include(charity.urls)),
-    path("company/", include(companies.urls)),
+    path(
+        "company/<str:company_number>",
+        ftc.views.company_detail,
+        {"filetype": "html"},
+        name="company_detail",
+    ),
     path("reconcile/", include(reconcile.urls)),
     path("reconcile", reconcile.views.index, {"orgtype": "registered-charity"}),
     path("dashboard/", include(django_sql_dashboard.urls)),

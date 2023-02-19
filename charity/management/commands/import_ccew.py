@@ -111,7 +111,6 @@ class Command(BaseScraper):
         z.close()
 
     def process_file(self, csvfile, filename):
-
         db_table = self.ccew_file_to_object.get(filename)
         page_size = 1000
 
@@ -154,7 +153,6 @@ class Command(BaseScraper):
         self.logger.info("Finished table insert [{}]".format(db_table._meta.db_table))
 
     def close_spider(self):
-
         # execute SQL statements
         self.execute_sql_statements(UPDATE_CCEW)
 
@@ -190,13 +188,19 @@ class Command(BaseScraper):
         # if we've been successfull then delete previous items
         if self.object_count > 0:
             self.logger.info("Deleting previous records")
-            Organisation.objects.filter(spider__exact=self.name,).exclude(
+            Organisation.objects.filter(
+                spider__exact=self.name,
+            ).exclude(
                 scrape_id=self.scrape.id,
             ).delete()
-            OrganisationLink.objects.filter(spider__exact=self.name,).exclude(
+            OrganisationLink.objects.filter(
+                spider__exact=self.name,
+            ).exclude(
                 scrape_id=self.scrape.id,
             ).delete()
-            OrganisationClassification.objects.filter(spider__exact=self.name,).exclude(
+            OrganisationClassification.objects.filter(
+                spider__exact=self.name,
+            ).exclude(
                 scrape_id=self.scrape.id,
             ).delete()
             self.logger.info("Deleted previous records")

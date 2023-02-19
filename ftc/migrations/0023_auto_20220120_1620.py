@@ -99,7 +99,6 @@ def update_vocabularies(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ftc", "0022_auto_20220120_1618"),
     ]
