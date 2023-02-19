@@ -1,5 +1,6 @@
 <section id="apikeys">
     <h2>API Keys</h2>
+    <p><a href="{{ url('api-1.0:openapi-view') }}" class="link underline f4 b mr4 blue">Find that Charity API documentation</a></p>
     {% set keys = request.user.apikey_set.all()|groupby("is_valid") %}
     <p>API Key values are only shown when they are created. If you have lost your API key please revoke that key and
         generate a new one.</p>

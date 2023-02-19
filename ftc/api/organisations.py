@@ -83,10 +83,15 @@ class API:
         "/_random",
         response={200: OrganisationResult, 404: ResultError},
     )
-    def get_random_organisation(self, request, active_only: bool = Query(False)):
+    def get_random_organisation(
+        self,
+        request,
+        active_only: bool = Query(False),
+        organisation_type: str = Query("registered-charity"),
+    ):
         """Get a random charity record"""
         q = OrganisationGroup.search().from_dict(
-            query_random_organisation(active_only, "registered-charity")
+            query_random_organisation(active_only, organisation_type)
         )[0]
         result = q.execute()
         for r in result:

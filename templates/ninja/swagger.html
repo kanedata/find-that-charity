@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link type="text/css" rel="stylesheet" href="{% static 'css/swagger.css' %}">
+<style>
+.swagger-ui .info .title small pre,
+.swagger-ui .highlight-code > .microlight code,
+.swagger-ui code {
+    background-color: inherit;
+}
+.swagger-ui table thead tr td,
+.swagger-ui table thead tr th,
+.swagger-ui table tbody tr td,
+.swagger-ui table tbody tr th {
+    text-align: left;
+}
+.swagger-ui .parameters-col_name,
+.swagger-ui .parameters-col_description {
+    padding: 10px 0;
+}
+.swagger-ui .renderedMarkdown p {
+    margin-top: 0;
+}
+</style>
+{% endblock %}
+
+{% block title %}{{ api.title }}{% endblock %}
+
+{% block content %}
+<div id="swagger-ui">
+</div>
+{% endblock %}
+
+{% block bodyscripts %}
+<script src="{% static 'ninja/swagger-ui-bundle.4.14.0.js' %}"></script>
+<script>
+    const ui = SwaggerUIBundle({
+        url: '{{ openapi_json_url }}',
+        dom_id: '#swagger-ui',
+        presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIBundle.SwaggerUIStandalonePreset
+        ],
+        layout: "BaseLayout",
+    {% if api.csrf and csrf_token %}
+    requestInterceptor: (req) => {
+        req.headers['X-CSRFToken'] = "{{csrf_token}}"
+        return req;
+    },
+        {% endif %}
+    deepLinking: true,
+    docExpansion: "list",
+    defaultModelsExpandDepth: -1,
+    })
+</script>
+{% endblock %}

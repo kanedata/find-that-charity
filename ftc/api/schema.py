@@ -138,7 +138,6 @@ class Company(Schema):
     Mortgages_NumMortSatisfied: int = None
     LimitedPartnerships_NumGenPartners: int = None
     LimitedPartnerships_NumLimPartners: int = None
-    URI: str = None
     ConfStmtNextDueDate: datetime.date = None
     ConfStmtLastMadeUpDate: datetime.date = None
     org_id: str = None
