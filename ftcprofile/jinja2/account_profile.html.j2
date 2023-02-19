@@ -1,5 +1,7 @@
 {% set frontpage = false %}
 {% extends 'base.html.j2' %}
+{% from 'components/org_id.html.j2' import orgid_link, orgtype_link %}
+{% set orgtypes = get_orgtypes() %}
 
 {% block headscripts %}
 <script src="https://unpkg.com/htmx.org@1.8.5"></script>
@@ -24,6 +26,8 @@
     </p>
     <hr class="mv5"/>
     {% include 'partials/profile/apikeys.html.j2' %}
+    <hr class="mv5"/>
+    {% include 'partials/profile/tags.html.j2' %}
     <hr class="mv5"/>
     {% include 'partials/profile/sqldashboard.html.j2' %}
 </div>

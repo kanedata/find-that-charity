@@ -18,6 +18,7 @@ from ftc.query import (
     get_organisation,
     random_query,
 )
+from ftcprofile.controller import user_get_org_tags
 from other_data.models import CQCProvider, Grant, WikiDataItem
 
 
@@ -123,6 +124,7 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
             "org": org,
             "related_orgs": related_orgs,
             "charity": charity,
+            "tags": user_get_org_tags(request.user, org.org_id),
             **additional_data,
         },
     )

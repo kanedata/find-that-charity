@@ -1,6 +1,7 @@
+from charity_django.utils.text import to_titlecase
 from django.utils.text import slugify
 
-from findthatcharity.utils import normalise_name, to_titlecase
+from findthatcharity.utils import normalise_name
 from ftc.documents import CompanyDocument
 
 COMPANY_RECON_TYPE = {"id": "/registered-company", "name": "Registered Company"}

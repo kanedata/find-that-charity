@@ -20,9 +20,6 @@ from django.views.generic.base import TemplateView
 
 import addtocsv.views
 import charity.urls
-
-# import companies.urls
-import findthatcharity.views
 import ftc.urls
 import ftc.views
 import reconcile.urls
@@ -35,16 +32,7 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-    path(
-        "accounts/profile/",
-        findthatcharity.views.account_profile,
-        name="account_profile",
-    ),
-    path(
-        "accounts/profile/apikey",
-        findthatcharity.views.api_key_edit,
-        name="api_key_edit",
-    ),
+    path("accounts/", include("ftcprofile.urls")),
     path("accounts/", include("django_registration.backends.activation.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls, name="admin"),

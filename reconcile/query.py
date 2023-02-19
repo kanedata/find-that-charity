@@ -2,6 +2,8 @@ import copy
 import json
 import os
 
+from charity_django.utils.text import to_titlecase
+
 from charity.models import (
     CCEWCharityAreaOfOperation,
     CCEWCharityARPartA,
@@ -9,7 +11,7 @@ from charity.models import (
     CCEWCharityGoverningDocument,
 )
 from findthatcharity.jinja2 import get_orgtypes
-from findthatcharity.utils import normalise_name, to_titlecase
+from findthatcharity.utils import normalise_name
 from ftc.documents import OrganisationGroup
 from ftc.models import Organisation
 from ftc.models.organisation_classification import OrganisationClassification

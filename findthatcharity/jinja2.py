@@ -1,5 +1,6 @@
 import datetime
 
+from charity_django.utils.text import list_to_string, regex_search, to_titlecase
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import naturalday, naturaltime
 from django.core.cache import cache
@@ -13,12 +14,9 @@ from markdownx.utils import markdownify
 from findthatcharity.utils import (
     a_or_an,
     format_currency,
-    list_to_string,
     number_format,
     pluralise,
-    regex_search,
     str_format,
-    to_titlecase,
     url_remove,
     url_replace,
 )
