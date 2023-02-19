@@ -8,9 +8,9 @@
       {% if company.DissolutionDate %}
       An <span class="normal red">inactive</span>
       {% else %}
-      {{ company.CompanyCategory|a_or_an|title }}
+      {{ company.get_CompanyCategory_display()|a_or_an|title }}
       {% endif %}
-      {{ company.CompanyCategory }}
+      {{ company.get_CompanyCategory_display() }}
       {%- if company.DissolutionDate %}. Removed on {{ "{:%d %B %Y}".format(company.DissolutionDate) }}.{% endif %}
     </h3>
 
@@ -36,7 +36,7 @@
       {% else %}
       <div class="mb1">
         <span class="dib nowrap bg-dark-blue f4 pv1 ph2 br2"><span
-   class="white code normal nowrap">{{ company.org_id}}</span>
+   class="white code normal nowrap">{{ company.org_id }}</span>
 <a class="copy-text pointer f6 grow" data-target="{{ company.org_id}}" title="Copy this identifier to your clipboard">
 <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 24 24" width="16px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></a></span>
       </div>

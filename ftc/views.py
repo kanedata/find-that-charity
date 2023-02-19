@@ -251,12 +251,6 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
 def company_detail(request, company_number, filetype="html"):
     company = get_object_or_404(Company, CompanyNumber=company_number)
 
-    # vocab = Vocabulary.objects.get(title="Companies House SIC Codes")
-    # sic_codes = {
-    #     entry.code: entry
-    #     for entry in VocabularyEntries.objects.filter(vocabulary=vocab)
-    # }
-
     # fetch any related organisations
     org = None
     orgs = list(
@@ -277,7 +271,6 @@ def company_detail(request, company_number, filetype="html"):
                 company.CompanyNumber,
                 company.CompanyName,
             ),
-            # "sic_codes": sic_codes,
             "source": Source.objects.get(id="companies"),
             "org": org,
         },

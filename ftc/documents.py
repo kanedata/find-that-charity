@@ -274,13 +274,12 @@ class CompanyDocument(Document):
         return self.django.model.objects.raw(
             """
             with names as (
-                select "org_id",
+                select "CompanyNumber",
                     json_agg("CompanyName") as "names"
                 from "companies_previousname"
-                group by "org_id"
+                group by "CompanyNumber"
             )
-            SELECT c."id",
-                c."CompanyNumber",
+            SELECT c."CompanyNumber",
                 c."CompanyName",
                 c."CompanyStatus",
                 c."RegAddress_PostCode",
@@ -288,7 +287,7 @@ class CompanyDocument(Document):
                 names.names as "PreviousNames"
             FROM "companies_company" c
                 left outer join names
-                    on c.org_id = names.org_id
+                    on c."CompanyNumber" = names."CompanyNumber"
         """
         )
 

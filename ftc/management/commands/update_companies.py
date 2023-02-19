@@ -1,4 +1,7 @@
+from charity_django.companies.models import SICCode
+
 from ftc.management.commands._base_scraper import SQLRunner
+from ftc.models import Vocabulary, VocabularyEntries
 
 UPDATE_ORGIDS_SQL = {
     "Add companies": """
@@ -87,6 +90,26 @@ select c."org_id" as "org_id",
 from c
     left outer join pn on c."CompanyNumber" = pn."CompanyNumber";
     """,
+    "Insert into organisation classification": """
+    insert into ftc_organisationclassification as ca (org_id, spider, scrape_id, source_id, vocabulary_id )
+    select c.org_id,
+        %(spider_name)s as "spider",
+        %(scrape_id)s as "scrape_id",
+        %(source_id)s as "source_id",
+        ve.id
+    from (
+        select CONCAT('GB-COH-', "CompanyNumber") as org_id,
+            cast(code as varchar) as "code"
+        from companies_companysiccode
+    ) as c
+        inner join ftc_vocabularyentries ve
+            on c.code = ve.code
+        inner join ftc_vocabulary v
+            on ve.vocabulary_id = v.id
+        inner join ftc_organisation o
+            on c.org_id = o.org_id
+    where v.slug like 'ch_sic';
+    """,
 }
 
 
@@ -126,6 +149,25 @@ class Command(SQLRunner):
         self.logger.info("saving sources")
         self.save_sources()
         self.logger.info("sources saved")
+
+        # create the classification vocabulary
+        self.logger.info("Creating or updating vocabulary 'Companies House SIC Codes'")
+        vocab = Vocabulary.objects.update_or_create(
+            slug="ch_sic",
+            defaults=dict(title="Companies House SIC Codes", single=False),
+        )[0]
+        sic_codes_total = 0
+        sic_codes_created = 0
+        for code in SICCode.objects.all():
+            _, created = VocabularyEntries.objects.update_or_create(
+                vocabulary=vocab, code=code.code, defaults={"title": code.title}
+            )
+            if created:
+                sic_codes_created += 1
+            sic_codes_total += 1
+        self.logger.info("Created vocabulary 'Companies House SIC Codes'")
+        self.logger.info("Created %s entries", sic_codes_created)
+        self.logger.info("Total %s entries", sic_codes_total)
 
         # close the spider
         self.close_spider()

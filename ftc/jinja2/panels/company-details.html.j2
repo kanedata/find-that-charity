@@ -45,10 +45,8 @@
 <ul>
     {% for s in company.sic_codes.all() %}
     <li>
-        <code>{{ s.code }}</code>
-        {% if s.code in sic_codes %}
-        - {{ sic_codes[s.code].title }}
-        {% endif %}
+        <code>{{ s.sic_code.code }}</code>
+        - {{ s.sic_code.title }}
     </li>
     {% endfor %}
 </ul>
@@ -59,7 +57,7 @@
     {% for account in company.accounts.order_by("-financial_year_end") %}
     <li>
         <strong>{{ account.financial_year_end }}</strong> - 
-        ({{ account.category|titlecase }})
+        {{ account.category|titlecase }}
     </li>
     {% endfor %}
 </ul>
