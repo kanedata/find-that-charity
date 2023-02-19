@@ -65,7 +65,7 @@ dj-database-url==1.2.0
     # via
     #   -r requirements.in
     #   charity-django
-django==4.1.6
+django==4.1.7
     # via
     #   -r requirements.in
     #   charity-django
