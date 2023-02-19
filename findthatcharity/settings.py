@@ -233,7 +233,7 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "findthatcharity", "static"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_MANIFEST_STRICT = True
 
 LOGGING = {
     "version": 1,
