@@ -4,15 +4,9 @@
 <style>
   {% include "django_sql_dashboard/_css.html" %}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"
-  integrity="sha512-i9pd5Q6ntCp6LwSgAZDzsrsOlE8SN+H5E0T5oumSXWQz5l1Oc4Kb5ZrXASfyjjqtc6Mg6xWbu+ePbbmiEPJlDg=="
-  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css"
-  integrity="sha512-xIf9AdJauwKIVtrVRZ0i4nHP61Ogx9fSRAkCLecmE2dL/U8ioWpDvFCAy4dcfecN72HHB9+7FfQj3aiO68aaaw=="
-  crossorigin="anonymous" referrerpolicy="no-referrer" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/sql/sql.min.js"
-  integrity="sha512-dfObApt1XdGl62IJLrjbIOc9QtnRORA5TCwdnJkSj6C/KjwMz2L/Sc4WlcrgAuWoY+n5xTf6NMMojoUOlgwjug=="
-  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'lib/codemirror/codemirror.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'lib/codemirror/codemirror.min.css' %}" />
+<script src="{% static 'lib/codemirror/codemirror.sql.min.js' %}"></script>
 {% endblock %}
 
 {% block sectionstyles %}sql-dashboard fl w-100 ph3 pv5 ph5-ns lh-copy f4 entry-content{% endblock %}

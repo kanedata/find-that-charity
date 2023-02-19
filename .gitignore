@@ -34,3 +34,5 @@ node_modules/
 
 logs/
 companies_old/
+
+!*/static/lib/

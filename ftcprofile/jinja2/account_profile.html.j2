@@ -4,7 +4,7 @@
 {% set orgtypes = get_orgtypes() %}
 
 {% block headscripts %}
-<script src="https://unpkg.com/htmx.org@1.8.5"></script>
+<script src="{{ static('lib/htmx/htmx.min.js') }}"></script>
 <script src="{{ static('js/copy-text.js') }}"></script>
 <script>
     htmx.on("htmx:load", function (evt) {
@@ -21,6 +21,9 @@
     </h1>
     {% include 'partials/profile/details.html.j2' %}
     <p>
+        {% if request.user.is_superuser %}
+        <a href="{{ url('admin:index') }}" class="link underline f4 b mr4 blue">Admin area</a>
+        {% endif %}
         <a href="{{ url('admin:auth_user_change', args=[request.user.id]) }}" class="link underline f4 b mr4 blue">Edit profile</a>
         <a href="{{ url('admin:logout') }}" class="link underline f4 b mr4 blue">Log out</a>
     </p>

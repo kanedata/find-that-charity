@@ -229,6 +229,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "findthatcharity", "static"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
@@ -300,6 +301,7 @@ DASHBOARD_ROW_LIMIT = 1000
 DASHBOARD_ENABLE_FULL_EXPORT = True
 
 ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_OPEN = False
 MAX_API_KEYS = 4  # Maximum number of API keys a user can have
 NINJA_DOCS_VIEW = "swagger"
 

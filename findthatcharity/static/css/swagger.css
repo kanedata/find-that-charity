@@ -8996,7 +8996,7 @@
     box-sizing: border-box;
     margin: 0 auto;
     max-width: 1460px;
-    padding: 0 20px;
+    padding: 0;
     width: 100%
 }
 
@@ -10887,7 +10887,7 @@
 .swagger-ui .info li, .swagger-ui .info p, .swagger-ui .info table {
     color: #3b4151;
     font-family: 'Raleway', sans-serif;
-    font-size: 14px
+    font-size: 1.25rem;
 }
 
 .swagger-ui .info h1, .swagger-ui .info h2, .swagger-ui .info h3, .swagger-ui .info h4, .swagger-ui .info h5 {
