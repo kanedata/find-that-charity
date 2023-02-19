@@ -34,12 +34,17 @@ def user_untag_org(user, org_id, tag):
 
 
 def user_get_org_tags(user, org_id):
+    if user.is_anonymous:
+        return []
     return user.tagged_organisations.filter(org_id=org_id).values_list("tag", flat=True)
 
 
 def user_get_tagged_orgs(
     user,
 ):
+    if user.is_anonymous:
+        return
+        yield
     tagged_orgs = user.tagged_organisations.all()
     orgs = {}
     for org in tagged_orgs:
