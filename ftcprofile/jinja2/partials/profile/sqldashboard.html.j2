@@ -16,15 +16,15 @@
         <tbody class="f6">
             {% for dashboard in dashboards.visible %}
             <tr>
-                <td class="tl">
+                <td class="tl v-top">
                     <a href="{{ dashboard.get_absolute_url() }}">{{ dashboard.title }}</a>
                 </td>
-                <td class="tl">{{ dashboard.description }}</td>
-                <td class="tl w4">{{ dashboard.view_summary() }}</td>
-                <td class="w5">
+                <td class="tl v-top">{{ dashboard.description }}</td>
+                <td class="tl v-top w4">{{ dashboard.view_summary() }}</td>
+                <td class="v-top">
                     <time datetime="{{ dashboard.created_at.isoformat() }}">{{ dashboard.created_at|naturaltime }}</time>
                 </td>
-                <td class="w3">
+                <td class="v-top">
                     {% if dashboard.user_can_edit(request.user) %}
                     <a href="{{ dashboard.get_edit_url() }}">Edit</a>
                     {% endif %}
