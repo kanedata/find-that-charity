@@ -67,8 +67,9 @@ class Command(CSVScraper):
             self.orgtype_cache["university"],
         ]
 
-        if record["FE_Provider"].strip().lower() == "yes":
-            org_types.append(self.orgtype_cache["further-education-provider"])
+        fe_provider = record.get("FE_Provider")
+        if fe_provider and fe_provider.strip().lower() == "yes":
+            org_types.append(self.add_org_type("Further Education Provider"))
 
         self.add_org_record(
             Organisation(

@@ -133,65 +133,62 @@ class Command(HTMLScraper):
                 if not headers:
                     headers = row
                     continue
-                row = self.clean_fields(dict(zip(headers, row)))
-                this_model = {m.__name__: {} for m in self.models}
+                self.parse_row(dict(zip(headers, row)))
 
-                for k in row:
-                    if k in self.field_lookup:
-                        meta = self.field_lookup[k]
-                        this_model[meta["model"]][meta["field"]] = row[k]
+    def parse_row(self, row):
+        row = self.clean_fields(row)
+        this_model = {m.__name__: {} for m in self.models}
 
-                # if row is blank then ignore
-                if not this_model["CQCProvider"].get("id"):
-                    continue
+        for k in row:
+            if k in self.field_lookup:
+                meta = self.field_lookup[k]
+                this_model[meta["model"]][meta["field"]] = row[k]
 
-                # add IDs
-                this_model["CQCLocation"]["provider_id"] = this_model["CQCProvider"][
-                    "id"
-                ]
-                if this_model["CQCBrand"]["id"] == "-":
-                    this_model["CQCBrand"]["id"] = None
-                if this_model["CQCBrand"].get("name", "").startswith("BRAND "):
-                    this_model["CQCBrand"]["name"] = this_model["CQCBrand"]["name"][6:]
-                this_model["CQCProvider"]["brand_id"] = this_model["CQCBrand"]["id"]
+        # if row is blank then ignore
+        if not this_model["CQCProvider"].get("id"):
+            return
 
-                if this_model["CQCProvider"]["charity_number"]:
-                    if (
-                        this_model["CQCProvider"]["charity_number"]
-                        .upper()
-                        .startswith("SC")
-                    ):
-                        this_model["CQCProvider"]["org_id"] = "GB-SC-{}".format(
-                            this_model["CQCProvider"]["charity_number"].upper()
-                        )
-                    else:
-                        this_model["CQCProvider"]["org_id"] = "GB-CHC-{}".format(
-                            this_model["CQCProvider"]["charity_number"]
-                        )
-                elif this_model["CQCProvider"]["company_number"]:
-                    this_model["CQCProvider"]["org_id"] = "GB-COH-{}".format(
-                        this_model["CQCProvider"]["company_number"]
-                    )
+        # add IDs
+        this_model["CQCLocation"]["provider_id"] = this_model["CQCProvider"]["id"]
+        if this_model["CQCBrand"]["id"] == "-":
+            this_model["CQCBrand"]["id"] = None
+        if this_model["CQCBrand"].get("name", "").startswith("BRAND "):
+            this_model["CQCBrand"]["name"] = this_model["CQCBrand"]["name"][6:]
+        this_model["CQCProvider"]["brand_id"] = this_model["CQCBrand"]["id"]
 
-                # add scrape id
-                this_model["CQCLocation"]["scrape_id"] = self.scrape.id
-                this_model["CQCProvider"]["scrape_id"] = self.scrape.id
-                this_model["CQCBrand"]["scrape_id"] = self.scrape.id
+        if this_model["CQCProvider"]["charity_number"]:
+            if this_model["CQCProvider"]["charity_number"].upper().startswith("SC"):
+                this_model["CQCProvider"]["org_id"] = "GB-SC-{}".format(
+                    this_model["CQCProvider"]["charity_number"].upper()
+                )
+            else:
+                this_model["CQCProvider"]["org_id"] = "GB-CHC-{}".format(
+                    this_model["CQCProvider"]["charity_number"]
+                )
+        elif this_model["CQCProvider"]["company_number"]:
+            this_model["CQCProvider"]["org_id"] = "GB-COH-{}".format(
+                this_model["CQCProvider"]["company_number"]
+            )
 
-                for m in self.models:
-                    if this_model[m.__name__]["id"]:
-                        if (
-                            m.__name__ == "CQCProvider"
-                            and this_model[m.__name__]["id"] in self.provider_ids
-                        ):
-                            continue
-                        if (
-                            m.__name__ == "CQCBrand"
-                            and this_model[m.__name__]["id"] in self.brand_ids
-                        ):
-                            continue
-                        self.add_record(m, this_model[m.__name__])
-                        if m.__name__ == "CQCProvider":
-                            self.provider_ids.add(this_model[m.__name__]["id"])
-                        if m.__name__ == "CQCBrand":
-                            self.brand_ids.add(this_model[m.__name__]["id"])
+        # add scrape id
+        this_model["CQCLocation"]["scrape_id"] = self.scrape.id
+        this_model["CQCProvider"]["scrape_id"] = self.scrape.id
+        this_model["CQCBrand"]["scrape_id"] = self.scrape.id
+
+        for m in self.models:
+            if this_model[m.__name__]["id"]:
+                if (
+                    m.__name__ == "CQCProvider"
+                    and this_model[m.__name__]["id"] in self.provider_ids
+                ):
+                    return
+                if (
+                    m.__name__ == "CQCBrand"
+                    and this_model[m.__name__]["id"] in self.brand_ids
+                ):
+                    return
+                self.add_record(m, this_model[m.__name__])
+                if m.__name__ == "CQCProvider":
+                    self.provider_ids.add(this_model[m.__name__]["id"])
+                if m.__name__ == "CQCBrand":
+                    self.brand_ids.add(this_model[m.__name__]["id"])

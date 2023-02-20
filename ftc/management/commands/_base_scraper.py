@@ -95,13 +95,13 @@ class BaseScraper(BaseCommand):
 
     def handle(self, *args, **options):
         self.debug = options.get("debug")
-        with transaction.atomic("data"):
-            try:
+        try:
+            with transaction.atomic("data"):
                 self.run_scraper(*args, **options)
-            except Exception as err:
-                self.logger.exception(err)
-                self.scrape_logger.teardown()
-                raise
+        except Exception as err:
+            self.logger.exception(err)
+            self.scrape_logger.teardown()
+            raise
         self.cursor.close()
 
     def run_scraper(self, *args, **options):
