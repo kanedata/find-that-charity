@@ -2,6 +2,7 @@ import csv
 import datetime
 import io
 
+from charity.utils import regno_to_orgid
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import OrganisationLink, Source
 
@@ -210,7 +211,7 @@ class Command(CSVScraper):
                 "org_id_a": "GB-COH-{}".format(row["company_number"].strip())
                 if row["company_number"].strip()
                 else None,
-                "org_id_b": "GB-CHC-{}".format(row["charity_number"].strip())
+                "org_id_b": regno_to_orgid(row["charity_number"].strip())
                 if row["charity_number"].strip()
                 else None,
             },
