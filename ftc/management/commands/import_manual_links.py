@@ -134,6 +134,54 @@ class Command(CSVScraper):
             },
         },
         {
+            "title": "Charity Company Numbers",
+            "description": "Company numbers for charities (Mainly for Scottish and Northern Irish charities)",
+            "identifier": "charity_company_numbers",
+            "license": "",
+            "license_name": "",
+            "issued": "",
+            "modified": "",
+            "publisher": {
+                "name": "Find that Charity",
+                "website": "https://github.com/drkane/charity-lookups",
+            },
+            "distribution": [
+                {
+                    "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/charity-company-numbers.csv",
+                    "accessURL": "https://github.com/drkane/charity-lookups/blob/master/charity-company-numbers.csv",
+                    "title": "Charity Company Numbers",
+                }
+            ],
+            "_parse_row": lambda row: {
+                "org_id_a": row["org_id_a"].strip(),
+                "org_id_b": row["org_id_b"].strip(),
+            },
+        },
+        {
+            "title": "Organisation Company Numbers",
+            "description": "Company numbers for non-charity organisations",
+            "identifier": "organisation_company_numbers",
+            "license": "",
+            "license_name": "",
+            "issued": "",
+            "modified": "",
+            "publisher": {
+                "name": "Find that Charity",
+                "website": "https://github.com/drkane/charity-lookups",
+            },
+            "distribution": [
+                {
+                    "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/organisation-company-numbers.csv",
+                    "accessURL": "https://github.com/drkane/charity-lookups/blob/master/organisation-company-numbers.csv",
+                    "title": "Organisations Company Numbers",
+                }
+            ],
+            "_parse_row": lambda row: {
+                "org_id_a": row["org_id_a"].strip(),
+                "org_id_b": row["org_id_b"].strip(),
+            },
+        },
+        {
             "title": "Independent Schools Charity Numbers",
             "description": "A list of charity numbers for independent schools",
             "identifier": "independent_schools_ew",
