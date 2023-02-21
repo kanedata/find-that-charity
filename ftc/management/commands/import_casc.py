@@ -34,6 +34,7 @@ class Command(CSVScraper):
         ],
     }
     orgtypes = ["Community Amateur Sports Club", "Sports Club", "Registered Company"]
+    bool_fields = ["active"]
 
     def parse_row(self, record):
         record = self.clean_fields(record)
@@ -78,7 +79,7 @@ class Command(CSVScraper):
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": None,
                     "dateRemoved": None,
-                    "active": True,
+                    "active": record.get("active", True),
                     "parent": None,
                     "orgIDs": org_ids,
                     "scrape": self.scrape,
