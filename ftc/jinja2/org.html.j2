@@ -48,6 +48,11 @@
   const GEOCODES = {{ org.geoCodes()|list|tojson }};
   const POSTCODE = {{ org.postalCode|tojson }};
   const ORG_LAT_LONGS = {{ org.lat_lngs|tojson }};
+  const MARKER_ICON_OPTIONS = {{ {
+    "iconUrl": static('lib/leaflet/images/marker-icon.png'),
+    "iconRetinaUrl": static('lib/leaflet/images/marker-icon-2x.png'),
+    "shadowUrl": static('lib/leaflet/images/marker-shadow.png'),
+  }|tojson }};
 </script>
 <script src="{{ static('js/locationmap.js') }}"></script>
 {% endif %}

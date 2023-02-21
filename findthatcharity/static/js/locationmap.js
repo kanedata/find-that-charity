@@ -7,14 +7,21 @@ const DEFAULT_BOUNDS = L.latLngBounds(
 );
 const MAX_ZOOM_BOUNDS = 8;
 
+if (MARKER_ICON_OPTIONS) {
+    Object.entries(MARKER_ICON_OPTIONS).forEach(([key, value]) => {
+        L.Icon.Default.prototype.options[key] = value
+    });
+    L.Icon.Default.imagePath = '';
+}
+
 if (GEOCODES || ORG_LAT_LONGS) {
     var map = L.map('locationmap');
     map.scrollWheelZoom.disable();
     L.tileLayer(TILES, { style: 'toner-lite' }).addTo(map);
     map.fitBounds(DEFAULT_BOUNDS);
     var bounds = L.latLngBounds();
-    
-    function updateBounds(layer){
+
+    function updateBounds(layer) {
         bounds.extend(layer);
         map.fitBounds(bounds, {
             maxZoom: MAX_ZOOM_BOUNDS
@@ -25,7 +32,7 @@ if (GEOCODES || ORG_LAT_LONGS) {
     if (GEOCODES) {
         geojsonbounds = L.latLngBounds();
         GEOCODES.forEach(function ([geocode_type, geocode]) {
-            if(!layer_groups[geocode_type]){
+            if (!layer_groups[geocode_type]) {
                 layer_groups[geocode_type] = L.layerGroup().addTo(map);
             }
             fetch(GEOJSON_URL.replace('{}', geocode))
@@ -51,7 +58,7 @@ if (GEOCODES || ORG_LAT_LONGS) {
                 latlng[1],
             ]);
             var group_label = latlng[2];
-            if(latlng[2]=="Registered Office"){
+            if (latlng[2] == "Registered Office") {
                 // group_label = `<img src="" /> ${latlng[2]}`;
                 var marker = L.marker(point).bindPopup(`<strong>${latlng[2]}</strong>: ${latlng[3]}`);
             } else {
@@ -63,7 +70,7 @@ if (GEOCODES || ORG_LAT_LONGS) {
                     fillOpacity: 0,
                 }).bindPopup(`<strong>${latlng[2]}</strong>: ${latlng[3]}`);
             }
-            if(!layer_groups[group_label]){
+            if (!layer_groups[group_label]) {
                 layer_groups[group_label] = L.layerGroup().addTo(map);
             }
             layer_groups[group_label].addLayer(marker);
