@@ -27,7 +27,7 @@ Installation
 10. Create `.env` file in root directory. Contents based on `.env.example`.
 11. Create the database tables (`python ./manage.py migrate --database=data && python ./manage.py migrate --database=admin && python ./manage.py createcachetable --database=admin`)
 12. Import data on charities (`python ./manage.py import_charities`)
-13. Import data on nonprofit companies (`python ./manage.py import_companies`)
+13. Import data on nonprofit companies (`python ./manage.py import_ch`)
 14. Import data on other non-profit organisations (`python ./manage.py import_all`)
 15. Add organisations to elasticsearch index (`python ./manage.py es_index`) - (Don't use the default `search_index` command as this won't setup aliases correctly)
 
@@ -51,6 +51,7 @@ dokku postgres:link ftc-db-admin ftc --alias "DATABASE_ADMIN_URL"
 
 # elasticsearch
 sudo dokku plugin:install https://github.com/dokku/dokku-elasticsearch.git elasticsearch
+echo 'vm.max_map_count=262144' | sudo tee -a /etc/sysctl.conf; sudo sysctl -p
 export ELASTICSEARCH_IMAGE="elasticsearch"
 export ELASTICSEARCH_IMAGE_VERSION="7.7.1"
 dokku elasticsearch:create ftc-es
@@ -67,7 +68,7 @@ dokku elasticsearch:restart ftc-es
 
 # SSL
 sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
-dokku config:set --no-restart ftc DOKKU_LETSENCRYPT_EMAIL=your@email.tld
+dokku config:set --no-restart --global DOKKU_LETSENCRYPT_EMAIL=your@email.tld
 dokku letsencrypt ftc
 dokku letsencrypt:cron-job --add
 ```
@@ -93,8 +94,10 @@ dokku run ftc python ./manage.py createcachetable --database=admin
 
 # run import
 dokku run ftc python ./manage.py charity_setup
+dokku run ftc python ./manage.py import_oscr
 dokku run ftc python ./manage.py import_charities
-dokku run ftc python ./manage.py import_companies
+dokku run ftc python ./manage.py import_ch
+dokku run ftc python ./manage.py import_other_data
 dokku run ftc python ./manage.py import_all
 dokku run ftc python ./manage.py es_index
 ```
@@ -116,8 +119,6 @@ The server offers the following API endpoints:
 
 Todo
 ----
-
-Current status is a proof-of-concept, needs a bit of work to get up and running.
 
 Priorities:
 
