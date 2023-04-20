@@ -4,7 +4,7 @@ import io
 from openpyxl import load_workbook
 
 from ftc.management.commands._base_scraper import HTMLScraper
-from ftc.models import Organisation, OrganisationLocation
+from ftc.models import Organisation
 
 
 class Command(HTMLScraper):
@@ -21,7 +21,10 @@ class Command(HTMLScraper):
     id_field = "registration number"
     source = {
         "title": "Current registered providers of social housing",
-        "description": "Current registered providers of social housing and new registrations and deregistrations. Covers England",
+        "description": (
+            "Current registered providers of social housing and "
+            "new registrations and deregistrations. Covers England"
+        ),
         "identifier": "rsl",
         "license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
         "license_name": "Open Government Licence v3.0",

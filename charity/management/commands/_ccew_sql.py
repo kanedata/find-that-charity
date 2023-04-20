@@ -16,9 +16,17 @@ select CONCAT('GB-CHC-', c.registered_charity_number) as "org_id",
 from charity_ccewcharity c
 where linked_charity_number = 0
 )
-insert into charity_charityaddresshistory (org_id, address_md5, address, postcode, first_added, last_updated)
+insert into charity_charityaddresshistory (
+    org_id,
+    address_md5,
+    address,
+    postcode,
+    first_added,
+    last_updated
+)
 select org_id,
-    md5(lower(coalesce(address, '')::text || coalesce(postcode, '')::text)) as address_md5,
+    md5(lower(coalesce(address, '')::text ||
+        coalesce(postcode, '')::text)) as address_md5,
     address,
     postcode,
     NOW() as first_added,
@@ -33,10 +41,10 @@ set first_added = charity_charityaddresshistory.first_added,
 UPDATE_CCEW[
     "Insert into charity table"
 ] = """
-insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
-    postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
-    company_number, activities, source, first_added, last_updated, income, spending, latest_fye,
-    scrape_id, spider)
+insert into charity_charity as cc (id, name, constitution , geographical_spread,
+    address, postcode, phone, active, date_registered, date_removed, removal_reason,
+    web, email, company_number, activities, source, first_added, last_updated, income,
+    spending, latest_fye, scrape_id, spider)
 with earliest_event as (
     select e.organisation_number, min(e.date_of_event) as earliest_date
     from charity_ccewcharityeventhistory e
@@ -85,7 +93,10 @@ where c.linked_charity_number = 0
 on conflict (id) do update
 set "name" = EXCLUDED.name,
     constitution = COALESCE(EXCLUDED.constitution, cc.constitution),
-    geographical_spread = COALESCE(EXCLUDED.geographical_spread, cc.geographical_spread),
+    geographical_spread = COALESCE(
+        EXCLUDED.geographical_spread,
+        cc.geographical_spread
+    ),
     "address" = COALESCE(EXCLUDED.address, cc.address),
     postcode = COALESCE(EXCLUDED.postcode, cc.postcode),
     phone = COALESCE(EXCLUDED.phone, cc.phone),
@@ -135,7 +146,14 @@ where spider = %(spider_name)s
 UPDATE_CCEW[
     "Insert annual return history into charity financial"
 ] = """
-insert into charity_charityfinancial as cf (charity_id, fyend, fystart, income, spending, account_type)
+insert into charity_charityfinancial as cf (
+    charity_id,
+    fyend,
+    fystart,
+    income,
+    spending,
+    account_type
+)
 select DISTINCT ON ("org_id", "fyend") a.*
 from (
     select CONCAT('GB-CHC-', c.registered_charity_number) as org_id,
@@ -157,7 +175,15 @@ set fystart = EXCLUDED.fystart,
 UPDATE_CCEW[
     "Insert parta into charity financial"
 ] = """
-insert into charity_charityfinancial as cf (charity_id, fyend, fystart, income, spending, volunteers, account_type)
+insert into charity_charityfinancial as cf (
+    charity_id,
+    fyend,
+    fystart,
+    income,
+    spending,
+    volunteers,
+    account_type
+)
 select DISTINCT ON ("org_id", "fyend") a.*
 from (
     select CONCAT('GB-CHC-', c.registered_charity_number) as org_id,
@@ -221,7 +247,8 @@ set
     funds_unrestrict = a.funds_unrestricted,
     funds_total = a.funds_total,
     employees = a.count_employees,
-    account_type = case when "consolidated_accounts" then 'consolidated' else 'charity' end
+    account_type = case when "consolidated_accounts"
+        then 'consolidated' else 'charity' end
 from charity_ccewcharityarpartb a
 where cf.charity_id = CONCAT('GB-CHC-', a.registered_charity_number)
     and cf.fyend = a.fin_period_end_date;
@@ -321,7 +348,13 @@ set title = EXCLUDED.title, current = true;
 UPDATE_CCEW[
     "Insert into charity classification"
 ] = """
-insert into ftc_organisationclassification as ca (org_id, spider, scrape_id, source_id, vocabulary_id )
+insert into ftc_organisationclassification as ca (
+    org_id,
+    spider,
+    scrape_id,
+    source_id,
+    vocabulary_id
+)
 select org_id,
     %(spider_name)s as "spider",
     %(scrape_id)s as "scrape_id",
@@ -356,16 +389,26 @@ insert into ftc_organisation (
 select distinct on (cc.id)
     cc.id as org_id,
     case when company_number in ('01234567', '12345678', '00000000') then array[cc.id]
-        when company_number is not null then array[cc.id, CONCAT('GB-COH-', company_number)]
+        when company_number is not null then array[
+            cc.id,
+            CONCAT('GB-COH-', company_number)
+        ]
         else array[cc.id] end as "orgIDs",
     case when company_number in ('01234567', '12345678', '00000000') then array[cc.id]
-        when company_number is not null then array[cc.id, CONCAT('GB-COH-', company_number)]
+        when company_number is not null then array[
+            cc.id,
+            CONCAT('GB-COH-', company_number)
+        ]
         else array[cc.id] end as "linked_orgs",
     cc.name,
     cn."alternateName" as "alternateName",
     regexp_replace(cc.id, 'GB\-(SC|NIC|COH|CHC)\-', '') as "charityNumber",
     cc.company_number as "companyNumber",
-    concat_ws(', ', ccew.charity_contact_address1, ccew.charity_contact_address2) as "streetAddress",
+    concat_ws(
+        ', ',
+        ccew.charity_contact_address1,
+        ccew.charity_contact_address2
+    ) as "streetAddress",
     ccew.charity_contact_address3 as "addressLocality",
     ccew.charity_contact_address4 as "addressRegion",
     ccew.charity_contact_address5 as "addressCountry",
@@ -387,17 +430,29 @@ select distinct on (cc.id)
     null as parent,
     now() as "dateModified",
     array['registered-charity'] ||
-        case when cc."source" = 'ccew' then array['registered-charity-england-and-wales']
-            when cc."source" = 'oscr' then array['registered-charity-scotland']
-            when cc."source" = 'ccni' then array['registered-charity-northern-ireland']
+        case when cc."source" = 'ccew' then array[
+                'registered-charity-england-and-wales'
+            ]
+            when cc."source" = 'oscr' then array[
+                'registered-charity-scotland'
+            ]
+            when cc."source" = 'ccni' then array[
+                'registered-charity-northern-ireland'
+            ]
             else array[]::text[] end ||
-        case when cc.company_number is not null or ccew.charity_type = 'Charitable company' then array['registered-company', 'incorporated-charity']
+        case when cc.company_number is not null
+                or ccew.charity_type = 'Charitable company'
+            then array['registered-company', 'incorporated-charity']
             else array[]::text[] end ||
-        case when cc.constitution ilike 'CIO - %%' or ccew.charity_type = 'CIO' then array['charitable-incorporated-organisation', 'incorporated-charity']
+        case when cc.constitution ilike 'CIO - %%'
+                or ccew.charity_type = 'CIO'
+            then array['charitable-incorporated-organisation', 'incorporated-charity']
             else array[]::text[] end ||
-        case when cc.constitution ilike 'cio - association %%' then array['charitable-incorporated-organisation-association']
+        case when cc.constitution ilike 'cio - association %%'
+            then array['charitable-incorporated-organisation-association']
             else array[]::text[] end ||
-        case when cc.constitution ilike 'cio - foundation %%' then array['charitable-incorporated-organisation-foundation']
+        case when cc.constitution ilike 'cio - foundation %%'
+            then array['charitable-incorporated-organisation-foundation']
             else array[]::text[] end ||
         case when ccew.charity_type = 'Trust' then array['trust']
             else array[]::text[] end
@@ -475,5 +530,13 @@ from charity_ccewcharityareaofoperation cc
     inner join charity_areaofoperation ca
         on cc.geographic_area_description = ca.aooname
 where ca."GSS" is not null or ca."ISO3166_1" is not null
-on conflict ("org_id", "name", "geoCodeType", "locationType", "spider", "source_id", "scrape_id") do nothing;
+on conflict (
+    "org_id",
+    "name",
+    "geoCodeType",
+    "locationType",
+    "spider",
+    "source_id",
+    "scrape_id"
+) do nothing;
 """

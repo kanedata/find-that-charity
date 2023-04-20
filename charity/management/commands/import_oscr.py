@@ -98,7 +98,9 @@ class Command(CSVScraper):
             {
                 "downloadURL": "",
                 "accessURL": "",
-                "title": "Office of Scottish Charity Regulator Charity Register Download",
+                "title": (
+                    "Office of Scottish Charity Regulator Charity Register Download"
+                ),
             }
         ],
     }
@@ -126,7 +128,11 @@ class Command(CSVScraper):
                 defaults=dict(
                     single=False,
                     title=f"{f} ({self.name.upper()})",
-                    description=f"{f} as chosen by the organisation in their annual return to {self.source['publisher']['name']}. Organisations can chose multiple categories.",
+                    description=(
+                        f"{f} as chosen by the organisation in their annual return to "
+                        f"{self.source['publisher']['name']}. Organisations can chose "
+                        "multiple categories."
+                    ),
                 ),
             )
             self.vocabularies[f] = {
@@ -280,9 +286,9 @@ class Command(CSVScraper):
         ):
             org_types.append(self.add_org_type("Registered Company"))
             org_types.append(self.add_org_type("Incorporated Charity"))
-        elif (
-            record.get("Constitutional Form")
-            == "Trust (founding document is a deed of trust) (other than educational endowment)"
+        elif record.get("Constitutional Form") == (
+            "Trust (founding document is a deed of trust) "
+            "(other than educational endowment)"
         ):
             org_types.append(self.add_org_type("Trust"))
         elif record.get("Constitutional Form") != "Other" and record.get(

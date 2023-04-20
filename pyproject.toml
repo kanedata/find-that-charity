@@ -1,0 +1,3 @@
+[tool.ruff]
+select = ["E", "F", "I"]
+ignore = ['E501']

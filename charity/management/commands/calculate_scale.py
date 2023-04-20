@@ -44,7 +44,10 @@ class Command(BaseScraper):
     name = "calculate_scale"
     source = {
         "title": "Calculate the scale of operation",
-        "description": "A calculation of the scale of the organisation's operation, based on locations it has provided to the Charity Commission",
+        "description": (
+            "A calculation of the scale of the organisation's operation, "
+            "based on locations it has provided to the Charity Commission"
+        ),
         "identifier": "calculate_scale",
         "issued": "",
         "modified": "",

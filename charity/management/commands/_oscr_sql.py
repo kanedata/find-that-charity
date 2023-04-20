@@ -3,10 +3,10 @@ UPDATE_OSCR = {}
 UPDATE_OSCR[
     "Insert into charity table"
 ] = """
-insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
-    postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
-    company_number, activities, source, first_added, last_updated, income, spending, latest_fye,
-    dual_registered, scrape_id, spider)
+insert into charity_charity as cc (id, name, constitution , geographical_spread,
+    address, postcode, phone, active, date_registered, date_removed, removal_reason,
+    web, email, company_number, activities, source, first_added, last_updated, income,
+    spending, latest_fye, dual_registered, scrape_id, spider)
 select cc.org_id as org_id,
     cc.data->>'Charity Name' as "name",
     cc.data->>'Constitutional Form' as constitution,
@@ -36,7 +36,9 @@ where cc.spider = %(spider_name)s
 on conflict (id) do update
 set "name" = EXCLUDED.name,
     constitution = COALESCE(EXCLUDED.constitution, cc.constitution),
-    geographical_spread = COALESCE(EXCLUDED.geographical_spread, cc.geographical_spread),
+    geographical_spread = COALESCE(
+        EXCLUDED.geographical_spread, cc.geographical_spread
+    ),
     "address" = COALESCE(EXCLUDED.address, cc.address),
     postcode = COALESCE(EXCLUDED.postcode, cc.postcode),
     phone = COALESCE(EXCLUDED.phone, cc.phone),
@@ -69,23 +71,28 @@ where spider = %(spider_name)s
 UPDATE_OSCR[
     "Insert into charity financial"
 ] = """
-insert into charity_charityfinancial as cf (charity_id, fyend, income, inc_total, inc_other, inc_invest, inc_char, inc_vol, inc_fr,
-    spending, exp_total, exp_vol, exp_charble, exp_other, account_type)
+insert into charity_charityfinancial as cf (charity_id, fyend, income, inc_total,
+    inc_other, inc_invest, inc_char, inc_vol, inc_fr, spending, exp_total, exp_vol,
+    exp_charble, exp_other, account_type)
 select cc.org_id as charity_id,
     to_date(cc.data->>'Year End', 'YYYY-MM-DD') as fyend,
     (cc.data->>'Most recent year income')::int as income,
-    case when cc.data->>'Charitable activities spending' is not null then (cc.data->>'Most recent year income')::int else null end as inc_total,
+    case when cc.data->>'Charitable activities spending' is not null
+        then (cc.data->>'Most recent year income')::int else null end as inc_total,
     (cc.data->>'Other income')::int as inc_other,
     (cc.data->>'Investments income')::int as inc_invest,
     (cc.data->>'Charitable activities income')::int as inc_char,
     (cc.data->>'Donations and legacies income')::int as inc_vol,
     (cc.data->>'Other trading activities income')::int as inc_fr,
     (cc.data->>'Most recent year expenditure')::int as income,
-    (cc.data->>'Charitable activities spending')::int + (cc.data->>'Raising funds spending')::int + (cc.data->>'Other spending')::int as exp_total,
+    (cc.data->>'Charitable activities spending')::int +
+        (cc.data->>'Raising funds spending')::int +
+        (cc.data->>'Other spending')::int as exp_total,
     (cc.data->>'Raising funds spending')::int as exp_vol,
     (cc.data->>'Charitable activities spending')::int as exp_charble,
     (cc.data->>'Other spending')::int as exp_other,
-    case when cc.data->>'Charitable activities spending' is not null then 'detailed_oscr' else 'basic_oscr' end as account_type
+    case when cc.data->>'Charitable activities spending' is not null
+        then 'detailed_oscr' else 'basic_oscr' end as account_type
 from charity_charityraw cc
 where cc.spider = %(spider_name)s
     and cc.data->>'Year End' is not null

@@ -3,10 +3,10 @@ UPDATE_CCNI = {}
 UPDATE_CCNI[
     "Insert into charity table"
 ] = """
-insert into charity_charity as cc (id, name, constitution , geographical_spread, address,
-    postcode, phone, active, date_registered, date_removed, removal_reason, web, email,
-    company_number, activities, source, first_added, last_updated, income, spending, latest_fye, 
-    dual_registered, scrape_id, spider)
+insert into charity_charity as cc (id, name, constitution , geographical_spread,
+    address, postcode, phone, active, date_registered, date_removed, removal_reason,
+    web, email, company_number, activities, source, first_added, last_updated, income,
+    spending, latest_fye, dual_registered, scrape_id, spider)
 select cc.org_id as org_id,
     cc.data->>'Charity name' as "name",
     null as constitution,
@@ -20,7 +20,9 @@ select cc.org_id as org_id,
     null as removal_reason,
     cc.data->>'Website' as web,
     cc.data->>'Email' as email,
-    case when cc.data->>'Company Number' != '0' then cc.data->>'Company Number' else null end as company_number,
+    case when cc.data->>'Company Number' != '0'
+        then cc.data->>'Company Number'
+        else null end as company_number,
     null as activities,
     cc.spider as source,
      NOW() as "first_added",
@@ -36,7 +38,9 @@ where cc.spider = %(spider_name)s
 on conflict (id) do update
 set "name" = EXCLUDED.name,
     constitution = COALESCE(EXCLUDED.constitution, cc.constitution),
-    geographical_spread = COALESCE(EXCLUDED.geographical_spread, cc.geographical_spread),
+    geographical_spread = COALESCE(
+        EXCLUDED.geographical_spread, cc.geographical_spread
+    ),
     "address" = COALESCE(EXCLUDED.address, cc.address),
     postcode = COALESCE(EXCLUDED.postcode, cc.postcode),
     phone = COALESCE(EXCLUDED.phone, cc.phone),
@@ -69,8 +73,10 @@ where spider = %(spider_name)s
 UPDATE_CCNI[
     "Insert into charity financial"
 ] = """
-insert into charity_charityfinancial as cf (charity_id, fyend, income, inc_total, spending,
-    exp_total, exp_vol, exp_charble, account_type)
+insert into charity_charityfinancial as cf (
+    charity_id, fyend, income, inc_total, spending,
+    exp_total, exp_vol, exp_charble, account_type
+)
 select cc.org_id as org_id,
     to_date(cc.data->>'Date for financial year ending', 'YYYY-MM-DD') as fyend,
     (cc.data->>'Total income')::int as income,
@@ -79,7 +85,8 @@ select cc.org_id as org_id,
     (cc.data->>'Total spending')::int as exp_total,
     (cc.data->>'Income generation and governance')::int as exp_vol,
     (cc.data->>'Charitable spending')::int as exp_charble,
-    case when (cc.data->>'Charitable spending')::int > 0 then 'detailed_ccni' else 'basic_ccni' end as account_type
+    case when (cc.data->>'Charitable spending')::int > 0
+        then 'detailed_ccni' else 'basic_ccni' end as account_type
 from charity_charityraw cc
 where cc.spider = %(spider_name)s
     and cc.data->>'Date for financial year ending' is not null
