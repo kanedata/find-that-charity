@@ -11,7 +11,7 @@ dj-database-url
 django-ninja-extra
 django-ninja-apikey
 django-registration
-django-sql-dashboard
+git+https://github.com/drkane/django-sql-dashboard.git@dk/issue-141
 whitenoise
 gunicorn
 tqdm
@@ -38,7 +38,7 @@ babel
 tweepy
 black
 isort
-flake8
+ruff
 requests-mock
 coverage
 django-debug-toolbar
