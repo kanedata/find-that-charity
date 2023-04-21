@@ -10,13 +10,16 @@
   {% endif %}
   {% endif %}
   {% block widget_results %}{% endblock %}
-  <details>
-    <summary style="font-size: 0.7em; margin-bottom: 0.5em; cursor: pointer;">SQL query</summary>
+  {% if user_can_edit_dashboard %}
+  <details class="mv2">
+    <summary class="pointer f6 mb1">SQL query</summary>
     {% if saved_dashboard %}
     <pre class="sql">{{ result.sql }}</pre>{% else %}<textarea
       name="sql">{{ result.sql|default:"" }}</textarea>{% endif %}
     {% if not saved_dashboard %}<p>
       <input class="btn" type="submit" value="Run quer{% if query_results|length > 1 %}ies{% else %}y{% endif %}" />
     </p>{% endif %}
+    <p class="f6 gray">Duration: {{ result.duration_ms|floatformat:2 }}ms</p>
   </details>
+  {% endif %}
 </div>

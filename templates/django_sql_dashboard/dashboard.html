@@ -9,134 +9,121 @@
 <h1>{{ title }}</h1>
 
 {% if too_long_so_use_post %}
-  <p style="background-color: pink; padding: 0.5em 1em 1em 1em; border: 2px solid red; margin-bottom: 1em">
-    This SQL is too long to bookmark, so sharing a link to this page will not work for these queries.
-  </p>
+<p style="background-color: pink; padding: 0.5em 1em 1em 1em; border: 2px solid red; margin-bottom: 1em">
+  This SQL is too long to bookmark, so sharing a link to this page will not work for these queries.
+</p>
 {% endif %}
 
 {% if unverified_sql_queries %}
-  <div style="background-color: pink; padding: 0.5em 1em 1em 1em; border: 2px solid red; margin-bottom: 1em">
-    <h2 style="margin-top: 0.5em">Unverified SQL</h2>
-    <p>The link you followed here included SQL that was missing its verification signatures.</p>
-    <p>If this link was provided to you by an untrusted source, they may be trying to trick you into executing queries that you do not want to execute.</p>
-    <p>Review these queries and copy and paste them once you have confirmed them:</p>
-    {% for query in unverified_sql_queries %}
-      <p><textarea>{{ query }}</textarea></p>
-    {% endfor %}
-  </div>
+<div style="background-color: pink; padding: 0.5em 1em 1em 1em; border: 2px solid red; margin-bottom: 1em">
+  <h2 style="margin-top: 0.5em">Unverified SQL</h2>
+  <p>The link you followed here included SQL that was missing its verification signatures.</p>
+  <p>If this link was provided to you by an untrusted source, they may be trying to trick you into executing queries
+    that you do not want to execute.</p>
+  <p>Review these queries and copy and paste them once you have confirmed them:</p>
+  {% for query in unverified_sql_queries %}
+  <p><textarea>{{ query }}</textarea></p>
+  {% endfor %}
+</div>
 {% endif %}
 <form action="{{ request.path }}" method="POST">
   {% csrf_token %}
   {% if query_results %}
-    <p>↓ <a href="#save-dashboard">Save this dashboard</a> | <a href="{{ request.path }}">Remove all queries</a></p>
+  <p>↓ <a href="#save-dashboard">Save this dashboard</a> | <a href="{{ request.path }}">Remove all queries</a></p>
   {% endif %}
   {% if parameter_values %}
-    <h3>Query parameters</h3>
-    <div class="query-parameters">
+  <h3>Query parameters</h3>
+  <div class="query-parameters">
     {% for name, value in parameter_values %}
-        <label for="qp{{ forloop.counter }}">{{ name }}</label>
-        <input type="text" id="qp{{ forloop.counter }}" name="{{ name }}" value="{{ value }}">
+    <label for="qp{{ forloop.counter }}">{{ name }}</label>
+    <input type="text" id="qp{{ forloop.counter }}" name="{{ name }}" value="{{ value }}">
     {% endfor %}
-    </div>
-    <input
-      class="btn"
-      type="submit"
-      value="Run quer{% if query_results|length > 1 %}ies{% else %}y{% endif %}"
-    />
+  </div>
+  <input class="btn" type="submit" value="Run quer{% if query_results|length > 1 %}ies{% else %}y{% endif %}" />
   {% endif %}
   {% for result in query_results %}
-    {% include result.templates with result=result %}
+  {% include result.templates with result=result %}
   {% endfor %}
   <p>Add {% if not query_results %}a{% else %}another{% endif %} query:</p>
-  <textarea
-    style="
+  <textarea style="
       width: 60%;
       height: 10em;
       border: 2px solid #666;
       padding: 0.5em;
-    "
-    name="sql"
-  ></textarea>
+    " name="sql"></textarea>
   <p>
-    <input
-      class="btn"
-      type="submit"
-      value="Run quer{% if query_results|length > 1 %}ies{% else %}y{% endif %}"
-    />
+    <input class="btn" type="submit" value="Run quer{% if query_results|length > 1 %}ies{% else %}y{% endif %}" />
   </p>
 
   {% if query_results %}
-    <h2 id="save-dashboard">Save this dashboard</h2>
-    <p>Saved dashboards get their own URL, which can be bookmarked and shared with others.</p>
-    <div class="save-dashboard-form">
-      {{ save_form.non_field_errors }}
-      {{ save_form.as_p }}
-      <p><input
-        class="btn"
-        type="submit"
-        name="_save"
-        value="Save dashboard"
-      /></p>
-    </div>
+  <h2 id="save-dashboard">Save this dashboard</h2>
+  <p>Saved dashboards get their own URL, which can be bookmarked and shared with others.</p>
+  <div class="save-dashboard-form">
+    {{ save_form.non_field_errors }}
+    {{ save_form.as_p }}
+    <p><input class="btn" type="submit" name="_save" value="Save dashboard" /></p>
+  </div>
   {% endif %}
 </form>
 
 {% if saved_dashboards %}
-  <h2>Saved dashboards</h2>
-  <table class="f5">
-    <thead>
-        <tr>
-            <th class="tl">Dashboard</th>
-            <th class="tl">Description</th>
-            <th class="tl">Created by</th>
-            <th class="tl">Visibility</th>
-            <th class="tl"></th>
-        </tr>
-    </thead>
-    <tbody>
+<h2>Saved dashboards</h2>
+<table class="f5">
+  <thead>
+    <tr>
+      <th class="tl">Dashboard</th>
+      <th class="tl">Description</th>
+      <th class="tl">Created by</th>
+      <th class="tl">Visibility</th>
+      <th class="tl"></th>
+    </tr>
+  </thead>
+  <tbody>
     {% for dashboard, can_edit in saved_dashboards %}
-      <tr>
-        <td class="tl ws-normal">
-            <a href="{{ dashboard.get_absolute_url }}" title="{{ dashboard.description }}">
-                {{ dashboard }}
-            </a>
-        </td>
-        <td class="tl ws-normal">{{ dashboard.description }}</td>
-        <td class="tl ws-normal">
-            {{ dashboard.owned_by }}<br>
-            <time datetime="{{ dashboard.created_at.isoformat }}" class="gray">{{ dashboard.created_at|naturaltime }}</time>
-        </td>
-        <td class="tl ws-normal">{{ dashboard.view_summary }}</td>
-        <td class="tl ws-normal">
-          {% if can_edit %}
-            <a href="{{ dashboard.get_edit_url }}">edit</a>
-          {% endif %}
-        </td>
-      </tr>
+    <tr>
+      <td class="tl ws-normal">
+        <a href="{{ dashboard.get_absolute_url }}" title="{{ dashboard.description }}">
+          {{ dashboard }}
+        </a>
+      </td>
+      <td class="tl ws-normal measure">{{ dashboard.description }}</td>
+      <td class="tl ws-normal">
+        {{ dashboard.owned_by }}<br>
+        <time datetime="{{ dashboard.created_at.isoformat }}" class="gray">{{ dashboard.created_at|naturaltime }}</time>
+      </td>
+      <td class="tl ws-normal">{{ dashboard.view_summary }}</td>
+      <td class="tl ws-normal">
+        {% if can_edit %}
+        <a href="{{ dashboard.get_edit_url }}">edit</a>
+        {% endif %}
+      </td>
+    </tr>
     {% endfor %}
-    </tbody>
-  </table>
+  </tbody>
+</table>
 {% endif %}
 
 <h2>Available tables</h2>
 {% for group, tables in available_tables|group_tables %}
-    <h3>{{ group|title }}</h3>
-    <table>
-        <thead>
-            <tr>
-                <th class="tl">Table</th>
-                <th class="tl">Columns</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for table in tables %}
-            <tr>
-                <td class="tl w4 f5 ws-normal"><a href="?sql={% filter sign_sql|urlencode %}select count(*) from {{ table.name }}{% endfilter %}&sql={% autoescape off %}{% filter sign_sql|urlencode %}select {{ table.sql_columns }} from {{ table.name }}{% endfilter %}{% endautoescape %}">{{ table.name }}</a></td>
-                <td class="tl f5 ws-normal">{{ table.columns|list_to_tags }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<h3>{{ group|title }}</h3>
+<table>
+  <thead>
+    <tr>
+      <th class="tl">Table</th>
+      <th class="tl measure">Columns</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for table in tables %}
+    <tr>
+      <td class="tl w4 f5 ws-normal"><a
+          href="?sql={% filter sign_sql|urlencode %}select count(*) from {{ table.name }}{% endfilter %}&sql={% autoescape off %}{% filter sign_sql|urlencode %}select {{ table.sql_columns }} from {{ table.name }}{% endfilter %}{% endautoescape %}">{{ table.name }}</a>
+      </td>
+      <td class="tl f5 ws-normal measure">{{ table.columns|list_to_tags }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endfor %}
 
 {% include "django_sql_dashboard/_script.html" %}

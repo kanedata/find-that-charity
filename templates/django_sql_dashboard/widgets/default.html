@@ -25,7 +25,7 @@
     {% endif %}
   </p>
   {% else %}
-  <p>{{ result.row_lists|length }} row{{ result.row_lists|length|pluralize }}</p>
+  <p class="gray f6">{{ result.row_lists|length }} row{{ result.row_lists|length|pluralize }}</p>
   {% endif %}
   {% if result.error %}
   <p style="background-color: pink; padding: 1em; margin: 1em 0">
@@ -59,9 +59,10 @@
       {% endfor %}
     </tbody>
   </table>
-  <details style="margin-top: 1em;">
-    <summary style="font-size: 0.7em; margin-bottom: 0.5em; cursor: pointer;">Copy and export data</summary>
-    <textarea id="copyable-{{ result.index }}" style="height: 10em">{{ result|sql_dashboard_tsv }}</textarea>
+  <details class="mv2">
+    <summary class="pointer f6 mb1">Copy and export data</summary>
+    <textarea id="copyable-{{ result.index }}" wrap="off" style=""
+      class="h5 code f6 normal">{{ result|sql_dashboard_tsv }}</textarea>
     {% if user_can_export_data and not saved_dashboard %}
     <div class="export-buttons">
       <input class="btn" type="submit" name="export_csv_{{ result.index }}" value="Export all as CSV" />
@@ -69,11 +70,11 @@
     </div>
     {% endif %}
   </details>
-  {% if saved_dashboard %}
-  <details>
-    <summary style="font-size: 0.7em; margin-bottom: 0.5em; cursor: pointer;">SQL query</summary>
-    <pre class="sql">{{ result.sql }}</pre>
-    <p>Duration: {{ result.duration_ms|floatformat:2 }}ms</p>
+  {% if saved_dashboard and user_can_edit_dashboard %}
+  <details class="mv2">
+    <summary class="pointer f6 mb1">SQL query</summary>
+    <pre class="sql f6">{{ result.sql }}</pre>
+    <p class="f6 gray">Duration: {{ result.duration_ms|floatformat:2 }}ms</p>
   </details>
   {% endif %}
   <!-- templates considered: {{ result.templates|join:", " }} -->
