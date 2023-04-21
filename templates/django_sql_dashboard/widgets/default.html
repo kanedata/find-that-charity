@@ -3,7 +3,9 @@
   {% if result.query %}
   {% if result.query.title %}<h2>{{ result.query.title }}</h2>{% endif %}
   {% if result.query.description %}
-  {{ result.query.description|sql_dashboard_markdown }}
+  <div class="description measure">
+    {{ result.query.description|sql_dashboard_markdown }}
+  </div>
   {% endif %}
   {% endif %}
   {% if not saved_dashboard %}<textarea name="sql"

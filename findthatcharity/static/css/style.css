@@ -325,19 +325,73 @@ body {
     font-weight: 400;
 }
 
+.sql-dashboard>form {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-gap: 1rem;
+}
+
+.sql-dashboard>form>.query-results {
+    grid-column: span 12;
+}
+
+.sql-dashboard>form>.query-results.span-1 {
+    grid-column: span 1;
+}
+
+.sql-dashboard>form>.query-results.span-2 {
+    grid-column: span 2;
+}
+
+.sql-dashboard>form>.query-results.span-3 {
+    grid-column: span 3;
+}
+
+.sql-dashboard>form>.query-results.span-4 {
+    grid-column: span 4;
+}
+
+.sql-dashboard>form>.query-results.span-5 {
+    grid-column: span 5;
+}
+
+.sql-dashboard>form>.query-results.span-6 {
+    grid-column: span 6;
+}
+
+.sql-dashboard>form>.query-results.span-7 {
+    grid-column: span 7;
+}
+
+.sql-dashboard>form>.query-results.span-8 {
+    grid-column: span 8;
+}
+
+.sql-dashboard>form>.query-results.span-9 {
+    grid-column: span 9;
+}
+
+.sql-dashboard>form>.query-results.span-10 {
+    grid-column: span 10;
+}
+
+.sql-dashboard>form>.query-results.span-11 {
+    grid-column: span 11;
+}
+
+.sql-dashboard>form>.query-results.span-12 {
+    grid-column: span 12;
+}
+
 .sql-dashboard .query-results {
     overflow-x: auto;
     overflow-y: auto;
     max-width: 100%;
     display: block;
-    white-space: nowrap;
-    border-left: 0px solid black;
-    border-right: 0px solid black;
-    border-top: 0px solid black;
-    border-bottom: 0.5rem solid #eee;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-bottom: 64px;
+    /* white-space: nowrap; */
+    border: 0px solid black;
+    padding: 0px;
+    margin: 0px;
 }
 
 .sql-dashboard .query-results table {
