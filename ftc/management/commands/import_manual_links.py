@@ -288,6 +288,30 @@ class Command(CSVScraper):
                 "org_id_b": row["org_id"].strip(),
             },
         },
+        {
+            "title": "Mutual Companies",
+            "description": "Match between company numbers held by Companies House and Mutuals identifiers held by the FCA",
+            "identifier": "mutual_companies",
+            "license": "",
+            "license_name": "",
+            "issued": "",
+            "modified": "",
+            "publisher": {
+                "name": "Find that Charity",
+                "website": "https://github.com/drkane/charity-lookups",
+            },
+            "distribution": [
+                {
+                    "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/mutual-companies.csv",
+                    "accessURL": "https://github.com/drkane/charity-lookups/blob/master/mutual-companies.csv",
+                    "title": "CIO Company Numbers",
+                }
+            ],
+            "_parse_row": lambda row: {
+                "org_id_a": row["mutual_id"].strip(),
+                "org_id_b": row["company_id"].strip(),
+            },
+        },
     ]
 
     def fetch_file(self):
