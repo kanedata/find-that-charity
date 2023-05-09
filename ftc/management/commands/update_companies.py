@@ -110,6 +110,12 @@ from c
             on c.org_id = o.org_id
     where v.slug like 'ch_sic';
     """,
+    "Delete existing organisation classification": """
+    delete from ftc_organisationclassification fo
+    where source_id = %(source_id)s
+        and spider = %(spider_name)s
+        and scrape_id != %(scrape_id)s;
+    """,
 }
 
 
