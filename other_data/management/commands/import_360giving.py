@@ -19,6 +19,9 @@ select g.data->>'id' as "grant_id",
   g.data->'recipientOrganization'->0->>'name' as "recipientOrganization_name",
   g.additional_data->'recipientOrganizationCanonical'->>'id' as "recipientOrganization_canonical_id",
   g.additional_data->'recipientOrganizationCanonical'->>'name' as "recipientOrganization_canonical_name",
+  g.data->'recipientIndividual'->>'id' as "recipientIndividual_id",
+  g.data->'recipientIndividual'->>'name' as "recipientIndividual_name",
+  case when g.data->>'recipientOrganization' is not null then '{}' else '{}' end as "recipient_type",
   g.data->'fundingOrganization'->0->>'id' as "fundingOrganization_id",
   g.data->'fundingOrganization'->0->>'name' as "fundingOrganization_name",
   g.additional_data->'fundingOrganizationCanonical'->>'id' as "fundingOrganization_canonical_id",
@@ -29,7 +32,9 @@ select g.data->>'id' as "grant_id",
   g.source_data->'publisher'->>'name' as "publisher_name",
   g.source_data->>'license' as "license"
 from view_latest_grant g
-"""
+""".format(
+    Grant.RecipientType.ORGANISATION, Grant.RecipientType.INDIVIDUAL
+)
 
 
 class Command(BaseScraper):
@@ -95,6 +100,19 @@ class Command(BaseScraper):
         for f in self.date_fields:
             if original_row[f]:
                 original_row[f] = original_row[f][0:10]
+                if len(original_row[f]) == 7:
+                    original_row[f] = original_row[f] + "-01"
+                if original_row[f].endswith("-02-30"):
+                    original_row[f] = original_row[f].replace("-02-30", "-02-28")
+                if original_row[f].endswith("-02-31"):
+                    original_row[f] = original_row[f].replace("-02-31", "-02-28")
+                if (
+                    original_row[f].endswith("-04-31")
+                    or original_row[f].endswith("-06-31")
+                    or original_row[f].endswith("-09-31")
+                    or original_row[f].endswith("-11-31")
+                ):
+                    original_row[f] = original_row[f].replace("-31", "-30")
         row = self.clean_fields(original_row)
         row["scrape"] = self.scrape
         self.add_record(Grant, row)

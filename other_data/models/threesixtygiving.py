@@ -5,6 +5,10 @@ from ftc.models import OrgidField
 
 
 class Grant(models.Model):
+    class RecipientType(models.TextChoices):
+        ORGANISATION = "Organisation"
+        INDIVIDUAL = "Individual"
+
     grant_id = models.CharField(db_index=True, max_length=255)
     title = models.TextField()
     description = models.TextField()
@@ -14,11 +18,29 @@ class Grant(models.Model):
     plannedDates_duration = models.IntegerField(db_index=True, null=True, blank=True)
     plannedDates_startDate = models.DateField(db_index=True, null=True, blank=True)
     plannedDates_endDate = models.DateField(db_index=True, null=True, blank=True)
-    recipientOrganization_id = OrgidField(db_index=True, max_length=255)
-    recipientOrganization_name = models.CharField(db_index=True, max_length=255)
-    recipientOrganization_canonical_id = OrgidField(db_index=True, max_length=255)
+    recipientOrganization_id = OrgidField(
+        db_index=True, max_length=255, null=True, blank=True
+    )
+    recipientOrganization_name = models.CharField(
+        db_index=True, max_length=255, null=True, blank=True
+    )
+    recipientOrganization_canonical_id = OrgidField(
+        db_index=True, max_length=255, null=True, blank=True
+    )
     recipientOrganization_canonical_name = models.CharField(
-        db_index=True, max_length=255
+        db_index=True, max_length=255, null=True, blank=True
+    )
+    recipientIndividual_id = models.CharField(
+        db_index=True, max_length=255, null=True, blank=True
+    )
+    recipientIndividual_name = models.CharField(
+        db_index=True, max_length=255, null=True, blank=True
+    )
+    recipient_type = models.CharField(
+        db_index=True,
+        max_length=255,
+        choices=RecipientType.choices,
+        default=RecipientType.ORGANISATION,
     )
     fundingOrganization_id = OrgidField(db_index=True, max_length=255)
     fundingOrganization_name = models.CharField(db_index=True, max_length=255)
