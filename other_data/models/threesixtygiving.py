@@ -25,10 +25,18 @@ class Grant(models.Model):
         db_index=True, max_length=255, null=True, blank=True
     )
     recipientOrganization_canonical_id = OrgidField(
-        db_index=True, max_length=255, null=True, blank=True
+        db_index=True,
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="DEPRECATED - do not use this field",
     )
     recipientOrganization_canonical_name = models.CharField(
-        db_index=True, max_length=255, null=True, blank=True
+        db_index=True,
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="DEPRECATED - do not use this field",
     )
     recipientIndividual_id = models.CharField(
         db_index=True, max_length=255, null=True, blank=True
@@ -44,8 +52,20 @@ class Grant(models.Model):
     )
     fundingOrganization_id = OrgidField(db_index=True, max_length=255)
     fundingOrganization_name = models.CharField(db_index=True, max_length=255)
-    fundingOrganization_canonical_id = OrgidField(db_index=True, max_length=255)
-    fundingOrganization_canonical_name = models.CharField(db_index=True, max_length=255)
+    fundingOrganization_canonical_id = OrgidField(
+        db_index=True,
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="DEPRECATED - do not use this field",
+    )
+    fundingOrganization_canonical_name = models.CharField(
+        db_index=True,
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="DEPRECATED - do not use this field",
+    )
     fundingOrganization_type = models.CharField(
         db_index=True, max_length=255, null=True, blank=True
     )
