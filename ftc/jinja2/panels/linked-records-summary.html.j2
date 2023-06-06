@@ -1,19 +1,20 @@
-<div class="mv3 measure f5">
-{% if related_orgs.records|length > 1 %}
+<div class="mv3 f5">
+    {% if related_orgs.records|length > 1 %}
     <p>
-        This organisation record is part of a group of <a href="#linked-records" class="link underline-hover blue">linked records</a> that describe a single organisation.
-        The organisation is linked to {{ "active record"|pluralise(related_orgs.activeRecords|length) }} and 
-        {{ "inactive record"|pluralise(related_orgs.inactiveRecords|length) }}, from 
+        This organisation record is part of a group of <a href="#linked-records"
+            class="link underline-hover blue">linked records</a> that describe a single organisation.
+        The organisation is linked to {{ "active record"|pluralise(related_orgs.activeRecords|length) }} and
+        {{ "inactive record"|pluralise(related_orgs.inactiveRecords|length) }}, from
         {{ "data source"|pluralise(related_orgs.activeRecords|length) }}.
     </p>
     <div>
         The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, large=true, copy=true) }}.
         {% include 'components/what_is_an_identifier.html.j2' %}
     </div>
-{% else %}
+    {% else %}
     <div>
         This organisation's identifier is {{ orgid_link(related_orgs.org_id, large=true, copy=true) }}.
         {% include 'components/what_is_an_identifier.html.j2' %}
     </div>
-{% endif %}
+    {% endif %}
 </div>

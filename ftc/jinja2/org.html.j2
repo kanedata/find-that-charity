@@ -6,7 +6,7 @@
 {% set orgidschemes = get_orgidschemes() %}
 {% set orgtypes = get_orgtypes() %}
 {% set sources = get_sources() %}
-{% set heading = "{} | {}".format(org.org_id, org["name"]|titlecase) %} 
+{% set heading = "{} | {}".format(org.org_id, org["name"]|titlecase) %}
 {% set subtitle = "Org ID: {}{}".format(
     org["id"],
     "" if org.active else " | Inactive"
@@ -17,12 +17,12 @@
 {% macro show_sources(v) %}
 <span class="gray f7 dib">
   [Source: {% for s in v.sources|reject('none')|unique -%}
-    {%- if sources.get(s) -%}
-      {{ sources.get(s).title }}
-    {%- else -%}
-      {{ s }}
-    {%- endif -%}
-    {%- if not loop.last %}, {% endif -%}
+  {%- if sources.get(s) -%}
+  {{ sources.get(s).title }}
+  {%- else -%}
+  {{ s }}
+  {%- endif -%}
+  {%- if not loop.last %}, {% endif -%}
   {%- endfor -%}]
   {# [{{ v["sources"]|list_to_string }}] #}
 </span>
@@ -32,7 +32,7 @@
 {{ super() }}
 <script src="{{ static('lib/htmx/htmx.min.js') }}"></script>
 {% if org.locations or org.postalCode %}
-<link rel="stylesheet" href="{{ static('lib/leaflet/leaflet.min.css' )}}"/>
+<link rel="stylesheet" href="{{ static('lib/leaflet/leaflet.min.css' )}}" />
 <script src="{{ static('lib/leaflet/leaflet.min.js' )}}"></script>
 {% endif %}
 <script type="application/ld+json">
@@ -45,14 +45,14 @@
 {{ super() }}
 {% if org.locations or org.postalCode %}
 <script>
-  const GEOCODES = {{ org.geoCodes()|list|tojson }};
-  const POSTCODE = {{ org.postalCode|tojson }};
-  const ORG_LAT_LONGS = {{ org.lat_lngs|tojson }};
+  const GEOCODES = {{ org.geoCodes() | list | tojson }};
+  const POSTCODE = {{ org.postalCode| tojson }};
+  const ORG_LAT_LONGS = {{ org.lat_lngs| tojson }};
   const MARKER_ICON_OPTIONS = {{ {
     "iconUrl": static('lib/leaflet/images/marker-icon.png'),
-    "iconRetinaUrl": static('lib/leaflet/images/marker-icon-2x.png'),
-    "shadowUrl": static('lib/leaflet/images/marker-shadow.png'),
-  }|tojson }};
+      "iconRetinaUrl": static('lib/leaflet/images/marker-icon-2x.png'),
+        "shadowUrl": static('lib/leaflet/images/marker-shadow.png'),
+  }| tojson }};
 </script>
 <script src="{{ static('js/locationmap.js') }}"></script>
 {% endif %}
@@ -61,14 +61,16 @@
 {% endblock %}
 
 {% block header %}
-  {% include 'panels/org-header.html.j2' %}
+{% include 'panels/org-header.html.j2' %}
 {% endblock %}
 
 {% block content %}
 
 {% block organisation_links %}
 <div class="w-100 w-80-ns fl">
-  {% include 'panels/linked-records-summary.html.j2' %}
+  <div class="measure">
+    {% include 'panels/linked-records-summary.html.j2' %}
+  </div>
   {% include 'panels/details.html.j2' %}
 </div>
 {% endblock %}

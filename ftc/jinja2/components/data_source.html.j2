@@ -2,64 +2,81 @@
 
 
 {% macro data_source(source, org, request) %}
-  <div class="mt4 measure-wide bb b--light-gray pb3 bw3">
-    <h4 class="ma0 pa0 f4" id='data-source-{{source.data.identifier}}'><a class="link near-black underline-hover" href="{{ source.data.publisher.website }}">{{ source.data.publisher.name }}</a></h4>
-    {% if source.data.title != source.data.publisher.name %}
-    <h5 class="ma0 pa0 f5 b">{{ source.data.title }}</h5>
+<div class="mt4 measure-wide bb b--light-gray pb3 bw3">
+  <h4 class="ma0 pa0 f4" id='data-source-{{source.data.identifier}}'><a class="link near-black underline-hover"
+      href="{{ source.data.publisher.website }}">{{ source.data.publisher.name }}</a></h4>
+  {% if source.data.title != source.data.publisher.name %}
+  <h5 class="ma0 pa0 f5 b">{{ source.data.title }}</h5>
+  {% endif %}
+  {% if source.data.description %}
+  <p class="mv1 pa0 mid-gray f6">{{ source.data.description }}</p>
+  {% endif %}
+  {% if source.data.modified %}
+  <p class="mv1 pa0 f5"><strong>Last fetched from source:</strong> {{ source.modified.strftime('%Y-%m-%d') }}</p>
+  {% endif %}
+  <p class="mv1 pa0 f5">
+    <a class="link underline blue" href="{{ source.data.license }}">{{ source.data.license_name }}</a>
+    {% if source.data.distribution|length == 1 %}
+    | <a class="link underline blue" href="{{ source.data.distribution[0].accessURL }}">Access data</a>
+    | <a class="link underline blue" href="{{ source.data.distribution[0].downloadURL }}"
+      title="Download links may be large files">
+      Download data {{ get_filetype(source.data.distribution[0].downloadURL) }}
+    </a><br>
     {% endif %}
-    {% if source.data.description %}
-    <p class="mv1 pa0 mid-gray f6">{{ source.data.description }}</p>
+  </p>
+  {% if source.data.distribution|length > 1 %}
+  <ul class="f5">
+    {% for d in source.data.distribution %}
+    <li class="">
+      <a class="link underline blue" href="{{ d.accessURL }}">{{ d.title }}</a>
+      <a class="link underline blue" href="{{ d.downloadURL }}" title="Download links may be large files">Download data
+        {{ get_filetype(d.downloadURL) }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if org %}
+
+  {% set source_records = {
+    "records": org.recordsBySource(source.id),
+    "record links": org.org_linksBySource(source.id),
+  }
+  %}
+
+  {% for key, value in source_records.items() %}
+  {% if value %}
+  <p class="mt1 mb0 pa0 f6"><strong>Source for {{ key }}: </strong></p>
+  <ul class="mt1 mb1 pa0 list">
+    {% for r in value[:10] %}
+    {% if key == "records" %}
+    <li class="dib mr2">{{ orgid_link(r.org_id) }}</li>
+    {% elif key == "record links" %}
+    <li class="f6">
+      {{ orgid_connection(r.org_id_a, r.org_id_b) }}
+    </li>
     {% endif %}
-    {% if source.data.modified %}
-    <p class="mv1 pa0 f5"><strong>Last fetched from source:</strong> {{ source.modified.strftime('%Y-%m-%d') }}</p>
-    {% endif %}
-    <p class="mv1 pa0 f5">
-      <a class="link underline blue" href="{{ source.data.license }}">{{ source.data.license_name }}</a>
-      {% if source.data.distribution|length == 1 %}
-      | <a class="link underline blue" href="{{ source.data.distribution[0].accessURL }}">Access data</a>
-      | <a class="link underline blue" href="{{ source.data.distribution[0].downloadURL }}" title="Download links may be large files">
-          Download data {{ get_filetype(source.data.distribution[0].downloadURL) }}
-        </a><br>
+    {% endfor %}
+  </ul>
+  {% if value|length > 10 %}
+  <details>
+    <summary class="pointer">Show more {{ key }}</summary>
+    <ul class="mt1 mb1 pa0 list">
+      {% for r in value[10:] %}
+      {% if key == "records" %}
+      <li class="dib mr2">{{ orgid_link(r.org_id) }}</li>
+      {% elif key == "record links" %}
+      <li class="f6">
+        {{ orgid_connection(r.org_id_a, r.org_id_b) }}
+      </li>
       {% endif %}
-    </p>
-      {% if source.data.distribution|length > 1 %}
-      <ul class="f5">
-      {% for d in source.data.distribution %}
-        <li class="">
-          <a class="link underline blue" href="{{ d.accessURL }}">{{ d.title }}</a>
-          <a class="link underline blue" href="{{ d.downloadURL }}" title="Download links may be large files">Download data {{ get_filetype(d.downloadURL) }}</a>
-        </li>
       {% endfor %}
-      </ul>
-      {% endif %}
-      {% if org %}
-      {% for r in org.records if r.source == source %}
-        {% if loop.first %}
-        <p class="mt1 mb0 pa0 f6"><strong>Source for records: </strong></p>
-        <ul class="mt1 mb1 pa0 list">
-        {% endif %}
-            <li class="dib mr2">{{ orgid_link(r.org_id) }}</li>
-        {% if loop.last %}
-        </ul>
-        {% endif %}
-      {% endfor %}
-    
-    <p class="mv1 pa0 f5">
-      {% for r in org.org_links if r.source == source %}
-        {% if loop.first %}
-        <p class="mt1 mb0 pa0 f6"><strong>Source for record links:</strong></p>
-        <ul class="mt1 mb1 pa0 list">
-        {% endif %}
-            <li class="f6">
-              {{ orgid_connection(r.org_id_a, r.org_id_b) }}
-            </li>
-        {% if loop.last %}
-        </ul>
-        {% endif %}
-      {% endfor %}
-      {% endif %}
-    </p>
-  </div>
+    </ul>
+  </details>
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+</div>
 {% endmacro %}
 
 

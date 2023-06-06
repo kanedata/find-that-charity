@@ -8,6 +8,7 @@ from ftc.models.organisation import EXTERNAL_LINKS, Organisation
 from ftc.models.organisation_link import OrganisationLink
 from ftc.models.organisation_location import OrganisationLocation
 from ftc.models.organisation_type import OrganisationType
+from ftc.models.source import Source
 
 SCALE_DEFAULT = 1.0
 SCALE_MINIMUM = 0.1
@@ -55,9 +56,7 @@ class RelatedOrganisation:
 
     @cached_property
     def sources(self):
-        sources = list(self.get_all("source"))
-        sources.extend([o.source for o in self.org_links])
-        return list(set(sources))
+        return list(Source.objects.filter(id__in=self.source_ids).all())
 
     @cached_property
     def source_ids(self):
@@ -99,10 +98,13 @@ class RelatedOrganisation:
 
     @cached_property
     def org_links(self):
-        org_links = []
-        for o in self.records:
-            org_links.extend(o.org_links)
-        return list(set(org_links))
+        return list(
+            set(
+                OrganisationLink.objects.filter(
+                    Q(org_id_a__in=self.orgIDs) | Q(org_id_b__in=self.orgIDs)
+                )
+            )
+        )
 
     @cached_property
     def search_scale(self):
@@ -162,6 +164,12 @@ class RelatedOrganisation:
                 if link[1] not in links_seen:
                     yield link
                 links_seen.add(link[1])
+
+    def recordsBySource(self, source_id):
+        return [r for r in self.records if r.source_id == source_id]
+
+    def org_linksBySource(self, source_id):
+        return [r for r in self.org_links if r.source_id == source_id]
 
     @cached_property
     def sameAs(self):

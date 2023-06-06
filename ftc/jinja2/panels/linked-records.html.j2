@@ -1,35 +1,42 @@
 {% if related_orgs.records|length > 1 %}
-  {% call org_panel("Linked records", org) %}
-    <p class="measure">
-      This organisation record is part of a group of linked records that describe a single organisation.
-    </p>
-    <p class="measure">
-      The best identifier for this organisation is {{ orgid_link(related_orgs.org_id, large=true) }}.
-    </p>
-    <div class="w-100 flex flex-wrap">
-      <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
-      {{ org_record(org, {}, request, small=true, this_record=true) }}
-      </div>
-      {% if related_orgs.activeRecords %}
-      {% for record in related_orgs.activeRecords if record.org_id != org.org_id %}
-      <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
-      {{ org_record(record, {}, request, small=true) }}
-      </div>
-      {% endfor %}
-      {% endif %}
-    </div>
+{% call org_panel("Linked records", org) %}
+{% include 'panels/linked-records-summary.html.j2' %}
+<div class="w-100 flex flex-wrap">
+  <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(org, {}, request, small=true, this_record=true) }}
+  </div>
+  {% if related_orgs.activeRecords %}
+  {% for record in related_orgs.activeRecords if record.org_id != org.org_id %}
+  <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(record, {}, request, small=true) }}
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
 
-    {% if related_orgs.activeRecords %}
-    <div class="w-100 flex flex-wrap">
-      {% for record in related_orgs.inactiveRecords if record.org_id != org.org_id %}
-      <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+{% if related_orgs.activeRecords %}
+<div class="w-100 flex flex-wrap">
+  {% for record in related_orgs.inactiveRecords[:9] if record.org_id != org.org_id %}
+  <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(record, {}, request, small=true) }}
+  </div>
+  {% endfor %}
+</div>
+{% if related_orgs.inactiveRecords|length > 9 %}
+<details class="w-100 db">
+  <summary class="w-100 pointer">Show {{ "more record"|pluralise(related_orgs.inactiveRecords|length - 9) }}</summary>
+  <div class="w-100 flex flex-wrap">
+    {% for record in related_orgs.inactiveRecords[9:] if record.org_id != org.org_id %}
+    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
       {{ org_record(record, {}, request, small=true) }}
-      </div>
-      {% endfor %}
     </div>
-    {% endif %}
-  
-  {# {% if org.parent.keys()|length %}
+    {% endfor %}
+  </div>
+</details>
+{% endif %}
+{% endif %}
+
+{# {% if org.parent.keys()|length %}
   <article class="message is-info">
     <h4 class="ma0 pa0">Parent organisations</h4>
     <div class="message-body">
@@ -59,5 +66,5 @@
   </article>
   {% endif %} #}
 
-  {% endcall %}
-  {% endif %}
+{% endcall %}
+{% endif %}
