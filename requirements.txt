@@ -65,7 +65,7 @@ dj-database-url==1.2.0
     # via
     #   -r requirements.in
     #   charity-django
-django==4.1.7
+django==4.2.2
     # via
     #   -r requirements.in
     #   charity-django
@@ -207,7 +207,7 @@ pytz==2022.7.1
     # via babel
 pyyaml==6.0
     # via -r requirements.in
-requests==2.28.2
+requests==2.31.0
     # via
     #   -r requirements.in
     #   charity-django
@@ -247,7 +247,7 @@ sqlite-fts4==1.0.3
     # via sqlite-utils
 sqlite-utils==3.30
     # via -r requirements.in
-sqlparse==0.4.3
+sqlparse==0.4.4
     # via
     #   django
     #   django-debug-toolbar
