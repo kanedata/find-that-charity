@@ -222,7 +222,7 @@ set
     pension_gain = a.gain_loss_pension_fund,
     exp_vol = a.expenditure_raising_funds,
     exp_trade = null,
-    exp_invest = null,
+    exp_invest = a.expenditure_investment_management,
     exp_grant = a.expenditure_grants_institution,
     exp_charble = a.expenditure_charitable_expenditure,
     exp_gov = a.expenditure_governance,
