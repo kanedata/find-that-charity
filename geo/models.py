@@ -43,6 +43,7 @@ class Postcode(models.Model):
     osnrth1m = models.IntegerField(null=True, blank=True)
     osgrdind = models.IntegerField(choices=GridIndex.choices)
     oa11 = models.CharField(max_length=9, null=True, blank=True)
+    oa21 = models.CharField(max_length=9, null=True, blank=True)
     cty = models.CharField(max_length=9, null=True, blank=True)
     ced = models.CharField(max_length=9, null=True, blank=True)
     laua = models.CharField(max_length=9, null=True, blank=True)
@@ -59,7 +60,9 @@ class Postcode(models.Model):
     nuts = models.CharField(max_length=9, null=True, blank=True)
     npark = models.CharField(max_length=9, null=True, blank=True)
     lsoa11 = models.CharField(max_length=9, null=True, blank=True)
+    lsoa21 = models.CharField(max_length=9, null=True, blank=True)
     msoa11 = models.CharField(max_length=9, null=True, blank=True)
+    msoa21 = models.CharField(max_length=9, null=True, blank=True)
     wz11 = models.CharField(max_length=9, null=True, blank=True)
     ccg = models.CharField(max_length=9, null=True, blank=True)
     bua11 = models.CharField(max_length=9, null=True, blank=True)
@@ -95,7 +98,10 @@ class GeoLookup(models.Model):
         default="GB",
     )
     geo_oa11 = models.CharField(
-        max_length=9, null=True, blank=True, verbose_name="Output Area"
+        max_length=9, null=True, blank=True, verbose_name="Output Area (2011)"
+    )
+    geo_oa21 = models.CharField(
+        max_length=9, null=True, blank=True, verbose_name="Output Area (2021)"
     )
     geo_cty = models.CharField(
         max_length=9, null=True, blank=True, verbose_name="County"
@@ -130,14 +136,28 @@ class GeoLookup(models.Model):
         max_length=9,
         null=True,
         blank=True,
-        verbose_name="Lower Super Output Area",
+        verbose_name="Lower Super Output Area (2011)",
+        db_index=True,
+    )
+    geo_lsoa21 = models.CharField(
+        max_length=9,
+        null=True,
+        blank=True,
+        verbose_name="Lower Super Output Area (2021)",
         db_index=True,
     )
     geo_msoa11 = models.CharField(
         max_length=9,
         null=True,
         blank=True,
-        verbose_name="Middle Super Output Area",
+        verbose_name="Middle Super Output Area (2011)",
+        db_index=True,
+    )
+    geo_msoa21 = models.CharField(
+        max_length=9,
+        null=True,
+        blank=True,
+        verbose_name="Middle Super Output Area (2021)",
         db_index=True,
     )
     geo_lep1 = models.CharField(

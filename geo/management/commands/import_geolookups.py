@@ -29,14 +29,14 @@ class Command(BaseScraper):
         "msoa": GeoSource(
             "https://github.com/drkane/geo-lookups/raw/master/msoa_la.csv",
             "msoa",
-            "MSOA11CD",
-            "MSOA11HCLNM",
+            "MSOACD",
+            "MSOAHCLNM",
         ),
         "lsoa": GeoSource(
             "https://github.com/drkane/geo-lookups/raw/master/lsoa_la.csv",
             "lsoa",
-            "LSOA11CD",
-            "LSOA11NM",
+            "LSOACD",
+            "LSOANM",
         ),
         "ward": GeoSource(
             "https://github.com/drkane/geo-lookups/raw/master/ward_all_codes.csv",
@@ -45,24 +45,26 @@ class Command(BaseScraper):
             "WDNM",
         ),
         "pcon": GeoSource(
-            "https://opendata.arcgis.com/datasets/8efdc64f7b4641c485adf606f8f39756_0.csv",
+            "https://github.com/drkane/geo-lookups/raw/master/pcon.csv",
             "pcon",
-            "PCON20CD",
-            "PCON20NM",
+            "PCON22CD",
+            "PCON22NM",
         ),
     }
 
     FIELD_MATCH = {
-        "WDCD": "geo_ward",  # ward code (may be out of date)
-        "LSOA11CD": "geo_lsoa11",  # Lower Super Output Area code
-        "MSOA11CD": "geo_msoa11",  # Middle Super Output Area code
-        "LAD20CD": "geo_laua",  # Local Authority (2020) code
-        "UTLACD": "geo_cty",  # Upper tier local authority code
-        # "CAUTHCD": "geo_",  # Combined authority code
-        "RGNCD": "geo_rgn",  # Region code
-        "CTRYCD": "geo_ctry",  # Country code
-        "TTWA11CD": "geo_ttwa",  # Travel to work area code
-        "PCON20CD": "geo_pcon",  # Parliamentary Constituency
+        "geo_ward": "WDCD",  # ward code (may be out of date)
+        "geo_lsoa11": "LSOA11CD",  # Lower Super Output Area (2011) code
+        "geo_msoa11": "MSOA11CD",  # Middle Super Output Area (2011) code
+        "geo_lsoa21": "LSOA21CD",  # Lower Super Output Area (2021) code
+        "geo_msoa21": "MSOA21CD",  # Middle Super Output Area (2021) code
+        "geo_laua": "LAD20CD",  # Local Authority (2020) code
+        "geo_cty": "UTLACD",  # Upper tier local authority code
+        # "geo_": "CAUTHCD",  # Combined authority code
+        "geo_rgn": "RGNCD",  # Region code
+        "geo_ctry": "CTRYCD",  # Country code
+        "geo_ttwa": "TTWA11CD",  # Travel to work area code
+        "geo_pcon": "PCON20CD",  # Parliamentary Constituency
     }
 
     MANUAL_RECORDS = (
@@ -224,7 +226,7 @@ class Command(BaseScraper):
             geoCodeType=geocodetype.type,
             geo_iso="GB",
             name=row[geocodetype.namefield],
-            **{v: row[k] for k, v in self.FIELD_MATCH.items() if row.get(k)}
+            **{k: row[v] for k, v in self.FIELD_MATCH.items() if row.get(v)}
         )
 
     def add_record(self, **kwargs):

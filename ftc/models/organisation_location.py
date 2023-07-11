@@ -55,7 +55,10 @@ class OrganisationLocation(models.Model):
         db_index=True,
     )
     geo_oa11 = models.CharField(
-        max_length=9, null=True, blank=True, verbose_name="Output Area"
+        max_length=9, null=True, blank=True, verbose_name="Output Area (2011)"
+    )
+    geo_oa21 = models.CharField(
+        max_length=9, null=True, blank=True, verbose_name="Output Area (2021)"
     )
     geo_cty = models.CharField(
         max_length=9, null=True, blank=True, verbose_name="County"
@@ -90,14 +93,28 @@ class OrganisationLocation(models.Model):
         max_length=9,
         null=True,
         blank=True,
-        verbose_name="Lower Super Output Area",
+        verbose_name="Lower Super Output Area (2011)",
+        db_index=True,
+    )
+    geo_lsoa21 = models.CharField(
+        max_length=9,
+        null=True,
+        blank=True,
+        verbose_name="Lower Super Output Area (2011)",
         db_index=True,
     )
     geo_msoa11 = models.CharField(
         max_length=9,
         null=True,
         blank=True,
-        verbose_name="Middle Super Output Area",
+        verbose_name="Middle Super Output Area (2021)",
+        db_index=True,
+    )
+    geo_msoa21 = models.CharField(
+        max_length=9,
+        null=True,
+        blank=True,
+        verbose_name="Middle Super Output Area (2021)",
         db_index=True,
     )
     geo_lep1 = models.CharField(

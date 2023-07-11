@@ -75,6 +75,7 @@ class RelatedOrganisation:
         location_fields = [
             "geo_iso",
             # "geo_oa11",
+            # "geo_oa21",
             "geo_cty",
             "geo_laua",
             "geo_ward",
@@ -83,7 +84,9 @@ class RelatedOrganisation:
             "geo_pcon",
             # "geo_ttwa",
             "geo_lsoa11",
+            "geo_lsoa21",
             "geo_msoa11",
+            "geo_msoa21",
             # "geo_lep1",
             # "geo_lep2",
         ]
