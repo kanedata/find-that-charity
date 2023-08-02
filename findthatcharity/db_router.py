@@ -38,13 +38,17 @@ class DBRouter:
         """
         Attempts to read data types go to data_db.
         """
-        return self._get_db(model._meta.app_label, model._meta.label, **hints)
+        return self._get_db(
+            model._meta.app_label, getattr(model._meta, "label", None), **hints
+        )
 
     def db_for_write(self, model, **hints):
         """
         Attempts to write data types go to data_db.
         """
-        return self._get_db(model._meta.app_label, model._meta.label, **hints)
+        return self._get_db(
+            model._meta.app_label, getattr(model._meta, "label", None), **hints
+        )
 
     def allow_relation(self, obj1, obj2, **hints):
         """
