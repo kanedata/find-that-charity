@@ -1,0 +1,40 @@
+{% macro table_table(tables) %}
+<table>
+    <thead>
+        <tr>
+            <th>Schema</th>
+            <th>Table</th>
+            {% for privilege in privileges %}
+            <th>{{ privilege }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for (table_schema, table_name), table_privileges in tables.items() %}
+        <tr>
+            <td>{{table_schema}}</td>
+            <td><strong>{{table_name}}</strong></td>
+            {% for privilege in privileges %}
+            {% if privilege in table_privileges %}
+            <td>{{ privilege }}</td>
+            {% else %}
+            <td><img src="{{ static('admin/img/icon-no.svg') }}" alt="False"></td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endmacro%}
+
+{% if public_tables %}
+<h3>Public schema</h3>
+{{ table_table(public_tables) }}
+{% endif %}
+
+{% if other_tables %}
+<details style="margin-top: 40px;">
+    <summary style="cursor: pointer;">Other schema</summary>
+    {{ table_table(other_tables) }}
+</details>
+{% endif %}

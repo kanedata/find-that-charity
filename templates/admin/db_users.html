@@ -1,0 +1,74 @@
+{% extends 'admin/change_list.html' %}
+{% load i18n static %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:db_users' %}">DB Users</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module" id="changelist">
+        <div class="changelist-form-container">
+            <form id="changelist-form" method="post" {% if cl.formset and cl.formset.is_multipart %}
+                enctype="multipart/form-data" {% endif %} novalidate>{% csrf_token %}
+                <div class="results">
+                    <table id="result_list">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="text"><a>System ID</a></div>
+                                    <div class="clear"></div>
+                                </th>
+                                <th>
+                                    <div class="text"><a>Username</a></div>
+                                    <div class="clear"></div>
+                                </th>
+                                <th>
+                                    <div class="text"><a>Database</a></div>
+                                    <div class="clear"></div>
+                                </th>
+                                <th>
+                                    <div class="text"><a>Can create DB</a></div>
+                                    <div class="clear"></div>
+                                </th>
+                                <th>
+                                    <div class="text"><a>Is super user</a></div>
+                                    <div class="clear"></div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.usesysid }}</td>
+                                <td>{{ user.usename }}</td>
+                                <td>{{ user.databases }}</td>
+                                <td>
+                                    {% if user.usecreatedb %}
+                                    <img src="{% static 'admin/img/icon-yes.svg' %}" alt="True">
+                                    {% else %}
+                                    <img src="/static/admin/img/icon-no.svg" alt="True">
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.usesuper %}
+                                    <img src="{% static 'admin/img/icon-yes.svg' %}" alt="True">
+                                    {% else %}
+                                    <img src="/static/admin/img/icon-no.svg" alt="True">
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<ul>
+</ul>
+{% endblock %}

@@ -156,6 +156,8 @@ WSGI_APPLICATION = "findthatcharity.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+ADMIN_DB_ALIAS = "admin"
+DATA_DB_ALIAS = "data"
 DATABASES = {
     "default": {
         "TEST": {
@@ -164,13 +166,13 @@ DATABASES = {
             ),
         },
     },
-    "admin": dj_database_url.config(
+    ADMIN_DB_ALIAS: dj_database_url.config(
         env="DATABASE_ADMIN_URL",
         test_options={
             "DEPENDENCIES": [],
         },
     ),
-    "data": dj_database_url.config(
+    DATA_DB_ALIAS: dj_database_url.config(
         env="DATABASE_URL",
         test_options={
             "DEPENDENCIES": [],
