@@ -468,7 +468,7 @@ select distinct on (cc.id)
 from charity_charity cc
     left outer join (
         select charity_id,
-            array_agg(name) as "alternateName"
+            array_agg(distinct name) as "alternateName"
         from charity_charityname
         group by charity_id
     ) as cn

@@ -83,7 +83,10 @@ class Grant(models.Model):
 
     def __str__(self):
         return "<Grant from {} to {}>".format(
-            self.fundingOrganization_name, self.recipientOrganization_name
+            self.fundingOrganization_name,
+            self.recipientOrganization_name
+            if self.recipientOrganization_name
+            else self.recipientIndividual_name,
         )
 
     @property

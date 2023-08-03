@@ -544,7 +544,7 @@ class CSVScraper(BaseScraper):
         try:
             csv_text = response.text
         except AttributeError:
-            csv_text = response.body.decode(self.encoding)
+            csv_text = response.content.decode(self.encoding)
 
         with io.StringIO(csv_text) as a:
             csvreader = csv.DictReader(a)

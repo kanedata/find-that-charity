@@ -6,6 +6,7 @@ class Command(BaseCommand):
     scrapers = [
         "gender_pay_gap",
         "360giving",
+        "national_lottery",
         "cqc",
         "wikidata",
     ]

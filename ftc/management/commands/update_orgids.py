@@ -102,6 +102,17 @@ UPDATE_ORGIDS_SQL = {
     """.format(
         ",".join([f"'{p}'" for p in OrgidScheme.PRIORITIES])
     ),
+    "Add names from grant data": """
+        insert into charity_charityname ("charity_id", "name", "name_type")
+        select "recipientOrganization_id" as "charity_id",
+            "recipientOrganization_name" as "name",
+            'Grant' as "name_type"
+        from other_data_grant g 
+            inner join charity_charity c
+                on g."recipientOrganization_id" = c.id
+        group by 1, 2
+        on conflict (charity_id, name) do nothing
+    """,
 }
 
 
