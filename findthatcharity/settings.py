@@ -42,6 +42,7 @@ if os.environ.get("SENTRY_DSN") and not DEBUG:
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 PROJECT_NAME = "Find that Charity"
 
@@ -81,14 +82,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
-    "ftc",
-    "ftcprofile",
-    "charity",
-    "reconcile",
-    "addtocsv",
-    "geo",
-    "other_data",
-    "ftcbot",
+    "findthatcharity.apps.ftc",
+    "findthatcharity.apps.ftcprofile",
+    "findthatcharity.apps.charity",
+    "findthatcharity.apps.reconcile",
+    "findthatcharity.apps.addtocsv",
+    "findthatcharity.apps.geo",
+    "findthatcharity.apps.other_data",
+    "findthatcharity.apps.ftcbot",
     "charity_django.companies",
     "markdownx",
     "prettyjson",
@@ -125,7 +126,7 @@ ROOT_URLCONF = "findthatcharity.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [(os.path.join(BASE_DIR, "templates"))],
+        "DIRS": [(os.path.join(PROJECT_DIR, "templates"))],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -138,7 +139,7 @@ TEMPLATES = [
     },
     {
         "BACKEND": "django.template.backends.jinja2.Jinja2",
-        "DIRS": [(os.path.join(BASE_DIR, "jinja2"))],
+        "DIRS": [(os.path.join(PROJECT_DIR, "jinja2"))],
         "APP_DIRS": True,
         "OPTIONS": {
             "environment": "findthatcharity.jinja2.environment",
@@ -234,8 +235,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "findthatcharity", "static"),)
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATICFILES_DIRS = (os.path.join(PROJECT_DIR, "static"),)
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 WHITENOISE_MANIFEST_STRICT = True

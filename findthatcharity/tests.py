@@ -2,7 +2,7 @@ import unittest
 
 from django.urls import reverse
 
-import ftc.tests
+import findthatcharity.apps.ftc.tests
 from findthatcharity.utils import (
     format_currency,
     get_domain,

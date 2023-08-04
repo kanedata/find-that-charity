@@ -18,11 +18,12 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import TemplateView
 
-import addtocsv.views
-import charity.urls
-import ftc.urls
-import ftc.views
-import reconcile.urls
+import findthatcharity.apps.addtocsv.views
+import findthatcharity.apps.charity.urls
+import findthatcharity.apps.ftc.urls
+import findthatcharity.apps.ftc.views
+import findthatcharity.apps.ftcprofile.urls
+import findthatcharity.apps.reconcile.urls
 from findthatcharity.api.endpoints import api
 
 handler404 = "findthatcharity.views.missing_page_handler"
@@ -32,25 +33,29 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-    path("accounts/", include("ftcprofile.urls")),
+    path("accounts/", include(findthatcharity.apps.ftcprofile.urls)),
     path("accounts/", include("django_registration.backends.activation.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("admin/clearcache/", include("clearcache.urls")),
     path("admin/", admin.site.urls, name="admin"),
-    path("", ftc.views.index, name="index"),
-    path("about", ftc.views.about, name="about"),
-    path("adddata/", addtocsv.views.index, name="csvtool"),
+    path("", findthatcharity.apps.ftc.views.index, name="index"),
+    path("about", findthatcharity.apps.ftc.views.about, name="about"),
+    path("adddata/", findthatcharity.apps.addtocsv.views.index, name="csvtool"),
     path("api/v1/", api.urls),
-    path("orgid/", include(ftc.urls)),
-    path("charity/", include(charity.urls)),
+    path("orgid/", include(findthatcharity.apps.ftc.urls)),
+    path("charity/", include(findthatcharity.apps.charity.urls)),
     path(
         "company/<str:company_number>",
-        ftc.views.company_detail,
+        findthatcharity.apps.ftc.views.company_detail,
         {"filetype": "html"},
         name="company_detail",
     ),
-    path("reconcile/", include(reconcile.urls)),
-    path("reconcile", reconcile.views.index, {"orgtype": "registered-charity"}),
+    path("reconcile/", include(findthatcharity.apps.reconcile.urls)),
+    path(
+        "reconcile",
+        findthatcharity.apps.reconcile.views.index,
+        {"orgtype": "registered-charity"},
+    ),
     path("dashboard/", include(django_sql_dashboard.urls)),
     path("markdownx/", include("markdownx.urls")),
     path("__debug__/", include("debug_toolbar.urls")),

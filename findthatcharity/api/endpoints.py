@@ -4,9 +4,9 @@ from ninja.security import APIKeyHeader
 from ninja_apikey.security import check_apikey
 from ninja_extra import NinjaExtraAPI
 
-from charity.api import API as CharityAPI
-from ftc.api import CompanyAPI, OrganisationAPI
-from reconcile.api import API as ReconcileAPI
+from findthatcharity.apps.charity.api import API as CharityAPI
+from findthatcharity.apps.ftc.api import CompanyAPI, OrganisationAPI
+from findthatcharity.apps.reconcile.api import API as ReconcileAPI
 
 
 class FtcAuthentication(APIKeyHeader):

@@ -1,0 +1,195 @@
+# -*- coding: utf-8 -*-
+import datetime
+import io
+
+from openpyxl import load_workbook
+
+from findthatcharity.apps.ftc.management.commands._base_scraper import HTMLScraper
+from findthatcharity.apps.ftc.models import Organisation
+
+SCOT_LAS = {
+    "Aberdeen City": "S12000033",
+    "Aberdeenshire": "S12000034",
+    "Angus": "S12000041",
+    "Argyll & Bute": "S12000035",
+    "Clackmannanshire": "S12000005",
+    "Dumfries & Galloway": "S12000006",
+    "Dundee City": "S12000042",
+    "East Ayrshire": "S12000008",
+    "East Dunbartonshire": "S12000045",
+    "East Lothian": "S12000010",
+    "East Renfrewshire": "S12000011",
+    "Edinburgh City": "S12000036",
+    "Falkirk": "S12000014",
+    "Fife": "S12000015",
+    "Glasgow City": "S12000046",
+    "Highland": "S12000017",
+    "Inverclyde": "S12000018",
+    "Midlothian": "S12000019",
+    "Moray": "S12000020",
+    "Na h-Eileanan Siar": "S12000013",
+    "North Ayrshire": "S12000021",
+    "North Lanarkshire": "S12000044",
+    "Orkney Islands": "S12000023",
+    "Perth & Kinross": "S12000024",
+    "Renfrewshire": "S12000038",
+    "Scottish Borders": "S12000026",
+    "Shetland Islands": "S12000027",
+    "South Ayrshire": "S12000028",
+    "South Lanarkshire": "S12000029",
+    "Stirling": "S12000030",
+    "West Dunbartonshire": "S12000039",
+    "West Lothian": "S12000040",
+}
+
+
+class Command(HTMLScraper):
+    name = "schools_scotland"
+    allowed_domains = ["gov.scot"]
+    start_urls = ["https://www.gov.scot/publications/school-contact-details/"]
+    skip_rows = 7
+    org_id_prefix = "GB-SCOTEDU"
+    id_field = "seed_code"
+    source = {
+        "title": "School Contact Details",
+        "description": "School contact details as at September 2017 including school names, addresses, pupil rolls, FTE numbers of teachers, urban/rural classification, denomination and proportion of pupils from minority ethnic groups.",
+        "identifier": "schoolsscotland",
+        "license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/",
+        "license_name": "Open Government Licence",
+        "issued": "",
+        "modified": "",
+        "publisher": {
+            "name": "Scottish Government",
+            "website": "https://www.gov.scot/",
+        },
+        "distribution": [
+            {"downloadURL": "", "accessURL": "", "title": "School Contact Details"}
+        ],
+    }
+    orgtypes = ["Education Institution"]
+
+    def parse_file(self, response, source_url):
+        link = [
+            link for link in response.html.absolute_links if link.endswith(".xlsx")
+        ][0]
+        self.set_download_url(link)
+        r = self.session.get(link)
+        r.raise_for_status()
+
+        wb = load_workbook(io.BytesIO(r.content), read_only=True)
+        latest_sheet = wb["Open Schools"]
+
+        # self.source["issued"] = wb.properties.modified.isoformat()[0:10]
+
+        self.logger.info("Latest sheet: {}".format(latest_sheet.title))
+        headers = {}
+        for k, row in enumerate(latest_sheet.rows):
+            if not row[0].value:
+                continue
+
+            if "seed code" in str(row[0].value).lower():
+                headers = self.get_headers(row, latest_sheet, k)
+                continue
+            elif not headers:
+                continue
+
+            record = {}
+            for i, c in enumerate(row):
+                if i + 1 in headers:
+                    v = c.value
+                    if v in ["", ".", "N/A", "0", 0]:
+                        v = None
+                    record[headers[i + 1]] = v
+
+            org_id = self.get_org_id(record)
+            org_types = self.get_org_types(record)
+
+            self.add_org_record(
+                Organisation(
+                    org_id=org_id,
+                    name=record.get("school_name"),
+                    charityNumber=None,
+                    companyNumber=None,
+                    streetAddress=record.get("address_line1"),
+                    addressLocality=record.get("address_line2"),
+                    addressRegion=record.get("address_line3"),
+                    addressCountry="Scotland",
+                    postalCode=self.parse_postcode(record.get("post_code")),
+                    telephone=record.get("phone_number"),
+                    alternateName=[],
+                    email=record.get("email"),
+                    description=None,
+                    organisationType=[o.slug for o in org_types],
+                    organisationTypePrimary=org_types[0],
+                    url=record.get("website_address"),
+                    latestIncome=None,
+                    dateModified=datetime.datetime.now(),
+                    dateRegistered=None,
+                    dateRemoved=None,
+                    active=True,
+                    parent=None,
+                    orgIDs=[org_id],
+                    scrape=self.scrape,
+                    source=self.source,
+                    spider=self.name,
+                    org_id_scheme=self.orgid_scheme,
+                )
+            )
+
+    def get_headers(self, row, sheet, row_number):
+        previous_overtitle = None
+        header_names = []
+        for c in row:
+            if c.value:
+                title = str(c.value)
+
+                # get the row before to find the heading for this title
+                overtitle = sheet.cell(row_number, c.column).value
+                if overtitle is None:
+                    overtitle = previous_overtitle
+                else:
+                    previous_overtitle = overtitle
+
+                # we actually only need three of them
+                if overtitle:
+                    if overtitle.startswith("Pupil rolls"):
+                        overtitle = "Pupil rolls"
+                    elif overtitle.startswith("Teachers"):
+                        overtitle = "Teachers FTE"
+                    elif overtitle.lower().startswith("school type"):
+                        overtitle = "School type"
+                    else:
+                        overtitle = None
+
+                header_names.append(
+                    self.slugify("{} {}".format(overtitle if overtitle else "", title))
+                )
+
+        return dict(
+            zip(
+                [c.column for c in row if c.value],  # header column numbers
+                header_names,
+            )
+        )
+
+    def get_org_types(self, record):
+        org_types = [
+            self.orgtype_cache["education-institution"],
+            self.add_org_type(record.get("centre_type") + " School"),
+        ]
+        if record.get("school_type_denomination"):
+            org_types.append(
+                self.add_org_type(record.get("school_type_denomination") + " School")
+            )
+
+        for type_key, type_name in {
+            "school_type_pre_school_department": "Pre-school",
+            "school_type_primary_department": "Primary school",
+            "school_type_secondary_department": "Secondary school",
+            "school_type_special_department": "Special school",
+            "school_type_gaelic_unit": "Gaelic Unit",
+            "school_type_integrated_special_unit": "Integrated Special Unit",
+        }.items():
+            if record.get(type_key) and str(record.get(type_key, "")).lower() == "yes":
+                org_types.append(self.add_org_type(type_name))
+        return org_types

@@ -12,7 +12,7 @@ data/
 !*/tests/fixtures/*.csv
 
 # djangofiles
-/static/
+/staticfiles/
 
 # python files
 __pycache__/

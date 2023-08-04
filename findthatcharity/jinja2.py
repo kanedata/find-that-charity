@@ -9,8 +9,16 @@ from django.db.models import Count, F, Func
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.text import slugify
+from jinja2 import Environment
 from markdownx.utils import markdownify
 
+from findthatcharity.apps.ftc.models import (
+    Organisation,
+    OrganisationType,
+    OrgidScheme,
+    Source,
+)
+from findthatcharity.apps.geo.models import GeoLookup
 from findthatcharity.utils import (
     a_or_an,
     format_currency,
@@ -20,9 +28,6 @@ from findthatcharity.utils import (
     url_remove,
     url_replace,
 )
-from ftc.models import Organisation, OrganisationType, OrgidScheme, Source
-from geo.models import GeoLookup
-from jinja2 import Environment
 
 
 def get_orgtypes():
