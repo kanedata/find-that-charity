@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "django_elasticsearch_dsl",
     "debug_toolbar",
     "django.contrib.postgres",
+    "clearcache",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -111,6 +112,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "findthatcharity.middleware.FTCThrottleMiddleware",
     # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -308,6 +310,16 @@ ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = False
 MAX_API_KEYS = 4  # Maximum number of API keys a user can have
 NINJA_DOCS_VIEW = "swagger"
+NINJA_EXTRA = {
+    "THROTTLE_CLASSES": [
+        "findthatcharity.api.throttling.APIAnonRateThrottle",
+        "findthatcharity.api.throttling.APIRateThrottle",
+    ],
+    "THROTTLE_RATES": {
+        "anon": "30/minute",
+        "api": "120/minute",
+    },
+}
 
 TWITTER_CONSUMER_KEY = os.environ.get("TWITTER_CONSUMER_KEY")
 TWITTER_CONSUMER_SECRET = os.environ.get("TWITTER_CONSUMER_SECRET")

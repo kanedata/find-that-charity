@@ -23,7 +23,7 @@ import charity.urls
 import ftc.urls
 import ftc.views
 import reconcile.urls
-from findthatcharity.endpoints import api
+from findthatcharity.api.endpoints import api
 
 handler404 = "findthatcharity.views.missing_page_handler"
 
@@ -35,6 +35,7 @@ urlpatterns = [
     path("accounts/", include("ftcprofile.urls")),
     path("accounts/", include("django_registration.backends.activation.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("admin/clearcache/", include("clearcache.urls")),
     path("admin/", admin.site.urls, name="admin"),
     path("", ftc.views.index, name="index"),
     path("about", ftc.views.about, name="about"),

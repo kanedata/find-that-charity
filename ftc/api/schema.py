@@ -109,6 +109,88 @@ class Organisation(Schema):
     # geo_long: float = None
 
 
+class OrganisationGroup(Schema):
+    org_id: str
+    # complete_names: List[str] = None
+    orgIDs: List[str] = None
+    # ids: List[str] = None
+    name: str = None
+    # sortname: str = None
+    alternateName: List[str] = None
+    postalCode: str = None
+    domain: List[str] = None
+    active: bool = None
+    organisationType: List[str] = None
+    organisationTypePrimary: str = None
+    source: List[str] = None
+    locations: List[str] = None
+    # search_scale: float = None
+    # dateModified: datetime.datetime = None
+    score: int = None
+
+
+{
+    "search_scale": 16.8310800230497,
+    "postalCode": "N1 9RL",
+    "active": True,
+    "alternateName": [
+        "NCVO",
+        "NATIONAL COUNCIL FOR VOLUNTARY ORGANISATIONS(THE)",
+        "NATIONAL ASSOCIATION OF WOMEN'S CLUBS",
+        "National Council for Voluntary Organisations",
+        "NATIONAL OLD PEOPLES' WELFARE COUNCIL",
+        "THE NATIONAL COUNCIL OF SOCIAL SERVICES",
+        "NATIONAL FEDERATION OF COMMUNITY ORGANISATIONS",
+        "VOLUNTEERING ENGLAND",
+    ],
+    "dateModified": "2022-07-01T13:29:36.633495+00:00",
+    "source": ["ccew", "companies", "ror"],
+    "organisationType": [
+        "registered-charity",
+        "registered-charity-england-and-wales",
+        "registered-company",
+        "incorporated-charity",
+        "company-limited-by-guarantee",
+        "nonprofit-institution",
+    ],
+    "sortname": "national council for voluntary organisations",
+    "orgIDs": [
+        "GB-CHC-1102770",
+        "XI-GRID-grid.436857.b",
+        "GB-COH-00198344",
+        "GB-CHC-225922",
+        "XI-ROR-01f3f2284",
+    ],
+    "org_id": "GB-CHC-225922",
+    "domain": ["ncvo.org.uk", "ncvo.org.uk"],
+    "name": "THE NATIONAL COUNCIL FOR VOLUNTARY ORGANISATIONS",
+    "ids": [
+        "1102770",
+        "grid.436857.b",
+        "00198344",
+        "225922",
+        "01f3f2284",
+        "198344",
+        "1f3f2284",
+    ],
+    "locations": [
+        "E30000234",
+        "GB",
+        "E37000023",
+        "E14000764",
+        "E92000001",
+        "E01002710",
+        "E05000368",
+        "E13000001",
+        "E12000007",
+        "E09000019",
+        "E00013485",
+        "E02000572",
+    ],
+    "organisationTypePrimary": "registered-charity",
+}
+
+
 class Company(Schema):
     CompanyName: str = None
     CompanyNumber: str = None

@@ -4,24 +4,74 @@
 {% block extra_head %}
 <link type="text/css" rel="stylesheet" href="{% static 'css/swagger.css' %}">
 <style>
-.swagger-ui .info .title small pre,
-.swagger-ui .highlight-code > .microlight code,
-.swagger-ui code {
-    background-color: inherit;
-}
-.swagger-ui table thead tr td,
-.swagger-ui table thead tr th,
-.swagger-ui table tbody tr td,
-.swagger-ui table tbody tr th {
-    text-align: left;
-}
-.swagger-ui .parameters-col_name,
-.swagger-ui .parameters-col_description {
-    padding: 10px 0;
-}
-.swagger-ui .renderedMarkdown p {
-    margin-top: 0;
-}
+    .swagger-ui .info .title small pre,
+    .swagger-ui .highlight-code>.microlight code,
+    .swagger-ui code {
+        background-color: inherit;
+    }
+
+    .swagger-ui table thead tr td,
+    .swagger-ui table thead tr th,
+    .swagger-ui table tbody tr td,
+    .swagger-ui table tbody tr th {
+        text-align: left;
+    }
+
+    .swagger-ui .parameters-col_name,
+    .swagger-ui .parameters-col_description {
+        padding: 10px 0;
+    }
+
+    .swagger-ui .renderedMarkdown {
+        max-width: 34em;
+    }
+
+    .swagger-ui .info .renderedMarkdown a {
+        font-size: inherit;
+    }
+
+    .swagger-ui .renderedMarkdown p {
+        margin-top: 0;
+    }
+
+    .swagger-ui .info hgroup.main a {
+        font-size: inherit;
+    }
+
+    .swagger-ui .opblock-tag {
+        display: grid;
+        grid-template-columns: 1fr max-content;
+    }
+
+    .swagger-ui .opblock-tag>a {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+    }
+
+    .swagger-ui .opblock-tag>button.expand-operation {
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+    }
+
+    .swagger-ui .opblock-tag>small {
+        grid-column: 1 / 3;
+        grid-row: 2 / 3;
+        padding-left: 0;
+    }
+
+    .swagger-ui .opblock-tag>small div.renderedMarkdown {
+        padding-top: 15px;
+    }
+
+    .swagger-ui .opblock-tag small {
+        padding-left: 0;
+    }
+
+    .swagger-ui .opblock-tag>div.info__externaldocs {
+        grid-column: 1 / 3;
+        grid-row: 3 / 4;
+        text-align: inherit;
+    }
 </style>
 {% endblock %}
 
@@ -33,7 +83,7 @@
 {% endblock %}
 
 {% block bodyscripts %}
-<script src="{% static 'ninja/swagger-ui-bundle.4.14.0.js' %}"></script>
+<script src="{% static 'ninja/swagger-ui-bundle.js' %}"></script>
 <script>
     const ui = SwaggerUIBundle({
         url: '{{ openapi_json_url }}',
@@ -50,8 +100,8 @@
     },
         {% endif %}
     deepLinking: true,
-    docExpansion: "list",
-    defaultModelsExpandDepth: -1,
+        docExpansion: "list",
+            defaultModelsExpandDepth: -1,
     })
 </script>
 {% endblock %}

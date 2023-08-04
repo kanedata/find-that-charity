@@ -5,6 +5,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import reverse
 from ninja_extra import api_controller, http_get, http_post
 
+from findthatcharity.api.base import APIControllerBase
 from findthatcharity.jinja2 import get_orgtypes
 from ftc.documents import OrganisationGroup
 from ftc.models import Organisation, OrganisationType, Vocabulary
@@ -40,7 +41,7 @@ def get_orgtypes_from_str(
     "/reconcile",
     tags=["Reconciliation (against all organisations)"],
 )
-class API:
+class API(APIControllerBase):
     def _get_service_spec(
         self, request, orgtypes: Optional[Union[List[str], Literal["all"]]] = None
     ):

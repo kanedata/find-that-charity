@@ -7,7 +7,7 @@ from ninja_extra import api_controller, http_get
 
 from charity.models import Charity, CharityFinancial
 from charity.utils import regno_to_orgid
-from ftc.api.organisations import ResultError
+from findthatcharity.api.base import APIControllerBase, default_response
 
 from .schema import Charity as CharityOut
 from .schema import CharityFinancial as CharityFinancialOut
@@ -31,10 +31,10 @@ class CharityFinancialResult(Schema):
     "/charities",
     tags=["Charities"],
 )
-class API:
+class API(APIControllerBase):
     @http_get(
         "/{charity_id}",
-        response={200: CharityResult, 404: ResultError},
+        response={200: CharityResult, **default_response},
     )
     def get_charity(self, request, charity_id: str):
         charity_id = regno_to_orgid(charity_id)
@@ -54,7 +54,7 @@ class API:
 
     @http_get(
         "/{charity_id}/financial/latest",
-        response={200: CharityFinancialResult, 404: ResultError},
+        response={200: CharityFinancialResult, **default_response},
     )
     def get_charity_finance_latest(self, request, charity_id: str):
         charity_id = regno_to_orgid(charity_id)
@@ -79,7 +79,7 @@ class API:
 
     @http_get(
         "/{charity_id}/financial/{date}",
-        response={200: CharityFinancialResult, 404: ResultError},
+        response={200: CharityFinancialResult, **default_response},
     )
     def get_charity_finance_by_date(self, request, charity_id: str, date: date):
         charity_id = regno_to_orgid(charity_id)

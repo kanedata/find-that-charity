@@ -3,7 +3,7 @@ from django.shortcuts import Http404
 from ninja import Schema
 from ninja_extra import api_controller, http_get
 
-from ftc.api.organisations import ResultError
+from findthatcharity.api.base import APIControllerBase, default_response
 from ftc.api.schema import Company as CompanyOut
 
 
@@ -18,10 +18,10 @@ class CompanyResult(Schema):
     "/companies",
     tags=["Companies"],
 )
-class API:
+class API(APIControllerBase):
     @http_get(
         "/{company_number}",
-        response={200: CompanyResult, 404: ResultError},
+        response={200: CompanyResult, **default_response},
     )
     def get_company(self, request, company_number: str):
         try:

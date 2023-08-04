@@ -3,24 +3,21 @@ from typing import List
 from django.core.paginator import Paginator
 from django.shortcuts import Http404, get_object_or_404
 from ninja import Query, Schema
-from ninja_extra import api_controller, http_generic, http_get
+from ninja_extra import api_controller, http_get, http_post
 
+from findthatcharity.api.base import APIControllerBase, default_response
 from findthatcharity.utils import url_replace
 from ftc.api.filters import OrganisationFilter, OrganisationIn
+from ftc.api.filters import OrganisationSearch as OrganisationSearchIn
 from ftc.api.schema import Organisation as OrganisationOut
+from ftc.api.schema import OrganisationGroup as OrganisationGroupOut
 from ftc.api.schema import Source as SourceOut
 from ftc.documents import OrganisationGroup
 from ftc.models import Organisation
+from ftc.query import OrganisationSearch
 from ftc.query import get_linked_organisations as query_linked_organisations
 from ftc.query import get_organisation as query_organisation
 from ftc.query import random_query as query_random_organisation
-
-
-class ResultError(Schema):
-    success: bool = False
-    error: str = None
-    params: dict = {}
-    result: List = None
 
 
 class OrganisationResult(Schema):
@@ -40,6 +37,10 @@ class OrganisationResultList(Schema):
     result: List[OrganisationOut]
 
 
+class OrganisationSearchResult(OrganisationResultList):
+    result: List[OrganisationGroupOut]
+
+
 class SourceResult(Schema):
     success: bool = True
     error: str = None
@@ -47,17 +48,15 @@ class SourceResult(Schema):
     result: SourceOut
 
 
+MAX_LIMIT = 50
+
+
 @api_controller(
     "/organisations",
     tags=["Organisations"],
 )
-class API:
-    @http_generic(
-        "",
-        methods=["GET", "POST"],
-        response={200: OrganisationResultList, 404: ResultError},
-    )
-    def get_organisation_list(self, request, filters: OrganisationIn = Query({})):
+class API(APIControllerBase):
+    def _get_organisation_list(self, request, filters: OrganisationIn = Query({})):
         filters = filters.dict()
         f = OrganisationFilter(
             request.GET,
@@ -80,8 +79,54 @@ class API:
         }
 
     @http_get(
+        "",
+        summary="Get list of organisations",
+        response={200: OrganisationResultList, **default_response},
+    )
+    def get_organisation_list(self, request, filters: OrganisationIn = Query({})):
+        return self._get_organisation_list(request, filters)
+
+    @http_post(
+        "",
+        summary="Get list of organisations",
+        description="This uses POST to allow for larger query strings",
+        response={200: OrganisationResultList, **default_response},
+    )
+    def get_organisation_list_post_version(
+        self, request, filters: OrganisationIn = Query({})
+    ):
+        return self._get_organisation_list(request, filters)
+
+    @http_get(
+        "/_search",
+        response={200: OrganisationSearchResult, **default_response},
+    )
+    def organisation_search(self, request, filters: OrganisationSearchIn = Query({})):
+        if filters.limit > MAX_LIMIT:
+            filters.limit = MAX_LIMIT
+        s = OrganisationSearch(results_per_page=filters.limit)
+        filters.set_criteria(s)
+        s.run_es(with_pagination=True, with_aggregation=True)
+        response = s.paginator.get_page(filters.page)
+        result_list = [
+            {**r.to_dict(), "score": r.meta.score} for r in response.object_list
+        ]
+        return {
+            "error": None,
+            "params": filters.dict(),
+            "count": s.paginator.count,
+            "result": result_list,
+            "next": url_replace(request, page=response.next_page_number())
+            if response.has_next()
+            else None,
+            "previous": url_replace(request, page=response.previous_page_number())
+            if response.has_previous()
+            else None,
+        }
+
+    @http_get(
         "/_random",
-        response={200: OrganisationResult, 404: ResultError},
+        response={200: OrganisationResult, **default_response},
     )
     def get_random_organisation(
         self,
@@ -105,7 +150,7 @@ class API:
 
     @http_get(
         "/{organisation_id}",
-        response={200: OrganisationResult, 404: ResultError},
+        response={200: OrganisationResult, **default_response},
     )
     def get_organisation(self, request, organisation_id: str):
         try:
@@ -124,7 +169,7 @@ class API:
 
     @http_get(
         "/{organisation_id}/canonical",
-        response={200: OrganisationResult, 404: ResultError},
+        response={200: OrganisationResult, **default_response},
     )
     def get_canonical_organisation(self, request, organisation_id: str):
         orgs = query_linked_organisations(organisation_id)
@@ -144,7 +189,7 @@ class API:
 
     @http_get(
         "/{organisation_id}/linked",
-        response={200: OrganisationResultList, 404: ResultError},
+        response={200: OrganisationResultList, **default_response},
     )
     def get_linked_organisations(self, request, organisation_id: str):
         try:
@@ -167,7 +212,7 @@ class API:
 
     @http_get(
         "/{organisation_id}/source",
-        response={200: SourceResult, 404: ResultError},
+        response={200: SourceResult, **default_response},
     )
     def get_organisation_source(self, request, organisation_id: str):
         try:

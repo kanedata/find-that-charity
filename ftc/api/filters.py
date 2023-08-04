@@ -28,3 +28,26 @@ class OrganisationIn(Schema):
     active: bool = True
     page: int = 1
     limit: int = 10
+
+
+class OrganisationSearch(Schema):
+    organisationType: List[str] = None
+    source: List[str] = None
+    location: List[str] = None
+    q: str = None
+    postcode: str = None
+    domain: str = None
+    active: bool = True
+    page: int = 1
+    limit: int = 10
+
+    def set_criteria(self, search):
+        search.set_criteria(
+            term=self.q,
+            other_orgtypes=self.organisationType,
+            source=self.source,
+            active=self.active,
+            domain=self.domain,
+            postcode=self.postcode,
+            location=self.location,
+        )
