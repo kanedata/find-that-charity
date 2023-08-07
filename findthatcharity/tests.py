@@ -66,7 +66,7 @@ class TestUtils(unittest.TestCase):
             self.assertEqual(number_format(amount, **kwargs), formatted)
 
 
-class IndexViewTests(ftc.tests.TestCase):
+class IndexViewTests(findthatcharity.apps.ftc.tests.TestCase):
     def test_index(self):
         response = self.client.get(reverse("index"))
         self.assertEqual(response.status_code, 200)
@@ -94,7 +94,7 @@ class IndexViewTests(ftc.tests.TestCase):
         self.assertContains(response, "Source publisher", html=True)
 
 
-class TestClacks(ftc.tests.TestCase):
+class TestClacks(findthatcharity.apps.ftc.tests.TestCase):
     def test_xheader_exists(self):
         response = self.client.get(reverse("about"))
         self.assertEqual(response["X-Clacks-Overhead"], "GNU Terry Pratchett")
