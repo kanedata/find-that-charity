@@ -90,6 +90,9 @@ INSTALLED_APPS = [
     "findthatcharity.apps.geo",
     "findthatcharity.apps.other_data",
     "findthatcharity.apps.ftcbot",
+    "charity_django.ccew",
+    "charity_django.oscr",
+    "charity_django.ccni",
     "charity_django.companies",
     "markdownx",
     "prettyjson",
@@ -97,6 +100,7 @@ INSTALLED_APPS = [
     "ninja",
     "ninja_extra",
     "ninja_apikey",
+    "graphene_django",
     "django_better_admin_arrayfield",
     "django_filters",
     "corsheaders",
@@ -321,6 +325,7 @@ NINJA_EXTRA = {
         "api": "120/minute",
     },
 }
+GRAPHENE = {"SCHEMA": "findthatcharity.api.graphql.schema"}
 
 TWITTER_CONSUMER_KEY = os.environ.get("TWITTER_CONSUMER_KEY")
 TWITTER_CONSUMER_SECRET = os.environ.get("TWITTER_CONSUMER_SECRET")

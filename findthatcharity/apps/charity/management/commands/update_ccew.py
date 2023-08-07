@@ -1,28 +1,6 @@
-# -*- coding: utf-8 -*-
-import csv
-import io
 import re
-import zipfile
-
-import psycopg2
-import tqdm
 
 from findthatcharity.apps.charity.management.commands._ccew_sql import UPDATE_CCEW
-from findthatcharity.apps.charity.models import (
-    CCEWCharity,
-    CCEWCharityAnnualReturnHistory,
-    CCEWCharityAreaOfOperation,
-    CCEWCharityARPartA,
-    CCEWCharityARPartB,
-    CCEWCharityClassification,
-    CCEWCharityEventHistory,
-    CCEWCharityGoverningDocument,
-    CCEWCharityOtherNames,
-    CCEWCharityOtherRegulators,
-    CCEWCharityPolicy,
-    CCEWCharityPublishedReport,
-    CCEWCharityTrustee,
-)
 from findthatcharity.apps.ftc.management.commands._base_scraper import BaseScraper
 from findthatcharity.apps.ftc.models import (
     Organisation,
@@ -63,21 +41,6 @@ class Command(BaseScraper):
             }
         ],
     }
-    ccew_file_to_object = {
-        "charity": CCEWCharity,
-        "charity_annual_return_history": CCEWCharityAnnualReturnHistory,
-        "charity_annual_return_parta": CCEWCharityARPartA,
-        "charity_annual_return_partb": CCEWCharityARPartB,
-        "charity_area_of_operation": CCEWCharityAreaOfOperation,
-        "charity_classification": CCEWCharityClassification,
-        "charity_event_history": CCEWCharityEventHistory,
-        "charity_governing_document": CCEWCharityGoverningDocument,
-        "charity_other_names": CCEWCharityOtherNames,
-        "charity_other_regulators": CCEWCharityOtherRegulators,
-        "charity_policy": CCEWCharityPolicy,
-        "charity_published_report": CCEWCharityPublishedReport,
-        "charity_trustee": CCEWCharityTrustee,
-    }
     orgtypes = [
         "Registered Charity",
         "Registered Charity (England and Wales)",
@@ -88,69 +51,6 @@ class Command(BaseScraper):
         "Charitable Incorporated Organisation - Foundation",
         "Trust",
     ]
-
-    def fetch_file(self):
-        self.files = {}
-        for filename in self.ccew_file_to_object:
-            url = self.base_url.format(filename)
-            self.set_download_url(url)
-            r = self.session.get(url)
-            r.raise_for_status()
-            self.files[filename] = r
-
-    def parse_file(self, response, filename):
-        try:
-            z = zipfile.ZipFile(io.BytesIO(response.content))
-        except zipfile.BadZipFile:
-            self.logger.info(response.content[0:1000])
-            raise
-        for f in z.infolist():
-            self.logger.info("Opening: {}".format(f.filename))
-            with z.open(f) as csvfile:
-                self.process_file(csvfile, filename)
-        z.close()
-
-    def process_file(self, csvfile, filename):
-        db_table = self.ccew_file_to_object.get(filename)
-        page_size = 1000
-
-        def convert_encoding(row):
-            for k in row:
-                if isinstance(row[k], str):
-                    row[k] = row[k].decode(self.encoding).encode("utf8")
-
-        def get_data(reader, row_count=None):
-            for k, row in tqdm.tqdm(enumerate(reader)):
-                row = self.clean_fields(row)
-                if row_count and row_count != (len(row) + 1):
-                    self.logger.info(row)
-                    raise ValueError(
-                        "Incorrect number of rows (expected {} and got {})".format(
-                            row_count,
-                            len(row) + 1,
-                        )
-                    )
-                yield [k] + list(row.values())
-
-        reader = csv.DictReader(
-            io.TextIOWrapper(csvfile, encoding="utf8"),
-            delimiter="\t",
-            escapechar="\\",
-            quoting=csv.QUOTE_NONE,
-        )
-        self.logger.info("Starting table insert [{}]".format(db_table._meta.db_table))
-        db_table.objects.all().delete()
-        statement = """INSERT INTO "{table}" ("{fields}") VALUES %s;""".format(
-            table=db_table._meta.db_table,
-            fields='", "'.join(["id"] + list(reader.fieldnames)),
-        )
-        psycopg2.extras.execute_values(
-            self.cursor,
-            statement,
-            get_data(reader, len(reader.fieldnames) + 1),
-            page_size=page_size,
-        )
-        self.logger.info("Finished table insert [{}]".format(db_table._meta.db_table))
 
     def close_spider(self):
         # execute SQL statements

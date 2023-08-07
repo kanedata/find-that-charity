@@ -7,34 +7,45 @@ insert into charity_charity as cc (id, name, constitution , geographical_spread,
     address, postcode, phone, active, date_registered, date_removed, removal_reason,
     web, email, company_number, activities, source, first_added, last_updated, income,
     spending, latest_fye, dual_registered, scrape_id, spider)
-select cc.org_id as org_id,
-    cc.data->>'Charity name' as "name",
+with address_rows as (
+	select cc.reg_charity_number,
+		jsonb_array_elements_text(array_to_json(regexp_split_to_array(cc.public_address, ', ?'))::jsonb - (-1)) as address_value
+	from ccni_charity cc
+),
+address_groups as (
+	select reg_charity_number, string_agg(address_value, ', ') as address
+	from address_rows
+	group by reg_charity_number
+)
+select 'GB-NIC-' || cc.reg_charity_number as org_id,
+    cc.charity_name as "name",
     null as constitution,
     null as geographical_spread,
-    cc.data->>'address' as address,
-    cc.data->>'postcode' as postcode,
-    cc.data->>'Telephone' as phone,
-    cc.data->>'Status'!='Removed' as active,
-    to_date(cc.data->>'Date registered', 'YYYY-MM-DD') as date_registered,
+    address_groups.address as address,
+    array_to_json(regexp_split_to_array(cc.public_address, ', ?'))::jsonb->>-1 as postcode,
+    cc.telephone as phone,
+    cc.status!='Removed' as active,
+    cc.date_registered as date_registered,
     null as date_removed,
     null as removal_reason,
-    cc.data->>'Website' as web,
-    cc.data->>'Email' as email,
-    case when cc.data->>'Company Number' != '0'
-        then cc.data->>'Company Number'
+    cc.website as web,
+    cc.email as email,
+    case when cc.company_number != '0'
+        then cc.company_number
         else null end as company_number,
     null as activities,
-    cc.spider as source,
+    %(spider_name)s as source,
      NOW() as "first_added",
      NOW() as "last_updated",
-    (cc.data->>'Total income')::int as income,
-    (cc.data->>'Total spending')::int as spending,
-    to_date(cc.data->>'Date for financial year ending', 'YYYY-MM-DD') as latest_fye,
+    cc.total_income as income,
+    cc.total_spending as spending,
+    cc.date_for_financial_year_ending as latest_fye,
     null as dual_registered,
-    cc.scrape_id as "scrape_id",
-    cc.spider as "spider"
-from charity_charityraw cc
-where cc.spider = %(spider_name)s
+    %(scrape_id)s as "scrape_id",
+    %(spider_name)s as "spider"
+from ccni_charity cc
+	left outer join address_groups
+		on cc.reg_charity_number = address_groups.reg_charity_number
 on conflict (id) do update
 set "name" = EXCLUDED.name,
     constitution = COALESCE(EXCLUDED.constitution, cc.constitution),
@@ -77,19 +88,19 @@ insert into charity_charityfinancial as cf (
     charity_id, fyend, income, inc_total, spending,
     exp_total, exp_vol, exp_charble, account_type
 )
-select cc.org_id as org_id,
-    to_date(cc.data->>'Date for financial year ending', 'YYYY-MM-DD') as fyend,
-    (cc.data->>'Total income')::int as income,
-    (cc.data->>'Total income')::int as inc_total,
-    (cc.data->>'Total spending')::int as spending,
-    (cc.data->>'Total spending')::int as exp_total,
-    (cc.data->>'Income generation and governance')::int as exp_vol,
-    (cc.data->>'Charitable spending')::int as exp_charble,
-    case when (cc.data->>'Charitable spending')::int > 0
+select 'GB-NIC-' || cc.reg_charity_number as org_id,
+    cc.date_for_financial_year_ending as fyend,
+    cc.total_income as income,
+    cc.total_income as inc_total,
+    cc.total_spending as spending,
+    cc.total_spending as exp_total,
+    cc.income_generation_and_governance as exp_vol,
+    cc.charitable_spending as exp_charble,
+    case when cc.charitable_spending > 0
         then 'detailed_ccni' else 'basic_ccni' end as account_type
-from charity_charityraw cc
+from ccni_charity cc
 where cc.spider = %(spider_name)s
-    and cc.data->>'Date for financial year ending' is not null
+    and cc.date_for_financial_year_ending is not null
 on conflict (charity_id, fyend) do update
 set income = EXCLUDED.income,
     inc_total = EXCLUDED.inc_total,

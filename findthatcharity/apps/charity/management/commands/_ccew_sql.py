@@ -13,7 +13,7 @@ select CONCAT('GB-CHC-', c.registered_charity_number) as "org_id",
         c."charity_contact_address5"
     ), '') as address,
     c.charity_contact_postcode as postcode
-from charity_ccewcharity c
+from ccew_charity c
 where linked_charity_number = 0
 )
 insert into charity_charityaddresshistory (
@@ -47,7 +47,7 @@ insert into charity_charity as cc (id, name, constitution , geographical_spread,
     spending, latest_fye, scrape_id, spider)
 with earliest_event as (
     select e.organisation_number, min(e.date_of_event) as earliest_date
-    from charity_ccewcharityeventhistory e
+    from ccew_charityeventhistory e
     group by e.organisation_number
 )
 select distinct on(c.registered_charity_number)
@@ -80,10 +80,10 @@ select distinct on(c.registered_charity_number)
     c.latest_acc_fin_period_end_date as latest_fye,
     %(scrape_id)s as "scrape_id",
     %(spider_name)s as "spider"
-from charity_ccewcharity c
-    left outer join charity_ccewcharitygoverningdocument cgd
+from ccew_charity c
+    left outer join ccew_charitygoverningdocument cgd
         on c.organisation_number = cgd.organisation_number
-    left outer join charity_ccewcharityeventhistory ceh
+    left outer join ccew_charityeventhistory ceh
         on c.organisation_number = ceh.organisation_number
             and ceh.date_of_event = c.date_of_removal
             and ceh.event_type = 'Removed'
@@ -162,7 +162,7 @@ from (
         c.total_gross_income as "income",
         c.total_gross_expenditure as "spending",
         'basic' as "account_type"
-    from charity_ccewcharityannualreturnhistory c
+    from ccew_charityannualreturnhistory c
     where "total_gross_income" is not null
 ) as a
 on conflict (charity_id, fyend) do update
@@ -193,7 +193,7 @@ from (
         c.total_gross_expenditure as "spending",
         c.count_volunteers as "volunteers",
         'basic' as "account_type"
-    from charity_ccewcharityarparta c
+    from ccew_charityarparta c
     where "total_gross_income" is not null
 ) as a
 on conflict (charity_id, fyend) do update
@@ -249,7 +249,7 @@ set
     employees = a.count_employees,
     account_type = case when "consolidated_accounts"
         then 'consolidated' else 'charity' end
-from charity_ccewcharityarpartb a
+from ccew_charityarpartb a
 where cf.charity_id = CONCAT('GB-CHC-', a.registered_charity_number)
     and cf.fyend = a.fin_period_end_date;
 """
@@ -273,7 +273,7 @@ set trustees = t.trustees
 from (
     select CONCAT('GB-CHC-', registered_charity_number) as "charity_id",
         COUNT(*) as trustees
-    from charity_ccewcharitytrustee
+    from ccew_charitytrustee
     where linked_charity_number = 0
     group by charity_id
 ) as t
@@ -286,7 +286,7 @@ UPDATE_CCEW[
 insert into charity_charity_areas_of_operation as ca (charity_id, areaofoperation_id )
 select CONCAT('GB-CHC-', c.registered_charity_number) as charity_id,
     aoo.id as "areaofoperation_id"
-from charity_ccewcharityareaofoperation c
+from ccew_charityareaofoperation c
     inner join charity_areaofoperation aoo
         on c.geographic_area_description = aoo.aooname
 on conflict (charity_id, areaofoperation_id) do nothing;
@@ -302,8 +302,8 @@ select CONCAT('GB-CHC-', c.registered_charity_number) as charity_id,
     case when c.linked_charity_number != '0' then 'Subsidiary'
         when c.charity_name = ccc."charity_name" then 'Primary'
         else c.charity_name_type end as "name_type"
-from charity_ccewcharityothernames c
-    left outer join charity_ccewcharity ccc
+from ccew_charityothernames c
+    left outer join ccew_charity ccc
         on c.registered_charity_number = ccc.registered_charity_number
             and c.linked_charity_number = ccc.linked_charity_number
 where c.charity_name is not null
@@ -332,7 +332,7 @@ select c.classification_code as "code",
     c.classification_description as "title",
     cv.id,
     true
-from charity_ccewcharityclassification c
+from ccew_charityclassification c
     inner join ftc_vocabulary cv
         on case when c.classification_type = 'What' then 'ccew_theme'
             when c.classification_type = 'How' then 'ccew_activities'
@@ -363,7 +363,7 @@ select org_id,
 from (
     select CONCAT('GB-CHC-', c.registered_charity_number) as org_id,
         cast(c.classification_code as varchar) as "c_class"
-    from charity_ccewcharityclassification c
+    from ccew_charityclassification c
 ) as c_class
     inner join ftc_vocabularyentries ve
         on c_class.c_class = ve.code
@@ -473,7 +473,7 @@ from charity_charity cc
         group by charity_id
     ) as cn
         on cc.id = cn.charity_id
-    left outer join charity_ccewcharity ccew
+    left outer join ccew_charity ccew
         on cc.id = CONCAT('GB-CHC-', ccew.registered_charity_number)
             and ccew.linked_charity_number = '0',
     ftc_organisationtype ot
@@ -526,7 +526,7 @@ select CONCAT('GB-CHC-', cc.registered_charity_number) as org_id,
     %(source_id)s as spider,
     %(source_id)s as source_id,
     %(scrape_id)s as scrape_id
-from charity_ccewcharityareaofoperation cc
+from ccew_charityareaofoperation cc
     inner join charity_areaofoperation ca
         on cc.geographic_area_description = ca.aooname
 where ca."GSS" is not null or ca."ISO3166_1" is not null

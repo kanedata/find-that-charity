@@ -17,6 +17,7 @@ import django_sql_dashboard
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import TemplateView
+from graphene_django.views import GraphQLView
 
 import findthatcharity.apps.addtocsv.views
 import findthatcharity.apps.charity.urls
@@ -41,6 +42,7 @@ urlpatterns = [
     path("", findthatcharity.apps.ftc.views.index, name="index"),
     path("about", findthatcharity.apps.ftc.views.about, name="about"),
     path("adddata/", findthatcharity.apps.addtocsv.views.index, name="csvtool"),
+    path("api/v1/graphql", GraphQLView.as_view(graphiql=True)),
     path("api/v1/", api.urls),
     path("orgid/", include(findthatcharity.apps.ftc.urls)),
     path("charity/", include(findthatcharity.apps.charity.urls)),

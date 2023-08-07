@@ -44,5 +44,6 @@ django-debug-toolbar
 django-enforce-host
 ua-parser
 sqlite-utils
-git+https://github.com/kanedata/charity-django.git@v0.4.1
+git+https://github.com/kanedata/charity-django.git@v0.8.1
 django-clearcache
+graphene-django

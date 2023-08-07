@@ -2,7 +2,7 @@ import datetime
 from collections import defaultdict
 
 from findthatcharity.apps.charity.management.commands._ccni_sql import UPDATE_CCNI
-from findthatcharity.apps.charity.management.commands.import_oscr import (
+from findthatcharity.apps.charity.management.commands.update_oscr import (
     Command as BaseCommand,
 )
 from findthatcharity.apps.ftc.management.commands._base_scraper import CSVScraper
