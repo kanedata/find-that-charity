@@ -2,82 +2,88 @@
 {% with default_title="Find that Charity" %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{% static 'lib/tachyons/tachyons.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" />
-    <title>{{ default_title }} - {% block title %}{% endblock %}</title>
-    {% block extra_head %}{% endblock %}
-  </head>
-  <body class="home w-100 sans-serif near-black base-font bg-wavy">
-    <header class="body header-font normal ph3 ph5-ns pt4 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
-      <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
-        <a href="{% url 'about' %}" class="white logo underline double underline-yellow">About</a> | 
-          {% if request.user.is_authenticated %}
-            <a href="{% url 'account_profile' %}" class="white logo underline double underline-yellow">Profile</a>
-            | <a href="{% url 'admin:logout' %}" class="white logo underline double underline-yellow">Logout</a>
-          {% else %}
-            <a href="{% url 'login' %}" class="white logo underline double underline-yellow">Login</a>
-          {% endif %}
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{% static 'lib/tachyons/tachyons.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" />
+  <title>{{ default_title }} - {% block title %}{% endblock %}</title>
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="home w-100 sans-serif near-black base-font bg-wavy">
+  <header class="body header-font normal ph3 ph5-ns pt4 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
+    <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
+      <a href="{% url 'about' %}" class="white logo underline double underline-yellow">About</a> |
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'account_profile' %}" class="white logo underline double underline-yellow">Profile</a>
+      | <a href="{% url 'admin:logout' %}" class="white logo underline double underline-yellow">Logout</a>
+      {% else %}
+      <a href="{% url 'login' %}" class="white logo underline double underline-yellow">Login</a>
+      {% endif %}
+    </div>
+    <h1 class="{% if frontpage %}f-subheadline-ns{% endif %} tracked-tight f1 lh-title mv0 logo normal">
+      <a href="{% url 'index' %}" class="link moon-gray underline-yellow underline">
+        {{ default_title }}
+      </a>
+    </h1>
+  </header>
+  <main class="ph0 bg-white cf">
+    <section id="content"
+      class="{% block sectionstyles %}fl w-100 ph3 pv5 ph5-ns lh-copy f4 entry-content{% endblock %}">
+      {% block content %}{% endblock %}
+    </section>
+  </main>
+  <footer id="contentinfo" class="body ph3 ph5-ns db pv5 moon-gray bg-near-black">
+    <div class="w-100">
+      <div class="w-100 w-third-l fr-l">
+        <p class="mv2 pa0 f6">
+          Find that Charity combines data from a number of different <a href="{% url 'about' %}#data-sources"
+            class="link yellow underline-hover">data sources</a>
+          published by official regulators of organisations. Those regulators provide the most up-to-date and official
+          versions of the data and should be contacted in
+          the event of any issues with the data on this site.
+        </p>
       </div>
-      <h1 class="{% if frontpage %}f-subheadline-ns{% endif %} tracked-tight f1 lh-title mv0 logo normal">
-        <a href="{% url 'index' %}" class="link moon-gray underline-yellow underline">
-          {{ default_title }}
-        </a>
-      </h1>
-    </header>
-    <main class="ph0 bg-white cf">
-      <section id="content" class="{% block sectionstyles %}fl w-100 ph3 pv5 ph5-ns lh-copy f4 entry-content{% endblock %}">
-        {% block content %}{% endblock %}
-      </section>
-    </main>
-    <footer id="contentinfo" class="body ph3 ph5-ns db pv5 moon-gray bg-near-black">
-      <div class="w-100">
-        <div class="w-100 w-third-l fr-l">
-          <p class="mv2 pa0 f6">
-            Find that Charity combines data from a number of different <a href="{% url 'about' %}#data-sources"
-              class="link yellow underline-hover">data sources</a>
-            published by official regulators of organisations. Those regulators provide the most up-to-date and official
-            versions of the data and should be contacted in
-            the event of any issues with the data on this site.
-          </p>
+      <div class="w-100 w-two-thirds-l">
+        <p class="mv2 pa0">
+          <strong>Find that Charity</strong>
+          | <a href="{% url 'about' %}" class="link yellow underline-hover">About</a>
+          | <a href="{% url 'about' %}#data-sources" class="link yellow underline-hover">Data sources</a>
+          | <a href="{% url 'about' %}#privacy" class="link yellow underline-hover">Privacy</a>
+          | <a href="https://findthatpostcode.uk/" target="_blank" class="link yellow underline-hover">Find that
+            postcode</a>
+        </p>
+        <div class="mv2 pa0">
+          Supported by <a href="http://www.threesixtygiving.org/" target="_blank"
+            class="link yellow underline-hover">360Giving</a> |
+          <a href="https://github.com/kanedata/find-that-charity" target="_blank" class="link yellow underline-hover"
+            title="View code on Github">Code</a> [<a
+            href="https://github.com/kanedata/find-that-charity/blob/main/LICENSE" target="_blank"
+            class="link yellow underline-hover">MIT License</a>] |
+          <a href="https://m.do.co/c/395b3c814647" target="_blank" class="link yellow underline-hover"
+            title="DigitalOcean referral link">Powered by DigitalOcean</a>
         </div>
-        <div class="w-100 w-two-thirds-l">
-          <p class="mv2 pa0">
-            <strong>Find that Charity</strong>
-            | <a href="{% url 'about' %}" class="link yellow underline-hover">About</a>
-            | <a href="{% url 'about' %}#data-sources" class="link yellow underline-hover">Data sources</a>
-            | <a href="{% url 'about' %}#privacy" class="link yellow underline-hover">Privacy</a>
-            | <a href="https://findthatpostcode.uk/" target="_blank" class="link yellow underline-hover">Find that
-              postcode</a>
-          </p>
-          <div class="mv2 pa0">
-            Supported by <a href="http://www.threesixtygiving.org/" target="_blank"
-              class="link yellow underline-hover">360Giving</a> |
-            <a href="https://github.com/kanedata/find-that-charity" target="_blank" class="link yellow underline-hover"
-              title="View code on Github">Code</a> [<a
-              href="https://github.com/kanedata/find-that-charity/blob/main/LICENSE" target="_blank"
-              class="link yellow underline-hover">MIT License</a>] |
-            <a href="https://m.do.co/c/395b3c814647" target="_blank" class="link yellow underline-hover"
-              title="DigitalOcean referral link">Powered by DigitalOcean</a>
-          </div>
-          <p class="mv2 pa0">© 2017 - {{now.year}} <a href="https://dkane.net/" class="link yellow underline-hover">Kane Data
-              Limited</a></p>
-          <p class="mv2 pa0 f7">
-            Kane Data Limited is registered as a company in England (company number <a
-              href="https://find-and-update.company-information.service.gov.uk/company/14015213" target="_blank"
-              class="link yellow">14015213</a>)
-          </p>
-        </div>
+        <p class="mv2 pa0">© 2017 - {{now.year}} <a href="https://kanedata.co.uk/"
+            class="link yellow underline-hover">Kane Data
+            Limited</a></p>
+        <p class="mv2 pa0 f7">
+          Kane Data Limited is registered as a company in England (company number <a
+            href="https://find-and-update.company-information.service.gov.uk/company/14015213" target="_blank"
+            class="link yellow">14015213</a>)
+        </p>
       </div>
-    </footer>
-    {% block bodyscripts %}
-    {% endblock %}
-    <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-    <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade" /></noscript>
-  </body>
+    </div>
+  </footer>
+  {% block bodyscripts %}
+  {% endblock %}
+  <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt=""
+      referrerpolicy="no-referrer-when-downgrade" /></noscript>
+</body>
+
 </html>
 {% endwith %}

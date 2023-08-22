@@ -17,7 +17,7 @@
 <body class="home w-100 sans-serif near-black base-font bg-wavy">
   <header class="body header-font normal ph3 ph5-ns pt4 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
     <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
-      <a href="{{ url('about') }}" class="white logo underline double underline-yellow">About</a> | 
+      <a href="{{ url('about') }}" class="white logo underline double underline-yellow">About</a> |
       {% if request.user.is_authenticated %}
       <a href="{{ url('account_profile') }}" class="white logo underline double underline-yellow">Profile</a>
       | <a href="{{ url('admin:logout') }}" class="white logo underline double underline-yellow">Logout</a>
@@ -82,7 +82,8 @@
           <a href="https://m.do.co/c/395b3c814647" target="_blank" class="link yellow underline-hover"
             title="DigitalOcean referral link">Powered by DigitalOcean</a>
         </div>
-        <p class="mv2 pa0">© 2017 - {{now.year}} <a href="https://dkane.net/" class="link yellow underline-hover">Kane Data
+        <p class="mv2 pa0">© 2017 - {{now.year}} <a href="https://kanedata.co.uk/"
+            class="link yellow underline-hover">Kane Data
             Limited</a></p>
         <p class="mv2 pa0 f7">
           Kane Data Limited is registered as a company in England (company number <a
