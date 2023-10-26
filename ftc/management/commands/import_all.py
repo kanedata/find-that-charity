@@ -23,10 +23,7 @@ class Command(BaseCommand):
     ]
 
     def handle(self, *args, **options):
-        scrapers_to_run = ["import_{}".format(scraper) for scraper in self.scrapers] + [
-            "update_orgids",
-            "update_geodata",
-        ]
+        scrapers_to_run = ["import_{}".format(scraper) for scraper in self.scrapers]
         for scraper in scrapers_to_run:
             try:
                 management.call_command(scraper)

@@ -13,6 +13,7 @@ data/
 
 # djangofiles
 /static/
+/staticfiles/
 
 # python files
 __pycache__/

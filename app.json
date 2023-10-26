@@ -6,32 +6,20 @@
     },
     "cron": [
         {
-            "command": "python ./manage.py import_all",
-            "schedule": "0 1 * * * "
-        },
-        {
             "command": "python ./manage.py import_oscr",
             "schedule": "0 20 * * 4"
         },
         {
-            "command": "python ./manage.py import_charities",
-            "schedule": "0 2 * * 0-5"
+            "command": "sh ./update_daily.sh",
+            "schedule": "0 1 * * 1-5"
         },
         {
-            "command": "python ./manage.py import_ch",
-            "schedule": "0 2 * * 6"
+            "command": "sh ./update_saturday.sh",
+            "schedule": "0 1 * * 6"
         },
         {
-            "command": "python ./manage.py import_other_data",
-            "schedule": "0 0 * * 0"
-        },
-        {
-            "command": "python ./manage.py es_index",
-            "schedule": "0 4 * * *"
-        },
-        {
-            "command": "python ./manage.py tweet",
-            "schedule": "47 * * * *"
+            "command": "sh ./update_sunday.sh",
+            "schedule": "0 1 * * 0"
         }
     ]
 }
