@@ -17,7 +17,7 @@ SCALE_INACTIVE = 0.7
 
 class RelatedOrganisation:
     def __init__(self, orgs):
-        self.records = self.prioritise_orgs(orgs)
+        self.records: list[Organisation] = self.prioritise_orgs(orgs)
 
     @classmethod
     def from_orgid(cls, org_id):

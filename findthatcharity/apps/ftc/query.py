@@ -1,8 +1,9 @@
 import copy
+from typing import Optional
 
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Func, Q
-from django.shortcuts import Http404
+from django.http import Http404, HttpRequest
 from elasticsearch_dsl import A
 
 from findthatcharity.apps.ftc.documents import DSEPaginator, OrganisationGroup
@@ -14,7 +15,7 @@ from findthatcharity.apps.ftc.models import (
 from findthatcharity.apps.reconcile.query import RECONCILE_QUERY
 
 
-def get_organisation(org_id):
+def get_organisation(org_id: str) -> Organisation:
     try:
         return Organisation.objects.get(org_id=org_id)
     except Organisation.DoesNotExist or Organisation.MultipleObjectsReturned:
@@ -26,14 +27,19 @@ def get_organisation(org_id):
             raise Http404("No Organisation found.")
 
 
-def get_linked_organisations(org_id):
+def get_linked_organisations(org_id: str) -> RelatedOrganisation:
     related_orgs = list(Organisation.objects.filter(linked_orgs__contains=[org_id]))
     if not related_orgs:
         raise Http404("No Organisation found.")
     return RelatedOrganisation(related_orgs)
 
 
-def random_query(active=False, orgtype=None, aggregate=False, source=None):
+def random_query(
+    active: bool = False,
+    orgtype: Optional[list | str] = None,
+    aggregate: bool = False,
+    source: Optional[list | str] = None,
+) -> dict:
     query = {
         "query": {
             "function_score": {
@@ -73,16 +79,16 @@ def random_query(active=False, orgtype=None, aggregate=False, source=None):
 
 
 class OrganisationSearch:
-    def __init__(self, results_per_page=25, **kwargs):
-        self.results_per_page = results_per_page
-        self.term = None
-        self.base_orgtype = None
-        self.other_orgtypes = None
-        self.source = None
-        self.active = None
-        self.domain = None
-        self.postcode = None
-        self.location = None
+    def __init__(self, results_per_page: int = 25, **kwargs):
+        self.results_per_page: int = results_per_page
+        self.term: Optional[str] = None
+        self.base_orgtype: Optional[list[str]] = None
+        self.other_orgtypes: Optional[list[str]] = None
+        self.source: Optional[list[str]] = None
+        self.active: Optional[bool] = None
+        self.domain: Optional[str] = None
+        self.postcode: Optional[str] = None
+        self.location: Optional[list[str]] = None
 
         self.query = None
         self.paginator = None
@@ -93,14 +99,14 @@ class OrganisationSearch:
 
     def set_criteria(
         self,
-        term=None,
-        base_orgtype=None,
-        other_orgtypes=None,
-        source=None,
-        active=None,
-        domain=None,
-        postcode=None,
-        location=None,
+        term: Optional[str] = None,
+        base_orgtype: Optional[list[str] | str] = None,
+        other_orgtypes: Optional[list[str] | str] = None,
+        source: Optional[list[str] | str] = None,
+        active: Optional[bool] = None,
+        domain: Optional[str] = None,
+        postcode: Optional[str] = None,
+        location: Optional[list[str] | str] = None,
     ):
         if term and isinstance(term, str):
             self.term = term
@@ -129,7 +135,7 @@ class OrganisationSearch:
         if isinstance(domain, str):
             self.postcode = postcode
 
-    def set_criteria_from_request(self, request):
+    def set_criteria_from_request(self, request: HttpRequest) -> None:
         if "orgtype" in request.GET and request.GET.get("orgtype") != "all":
             self.set_criteria(other_orgtypes=request.GET.getlist("orgtype"))
         if "source" in request.GET and request.GET.get("source") != "all":
@@ -144,15 +150,15 @@ class OrganisationSearch:
             self.set_criteria(active=False)
 
     @property
-    def orgtypes(self):
-        orgtypes = []
+    def orgtypes(self) -> list[str]:
+        orgtypes: list[str] = []
         if isinstance(self.base_orgtype, list):
             orgtypes.extend(self.base_orgtype)
         if isinstance(self.other_orgtypes, list):
             orgtypes.extend(self.other_orgtypes)
         return orgtypes
 
-    def run_es(self, with_pagination=False, with_aggregation=False):
+    def run_es(self, with_pagination: bool = False, with_aggregation: bool = False):
         """
         Fetch the reconciliation query and insert the query term
         """

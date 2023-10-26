@@ -1,7 +1,8 @@
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
 
-def missing_page_handler(request, exception=None):
+def missing_page_handler(request: HttpRequest, exception=None) -> HttpResponse:
     return render(
         request,
         "error.html.j2",

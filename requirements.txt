@@ -50,6 +50,7 @@ click-default-group-wheel==1.2.2
 colorama==0.4.6
     # via
     #   click
+    #   pytest
     #   tqdm
 confusable-homoglyphs==3.2.0
     # via django-registration
@@ -123,7 +124,9 @@ elasticsearch-dsl==7.4.1
 et-xmlfile==1.1.0
     # via openpyxl
 exceptiongroup==1.1.2
-    # via cattrs
+    # via
+    #   cattrs
+    #   pytest
 fake-useragent==1.2.1
     # via requests-html
 faker==19.2.0
@@ -153,6 +156,8 @@ inflect==7.0.0
     # via
     #   -r requirements.in
     #   charity-django
+iniconfig==2.0.0
+    # via pytest
 injector==0.21.0
     # via django-ninja-extra
 jinja2==3.1.2
@@ -183,6 +188,7 @@ packaging==23.1
     # via
     #   black
     #   gunicorn
+    #   pytest
 parse==1.19.1
     # via requests-html
 pathspec==0.11.2
@@ -194,7 +200,9 @@ platformdirs==3.10.0
     #   black
     #   requests-cache
 pluggy==1.2.0
-    # via sqlite-utils
+    # via
+    #   pytest
+    #   sqlite-utils
 promise==2.3
     # via graphene-django
 psycopg2==2.9.6
@@ -220,6 +228,10 @@ pyppeteer==1.0.2
     # via requests-html
 pyquery==2.0.0
     # via requests-html
+pytest==7.4.0
+    # via pytest-django
+pytest-django==4.5.2
+    # via -r requirements.in
 python-dateutil==2.8.2
     # via
     #   charity-django
@@ -286,7 +298,9 @@ titlecase==2.4
     #   -r requirements.in
     #   charity-django
 tomli==2.0.1
-    # via black
+    # via
+    #   black
+    #   pytest
 tqdm==4.65.0
     # via
     #   -r requirements.in

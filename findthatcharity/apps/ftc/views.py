@@ -1,8 +1,9 @@
 import csv
 from collections import defaultdict
+from typing import Any, Optional
 
 from charity_django.companies.models import Company
-from django.http import JsonResponse, StreamingHttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -28,11 +29,11 @@ from findthatcharity.apps.other_data.models import CQCProvider, Grant, WikiDataI
 
 
 # site homepage
-def index(request):
+def index(request: HttpRequest) -> HttpResponse:
     if "q" in request.GET:
         return orgid_type(request, filetype=request.GET.get("filetype", "html"))
 
-    context = dict(
+    context: dict[str, Any] = dict(
         examples={
             "registered-charity-england-and-wales": "GB-CHC-1177548",
             "registered-charity-scotland": "GB-SC-SC007427",
@@ -63,13 +64,19 @@ def index(request):
     return render(request, "index.html.j2", context)
 
 
-def about(request):
+def about(request: HttpRequest) -> HttpResponse:
     context = {}
     return render(request, "about.html.j2", context)
 
 
 @xframe_options_exempt
-def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=False):
+def get_org_by_id(
+    request: HttpRequest,
+    org_id: str,
+    filetype: str = "html",
+    preview: bool = False,
+    as_charity: bool = False,
+) -> HttpResponse:
     org = get_organisation(org_id)
     charity = Charity.objects.filter(id=org_id).first()
 
@@ -91,7 +98,7 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
         related_orgs = [org]
     related_orgs = RelatedOrganisation(related_orgs)
 
-    additional_data = dict(
+    additional_data: dict[str, Any] = dict(
         cqc=CQCProvider.objects.filter(org_id__in=related_orgs.orgIDs).all(),
         grants_received=list(
             Grant.objects.filter(recipientOrganization_id__in=related_orgs.orgIDs)
@@ -145,7 +152,7 @@ def get_orgid_canon(request, org_id):
     return JsonResponse(related_orgs.to_json(request=request))
 
 
-def get_random_org(request):
+def get_random_org(request: HttpRequest) -> HttpResponse:
     """Get a random charity record"""
     # filetype = request.GET.get("filetype", "html")
     active = request.GET.get("active", False)
@@ -168,7 +175,12 @@ class Echo:
         return value
 
 
-def orgid_type(request, orgtype=None, source=None, filetype="html"):
+def orgid_type(
+    request: HttpRequest,
+    orgtype: Optional[str] = None,
+    source: Optional[str] = None,
+    filetype: str = "html",
+) -> HttpResponse:
     base_query = None
     download_url = request.build_absolute_uri() + "&filetype=csv"
     s = OrganisationSearch()
@@ -259,7 +271,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
 
 
 @xframe_options_exempt
-def company_detail(request, company_number, filetype="html"):
+def company_detail(request: HttpRequest, company_number: str, filetype: str = "html"):
     company = get_object_or_404(Company, CompanyNumber=company_number)
 
     # fetch any related organisations

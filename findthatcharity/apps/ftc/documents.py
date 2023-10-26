@@ -106,7 +106,7 @@ class OrganisationGroup(Document):
     search_scale = fields.FloatField()
 
     @classmethod
-    def search(cls, using=None, index=None):
+    def search(cls, using=None, index=None) -> SearchWithTemplate:
         return SearchWithTemplate(
             using=cls._get_using(using),
             index=cls._default_index(index),
