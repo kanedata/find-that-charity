@@ -51,6 +51,7 @@ class Command(BaseCommand):
         "Who the charity helps",
         "How the charity works",
     ]
+    verify_certificate = False
 
     def parse_file(self, response, source_url):
         CSVScraper.parse_file(self, response, source_url)

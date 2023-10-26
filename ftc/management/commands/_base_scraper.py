@@ -43,6 +43,7 @@ class BaseScraper(BaseCommand):
     model_updates = {}
     upsert_models = {}
     expected_records = 1
+    verify_certificate = True
 
     postcode_regex = re.compile(
         r"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"
@@ -285,7 +286,7 @@ class BaseScraper(BaseCommand):
         self.files = {}
         for u in self.start_urls:
             self.set_download_url(u)
-            r = self.session.get(u)
+            r = self.session.get(u, verify=self.verify_certificate)
             r.raise_for_status()
             self.files[u] = r
 
@@ -569,7 +570,7 @@ class HTMLScraper(BaseScraper):
     def fetch_file(self):
         self.files = {}
         for u in self.start_urls:
-            r = self.session.get(u)
+            r = self.session.get(u, verify=self.verify_certificate)
             r.raise_for_status()
             self.set_access_url(u)
             self.files[u] = r

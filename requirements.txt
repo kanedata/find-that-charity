@@ -30,8 +30,9 @@ bs4==0.0.1
     # via requests-html
 cattrs==22.2.0
     # via requests-cache
-certifi==2022.12.7
+certifi==2023.7.22
     # via
+    #   -r requirements.in
     #   elasticsearch
     #   pyppeteer
     #   requests
