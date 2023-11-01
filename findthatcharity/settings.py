@@ -257,6 +257,7 @@ LOGGING = {
 LOGGING_DB = os.environ.get("LOGGING_DB")
 
 CORS_ALLOW_ALL_ORIGINS = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 IGNORE_DOMAINS = (
     "gmail.com",
