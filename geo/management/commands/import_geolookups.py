@@ -226,7 +226,7 @@ class Command(BaseScraper):
             geoCodeType=geocodetype.type,
             geo_iso="GB",
             name=row[geocodetype.namefield],
-            **{k: row[v] for k, v in self.FIELD_MATCH.items() if row.get(v)}
+            **{k: row[v] for k, v in self.FIELD_MATCH.items() if row.get(v)},
         )
 
     def add_record(self, **kwargs):

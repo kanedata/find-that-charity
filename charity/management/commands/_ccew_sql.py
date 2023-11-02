@@ -1,8 +1,6 @@
 UPDATE_CCEW = {}
 
-UPDATE_CCEW[
-    "Update archive addresses"
-] = """
+UPDATE_CCEW["Update archive addresses"] = """
 with addresses as (
 select CONCAT('GB-CHC-', c.registered_charity_number) as "org_id",
     NULLIF(concat_ws(', ',
@@ -38,9 +36,7 @@ set first_added = charity_charityaddresshistory.first_added,
     last_updated = EXCLUDED.last_updated
 """
 
-UPDATE_CCEW[
-    "Insert into charity table"
-] = """
+UPDATE_CCEW["Insert into charity table"] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread,
     address, postcode, phone, active, date_registered, date_removed, removal_reason,
     web, email, company_number, activities, source, first_added, last_updated, income,
@@ -118,9 +114,7 @@ set "name" = EXCLUDED.name,
     spider = EXCLUDED.spider
 """
 
-UPDATE_CCEW[
-    "Add missing addresses"
-] = """
+UPDATE_CCEW["Add missing addresses"] = """
 update charity_charity c
 set address = last_address.address,
     postcode = last_address.postcode
@@ -134,18 +128,14 @@ where last_address.org_id = c.id
     and c.postcode is null
 """
 
-UPDATE_CCEW[
-    "Mark missing charities as inactive"
-] = """
+UPDATE_CCEW["Mark missing charities as inactive"] = """
 update charity_charity as cc
 set active = false
 where spider = %(spider_name)s
     and scrape_id != %(scrape_id)s
 """
 
-UPDATE_CCEW[
-    "Insert annual return history into charity financial"
-] = """
+UPDATE_CCEW["Insert annual return history into charity financial"] = """
 insert into charity_charityfinancial as cf (
     charity_id,
     fyend,
@@ -172,9 +162,7 @@ set fystart = EXCLUDED.fystart,
     account_type = cf.account_type;
 """
 
-UPDATE_CCEW[
-    "Insert parta into charity financial"
-] = """
+UPDATE_CCEW["Insert parta into charity financial"] = """
 insert into charity_charityfinancial as cf (
     charity_id,
     fyend,
@@ -204,9 +192,7 @@ set fystart = EXCLUDED.fystart,
     account_type = cf.account_type;
 """
 
-UPDATE_CCEW[
-    "Insert partb into charity financial"
-] = """
+UPDATE_CCEW["Insert partb into charity financial"] = """
 update charity_charityfinancial cf
 set
     inc_leg = a.income_legacies,
@@ -254,9 +240,7 @@ where cf.charity_id = CONCAT('GB-CHC-', a.registered_charity_number)
     and cf.fyend = a.fin_period_end_date;
 """
 
-UPDATE_CCEW[
-    "Update number of employees and volunteers"
-] = """
+UPDATE_CCEW["Update number of employees and volunteers"] = """
 update charity_charity
 set employees = cf.employees,
     volunteers = cf.volunteers
@@ -265,9 +249,7 @@ where charity_charity.id = cf.charity_id
     and charity_charity.latest_fye = cf.fyend;
 """
 
-UPDATE_CCEW[
-    "Update number of trustees"
-] = """
+UPDATE_CCEW["Update number of trustees"] = """
 update charity_charity
 set trustees = t.trustees
 from (
@@ -280,9 +262,7 @@ from (
 where charity_charity.id = t.charity_id;
 """
 
-UPDATE_CCEW[
-    "Insert into charity areas of operation"
-] = """
+UPDATE_CCEW["Insert into charity areas of operation"] = """
 insert into charity_charity_areas_of_operation as ca (charity_id, areaofoperation_id )
 select CONCAT('GB-CHC-', c.registered_charity_number) as charity_id,
     aoo.id as "areaofoperation_id"
@@ -292,9 +272,7 @@ from charity_ccewcharityareaofoperation c
 on conflict (charity_id, areaofoperation_id) do nothing;
 """
 
-UPDATE_CCEW[
-    "Insert into charity names"
-] = """
+UPDATE_CCEW["Insert into charity names"] = """
 insert into charity_charityname as cn (charity_id, name, "normalisedName", name_type)
 select CONCAT('GB-CHC-', c.registered_charity_number) as charity_id,
     c.charity_name as "name",
@@ -310,9 +288,7 @@ where c.charity_name is not null
 on conflict (charity_id, name) do nothing;
 """
 
-UPDATE_CCEW[
-    "Update charity classification to set current as false"
-] = """
+UPDATE_CCEW["Update charity classification to set current as false"] = """
 update ftc_vocabularyentries
 set current = false
 where vocabulary_id in (
@@ -324,9 +300,7 @@ where vocabulary_id in (
 );
 """
 
-UPDATE_CCEW[
-    "Insert charity classification into vocabs"
-] = """
+UPDATE_CCEW["Insert charity classification into vocabs"] = """
 insert into ftc_vocabularyentries (code, title, vocabulary_id, current)
 select c.classification_code as "code",
     c.classification_description as "title",
@@ -345,9 +319,7 @@ on conflict (code, vocabulary_id) do update
 set title = EXCLUDED.title, current = true;
 """
 
-UPDATE_CCEW[
-    "Insert into charity classification"
-] = """
+UPDATE_CCEW["Insert into charity classification"] = """
 insert into ftc_organisationclassification as ca (
     org_id,
     spider,
@@ -372,9 +344,7 @@ from (
 where v.slug like 'ccew_%%';
 """
 
-UPDATE_CCEW[
-    "Insert into organisation table"
-] = r"""
+UPDATE_CCEW["Insert into organisation table"] = r"""
 insert into ftc_organisation (
     org_id, "orgIDs", linked_orgs, name, "alternateName",
     "charityNumber", "companyNumber", "streetAddress", "addressLocality",
@@ -481,9 +451,7 @@ where ot.title = 'Registered Charity'
     and cc.source = %(source_id)s
 """
 
-UPDATE_CCEW[
-    "Insert companies into organisation link table"
-] = """
+UPDATE_CCEW["Insert companies into organisation link table"] = """
 insert into "ftc_organisationlink" (
     org_id_a,
     org_id_b,
@@ -501,9 +469,7 @@ where company_number not in ('01234567', '12345678', '00000000')
     and cc.source = %(source_id)s
 """
 
-UPDATE_CCEW[
-    "Insert into organisation location table"
-] = """
+UPDATE_CCEW["Insert into organisation location table"] = """
 insert into ftc_organisationlocation (
     org_id,
     name,

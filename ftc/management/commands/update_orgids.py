@@ -99,9 +99,7 @@ UPDATE_ORGIDS_SQL = {
         coalesce(extract(epoch from o."dateRegistered"), 0)
     ]
     from priorities;
-    """.format(
-        ",".join([f"'{p}'" for p in OrgidScheme.PRIORITIES])
-    ),
+    """.format(",".join([f"'{p}'" for p in OrgidScheme.PRIORITIES])),
     "Add names from grant data": """
         insert into charity_charityname ("charity_id", "name", "name_type")
         select "recipientOrganization_id" as "charity_id",

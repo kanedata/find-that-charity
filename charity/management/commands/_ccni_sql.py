@@ -1,8 +1,6 @@
 UPDATE_CCNI = {}
 
-UPDATE_CCNI[
-    "Insert into charity table"
-] = """
+UPDATE_CCNI["Insert into charity table"] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread,
     address, postcode, phone, active, date_registered, date_removed, removal_reason,
     web, email, company_number, activities, source, first_added, last_updated, income,
@@ -61,18 +59,14 @@ set "name" = EXCLUDED.name,
     spider = EXCLUDED.spider;
 """
 
-UPDATE_CCNI[
-    "Mark missing charities as inactive"
-] = """
+UPDATE_CCNI["Mark missing charities as inactive"] = """
 update charity_charity as cc
 set active = false
 where spider = %(spider_name)s
     and scrape_id != %(scrape_id)s
 """
 
-UPDATE_CCNI[
-    "Insert into charity financial"
-] = """
+UPDATE_CCNI["Insert into charity financial"] = """
 insert into charity_charityfinancial as cf (
     charity_id, fyend, income, inc_total, spending,
     exp_total, exp_vol, exp_charble, account_type

@@ -32,9 +32,7 @@ select g.data->>'id' as "grant_id",
   g.source_data->'publisher'->>'name' as "publisher_name",
   g.source_data->>'license' as "license"
 from view_latest_grant g
-""".format(
-    Grant.RecipientType.ORGANISATION, Grant.RecipientType.INDIVIDUAL
-)
+""".format(Grant.RecipientType.ORGANISATION, Grant.RecipientType.INDIVIDUAL)
 
 
 class Command(BaseScraper):

@@ -1,8 +1,6 @@
 UPDATE_OSCR = {}
 
-UPDATE_OSCR[
-    "Insert into charity table"
-] = """
+UPDATE_OSCR["Insert into charity table"] = """
 insert into charity_charity as cc (id, name, constitution , geographical_spread,
     address, postcode, phone, active, date_registered, date_removed, removal_reason,
     web, email, company_number, activities, source, first_added, last_updated, income,
@@ -59,18 +57,14 @@ set "name" = EXCLUDED.name,
     spider = EXCLUDED.spider;
 """
 
-UPDATE_OSCR[
-    "Mark missing charities as inactive"
-] = """
+UPDATE_OSCR["Mark missing charities as inactive"] = """
 update charity_charity as cc
 set active = false
 where spider = %(spider_name)s
     and scrape_id != %(scrape_id)s
 """
 
-UPDATE_OSCR[
-    "Insert into charity financial"
-] = """
+UPDATE_OSCR["Insert into charity financial"] = """
 insert into charity_charityfinancial as cf (charity_id, fyend, income, inc_total,
     inc_other, inc_invest, inc_char, inc_vol, inc_fr, spending, exp_total, exp_vol,
     exp_charble, exp_other, account_type)
@@ -111,9 +105,7 @@ set income = EXCLUDED.income,
     account_type = EXCLUDED.account_type;
 """
 
-UPDATE_OSCR[
-    "Insert into charity names"
-] = """
+UPDATE_OSCR["Insert into charity names"] = """
 insert into charity_charityname as cn (charity_id, name, "normalisedName", name_type)
 select cc.org_id as org_id,
     cc.data->>'Charity Name' as "name",
@@ -131,9 +123,7 @@ where cc.spider = %(spider_name)s and cc.data->>'Known As' is not null
 on conflict (charity_id, name) do nothing;
 """
 
-UPDATE_OSCR[
-    "Add dual registered flag"
-] = """
+UPDATE_OSCR["Add dual registered flag"] = """
 update charity_charity
 set dual_registered = true
 where id in (

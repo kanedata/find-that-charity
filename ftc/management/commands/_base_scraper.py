@@ -171,9 +171,7 @@ class BaseScraper(BaseCommand):
                     "{db_table}"."spider" = %s
                     AND NOT ("{db_table}"."scrape_id" = %s)
                 );
-            """.format(
-                db_table=model._meta.db_table
-            )
+            """.format(db_table=model._meta.db_table)
             self.cursor.execute(
                 delete_sql,
                 [

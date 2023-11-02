@@ -36,7 +36,6 @@ urllib3
 pydantic
 babel
 tweepy
-black
 ruff
 requests-mock
 coverage
