@@ -282,6 +282,8 @@ websockets==10.4
     # via pyppeteer
 whitenoise==6.3.0
     # via -r requirements.in
+xlsxwriter==3.1.9
+    # via -r requirements.in
 zipp==3.12.0
     # via importlib-metadata
 

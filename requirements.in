@@ -45,3 +45,4 @@ ua-parser
 sqlite-utils
 git+https://github.com/kanedata/charity-django.git@v0.4.1
 certifi
+xlsxwriter

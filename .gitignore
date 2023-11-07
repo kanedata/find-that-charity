@@ -2,6 +2,7 @@
 
 data/
 *.csv
+*.xlsx
 
 # test data
 !*/tests/data/
