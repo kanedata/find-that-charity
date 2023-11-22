@@ -36,7 +36,7 @@ class Command(BaseScraper):
     name = "ccew"
     allowed_domains = ["charitycommission.gov.uk"]
     start_urls = []
-    encoding = "cp858"
+    encoding = "utf8"
     org_id_prefix = "GB-CHC"
     id_field = "regno"
     date_fields = []
@@ -114,11 +114,6 @@ class Command(BaseScraper):
         db_table = self.ccew_file_to_object.get(filename)
         page_size = 1000
 
-        def convert_encoding(row):
-            for k in row:
-                if isinstance(row[k], str):
-                    row[k] = row[k].decode(self.encoding).encode("utf8")
-
         def get_data(reader, row_count=None):
             for k, row in tqdm.tqdm(enumerate(reader)):
                 row = self.clean_fields(row)
@@ -133,7 +128,7 @@ class Command(BaseScraper):
                 yield [k] + list(row.values())
 
         reader = csv.DictReader(
-            io.TextIOWrapper(csvfile, encoding="utf8"),
+            io.TextIOWrapper(csvfile, encoding=self.encoding),
             delimiter="\t",
             escapechar="\\",
             quoting=csv.QUOTE_NONE,
