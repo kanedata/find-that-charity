@@ -3,7 +3,6 @@ import os
 from tempfile import NamedTemporaryFile
 
 import xlsxwriter
-from django.http import HttpResponse
 from django.shortcuts import redirect
 from sqlite_utils import Database
 
