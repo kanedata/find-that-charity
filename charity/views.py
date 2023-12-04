@@ -148,6 +148,7 @@ def export_to_sqlite(geoarea, geocode):
 
 
 def export_data(request, geoarea, geocode, filetype="xlsx"):
+    geoarea = GEOAREAS.get(geoarea.lower(), "geo_laua")
     s3_file_url = "https://findthatcharity.ams3.cdn.digitaloceanspaces.com/findthatcharity/data/{geoarea}/{geocode}.{filetype}".format(
         geoarea=geoarea, geocode=geocode, filetype=filetype
     )
