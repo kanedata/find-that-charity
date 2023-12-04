@@ -322,3 +322,9 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = os.environ.get("EMAIL_PORT")
 EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"
 EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"
+
+S3_REGION = os.environ.get("S3_REGION")
+S3_ENDPOINT = os.environ.get("S3_ENDPOINT")
+S3_ACCESS_ID = os.environ.get("S3_ACCESS_ID")
+S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")
+S3_BUCKET = os.environ.get("S3_BUCKET")
