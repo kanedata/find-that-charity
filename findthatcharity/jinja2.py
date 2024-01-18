@@ -56,6 +56,10 @@ def get_orgtypes():
     return value
 
 
+def orgtypes_to_dict(orgtypes):
+    return {o.slug: o.title for o in orgtypes.values()}
+
+
 def get_sources():
     cache_key = "sources"
     value = cache.get(cache_key)
@@ -142,6 +146,7 @@ def environment(**options):
             "a_or_an": a_or_an,
             "markdown": markdownify,
             "number_format": number_format,
+            "orgtypes_to_dict": orgtypes_to_dict,
         }
     )
     return env
