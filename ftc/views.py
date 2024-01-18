@@ -10,6 +10,7 @@ from django_sql_dashboard.models import Dashboard
 from elasticsearch.exceptions import RequestError
 
 from charity.models import Charity
+from findthatcharity.utils import get_trending_organisations
 from ftc.documents import OrganisationGroup
 from ftc.models import Organisation, OrganisationType, RelatedOrganisation, Source
 from ftc.query import (
@@ -55,6 +56,11 @@ def index(request):
                 "owned_by", "view_group", "edit_group"
             )
         ]
+
+    context["trending_organisations"] = list(
+        get_trending_organisations(context["examples"].values())
+    )
+
     return render(request, "index.html.j2", context)
 
 

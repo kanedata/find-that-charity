@@ -328,3 +328,5 @@ S3_ENDPOINT = os.environ.get("S3_ENDPOINT")
 S3_ACCESS_ID = os.environ.get("S3_ACCESS_ID")
 S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")
 S3_BUCKET = os.environ.get("S3_BUCKET")
+
+SIMPLE_ANALYTICS_API_KEY = os.environ.get("SIMPLE_ANALYTICS_API_KEY")
