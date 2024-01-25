@@ -215,6 +215,8 @@ class RelatedOrganisation:
                 obj["sameAs"] = [request.build_absolute_uri(id) for id in self.sameAs]
             else:
                 obj["sameAs"] = self.sameAs
+            if len(obj.get("sameAs", [])) == 1:
+                obj["sameAs"] = obj["sameAs"][0]
         return obj
 
     def to_json(self, as_charity=False, request=None, charity=None):
