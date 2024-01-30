@@ -150,7 +150,7 @@ def get_random_org(request):
     """Get a random charity record"""
     # filetype = request.GET.get("filetype", "html")
     active = request.GET.get("active", False)
-    q = OrganisationGroup.search().from_dict(
+    q = OrganisationGroup.search().update_from_dict(
         random_query(active, "registered-charity")
     )[0]
     result = q.execute()

@@ -43,7 +43,7 @@ def do_reconcile_query(
         postcode=properties.get("postalCode"),
         domain=properties.get("domain"),
     )
-    q = OrganisationGroup.search().from_dict(query_template)[:limit]
+    q = OrganisationGroup.search().update_from_dict(query_template)[:limit]
     result = q.execute(params=params)
     all_orgtypes = get_orgtypes()
 

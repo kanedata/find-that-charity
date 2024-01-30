@@ -4,14 +4,14 @@
 #
 #    pip-compile
 #
+annotated-types==0.6.0
+    # via pydantic
 appdirs==1.4.4
     # via
     #   pyppeteer
     #   requests-cache
 asgiref==3.6.0
-    # via
-    #   django
-    #   django-ninja-extra
+    # via django
 attrs==22.2.0
     # via
     #   cattrs
@@ -57,8 +57,6 @@ colorama==0.4.6
     #   tqdm
 confusable-homoglyphs==3.2.0
     # via django-registration
-contextlib2==21.6.0
-    # via django-ninja-extra
 coverage==7.1.0
     # via -r requirements.in
 cssselect==1.2.0
@@ -80,7 +78,6 @@ django==4.2.2
     #   django-markdownx
     #   django-ninja
     #   django-ninja-apikey
-    #   django-ninja-extra
     #   django-prettyjson
     #   django-registration
     #   django-sql-dashboard
@@ -100,13 +97,11 @@ django-filter==22.1
     # via -r requirements.in
 django-markdownx==4.0.0b1
     # via -r requirements.in
-django-ninja==0.20.0
+django-ninja==1.1.0
     # via
+    #   -r requirements.in
     #   django-ninja-apikey
-    #   django-ninja-extra
 django-ninja-apikey==0.1.0
-    # via -r requirements.in
-django-ninja-extra==0.18.2
     # via -r requirements.in
 django-prettyjson==0.4.1
     # via -r requirements.in
@@ -136,12 +131,10 @@ idna==3.4
     # via requests
 importlib-metadata==6.0.0
     # via pyppeteer
-inflect==6.0.2
+inflect==7.0.0
     # via
     #   -r requirements.in
     #   charity-django
-injector==0.19.0
-    # via django-ninja-extra
 jinja2==3.1.2
     # via -r requirements.in
 jmespath==1.0.1
@@ -178,11 +171,13 @@ psycopg2-binary==2.9.5
     # via charity-django
 pycountry==22.3.5
     # via -r requirements.in
-pydantic==1.10.4
+pydantic==2.6.0
     # via
     #   -r requirements.in
     #   django-ninja
     #   inflect
+pydantic-core==2.16.1
+    # via pydantic
 pyee==8.2.2
     # via pyppeteer
 pyexcel-ezodf==0.3.4
@@ -269,8 +264,11 @@ tqdm==4.64.1
     #   pyppeteer
 tweepy==4.12.1
     # via -r requirements.in
-typing-extensions==4.4.0
-    # via pydantic
+typing-extensions==4.9.0
+    # via
+    #   inflect
+    #   pydantic
+    #   pydantic-core
 tzdata==2022.7
     # via django
 ua-parser==0.16.1

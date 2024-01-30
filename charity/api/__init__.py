@@ -1,3 +1,3 @@
-from .charities import API
+from .charities import api
 
-__all__ = ["API"]
+__all__ = ["api"]

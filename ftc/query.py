@@ -213,7 +213,7 @@ class OrganisationSearch:
 
         q = (
             OrganisationGroup.search()
-            .from_dict(self.es_query["inline"])
+            .update_from_dict(self.es_query["inline"])
             .params(track_total_hits=True)
             .index(OrganisationGroup._default_index())
         )

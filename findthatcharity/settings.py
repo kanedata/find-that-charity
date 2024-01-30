@@ -93,7 +93,6 @@ INSTALLED_APPS = [
     "prettyjson",
     "django_registration",
     "ninja",
-    "ninja_extra",
     "ninja_apikey",
     "django_better_admin_arrayfield",
     "django_filters",

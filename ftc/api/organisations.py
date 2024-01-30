@@ -2,8 +2,7 @@ from typing import List
 
 from django.core.paginator import Paginator
 from django.shortcuts import Http404, get_object_or_404
-from ninja import Query, Schema
-from ninja_extra import api_controller, http_generic, http_get
+from ninja import Query, Router, Schema
 
 from findthatcharity.utils import url_replace
 from ftc.api.filters import OrganisationFilter, OrganisationIn
@@ -47,140 +46,142 @@ class SourceResult(Schema):
     result: SourceOut
 
 
-@api_controller(
-    "/organisations",
-    tags=["Organisations"],
+api = Router(tags=["Organisations"])
+
+
+@api.api_operation(
+    methods=["GET", "POST"],
+    path="",
+    response={200: OrganisationResultList, 404: ResultError},
 )
-class API:
-    @http_generic(
-        "",
-        methods=["GET", "POST"],
-        response={200: OrganisationResultList, 404: ResultError},
+def get_organisation_list(request, filters: OrganisationIn = Query({})):
+    filters = filters.dict()
+    f = OrganisationFilter(
+        request.GET,
+        queryset=Organisation.objects.prefetch_related("organisationTypePrimary"),
+        request=request,
     )
-    def get_organisation_list(self, request, filters: OrganisationIn = Query({})):
-        filters = filters.dict()
-        f = OrganisationFilter(
-            request.GET,
-            queryset=Organisation.objects.prefetch_related("organisationTypePrimary"),
-            request=request,
-        )
-        paginator = Paginator(f.qs, filters["limit"])
-        response = paginator.page(filters["page"])
+    paginator = Paginator(f.qs, filters["limit"])
+    response = paginator.page(filters["page"])
+    return {
+        "error": None,
+        "params": filters,
+        "count": paginator.count,
+        "result": list(response.object_list),
+        "next": url_replace(request, page=response.next_page_number())
+        if response.has_next()
+        else None,
+        "previous": url_replace(request, page=response.previous_page_number())
+        if response.has_previous()
+        else None,
+    }
+
+
+@api.get(
+    "/_random",
+    response={200: OrganisationResult, 404: ResultError},
+)
+def get_random_organisation(
+    request,
+    active_only: bool = Query(False),
+    organisation_type: str = Query("registered-charity"),
+):
+    """Get a random charity record"""
+    q = OrganisationGroup.search().update_from_dict(
+        query_random_organisation(active_only, organisation_type)
+    )[0]
+    result = q.execute()
+    for r in result:
         return {
             "error": None,
-            "params": filters,
-            "count": paginator.count,
-            "result": list(response.object_list),
-            "next": url_replace(request, page=response.next_page_number())
-            if response.has_next()
-            else None,
-            "previous": url_replace(request, page=response.previous_page_number())
-            if response.has_previous()
-            else None,
+            "params": {
+                "active_only": active_only,
+            },
+            "result": query_organisation(r.org_id),
         }
 
-    @http_get(
-        "/_random",
-        response={200: OrganisationResult, 404: ResultError},
-    )
-    def get_random_organisation(
-        self,
-        request,
-        active_only: bool = Query(False),
-        organisation_type: str = Query("registered-charity"),
-    ):
-        """Get a random charity record"""
-        q = OrganisationGroup.search().from_dict(
-            query_random_organisation(active_only, organisation_type)
-        )[0]
-        result = q.execute()
-        for r in result:
-            return {
-                "error": None,
-                "params": {
-                    "active_only": active_only,
-                },
-                "result": query_organisation(r.org_id),
-            }
 
-    @http_get(
-        "/{organisation_id}",
-        response={200: OrganisationResult, 404: ResultError},
-    )
-    def get_organisation(self, request, organisation_id: str):
-        try:
-            return {
-                "error": None,
-                "params": {
-                    "org_id": organisation_id,
-                },
-                "result": query_organisation(organisation_id),
-            }
-        except Http404 as e:
-            return 404, {
-                "error": str(e),
-                "params": {"organisation_id": organisation_id},
-            }
+@api.get(
+    "/{organisation_id}",
+    response={200: OrganisationResult, 404: ResultError},
+)
+def get_organisation(request, organisation_id: str):
+    try:
+        return {
+            "error": None,
+            "params": {
+                "org_id": organisation_id,
+            },
+            "result": query_organisation(organisation_id),
+        }
+    except Http404 as e:
+        return 404, {
+            "error": str(e),
+            "params": {"organisation_id": organisation_id},
+        }
 
-    @http_get(
-        "/{organisation_id}/canonical",
-        response={200: OrganisationResult, 404: ResultError},
-    )
-    def get_canonical_organisation(self, request, organisation_id: str):
+
+@api.get(
+    "/{organisation_id}/canonical",
+    response={200: OrganisationResult, 404: ResultError},
+)
+def get_canonical_organisation(request, organisation_id: str):
+    orgs = query_linked_organisations(organisation_id)
+    try:
+        return {
+            "error": None,
+            "params": {
+                "org_id": organisation_id,
+            },
+            "result": orgs.records[0],
+        }
+    except Http404 as e:
+        return 404, {
+            "error": str(e),
+            "params": {"organisation_id": organisation_id},
+        }
+
+
+@api.get(
+    "/{organisation_id}/linked",
+    response={200: OrganisationResultList, 404: ResultError},
+)
+def get_linked_organisations(request, organisation_id: str):
+    try:
         orgs = query_linked_organisations(organisation_id)
-        try:
-            return {
-                "error": None,
-                "params": {
-                    "org_id": organisation_id,
-                },
-                "result": orgs.records[0],
-            }
-        except Http404 as e:
-            return 404, {
-                "error": str(e),
-                "params": {"organisation_id": organisation_id},
-            }
+        return {
+            "error": None,
+            "params": {
+                "org_id": organisation_id,
+            },
+            "count": len(orgs.records),
+            "result": orgs.records,
+            "next": None,
+            "previous": None,
+        }
+    except Http404 as e:
+        return 404, {
+            "error": str(e),
+            "params": {"organisation_id": organisation_id},
+        }
 
-    @http_get(
-        "/{organisation_id}/linked",
-        response={200: OrganisationResultList, 404: ResultError},
-    )
-    def get_linked_organisations(self, request, organisation_id: str):
-        try:
-            orgs = query_linked_organisations(organisation_id)
-            return {
-                "error": None,
-                "params": {
-                    "org_id": organisation_id,
-                },
-                "count": len(orgs.records),
-                "result": orgs.records,
-                "next": None,
-                "previous": None,
-            }
-        except Http404 as e:
-            return 404, {
-                "error": str(e),
-                "params": {"organisation_id": organisation_id},
-            }
 
-    @http_get(
-        "/{organisation_id}/source",
-        response={200: SourceResult, 404: ResultError},
-    )
-    def get_organisation_source(self, request, organisation_id: str):
-        try:
-            organisation = get_object_or_404(Organisation, org_id=organisation_id)
-            return {
-                "error": None,
-                "params": {
-                    "org_id": organisation_id,
-                },
-                "result": organisation.source,
-            }
-        except Http404 as e:
-            return 404, {
-                "error": str(e),
-                "params": {"organisation_id": organisation_id},
-            }
+@api.get(
+    "/{organisation_id}/source",
+    response={200: SourceResult, 404: ResultError},
+)
+def get_organisation_source(request, organisation_id: str):
+    try:
+        organisation = get_object_or_404(Organisation, org_id=organisation_id)
+        return {
+            "error": None,
+            "params": {
+                "org_id": organisation_id,
+            },
+            "result": organisation.source,
+        }
+    except Http404 as e:
+        return 404, {
+            "error": str(e),
+            "params": {"organisation_id": organisation_id},
+        }

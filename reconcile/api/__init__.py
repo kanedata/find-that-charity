@@ -1,3 +1,3 @@
-from .reconcile import API
+from .reconcile import api
 
-__all__ = ["API"]
+__all__ = ["api"]

@@ -23,7 +23,7 @@ class Command(BaseCommand):
         )
 
     def get_random_charity(self):
-        q = OrganisationGroup.search().from_dict(
+        q = OrganisationGroup.search().update_from_dict(
             random_query(True, "registered-charity")
         )[:100]
         result = q.execute()

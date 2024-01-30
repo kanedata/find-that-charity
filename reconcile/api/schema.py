@@ -113,11 +113,15 @@ class ReconciliationQuery(Schema):
     type: Optional[EntityType] = None
     limit: int = 10
     properties: Optional[List[QueryProperty]] = None
-    type_strict: Optional[Literal["should", "all", "anny"]] = None
+    type_strict: Optional[Literal["should", "all", "any"]] = None
 
 
 class ReconciliationQueryBatch(Schema):
-    queries: List[ReconciliationQuery]
+    queries: Dict[str, ReconciliationQuery]
+
+
+class ReconciliationQueryBatchForm(Schema):
+    queries: str
 
 
 class MatchingFeature(Schema):

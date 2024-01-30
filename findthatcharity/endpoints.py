@@ -1,15 +1,15 @@
-from ninja_extra import NinjaExtraAPI
+from ninja import NinjaAPI
 
-from charity.api import API as CharityAPI
-from ftc.api import CompanyAPI, OrganisationAPI
-from reconcile.api import API as ReconcileAPI
+from charity.api import api as charity_api
+from ftc.api import company_api, organisation_api
+from reconcile.api import api as reconcile_api
 
-api = NinjaExtraAPI(
+api = NinjaAPI(
     title="Find that Charity API",
     description="Search for information about charities and other non-profit organisations",
     version="1.0",
 )
-api.register_controllers(OrganisationAPI)
-api.register_controllers(CharityAPI)
-api.register_controllers(CompanyAPI)
-api.register_controllers(ReconcileAPI)
+api.add_router("/organisations", organisation_api)
+api.add_router("/charities", charity_api)
+api.add_router("/companies", company_api)
+api.add_router("/reconcile", reconcile_api)

@@ -2,8 +2,79 @@
 {% load static %}
 
 {% block extra_head %}
-<link type="text/css" rel="stylesheet" href="{% static 'css/swagger.css' %}">
+<link type="text/css" rel="stylesheet" href="{% static 'ninja/swagger-ui.css' %}">
 <style>
+.swagger-ui,
+.swagger-ui .btn,
+.swagger-ui .dialog-ux .modal-ux-content h4,
+.swagger-ui .dialog-ux .modal-ux-content p,
+.swagger-ui .dialog-ux .modal-ux-header h3,
+.swagger-ui .download-contents,
+.swagger-ui .errors-wrapper hgroup h4,
+.swagger-ui .info .title,
+.swagger-ui .info .title small pre,
+.swagger-ui .info a,
+.swagger-ui .info h1,
+.swagger-ui .info h2,
+.swagger-ui .info h3,
+.swagger-ui .info h4,
+.swagger-ui .info h5,
+.swagger-ui .info li,
+.swagger-ui .info p,
+.swagger-ui .info table,
+.swagger-ui .json-schema-2020-12__title,
+.swagger-ui .json-schema-2020-12-expand-deep-button,
+.swagger-ui .loading-container .loading:after,
+.swagger-ui .model-deprecated-warning,
+.swagger-ui .model-title,
+.swagger-ui .opblock .opblock-section-header h4,
+.swagger-ui .opblock .opblock-section-header>label,
+.swagger-ui .opblock .opblock-summary-description,
+.swagger-ui .opblock .opblock-summary-method,
+.swagger-ui .opblock-description-wrapper,
+.swagger-ui .opblock-description-wrapper h4,
+.swagger-ui .opblock-description-wrapper p,
+.swagger-ui .opblock-external-docs-wrapper,
+.swagger-ui .opblock-external-docs-wrapper h4,
+.swagger-ui .opblock-external-docs-wrapper p,
+.swagger-ui .opblock-tag,
+.swagger-ui .opblock-tag small,
+.swagger-ui .opblock-title_normal,
+.swagger-ui .opblock-title_normal h4,
+.swagger-ui .opblock-title_normal p,
+.swagger-ui .parameter__name,
+.swagger-ui .response-col_links,
+.swagger-ui .response-col_status,
+.swagger-ui .responses-inner h4,
+.swagger-ui .responses-inner h5,
+.swagger-ui .sans-serif,
+.swagger-ui .scheme-container .schemes>label,
+.swagger-ui .scopes h2,
+.swagger-ui .servers>label,
+.swagger-ui .system-sans-serif,
+.swagger-ui .tab li,
+.swagger-ui .topbar .download-url-wrapper .download-url-button,
+.swagger-ui .topbar a,
+.swagger-ui button,
+.swagger-ui input,
+.swagger-ui label,
+.swagger-ui optgroup,
+.swagger-ui section h3,
+.swagger-ui section.models h4,
+.swagger-ui section.models h5,
+.swagger-ui select,
+.swagger-ui table thead tr td,
+.swagger-ui table thead tr th,
+.swagger-ui textarea {
+  font-family: 'Raleway', sans-serif;
+}
+
+.swagger-ui .info .title,
+.swagger-ui .opblock-tag,
+.swagger-ui .json-schema-2020-12__title,
+.swagger-ui section.models h4 {
+    font-family: 'Archivo', sans-serif;
+}
 .swagger-ui .info .title small pre,
 .swagger-ui .highlight-code > .microlight code,
 .swagger-ui code {
@@ -22,36 +93,50 @@
 .swagger-ui .renderedMarkdown p {
     margin-top: 0;
 }
+.swagger-ui .json-schema-2020-12 [type=button] {
+    background-color: transparent;
+}
+.swagger-ui .wrapper {
+    padding: 0;
+    max-width: 100%;
+}
+.swagger-ui .info {
+    margin-top: 0;
+}
+.swagger-ui .info .title {
+    font-weight: 400;
+    font-size: 2.25rem;
+    color: #111;
+}
+.swagger-ui .info hgroup.main a {
+    font-size: 1.5rem;
+    color: #777;
+    font-weight: 400;
+    line-height: 1;
+}
+.swagger-ui .info > div {
+    font-size: 1rem;
+}
+.swagger-ui .json-schema-2020-12-accordion__icon
+{
+    padding-bottom: 3px;
+    padding-left: 3px;
+}
 </style>
 {% endblock %}
 
 {% block title %}{{ api.title }}{% endblock %}
 
 {% block content %}
+<script type="application/json" id="swagger-settings">
+    {{ swagger_settings | safe }}
+</script>
+
 <div id="swagger-ui">
 </div>
 {% endblock %}
 
 {% block bodyscripts %}
-<script src="{% static 'ninja/swagger-ui-bundle.4.14.0.js' %}"></script>
-<script>
-    const ui = SwaggerUIBundle({
-        url: '{{ openapi_json_url }}',
-        dom_id: '#swagger-ui',
-        presets: [
-            SwaggerUIBundle.presets.apis,
-            SwaggerUIBundle.SwaggerUIStandalonePreset
-        ],
-        layout: "BaseLayout",
-    {% if api.csrf and csrf_token %}
-    requestInterceptor: (req) => {
-        req.headers['X-CSRFToken'] = "{{csrf_token}}"
-        return req;
-    },
-        {% endif %}
-    deepLinking: true,
-    docExpansion: "list",
-    defaultModelsExpandDepth: -1,
-    })
-</script>
+<script src="{% static 'ninja/swagger-ui-bundle.js' %}"></script>
+<script src="{% static 'ninja/swagger-ui-init.js' %}"></script>
 {% endblock %}

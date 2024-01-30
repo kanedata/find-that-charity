@@ -48,7 +48,7 @@ def do_reconcile_query(
             }
         }
 
-    s = CompanyDocument.search().from_dict(search_dict)
+    s = CompanyDocument.search().update_from_dict(search_dict)
     result = s.execute()
 
     return {
