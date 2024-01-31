@@ -13,7 +13,7 @@ from charity.models import (
 from findthatcharity.jinja2 import get_orgtypes
 from findthatcharity.utils import normalise_name
 from ftc.documents import OrganisationGroup
-from ftc.models import Organisation
+from ftc.models import Organisation, OrganisationType
 from ftc.models.organisation_classification import OrganisationClassification
 from reconcile.utils import convert_value
 
@@ -22,27 +22,27 @@ with open(os.path.join(os.path.dirname(__file__), "query.json")) as a:
 
 
 def do_reconcile_query(
-    query,
-    orgtypes="all",
-    type="/Organization",
-    limit=5,
-    properties=[],
+    query: str,
+    orgtypes: list[OrganisationType] = [],
+    type_: list[OrganisationType] = [],
+    limit: int = 5,
+    properties: list[dict] = [],
     type_strict="should",
     result_key="result",
 ):
     if not query:
         return []
 
-    if not isinstance(orgtypes, list) and orgtypes != "all":
-        orgtypes = orgtypes.split("+")
+    if type_:
+        orgtypes = type_ + orgtypes
 
-    properties = {p["pid"]: p["v"] for p in properties} if properties else {}
+    properties_parsed = {p["pid"]: p["v"] for p in properties} if properties else {}
 
     query_template, params = recon_query(
         query,
         orgtypes=orgtypes,
-        postcode=properties.get("postalCode"),
-        domain=properties.get("domain"),
+        postcode=properties_parsed.get("postalCode"),
+        domain=properties_parsed.get("domain"),
     )
     q = OrganisationGroup.search().update_from_dict(query_template)[:limit]
     result = q.execute(params=params)

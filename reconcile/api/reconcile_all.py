@@ -70,10 +70,10 @@ def propose_properties(request, type: str, limit: int = 500):
     return reconcile.propose_properties(request, type_=type, limit=limit)
 
 
-@api.post(
-    "/extend",
-    response={200: DataExtensionQueryResponse},
-    exclude_none=True,
-)
-def data_extension(request, body: DataExtensionQuery):
-    return reconcile.data_extension(request, body)
+# @api.post(
+#     "/extend",
+#     response={200: DataExtensionQueryResponse},
+#     exclude_none=True,
+# )
+# def data_extension(request, body: DataExtensionQuery):
+#     return reconcile.data_extension(request, body)

@@ -30,7 +30,7 @@ with open(
 
 RECON_BASE_URLS: list[Tuple[str, list[str]]] = [
     ("/api/v1/reconcile/", ["0.2"]),
-    ("/api/v1/reconcile/local-authority", ["0.2"]),
+    # ("/api/v1/reconcile/local-authority", ["0.2"]),
     ("/reconcile", ["0.1"]),
     ("/reconcile/local-authority", ["0.1"]),
 ]
@@ -88,6 +88,47 @@ class TestReconcileAllAPI(TestCase):
                 self.assertEqual(response.status_code, 200)
                 data = response.json()
                 self.assertEqual(list(data.keys()), ["q0"])
+                self.assertEqual(len(data["q0"]["result"]), 10)
+                self.assertEqual(data["q0"]["result"][0]["id"], "GB-CHC-1006706")
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
+    # POST request to /api/v1/reconcile should return a list of candidates
+    def test_reconcile_with_type(self):
+        # attach RECON RESPONSE to the search() method of self.mock_es
+        self.mock_es.return_value.search.return_value = RECON_RESPONSE
+
+        for base_url, schema_version, schema in get_test_cases(
+            "reconciliation-result-batch.json"
+        ):
+            with self.subTest((base_url, schema_version)):
+                response = self.client.post(
+                    base_url,
+                    {
+                        "queries": json.dumps(
+                            {
+                                "q0": {
+                                    "query": "Test",
+                                    "type": "registered-charity",
+                                    "type_strict": "should",
+                                },
+                                "q1": {
+                                    "query": "Test",
+                                    "type": "registered-charity",
+                                    "type_strict": "should",
+                                },
+                            }
+                        ),
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["q0", "q1"])
                 self.assertEqual(len(data["q0"]["result"]), 10)
                 self.assertEqual(data["q0"]["result"][0]["id"], "GB-CHC-1006706")
 

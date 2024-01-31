@@ -157,7 +157,7 @@ class ServiceSpec(Schema):
 
 class ReconciliationQuery(Schema):
     query: str
-    type: Optional[EntityType] = None
+    type: Optional[EntityType | str] = None
     limit: int = 10
     properties: Optional[List[QueryProperty]] = None
     type_strict: Optional[Literal["should", "all", "any"]] = None

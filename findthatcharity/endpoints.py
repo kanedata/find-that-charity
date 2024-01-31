@@ -38,13 +38,6 @@ api = NinjaAPI(
                     "url": "https://reconciliation-api.github.io/specs/latest/",
                 },
             },
-            {
-                "name": "Reconciliation (against specific type of organisation)",
-                "externalDocs": {
-                    "description": "Reconciliation Service API v0.2",
-                    "url": "https://reconciliation-api.github.io/specs/latest/",
-                },
-            },
         ]
     },
 )

@@ -10,7 +10,7 @@ COMPANY_RECON_TYPE = {"id": "/registered-company", "name": "Registered Company"}
 def do_reconcile_query(
     query,
     orgtypes="all",
-    type="/Organization",
+    type_="/Organization",
     limit=5,
     properties=[],
     type_strict="should",

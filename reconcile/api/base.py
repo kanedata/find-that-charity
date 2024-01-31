@@ -112,7 +112,7 @@ class Reconcile:
         for key, query in body.queries.items():
             results[key] = self.reconcile_query(
                 query.query,
-                type=query.type,
+                type_=self._get_orgtypes_from_str(query.type),
                 limit=query.limit,
                 properties=query.properties,
                 type_strict=query.type_strict,

@@ -25,6 +25,10 @@ def index(request, orgtype="all"):
         queries = json.loads(queries)
         results = {}
         for query_id, query in queries.items():
+            if "type" in query:
+                query["type_"] = query.pop("type")
+                if query["type_"]:
+                    query["type_"] = [OrganisationType.objects.get(slug=query["type_"])]
             results[query_id] = do_reconcile_query(**query, orgtypes=orgtypes)
         return JsonResponse(results)
 
