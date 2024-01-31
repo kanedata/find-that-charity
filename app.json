@@ -37,19 +37,6 @@
                 "content": "Search Results",
                 "path": "/?q=test&orgtype=all",
                 "attempts": 3
-            },
-            {
-                "type": "startup",
-                "name": "Reconcile API check",
-                "content": "Find that Charity Reconciliation API",
-                "path": "/api/v1/reconcile/",
-                "attempts": 3,
-                "httpHeaders": [
-                    {
-                        "name": "Accepts",
-                        "value": "application/json"
-                    }
-                ]
             }
         ]
     }
