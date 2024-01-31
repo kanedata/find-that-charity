@@ -1,16 +1,23 @@
 import json
 from typing import Dict
 
+from charity_django.companies.models import CompanyTypeChoices
+from django.http import Http404
 from ninja import Form, Query, Router
 
+from ftc.documents import CompanyDocument
 from reconcile.companies import COMPANY_RECON_TYPE, do_reconcile_query
 
 from .base import Reconcile
 from .schema import (
+    DataExtensionPropertyProposalQuery,
+    DataExtensionPropertyProposalResponse,
     ReconciliationQueryBatch,
     ReconciliationQueryBatchForm,
     ReconciliationResult,
     ServiceSpec,
+    SuggestResponse,
+    SuggestTypeQuery,
 )
 
 api = Router(tags=["Reconciliation (registered companies)"])
@@ -20,12 +27,54 @@ class CompanyReconcile(Reconcile):
     name = "Find that Charity Company Reconciliation API"
     view_url = "company_detail"
     view_url_args = {"company_number": "{{id}}"}
-    suggest = []
-    extend = False
+    suggest = ["property", "type"]
+    extend = True
     preview = False
+    base_type = "Company"
 
     def reconcile_query(self, *args, **kwargs):
         return do_reconcile_query(*args, **kwargs)
+
+    def propose_properties(self, request, type_, limit=500):
+        if type_ != self.base_type:
+            msg = f"type must be {self.base_type}"
+            raise Http404(msg)
+
+        mapping = CompanyDocument._index.get_mapping()
+
+        internal_fields = ["scrape", "spider", "id", "priority"]
+        company_properties = [
+            {"id": f, "name": f}
+            for f in mapping["companies"]["mappings"]["properties"].keys()
+            if f not in internal_fields
+        ]
+
+        return {"limit": limit, "type": type_, "properties": company_properties}
+
+    def suggest_type(
+        self,
+        request,
+        prefix: str,
+        cursor: int = 0,
+    ):
+        if not prefix:
+            raise Http404("Prefix must be supplied")
+
+        results = [
+            ("registered-company", "Registered Company")
+        ] + CompanyTypeChoices.choices
+
+        return {
+            "result": [
+                {
+                    "id": id,
+                    "name": name,
+                    "notable": [],
+                }
+                for id, name in results
+                if prefix.lower() in id.lower() or prefix.lower() in name.lower()
+            ]
+        }
 
 
 reconcile = CompanyReconcile()
@@ -43,7 +92,9 @@ def get_company_service_spec(
     if queries.queries:
         queries_parsed = ReconciliationQueryBatch(queries=json.loads(queries.queries))
         return reconcile.reconcile(request, queries_parsed)
-    return reconcile.get_service_spec(request, defaultTypes=[COMPANY_RECON_TYPE])
+    return ServiceSpec(
+        **reconcile.get_service_spec(request, defaultTypes=[COMPANY_RECON_TYPE])
+    )
 
 
 @api.post(
@@ -59,3 +110,22 @@ def company_reconcile_entities(
 ):
     queries_parsed = ReconciliationQueryBatch(queries=json.loads(queries.queries))
     return reconcile.reconcile(request, queries_parsed)
+
+
+@api.get("/suggest/type", response={200: SuggestResponse}, exclude_none=True)
+def suggest_type(request, query: Query[SuggestTypeQuery]):
+    return reconcile.suggest_type(request, query.prefix, query.cursor)
+
+
+@api.get("/suggest/property", response={200: SuggestResponse}, exclude_none=True)
+def suggest_property(request, query: Query[SuggestTypeQuery]):
+    return reconcile.suggest_property(request, query.prefix, query.cursor)
+
+
+@api.get(
+    "/extend/propose",
+    response={200: DataExtensionPropertyProposalResponse},
+    exclude_none=True,
+)
+def propose_properties(request, query: Query[DataExtensionPropertyProposalQuery]):
+    return reconcile.propose_properties(request, type_=query.type, limit=query.limit)

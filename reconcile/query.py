@@ -31,7 +31,7 @@ def do_reconcile_query(
     result_key="result",
 ):
     if not query:
-        return []
+        return {result_key: []}
 
     if type_:
         orgtypes = type_ + orgtypes

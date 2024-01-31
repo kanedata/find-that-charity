@@ -17,7 +17,7 @@ def do_reconcile_query(
     result_key="result",
 ):
     if not query:
-        return []
+        return {result_key: []}
 
     properties = {p["pid"]: p["v"] for p in properties} if properties else {}
 

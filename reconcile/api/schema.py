@@ -42,7 +42,7 @@ class UrlSchema(Schema):
 
 
 class PreviewMetadata(Schema):
-    url: str = None
+    url: Optional[str] = None
     width: int = 430
     height: int = 300
 
@@ -63,8 +63,8 @@ class DataExtensionPropertySetting(Schema):
 
 class DataExtensionProperty(Schema):
     id: str
-    name: str = None
-    settings: DataExtensionPropertySetting = None
+    name: Optional[str] = None
+    settings: Optional[DataExtensionPropertySetting] = None
 
 
 class DataExtensionPropertyProprosal(Schema):
@@ -106,8 +106,8 @@ class DataExtensionQueryResponse(Schema):
 class SuggestMetadata(Schema):
     service_url: str
     service_path: str
-    flyout_service_url: str = None
-    flyout_service_path: str = None
+    flyout_service_url: Optional[str] = None
+    flyout_service_path: Optional[str] = None
 
 
 class ServiceSpecSuggest(Schema):
@@ -173,8 +173,8 @@ class ReconciliationQueryBatch(Schema):
 
 
 class ReconciliationQueryBatchForm(Schema):
-    queries: str = None
-    extend: str = None
+    queries: Optional[str] = None
+    extend: Optional[str] = None
 
 
 class MatchingFeature(Schema):
@@ -194,7 +194,7 @@ class ReconciliationCandidate(Schema):
 
 
 class ReconciliationResult(Schema):
-    result: List[ReconciliationCandidate]
+    result: List[ReconciliationCandidate] = []
 
 
 class ReconciliationResultBatch(RootModel[Dict[str, Dict]], Schema):
@@ -215,7 +215,7 @@ class SuggestTypeQuery(Schema):
 class SuggestResult(Schema):
     id: str
     name: str
-    description: str = None
+    description: Optional[str] = None
     notable: Optional[Union[List[EntityType], List[str]]] = None
 
 

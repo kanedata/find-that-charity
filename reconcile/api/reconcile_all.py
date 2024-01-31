@@ -36,11 +36,18 @@ reconcile = Reconcile()
 def get_service_spec(request, queries: Query[ReconciliationQueryBatchForm]):
     if queries.queries:
         queries_parsed = ReconciliationQueryBatch(queries=json.loads(queries.queries))
-        return reconcile.reconcile(request, queries_parsed, orgtypes="all")
+        return {
+            k: ReconciliationResult(**v)
+            for k, v in reconcile.reconcile(
+                request, queries_parsed, orgtypes="all"
+            ).items()
+        }
     elif queries.extend:
         queries_parsed = DataExtensionQuery(**json.loads(queries.extend))
-        return reconcile.data_extension(request, queries_parsed)
-    return reconcile.get_service_spec(request, orgtypes="all")
+        return DataExtensionQueryResponse(
+            **reconcile.data_extension(request, queries_parsed)
+        )
+    return ServiceSpec(**reconcile.get_service_spec(request, orgtypes="all"))
 
 
 @api.post(
@@ -53,10 +60,17 @@ def get_service_spec(request, queries: Query[ReconciliationQueryBatchForm]):
 def reconcile_entities(request, queries: Form[ReconciliationQueryBatchForm]):
     if queries.queries:
         queries_parsed = ReconciliationQueryBatch(queries=json.loads(queries.queries))
-        return reconcile.reconcile(request, queries_parsed, orgtypes="all")
+        return {
+            k: ReconciliationResult(**v)
+            for k, v in reconcile.reconcile(
+                request, queries_parsed, orgtypes="all"
+            ).items()
+        }
     elif queries.extend:
         queries_parsed = DataExtensionQuery(**json.loads(queries.extend))
-        return reconcile.data_extension(request, queries_parsed)
+        return DataExtensionQueryResponse(
+            **reconcile.data_extension(request, queries_parsed)
+        )
 
 
 @api.get("/preview")

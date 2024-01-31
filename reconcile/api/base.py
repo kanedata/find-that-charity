@@ -26,6 +26,7 @@ class Reconcile:
     suggest: list[str] = ["entity", "type", "property"]
     extend = True
     preview = True
+    base_type = "Organization"
 
     def reconcile_query(self, *args, **kwargs):
         return do_reconcile_query(*args, **kwargs)
@@ -209,7 +210,7 @@ class Reconcile:
         if not prefix:
             raise Http404("Prefix must be supplied")
 
-        properties = self.propose_properties(request, "Organization")["properties"]
+        properties = self.propose_properties(request, self.base_type)["properties"]
 
         return {
             "result": [
@@ -224,8 +225,9 @@ class Reconcile:
         }
 
     def propose_properties(self, request, type_, limit=500):
-        if type_ != "Organization":
-            raise Http404("type must be Organization")
+        if type_ != self.base_type:
+            msg = f"type must be {self.base_type}"
+            raise Http404(msg)
 
         organisation_properties = Organisation.get_fields_as_properties()
 
