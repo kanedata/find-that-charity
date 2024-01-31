@@ -37,12 +37,6 @@
                 "content": "Search Results",
                 "path": "/?q=test&orgtype=all",
                 "attempts": 3
-            },
-            {
-                "type": "startup",
-                "name": "Front page",
-                "path": "/",
-                "attempts": 3
             }
         ]
     }
