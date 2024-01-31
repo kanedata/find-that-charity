@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from socket import gethostbyname_ex, gethostname
 
 import dj_database_url
 import sentry_sdk
@@ -56,6 +57,13 @@ ALLOWED_HOSTS = (
     os.environ.get("ALLOWED_HOSTS").split(";")
     if os.environ.get("ALLOWED_HOSTS")
     else []
+)
+ALLOWED_HOSTS = (
+    [
+        gethostname(),
+    ]
+    + list(set(gethostbyname_ex(gethostname())[2]))
+    + ALLOWED_HOSTS
 )
 ENFORCE_HOST = (
     os.environ.get("ENFORCE_HOST").split(";")
