@@ -15,6 +15,7 @@ from findthatcharity.utils import normalise_name
 from ftc.documents import OrganisationGroup
 from ftc.models import Organisation
 from ftc.models.organisation_classification import OrganisationClassification
+from reconcile.utils import convert_value
 
 with open(os.path.join(os.path.dirname(__file__), "query.json")) as a:
     RECONCILE_QUERY = json.load(a)
@@ -151,6 +152,12 @@ def do_extend_query(ids, properties):
     for i in ids:
         if i not in result["rows"]:
             result["rows"][i] = {k: None for k in all_fields}
+
+    # clean up the data
+    result["rows"] = {
+        id: {k: convert_value(v) for k, v in row.items()}
+        for id, row in result["rows"].items()
+    }
 
     return result
 

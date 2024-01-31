@@ -127,7 +127,9 @@
 
 {% block bodyscripts %}
 <script type="text/javascript">
-    const AUTOCOMPLETE_URL = {{ request.build_absolute_uri(url('suggest', kwargs = { 'orgtype': 'all' })) | tojson }};
+    const AUTOCOMPLETE_URL = {{ request.build_absolute_uri(url('api-1.0:suggest_entity')) | tojson }};
+    const AUTOCOMPLETE_ORGTYPE_URL = {{ request.build_absolute_uri(url('api-1.0:orgtype_suggest_entity', kwargs = { "orgtype": "__orgtype__" })) | tojson }};
+    const ORG_ID_URL = {{ request.build_absolute_uri(url("orgid_html", kwargs = { "org_id": "__id__" })) | tojson }};
     var ORGTYPES = {{ orgtypes| orgtypes_to_dict | tojson(indent = 4) }};
 </script>
 <script src='{{ static("js/autocomplete.js") }}' type="text/javascript"></script>

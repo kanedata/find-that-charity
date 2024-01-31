@@ -1,5 +1,7 @@
+from typing import Optional
+
 from charity_django.companies.models import Company
-from django.shortcuts import Http404
+from django.shortcuts import Http404, get_object_or_404
 from ninja import Router, Schema
 
 from ftc.api.organisations import ResultError
@@ -8,9 +10,9 @@ from ftc.api.schema import Company as CompanyOut
 
 class CompanyResult(Schema):
     success: bool = True
-    error: str = None
+    error: Optional[str] = None
     params: dict = {}
-    result: CompanyOut = None
+    result: Optional[CompanyOut] = None
 
 
 api = Router(tags=["Companies"])
@@ -27,7 +29,7 @@ def get_company(request, company_number: str):
             "params": {
                 "company_number": company_number,
             },
-            "result": Company.objects.get(CompanyNumber=company_number),
+            "result": get_object_or_404(Company, CompanyNumber=company_number),
         }
     except Http404 as e:
         return 404, {

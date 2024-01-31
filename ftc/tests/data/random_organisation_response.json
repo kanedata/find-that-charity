@@ -1,0 +1,59 @@
+{
+    "took": 241,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 10000,
+            "relation": "gte"
+        },
+        "max_score": 2.169083,
+        "hits": [
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-CHC-1234",
+                "_score": 2.169083,
+                "_source": {
+                    "org_id": "GB-CHC-1234",
+                    "complete_names": [
+                        "Test organisation",
+                        "Test"
+                    ],
+                    "orgIDs": [
+                        "GB-CHC-1234"
+                    ],
+                    "ids": [
+                        "1234"
+                    ],
+                    "sortname": "test organisation",
+                    "alternateName": [],
+                    "domain": [],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-england-and-wales",
+                        "charitable-incorporated-organisation",
+                        "incorporated-charity",
+                        "charitable-incorporated-organisation-foundation",
+                        "registered-company"
+                    ],
+                    "organisationTypePrimary": "registered-charity",
+                    "source": [
+                        "ts"
+                    ],
+                    "locations": [],
+                    "search_scale": 9.705165419719007,
+                    "name": "Test organisation",
+                    "postalCode": "SW1A 1AA",
+                    "dateModified": "2022-07-01T13:29:36.633495+00:00",
+                    "active": true
+                }
+            }
+        ]
+    }
+}

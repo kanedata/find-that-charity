@@ -2,9 +2,8 @@ name: Django tests
 on: [push, pull_request]
 jobs:
   django-test:
-
     runs-on: ubuntu-latest
-  
+
     services:
       postgres_data:
         image: postgres:14.5
@@ -26,32 +25,32 @@ jobs:
           - 5433:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-    
+
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/github_actions_data
       DATABASE_ADMIN_URL: postgres://postgres:postgres@localhost:5433/github_actions_admin
       SECRET_KEY: 1234567890
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Parse Python version
-      run: sed  s/python-// runtime.txt | head > .python-version
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version-file: '.python-version'
-        cache: 'pip'
-    - name: psycopg2 prerequisites
-      run: sudo apt-get install libxml2-dev libxslt-dev python3-dev libpq-dev
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Run migrations
-      run: |
-        python manage.py migrate --database=data --noinput
-        python manage.py migrate --database=admin --noinput
-        python manage.py collectstatic
-    - name: Test with django test
-      run: |
-        python manage.py test
+      - uses: actions/checkout@v3
+      - name: Parse Python version
+        run: sed  s/python-// runtime.txt | head > .python-version
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version-file: ".python-version"
+          cache: "pip"
+      - name: psycopg2 prerequisites
+        run: sudo apt-get install libxml2-dev libxslt-dev python3-dev libpq-dev
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run migrations
+        run: |
+          python manage.py migrate --database=data --noinput
+          python manage.py migrate --database=admin --noinput
+          python manage.py collectstatic
+      - name: Test with django test
+        run: |
+          pytest

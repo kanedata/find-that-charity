@@ -1,0 +1,467 @@
+{
+    "took": 148,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 81,
+            "relation": "eq"
+        },
+        "max_score": 4839660.5,
+        "hits": [
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-CHC-1006706",
+                "_score": 4839660.5,
+                "_source": {
+                    "search_scale": 13.081919991859861,
+                    "postalCode": "YO30 2DQ",
+                    "active": true,
+                    "alternateName": [
+                        "SOUTH AND WEST YORKSHIRE PROFICIENCY TEST COMMITTEE",
+                        "SOUTH AND WEST YORKSHIRE PROFICIENCY TEST COMMITTEE FOR AGRICULTURE AND HORTICULTURE"
+                    ],
+                    "dateModified": "2022-07-01T13:29:36.633495+00:00",
+                    "source": [
+                        "ccew"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-england-and-wales"
+                    ],
+                    "sortname": "yorkshire proficiency test committee",
+                    "orgIDs": [
+                        "GB-CHC-1006706"
+                    ],
+                    "org_id": "GB-CHC-1006706",
+                    "domain": [
+                        "WWW.YPTC.ORG.UK"
+                    ],
+                    "name": "YORKSHIRE PROFICIENCY TEST COMMITTEE",
+                    "ids": [
+                        "1006706"
+                    ],
+                    "locations": [
+                        "GB",
+                        "E07000164",
+                        "E14000993",
+                        "E10000023",
+                        "E05009675",
+                        "E92000001",
+                        "E00140637",
+                        "E30000294",
+                        "E12000003",
+                        "E37000039",
+                        "E01027619",
+                        "E02005760"
+                    ],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            },
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-SC-SC051892",
+                "_score": 4274882.0,
+                "_source": {
+                    "search_scale": 13.524526376648708,
+                    "postalCode": "G11 5DZ",
+                    "active": true,
+                    "alternateName": [
+                        "Safe Water for All"
+                    ],
+                    "dateModified": "2022-09-07T15:35:04.802560+00:00",
+                    "source": [
+                        "oscr"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-scotland",
+                        "registered-society"
+                    ],
+                    "sortname": "qa test 12",
+                    "orgIDs": [
+                        "GB-SC-SC051892"
+                    ],
+                    "org_id": "GB-SC-SC051892",
+                    "domain": [
+                        "teststandardcharity.com"
+                    ],
+                    "name": "QA Test 12",
+                    "ids": [
+                        "SC051892"
+                    ],
+                    "locations": [],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            },
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-SC-SC051908",
+                "_score": 4252229.0,
+                "_source": {
+                    "search_scale": 13.452858501957351,
+                    "postalCode": "W1U 4DG",
+                    "active": true,
+                    "alternateName": [],
+                    "dateModified": "2022-09-07T15:35:04.805518+00:00",
+                    "source": [
+                        "oscr"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-scotland",
+                        "statutory-corporation-royal-charter-etc"
+                    ],
+                    "sortname": "qa test 14",
+                    "orgIDs": [
+                        "GB-SC-SC051908"
+                    ],
+                    "org_id": "GB-SC-SC051908",
+                    "domain": [
+                        "testcharity.org.uk"
+                    ],
+                    "name": "QA Test 14",
+                    "ids": [
+                        "SC051908"
+                    ],
+                    "locations": [],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            },
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-SC-SC051848",
+                "_score": 3793668.0,
+                "_source": {
+                    "search_scale": 12.002099841204238,
+                    "postalCode": "DD1 1TB",
+                    "active": true,
+                    "alternateName": [],
+                    "dateModified": "2022-09-07T15:35:04.798522+00:00",
+                    "source": [
+                        "oscr"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-scotland",
+                        "unincorporated-association"
+                    ],
+                    "sortname": "test charity 41",
+                    "orgIDs": [
+                        "GB-SC-SC051848"
+                    ],
+                    "org_id": "GB-SC-SC051848",
+                    "domain": [],
+                    "name": "Test Charity 41",
+                    "ids": [
+                        "SC051848"
+                    ],
+                    "locations": [],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            },
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-CHC-1156829",
+                "_score": 3588501.2,
+                "_source": {
+                    "search_scale": 13.744838286283413,
+                    "postalCode": "SP10 1LZ",
+                    "active": true,
+                    "alternateName": [],
+                    "dateModified": "2022-07-01T13:29:36.633495+00:00",
+                    "source": [
+                        "ccew",
+                        "companies"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-england-and-wales",
+                        "registered-company",
+                        "incorporated-charity",
+                        "company-limited-by-guarantee"
+                    ],
+                    "sortname": "test valley citizens advice bureau",
+                    "orgIDs": [
+                        "GB-COH-08933947",
+                        "GB-CHC-1156829"
+                    ],
+                    "org_id": "GB-CHC-1156829",
+                    "domain": [
+                        "testvalleycab.org.uk"
+                    ],
+                    "name": "TEST VALLEY CITIZENS ADVICE BUREAU",
+                    "ids": [
+                        "08933947",
+                        "1156829",
+                        "8933947"
+                    ],
+                    "locations": [
+                        "E37000010",
+                        "GB",
+                        "E01023202",
+                        "E00117896",
+                        "E14000857",
+                        "E10000014",
+                        "E92000001",
+                        "E30000159",
+                        "E12000008",
+                        "E07000093",
+                        "E02004816",
+                        "E05012930"
+                    ],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            },
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-SC-SC051846",
+                "_score": 3516946.5,
+                "_source": {
+                    "search_scale": 11.126631103850338,
+                    "postalCode": "DD5 1TT",
+                    "active": true,
+                    "alternateName": [],
+                    "dateModified": "2022-09-07T15:35:04.797518+00:00",
+                    "source": [
+                        "oscr"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-scotland",
+                        "scottish-charitable-incorporated-organisation"
+                    ],
+                    "sortname": "test charity 37",
+                    "orgIDs": [
+                        "GB-SC-SC051846"
+                    ],
+                    "org_id": "GB-SC-SC051846",
+                    "domain": [],
+                    "name": "Test Charity 37",
+                    "ids": [
+                        "SC051846"
+                    ],
+                    "locations": [],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            },
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-CHC-1102251",
+                "_score": 3511033.2,
+                "_source": {
+                    "search_scale": 9.46674164792014,
+                    "postalCode": "SO20 6HA",
+                    "active": true,
+                    "alternateName": [
+                        "TEST VALLEY SCHOOL PARENT TEACHER ASSOCIATION",
+                        "TEST VALLEY SCHOOL PTA"
+                    ],
+                    "dateModified": "2022-07-01T13:29:36.633495+00:00",
+                    "source": [
+                        "ccew"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-england-and-wales"
+                    ],
+                    "sortname": "test valley parent teacher association",
+                    "orgIDs": [
+                        "GB-CHC-1102251"
+                    ],
+                    "org_id": "GB-CHC-1102251",
+                    "domain": [
+                        "testvalley.hants.sch.uk"
+                    ],
+                    "name": "TEST VALLEY PARENT TEACHER ASSOCIATION",
+                    "ids": [
+                        "1102251"
+                    ],
+                    "locations": [
+                        "E37000010",
+                        "GB",
+                        "E05012098",
+                        "E01023167",
+                        "E00117714",
+                        "E02004822",
+                        "E10000014",
+                        "E92000001",
+                        "E30000159",
+                        "E12000008",
+                        "E14000901",
+                        "E07000093"
+                    ],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            },
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-CHC-514370",
+                "_score": 3496219.2,
+                "_source": {
+                    "search_scale": 12.226216252470039,
+                    "postalCode": "PE22 7LG",
+                    "active": true,
+                    "alternateName": [
+                        "LINCOLNSHIRE PROFICIENCY TESTS COMMITTEE",
+                        "LPTC"
+                    ],
+                    "dateModified": "2022-07-01T13:29:36.633495+00:00",
+                    "source": [
+                        "ccew"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-england-and-wales"
+                    ],
+                    "sortname": "lincolnshire proficiency test committee",
+                    "orgIDs": [
+                        "GB-CHC-514370"
+                    ],
+                    "org_id": "GB-CHC-514370",
+                    "domain": [
+                        "lptc.org.uk"
+                    ],
+                    "name": "LINCOLNSHIRE PROFICIENCY TEST COMMITTEE",
+                    "ids": [
+                        "514370"
+                    ],
+                    "locations": [
+                        "E01026075",
+                        "GB",
+                        "E12000004",
+                        "E30000174",
+                        "E02005441",
+                        "E92000001",
+                        "E07000137",
+                        "E05009877",
+                        "E37000014",
+                        "E10000018",
+                        "E14000798",
+                        "E10000024",
+                        "E10000019",
+                        "E00132346"
+                    ],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            },
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-CHC-1173575",
+                "_score": 3366840.5,
+                "_source": {
+                    "search_scale": 12.895824531066458,
+                    "postalCode": "LD3 8SB",
+                    "active": true,
+                    "alternateName": [],
+                    "dateModified": "2022-07-01T13:29:36.633495+00:00",
+                    "source": [
+                        "ccew",
+                        "companies"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-england-and-wales",
+                        "charitable-incorporated-organisation",
+                        "incorporated-charity",
+                        "charitable-incorporated-organisation-foundation",
+                        "registered-company"
+                    ],
+                    "sortname": "british nuclear test veterans association",
+                    "orgIDs": [
+                        "GB-COH-CE011152",
+                        "GB-CHC-1173575"
+                    ],
+                    "org_id": "GB-CHC-1173575",
+                    "domain": [
+                        "bntva.com"
+                    ],
+                    "name": "BRITISH NUCLEAR TEST VETERANS ASSOCIATION",
+                    "ids": [
+                        "CE011152",
+                        "1173575"
+                    ],
+                    "locations": [
+                        "W92000004",
+                        "W07000068",
+                        "S92000003",
+                        "GB",
+                        "N92000002",
+                        "JE",
+                        "GG",
+                        "W00002528",
+                        "W05000331",
+                        "W22000023",
+                        "E92000001",
+                        "W01000474",
+                        "IM",
+                        "W06000023",
+                        "W02000414"
+                    ],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            },
+            {
+                "_index": "full-organisation-load-1166",
+                "_type": "_doc",
+                "_id": "GB-CHC-1090095",
+                "_score": 3189384.8,
+                "_source": {
+                    "search_scale": 10.090317329376452,
+                    "postalCode": "SP10 3PB",
+                    "active": true,
+                    "alternateName": [],
+                    "dateModified": "2022-07-01T13:29:36.633495+00:00",
+                    "source": [
+                        "ccew"
+                    ],
+                    "organisationType": [
+                        "registered-charity",
+                        "registered-charity-england-and-wales"
+                    ],
+                    "sortname": "test valley brass",
+                    "orgIDs": [
+                        "GB-CHC-1090095"
+                    ],
+                    "org_id": "GB-CHC-1090095",
+                    "domain": [
+                        "testvalleybrass.co.uk"
+                    ],
+                    "name": "TEST VALLEY BRASS",
+                    "ids": [
+                        "1090095"
+                    ],
+                    "locations": [
+                        "E37000010",
+                        "GB",
+                        "E02004818",
+                        "E01023186",
+                        "E14000857",
+                        "E10000014",
+                        "E92000001",
+                        "E30000159",
+                        "E12000008",
+                        "E07000093",
+                        "E05012929",
+                        "E00117810"
+                    ],
+                    "organisationTypePrimary": "registered-charity"
+                }
+            }
+        ]
+    }
+}

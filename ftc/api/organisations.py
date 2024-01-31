@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from django.core.paginator import Paginator
 from django.shortcuts import Http404, get_object_or_404
@@ -17,31 +17,31 @@ from ftc.query import random_query as query_random_organisation
 
 class ResultError(Schema):
     success: bool = False
-    error: str = None
+    error: Optional[str] = None
     params: dict = {}
-    result: List = None
+    result: Optional[List] = None
 
 
 class OrganisationResult(Schema):
     success: bool = True
-    error: str = None
+    error: Optional[str] = None
     params: dict = {}
     result: OrganisationOut
 
 
 class OrganisationResultList(Schema):
     success: bool = True
-    error: str = None
+    error: Optional[str] = None
     params: dict = {}
     count: int = 0
-    next: str = None
-    previous: str = None
+    next: Optional[str] = None
+    previous: Optional[str] = None
     result: List[OrganisationOut]
 
 
 class SourceResult(Schema):
     success: bool = True
-    error: str = None
+    error: Optional[str] = None
     params: dict = {}
     result: SourceOut
 
@@ -61,19 +61,23 @@ def get_organisation_list(request, filters: OrganisationIn = Query({})):
         queryset=Organisation.objects.prefetch_related("organisationTypePrimary"),
         request=request,
     )
-    paginator = Paginator(f.qs, filters["limit"])
+    paginator = Paginator(f.qs.order_by("name"), filters["limit"])
     response = paginator.page(filters["page"])
     return {
         "error": None,
         "params": filters,
         "count": paginator.count,
         "result": list(response.object_list),
-        "next": url_replace(request, page=response.next_page_number())
-        if response.has_next()
-        else None,
-        "previous": url_replace(request, page=response.previous_page_number())
-        if response.has_previous()
-        else None,
+        "next": (
+            url_replace(request, page=response.next_page_number())
+            if response.has_next()
+            else None
+        ),
+        "previous": (
+            url_replace(request, page=response.previous_page_number())
+            if response.has_previous()
+            else None
+        ),
     }
 
 

@@ -223,8 +223,6 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 
@@ -234,7 +232,17 @@ USE_TZ = True
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "findthatcharity", "static"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 WHITENOISE_MANIFEST_STRICT = True
 
 LOGGING = {
@@ -307,7 +315,6 @@ DASHBOARD_ENABLE_FULL_EXPORT = True
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = False
 MAX_API_KEYS = 4  # Maximum number of API keys a user can have
-NINJA_DOCS_VIEW = "swagger"
 
 TWITTER_CONSUMER_KEY = os.environ.get("TWITTER_CONSUMER_KEY")
 TWITTER_CONSUMER_SECRET = os.environ.get("TWITTER_CONSUMER_SECRET")

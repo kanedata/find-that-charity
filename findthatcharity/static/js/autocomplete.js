@@ -70,13 +70,13 @@ const updateAutoComplete = (results, el, q) => {
         let a = createEl('a', {
             classList: 'link dark-blue underline-hover pointer',
         });
-        a.setAttribute('href', r.url);
+        a.setAttribute('href', ORG_ID_URL.replace("__id__", r.id));
         a.append(
             getHighlightedText(r.name, q)
         );
-        if(r.orgtypes){
+        if (r.notable) {
             let orgtype = createEl('span', { classList: 'fr gray i ml1 dib' });
-            orgtype.innerText = ORGTYPES[r.orgtypes[0]];
+            orgtype.innerText = ORGTYPES[r.notable[0]];
             a.append(orgtype);
         }
         li.append(a);
@@ -97,11 +97,11 @@ const fetchAutocomplete = () => {
         updateAutoComplete([], resultsContainer, v);
         return;
     }
-    const url = new URL(AUTOCOMPLETE_URL);
-    url.searchParams.append('prefix', v);
+    var url = new URL(AUTOCOMPLETE_URL);
     if (orgtype) {
-        url.searchParams.append('orgtype', orgtype);
+        var url = new URL(AUTOCOMPLETE_ORGTYPE_URL.replace("__orgtype__", orgtype));
     }
+    url.searchParams.append('prefix', v);
     fetch(url)
         .then((r) => {
             var url = new URL(r.url);

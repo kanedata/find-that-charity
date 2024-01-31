@@ -1,0 +1,162 @@
+{
+    "took": 280,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 2139,
+            "relation": "eq"
+        },
+        "max_score": 26.07034,
+        "hits": [
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345670",
+                "_score": 26.07034,
+                "_source": {
+                    "CompanyNumber": "12345670",
+                    "CompanyStatus": "active",
+                    "RegAddress_PostCode": "SW1A 1AA",
+                    "CompanyCategory": "ltd",
+                    "PreviousNames": null,
+                    "CompanyName": "TEST COMPANY A LTD"
+                }
+            },
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345671",
+                "_score": 20.736366,
+                "_source": {
+                    "CompanyNumber": "12345671",
+                    "CompanyStatus": "Active",
+                    "RegAddress_PostCode": null,
+                    "CompanyCategory": "Charitable Incorporated Organisation",
+                    "PreviousNames": null,
+                    "CompanyName": "TEST COMPANY B LTD"
+                }
+            },
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345672",
+                "_score": 20.736366,
+                "_source": {
+                    "CompanyNumber": "12345672",
+                    "CompanyStatus": "active",
+                    "RegAddress_PostCode": null,
+                    "CompanyCategory": "charitable-incorporated-organisation",
+                    "PreviousNames": null,
+                    "CompanyName": "TEST COMPANY C LTD"
+                }
+            },
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345673",
+                "_score": 18.16774,
+                "_source": {
+                    "CompanyNumber": "12345673",
+                    "CompanyStatus": "Active",
+                    "RegAddress_PostCode": "SW1A 1AA",
+                    "CompanyCategory": "Private Limited Company",
+                    "PreviousNames": null,
+                    "CompanyName": "TEST COMPANY D LTD"
+                }
+            },
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345674",
+                "_score": 18.16774,
+                "_source": {
+                    "CompanyNumber": "12345674",
+                    "CompanyStatus": "Liquidation",
+                    "RegAddress_PostCode": "SW1A 1AA",
+                    "CompanyCategory": "Private Limited Company",
+                    "PreviousNames": null,
+                    "CompanyName": "TEST COMPANY E LTD"
+                }
+            },
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345675",
+                "_score": 18.16774,
+                "_source": {
+                    "CompanyNumber": "12345675",
+                    "CompanyStatus": "Active",
+                    "RegAddress_PostCode": "SW1A 1AA",
+                    "CompanyCategory": "Private Limited Company",
+                    "PreviousNames": null,
+                    "CompanyName": "TEST COMPANY F LTD"
+                }
+            },
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345676",
+                "_score": 18.16774,
+                "_source": {
+                    "CompanyNumber": "12345676",
+                    "CompanyStatus": "Active",
+                    "RegAddress_PostCode": "SW1A 1AA",
+                    "CompanyCategory": "Private Limited Company",
+                    "PreviousNames": [
+                        "TEST COMPANY G PREVIOUS LTD",
+                        "TEST COMPANY G PREVIOUS 2 LTD"
+                    ],
+                    "CompanyName": "TEST COMPANY G LTD"
+                }
+            },
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345677",
+                "_score": 18.16774,
+                "_source": {
+                    "CompanyNumber": "12345677",
+                    "CompanyStatus": "Active",
+                    "RegAddress_PostCode": "SW1A 1AA",
+                    "CompanyCategory": "Private Limited Company",
+                    "PreviousNames": null,
+                    "CompanyName": "TEST COMPANY H LTD"
+                }
+            },
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345678",
+                "_score": 18.16774,
+                "_source": {
+                    "CompanyNumber": "12345678",
+                    "CompanyStatus": "Active",
+                    "RegAddress_PostCode": "SW1A 1AA",
+                    "CompanyCategory": "Private Limited Company",
+                    "PreviousNames": null,
+                    "CompanyName": "TEST COMPANY I LTD"
+                }
+            },
+            {
+                "_index": "companies",
+                "_type": "_doc",
+                "_id": "12345679",
+                "_score": 18.16774,
+                "_source": {
+                    "CompanyNumber": "12345679",
+                    "CompanyStatus": "Active",
+                    "RegAddress_PostCode": "SW1A 1AA",
+                    "CompanyCategory": "Private Limited Company",
+                    "PreviousNames": null,
+                    "CompanyName": "TEST COMPANY J LTD"
+                }
+            }
+        ]
+    }
+}

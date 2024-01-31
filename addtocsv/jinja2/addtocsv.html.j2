@@ -12,25 +12,28 @@
 {% block content %}
 <form action="" method="post" enctype="multipart/form-data" class="w-100 w-70-l fl-l pr3-l">
   <div class="w-100 mb4 entry-content cf">
-    <p class="measure">Add data to a CSV file by looking it up from a column with a charity number or other organisation identifier.</p>
+    <p class="measure">Add data to a CSV file by looking it up from a column with a charity number or other organisation
+      identifier.</p>
     <p class="measure">The file should be separated by commas (<code>,</code>) - not semicolons or tabs)
-    and the first row should contain the column names.</p>
+      and the first row should contain the column names.</p>
     <a class="dn-l link underline blue f5" href="#privacy">See important note on privacy below</a>
   </div>
   <div class="w-100 b--light-gray ba bw1 br3 mb4" id="addtocsv">
 
     <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-select-file">
       <h3 class="pa0 ma0 dib">
-        Step 1: 
+        Step 1:
         <span class="normal">Select CSV file</span>
       </h3>
       <span class="fr contents-top" v-if="stage > 0">
-        <a href="#" id="reset-select-file" class="stage-reset link f6 blue underline dim" v-on:click.prevent="csv = null">Change file</a>
+        <a href="#" id="reset-select-file" class="stage-reset link f6 blue underline dim"
+          v-on:click.prevent="csv = null">Change file</a>
         <span class="file-name dib code pa1 bg-light-gray lh-solid" id="csvfilename">[[filename]]</span>
       </span>
       <div class="contents mv3" v-else-if="stage == 0">
         <label class="file-label">
-          <input class="file-input w-100" type="file" name="csvfile" id="csvfile" accept="text/csv,.csv" v-on:change="selectFile">
+          <input class="file-input w-100" type="file" name="csvfile" id="csvfile" accept="text/csv,.csv"
+            v-on:change="selectFile">
           <span class="file-cta">
             <span class="file-icon">
               <i class="fas fa-upload"></i>
@@ -52,11 +55,12 @@
 
     <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-select-identifier-field">
       <h3 class="pa0 ma0 dib">
-        Step 2: 
+        Step 2:
         <span class="normal">Select organisation identifier field</span>
       </h3>
       <span class="fr contents-top" v-if="stage > 1">
-        <a href="#" id="reset-select-identifier-field" class="stage-reset link f6 blue underline dim" v-on:click.prevent="column_to_use = null">Change field</a>
+        <a href="#" id="reset-select-identifier-field" class="stage-reset link f6 blue underline dim"
+          v-on:click.prevent="column_to_use = null">Change field</a>
         <span class="dib code pa1 bg-light-gray lh-solid" id="column-name-desc">[[column_to_use]]</span>
         <input class="dn" type="text" name="column_name" id="column_name" :value="column_to_use">
       </span>
@@ -64,13 +68,14 @@
         <div class="field mb3" id="csvpreview">
           <ul class="list pa0 ma0">
             <li v-for="f in field_select" class="mb2">
-                <label class="pointer">
-                    <input type="radio" name="identifier_field" :value=[[f.name]] v-on:click.prevent="column_to_use = f.name" />
-                    <span class="code pa1 bg-light-gray underline-hover">[[f.name]]</span>
-                    <ul class="list pa0 ma0">
-                        <li class="dib mr2 gray mt1 f6 tl truncate mw5" v-for="v in f.example_values">[[v]]</li>
-                    </ul>
-                </label>
+              <label class="pointer">
+                <input type="radio" name="identifier_field" :value=[[f.name]]
+                  v-on:click.prevent="column_to_use = f.name" />
+                <span class="code pa1 bg-light-gray underline-hover">[[f.name]]</span>
+                <ul class="list pa0 ma0">
+                  <li class="dib mr2 gray mt1 f6 tl truncate mw5" v-for="v in f.example_values">[[v]]</li>
+                </ul>
+              </label>
             </li>
           </ul>
         </div>
@@ -79,11 +84,12 @@
 
     <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-identifier-type-field">
       <h3 class="pa0 ma0 dib">
-        Step 3: 
+        Step 3:
         <span class="normal">Select identifier type</span>
       </h3>
       <span class="fr contents-top" v-if="stage > 2">
-        <a href="#" id="reset-identifier-type-field" class="stage-reset link f6 blue underline dim" v-on:click.prevent="identifier_type = null">Change field</a>
+        <a href="#" id="reset-identifier-type-field" class="stage-reset link f6 blue underline dim"
+          v-on:click.prevent="identifier_type = null">Change field</a>
         <span class="dib code pa1 bg-light-gray lh-solid" id="column-name-desc">[[identifier_type]]</span>
         <input class="dn" type="text" name="column_name" id="column_name" :value="identifier_type">
       </span>
@@ -91,10 +97,10 @@
         <div class="field mb3" id="identifier_select">
           <ul class="list pa0 ma0">
             <li class="mb2" v-for="label, i in identifier_types">
-                <label class="pointer">
-                    <input type="radio" name="identifier_type_field" :value="i" v-on:click.prevent="identifier_type = i" />
-                    [[ label[0] ]] (eg <span class="code pa1 bg-light-gray underline-hover">[[ label[1] ]]</span>)
-                </label>
+              <label class="pointer">
+                <input type="radio" name="identifier_type_field" :value="i" v-on:click.prevent="identifier_type = i" />
+                [[ label[0] ]] (eg <span class="code pa1 bg-light-gray underline-hover">[[ label[1] ]]</span>)
+              </label>
             </li>
           </ul>
         </div>
@@ -103,7 +109,7 @@
 
     <div class="w-100 pa2 b--light-gray bb bw1 stage" id="stage-select-fields">
       <h3 class="pa0 ma0 dib">
-        Step 3: 
+        Step 3:
         <span class="normal">Select data to add</span>
       </h3>
       <span class="fr contents-top" v-if="stage > 3">
@@ -111,32 +117,33 @@
       </span>
       <div class="contents mv4" v-else-if="stage == 3">
         <ul class="list ma0 pa0" style="column-count: 3;">
-            <li>            
-                <label>
-                    <input type="checkbox" name="select_all_fields" v-on:click.prevent="selectAllFields">
-                    <strong>Select all</strong>
-                </label>
-            </li>
-            <li v-for="field in fields" :key="field.id">
-                <label>
-                    <input type="checkbox" name="fields" :value="field.id" v-model="fields_to_add">
-                    [[field.name]]
-                </label>
-            </li>
+          <li>
+            <label>
+              <input type="checkbox" name="select_all_fields" v-on:click.prevent="selectAllFields">
+              <strong>Select all</strong>
+            </label>
+          </li>
+          <li v-for="field in fields" :key="field.id">
+            <label>
+              <input type="checkbox" name="fields" :value="field.id" v-model="fields_to_add">
+              [[field.name]]
+            </label>
+          </li>
         </ul>
-        
+
         <div class="contents mv4">
-            <input class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns ml4-l" type="submit" 
-                   value="Add data to CSV" id='fetch_identifiers' v-on:click.prevent="getResults" />
-            <div id="result" v-if="progress !== null">
-                <p class="pa0 mv3 mh2" id="result-text">Creating file…</p>
-                <div id="progress-bar" class="bg-light-blue h2 mt4 mh2">
-                    <div class="progress-bar-inner bg-blue h2 ph3 pv1 f6 tr white" v-bind:style="{ width: progress + '%' }" id="progress-bar-inner">[[progress]]%</div>
-                </div>
+          <input class="button-reset bn pv3 ph4 b tc bg-animate bg-yellow dim near-black pointer br2-ns ml4-l"
+            type="submit" value="Add data to CSV" id='fetch_identifiers' v-on:click.prevent="getResults" />
+          <div id="result" v-if="progress !== null">
+            <p class="pa0 mv3 mh2" id="result-text">Creating file…</p>
+            <div id="progress-bar" class="bg-light-blue h2 mt4 mh2">
+              <div class="progress-bar-inner bg-blue h2 ph3 pv1 f6 tr white" v-bind:style="{ width: progress + '%' }"
+                id="progress-bar-inner">[[progress]]%</div>
             </div>
+          </div>
         </div>
       </div>
-      
+
     </div>
 
   </div>
@@ -145,18 +152,18 @@
 <div class="content w-100 w-30-l fl-l pa3 bg-light-gray f5" id="privacy">
   <h3 class="pa0 ma0 header-font">Privacy</h3>
   <p>Your file will not leave your computer, but the organsiation identifiers from
-    the column you select will be sent to the findthatcharity server in order to 
+    the column you select will be sent to the findthatcharity server in order to
     retrieve the information. No other data is sent to the server.</p>
   <p>It could therefore be possible to reconstruct the organisations contained
     in your file. <strong>You should think carefully before using this tool
-    for any personal or sensitive information.</strong></p>
+      for any personal or sensitive information.</strong></p>
 </div>
 {% endblock %}
 
 {% block bodyscripts %}
 <script type="text/javascript">
-const PROPERTIES_URL = {{ request.build_absolute_uri(url('propose_properties'))|tojson }};
-const EXTEND_URL = {{ request.build_absolute_uri(url('reconcile'))|tojson }};
+  const PROPERTIES_URL = {{ (request.build_absolute_uri(url('api-1.0:propose_properties')) + '?type=Organization') | tojson }};
+  const EXTEND_URL = {{ request.build_absolute_uri(url('api-1.0:reconcile_entities')) | tojson }};
 </script>
 <script src='{{ static("js/csv.js") }}' type="text/javascript"></script>
 {% endblock %}

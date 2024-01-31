@@ -282,7 +282,7 @@ class Organisation(models.Model):
 
     @classmethod
     def get_fields_as_properties(cls):
-        internal_fields = ["scrape", "spider", "id"]
+        internal_fields = ["scrape", "spider", "id", "priority"]
         return [
             {"id": f.name, "name": f.verbose_name}
             for f in cls._meta.get_fields()

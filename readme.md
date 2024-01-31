@@ -1,5 +1,4 @@
-Find that charity
-================
+# Find that charity
 
 Elasticsearch-powered search engine for looking for charities and other non-profit organisations. Allows for:
 
@@ -12,8 +11,7 @@ Elasticsearch-powered search engine for looking for charities and other non-prof
   charity number.
 - HTML pages for searching for a charity
 
-Installation
-------------
+## Installation
 
 1. [Clone repository](https://github.com/kanedata/find-that-charity)
 2. Create virtual environment (`python -m venv env`)
@@ -31,8 +29,7 @@ Installation
 14. Import data on other non-profit organisations (`python ./manage.py import_all`)
 15. Add organisations to elasticsearch index (`python ./manage.py es_index`) - (Don't use the default `search_index` command as this won't setup aliases correctly)
 
-Dokku Installation
-------------------
+## Dokku Installation
 
 ### 1. Set up dokku server
 
@@ -102,8 +99,7 @@ dokku run ftc python ./manage.py import_all
 dokku run ftc python ./manage.py es_index
 ```
 
-Server
-------
+## Server
 
 The server uses [django](https://www.djangoproject.com/). Run it with the
 following command:
@@ -117,8 +113,7 @@ The server offers the following API endpoints:
 
 - `/charity/12345`: Look up information about a particular charity
 
-Todo
-----
+## Todo
 
 Priorities:
 
@@ -133,10 +128,9 @@ Future development:
 - upload a CSV file and reconcile each row with a charity
 - allow updating a charity with additional possible names
 
-Testing
--------
+## Testing
 
 ```sh
-coverage run manage.py test && coverage html
+coverage run pytest && coverage html
 python -m http.server -d htmlcov --bind 127.0.0.1 8001
 ```

@@ -1,6 +1,14 @@
+from enum import Enum
 from typing import Dict, List, Literal, Optional, TypeVar, Union
 
 from ninja import Schema
+from pydantic import RootModel
+
+# Reconciliation API Schema
+#
+# Based on version 0.2 of the schema
+# https://www.w3.org/community/reports/reconciliation/CG-FINAL-specs-0.2-20230410/#service-manifest
+#
 
 
 class EntityType(Schema):
@@ -13,7 +21,7 @@ class Entity(Schema):
     id: str
     name: str
     description: Optional[str] = None
-    type: List[EntityType] = []
+    type: Optional[List[EntityType]] = None
 
 
 class Property(Schema):
@@ -34,6 +42,7 @@ class UrlSchema(Schema):
 
 
 class PreviewMetadata(Schema):
+    url: str = None
     width: int = 430
     height: int = 300
 
@@ -58,9 +67,14 @@ class DataExtensionProperty(Schema):
     settings: DataExtensionPropertySetting = None
 
 
+class DataExtensionPropertyProprosal(Schema):
+    service_url: str
+    service_path: str
+
+
 class DataExtensionMetadata(Schema):
-    propose_properties: bool = False
-    property_settings: List[dict]
+    propose_properties: Optional[DataExtensionPropertyProprosal] = None
+    property_settings: List[DataExtensionPropertySetting] = []
 
 
 class DataExtensionPropertyProposalResponse(Schema):
@@ -81,31 +95,64 @@ class DataExtensionPropertyResponse(Schema):
 
 class DataExtensionQueryResponse(Schema):
     meta: List[Entity]
-    rows: List[Dict]
+    rows: Dict[str, Dict]
+
+
+class SuggestMetadata(Schema):
+    service_url: str
+    service_path: str
+    flyout_service_url: str = None
+    flyout_service_path: str = None
 
 
 class ServiceSpecSuggest(Schema):
-    entity: bool = False
-    property: bool = False
-    type: bool = False
+    entity: Optional[SuggestMetadata] = None
+    property: Optional[SuggestMetadata] = None
+    type: Optional[SuggestMetadata] = None
+
+
+class ReconciliationServiceVersions(str, Enum):
+    v0_1 = "0.1"
+    v0_2 = "0.2"
+
+
+class OpenAPISecuritySchemeType(str, Enum):
+    apikey = "apiKey"
+    http = "http"
+    mutualTLS = "mutualTLS"
+    oauth2 = "oauth2"
+    openIdConnect = "openIdConnect"
+
+
+class OpenAPISecuritySchema(Schema):
+    type: OpenAPISecuritySchemeType
+    description: Optional[str] = None
+    name: Optional[str] = None
+    in_: Optional[str] = None
+    scheme: Optional[str] = None
+    bearerFormat: Optional[str] = None
+    flows: Optional[Dict] = None
+    openIdConnectUrl: Optional[str] = None
 
 
 class ServiceSpec(Schema):
-    versions: Optional[List[str]] = ["0.1", "0.2"]
-    name: str = "Find that Charity Reconciliation API"
+    versions: Optional[List[ReconciliationServiceVersions]] = [
+        ReconciliationServiceVersions.v0_2
+    ]
+    name: str = "Reconciliation API"
     identifierSpace: str = "http://org-id.guide"
     schemaSpace: str = "https://schema.org"
+    defaultTypes: List[EntityType] = []
     documentation: Optional[str] = None
     logo: Optional[str] = None
     serviceVersion: Optional[str] = None
-    defaultTypes: List[EntityType]
     view: UrlSchema
     feature_view: Optional[UrlSchema] = None
     preview: Optional[PreviewMetadata] = None
     suggest: Optional[ServiceSpecSuggest] = None
     extend: Optional[DataExtensionMetadata] = None
     batchSize: Optional[int] = None
-    authentication: Optional[Dict] = None
+    authentication: Optional[OpenAPISecuritySchema] = None
 
 
 class ReconciliationQuery(Schema):
@@ -121,7 +168,8 @@ class ReconciliationQueryBatch(Schema):
 
 
 class ReconciliationQueryBatchForm(Schema):
-    queries: str
+    queries: str = None
+    extend: str = None
 
 
 class MatchingFeature(Schema):
@@ -141,11 +189,11 @@ class ReconciliationCandidate(Schema):
 
 
 class ReconciliationResult(Schema):
-    candidates: List[ReconciliationCandidate]
+    result: List[ReconciliationCandidate]
 
 
-class ReconciliationResultBatch(Schema):
-    results: List[ReconciliationResult]
+class ReconciliationResultBatch(RootModel[Dict[str, Dict]], Schema):
+    root: Dict[str, ReconciliationResult]
 
 
 class SuggestResult(Schema):

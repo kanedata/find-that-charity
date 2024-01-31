@@ -1,7 +1,7 @@
 import datetime
-from typing import List
+from typing import List, Optional
 
-from ninja import Schema
+from ninja import Field, Schema
 
 
 class OrganisationType(Schema):
@@ -13,131 +13,131 @@ class Source(Schema):
     id: str
     title: str
     publisher: str
-    data: dict = None
+    data: Optional[dict] = None
 
 
 class OrgIdScheme(Schema):
     code: str
     data: dict
-    priority: int = None
+    priority: Optional[int] = None
 
 
 class Address(Schema):
-    streetAddress: str = None
-    addressLocality: str = None
-    addressRegion: str = None
-    addressCountry: str = None
-    postalCode: str = None
+    streetAddress: Optional[str] = None
+    addressLocality: Optional[str] = None
+    addressRegion: Optional[str] = None
+    addressCountry: Optional[str] = None
+    postalCode: Optional[str] = None
 
 
 class OrganisationLink(Schema):
-    orgid: str = None
-    url: str = None
+    orgid: Optional[str] = None
+    url: Optional[str] = None
 
 
 class OrganisationWebsiteLink(Schema):
-    site: str = None
-    orgid: str = None
-    url: str = None
+    site: Optional[str] = None
+    orgid: Optional[str] = None
+    url: Optional[str] = None
 
 
 class Location(Schema):
-    id: str = None
-    name: str = None
-    geocode: str = None
-    type: str = None
+    id: Optional[str] = None
+    name: Optional[str] = None
+    geocode: Optional[str] = None
+    type: Optional[str] = None
 
 
 class Organisation(Schema):
-    id: str
+    id: str = Field(alias="org_id")
     name: str
-    charityNumber: str = None
-    companyNumber: str = None
-    description: str = None
-    url: str = None
+    charityNumber: Optional[str] = None
+    companyNumber: Optional[str] = None
+    description: Optional[str] = None
+    url: Optional[str] = None
 
     # finances
-    latestFinancialYearEnd: datetime.date = None
-    latestIncome: int = None
-    latestSpending: int = None
-    latestEmployees: int = None
-    latestVolunteers: int = None
-    trusteeCount: int = None
+    latestFinancialYearEnd: Optional[datetime.date] = None
+    latestIncome: Optional[int] = None
+    latestSpending: Optional[int] = None
+    latestEmployees: Optional[int] = None
+    latestVolunteers: Optional[int] = None
+    trusteeCount: Optional[int] = None
 
-    dateRegistered: datetime.date = None
-    dateRemoved: datetime.date = None
-    active: bool = None
+    dateRegistered: Optional[datetime.date] = None
+    dateRemoved: Optional[datetime.date] = None
+    active: Optional[bool] = None
 
-    parent: str = None
-    organisationType: List[str] = None
-    organisationTypePrimary: OrganisationType = None
-    alternateName: List[str] = None
-    telephone: str = None
-    email: str = None
+    parent: Optional[str] = None
+    organisationType: Optional[List[str]] = None
+    organisationTypePrimary: Optional[OrganisationType] = None
+    alternateName: Optional[List[str]] = None
+    telephone: Optional[str] = None
+    email: Optional[str] = None
 
-    location: List[dict] = None
-    address: Address = None
+    location: Optional[List[dict]] = None
+    address: Optional[Address] = None
 
-    sources: List[str] = None
+    sources: Optional[List[str]] = None
     links: List[OrganisationWebsiteLink] = None
-    orgIDs: List[str] = None
+    orgIDs: Optional[List[str]] = None
     linked_records: List[OrganisationLink] = None
 
-    dateModified: datetime.datetime = None
+    dateModified: Optional[datetime.datetime] = None
 
-    # domain: str = None
-    # status: str = None
+    # domain: Optional[str] = None
+    # status: Optional[str] = None
     # source_id: str
-    # # scrape: str = None
-    # spider: str = None
-    # # org_id_scheme: OrgIdScheme = None
+    # # scrape: Optional[str] = None
+    # spider: Optional[str] = None
+    # # org_id_scheme: Optional[OrgIdScheme] = None
 
     # # geography fields
-    # geo_oa11: str = None
-    # geo_cty: str = None
-    # geo_laua: str = None
-    # geo_ward: str = None
-    # geo_ctry: str = None
-    # geo_rgn: str = None
-    # geo_pcon: str = None
-    # geo_ttwa: str = None
-    # geo_lsoa11: str = None
-    # geo_msoa11: str = None
-    # geo_lep1: str = None
-    # geo_lep2: str = None
-    # geo_lat: float = None
-    # geo_long: float = None
+    # geo_oa11: Optional[str] = None
+    # geo_cty: Optional[str] = None
+    # geo_laua: Optional[str] = None
+    # geo_ward: Optional[str] = None
+    # geo_ctry: Optional[str] = None
+    # geo_rgn: Optional[str] = None
+    # geo_pcon: Optional[str] = None
+    # geo_ttwa: Optional[str] = None
+    # geo_lsoa11: Optional[str] = None
+    # geo_msoa11: Optional[str] = None
+    # geo_lep1: Optional[str] = None
+    # geo_lep2: Optional[str] = None
+    # geo_lat: Optional[float] = None
+    # geo_long: Optional[float] = None
 
 
 class Company(Schema):
-    CompanyName: str = None
-    CompanyNumber: str = None
-    RegAddress_CareOf: str = None
-    RegAddress_POBox: str = None
-    RegAddress_AddressLine1: str = None
-    RegAddress_AddressLine2: str = None
-    RegAddress_PostTown: str = None
-    RegAddress_County: str = None
-    RegAddress_Country: str = None
-    RegAddress_PostCode: str = None
-    CompanyCategory: str = None
-    CompanyStatus: str = None
-    CountryOfOrigin: str = None
-    DissolutionDate: datetime.date = None
-    IncorporationDate: datetime.date = None
-    Accounts_AccountRefDay: int = None
-    Accounts_AccountRefMonth: int = None
-    Accounts_NextDueDate: datetime.date = None
-    Accounts_LastMadeUpDate: datetime.date = None
-    Accounts_AccountCategory: str = None
-    Returns_NextDueDate: datetime.date = None
-    Returns_LastMadeUpDate: datetime.date = None
-    Mortgages_NumMortCharges: int = None
-    Mortgages_NumMortOutstanding: int = None
-    Mortgages_NumMortPartSatisfied: int = None
-    Mortgages_NumMortSatisfied: int = None
-    LimitedPartnerships_NumGenPartners: int = None
-    LimitedPartnerships_NumLimPartners: int = None
-    ConfStmtNextDueDate: datetime.date = None
-    ConfStmtLastMadeUpDate: datetime.date = None
-    org_id: str = None
+    CompanyName: Optional[str] = None
+    CompanyNumber: Optional[str] = None
+    RegAddress_CareOf: Optional[str] = None
+    RegAddress_POBox: Optional[str] = None
+    RegAddress_AddressLine1: Optional[str] = None
+    RegAddress_AddressLine2: Optional[str] = None
+    RegAddress_PostTown: Optional[str] = None
+    RegAddress_County: Optional[str] = None
+    RegAddress_Country: Optional[str] = None
+    RegAddress_PostCode: Optional[str] = None
+    CompanyCategory: Optional[str] = None
+    CompanyStatus: Optional[str] = None
+    CountryOfOrigin: Optional[str] = None
+    DissolutionDate: Optional[datetime.date] = None
+    IncorporationDate: Optional[datetime.date] = None
+    Accounts_AccountRefDay: Optional[int] = None
+    Accounts_AccountRefMonth: Optional[int] = None
+    Accounts_NextDueDate: Optional[datetime.date] = None
+    Accounts_LastMadeUpDate: Optional[datetime.date] = None
+    Accounts_AccountCategory: Optional[str] = None
+    Returns_NextDueDate: Optional[datetime.date] = None
+    Returns_LastMadeUpDate: Optional[datetime.date] = None
+    Mortgages_NumMortCharges: Optional[int] = None
+    Mortgages_NumMortOutstanding: Optional[int] = None
+    Mortgages_NumMortPartSatisfied: Optional[int] = None
+    Mortgages_NumMortSatisfied: Optional[int] = None
+    LimitedPartnerships_NumGenPartners: Optional[int] = None
+    LimitedPartnerships_NumLimPartners: Optional[int] = None
+    ConfStmtNextDueDate: Optional[datetime.date] = None
+    ConfStmtLastMadeUpDate: Optional[datetime.date] = None
+    org_id: Optional[str] = None

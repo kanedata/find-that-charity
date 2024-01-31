@@ -262,6 +262,15 @@ class CompanyDocument(Document):
     CompanyCategory = fields.KeywordField(attr="CompanyCategory")
     PreviousNames = fields.TextField()
 
+    @classmethod
+    def search(cls, using=None, index=None):
+        return SearchWithTemplate(
+            using=cls._get_using(using),
+            index=cls._default_index(index),
+            doc_type=[cls],
+            model=cls.django.model,
+        )
+
     def bulk(self, actions, **kwargs):
         if self.django.queryset_pagination and "chunk_size" not in kwargs:
             kwargs["chunk_size"] = self.django.queryset_pagination

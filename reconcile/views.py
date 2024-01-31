@@ -70,14 +70,14 @@ def service_spec(request, orgtypes=None):
         "defaultTypes": defaultTypes,
         "extend": {
             "propose_properties": {
-                "service_url": request.build_absolute_uri(reverse("index")),
+                "service_url": request.build_absolute_uri(reverse("index")).rstrip("/"),
                 "service_path": reverse("propose_properties"),
             },
             "property_settings": [],
         },
         "suggest": {
             "entity": {
-                "service_url": request.build_absolute_uri(reverse("index")),
+                "service_url": request.build_absolute_uri(reverse("index")).rstrip("/"),
                 "service_path": reverse("suggest"),
                 # "flyout_service_path": "/suggest/flyout/${id}"
             }
@@ -180,10 +180,7 @@ def suggest(request, orgtype=None):
                 {
                     "id": r["_source"]["org_id"],
                     "name": r["_source"]["name"],
-                    "url": request.build_absolute_uri(
-                        reverse("orgid_html", kwargs={"org_id": r["_source"]["org_id"]})
-                    ),
-                    "orgtypes": list(r["_source"]["organisationType"]),
+                    "notable": list(r["_source"]["organisationType"]),
                 }
                 for r in result.suggest[SUGGEST_NAME][0]["options"]
             ]

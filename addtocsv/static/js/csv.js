@@ -50,6 +50,14 @@ function openSaveFileDialog(data, filename, mimetype) {
 
 }
 
+function extractProperties(orgRecord) {
+    // properties are stored as a list of dicts, with a single key/value pair
+    // // We don't neeed to extract the key, so we just return the value
+    return Object.fromEntries(Object.entries(orgRecord).map(
+        ([k, v]) => [k, Object.values(v).map((v) => Object.values(v)).join("; ")]
+    ));
+}
+
 var app = new Vue({
     el: '#addtocsv',
     data: {
@@ -166,6 +174,11 @@ var app = new Vue({
                     })
             }))
                 .then(data => Object.assign({}, ...data))
+                .then(data => Object.fromEntries(Object.entries(data).map(
+                    ([orgid, properties]) => (
+                        [orgid, extractProperties(properties)]
+                    )
+                )))
                 .then(new_data => openSaveFileDialog(
                     Papa.unparse({
                         fields: component.csv_results.meta.fields.concat(component.fields_to_add),

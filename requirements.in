@@ -47,3 +47,6 @@ git+https://github.com/kanedata/charity-django.git@v0.4.1
 certifi
 xlsxwriter
 boto3
+jsonschema
+pytest
+pytest-django
