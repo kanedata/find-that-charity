@@ -1,6 +1,7 @@
 import urllib.parse
 from typing import Dict, List, Literal, Optional, Union
 
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import reverse
 
@@ -22,7 +23,8 @@ class Reconcile:
     name = "Find that Charity Reconciliation API"
     view_url = "orgid_html"
     view_url_args = {"org_id": "{{id}}"}
-    suggest = True
+    suggest_entity = True
+    suggest_type = True
     extend = True
     preview = True
 
@@ -58,7 +60,9 @@ class Reconcile:
             orgtypes = self._get_orgtypes_from_str(orgtypes)
         if not defaultTypes:
             if not orgtypes or orgtypes == "all":
-                defaultTypes = [{"id": "/Organization", "name": "Organisation"}]
+                defaultTypes = [
+                    {"id": "registered-charity", "name": "Registered Charity"}
+                ]
             elif isinstance(orgtypes, list):
                 defaultTypes = [{"id": o.slug, "name": o.title} for o in orgtypes]
 
@@ -92,13 +96,18 @@ class Reconcile:
                 },
                 "property_settings": [],
             }
-        if self.suggest:
-            spec["suggest"] = {
-                "entity": {
+        if self.suggest_entity or self.suggest_type:
+            spec["suggest"] = {}
+            if self.suggest_entity:
+                spec["suggest"]["entity"] = {
                     "service_url": request_path,
                     "service_path": "/suggest/entity",
-                },
-            }
+                }
+            if self.suggest_type:
+                spec["suggest"]["type"] = {
+                    "service_url": request_path,
+                    "service_path": "/suggest/type",
+                }
         return spec
 
     def reconcile(
@@ -139,7 +148,6 @@ class Reconcile:
         orgtypes = self._get_orgtypes_from_str(orgtypes)
         SUGGEST_NAME = "name_complete"
 
-        # cursor = request.GET.get("cursor")
         if not prefix:
             raise Http404("Prefix must be supplied")
         q = OrganisationGroup.search()
@@ -173,6 +181,30 @@ class Reconcile:
                     "notable": list(r["_source"]["organisationType"]),
                 }
                 for r in result.suggest[SUGGEST_NAME][0]["options"]
+            ]
+        }
+
+    def suggest_type(
+        self,
+        request,
+        prefix: str,
+        cursor: int = 0,
+    ):
+        if not prefix:
+            raise Http404("Prefix must be supplied")
+
+        results = OrganisationType.objects.filter(
+            Q(title__icontains=prefix) | Q(slug__icontains=prefix)
+        )[cursor : cursor + 10]
+
+        return {
+            "result": [
+                {
+                    "id": r.slug,
+                    "name": r.title,
+                    "notable": [],
+                }
+                for r in results
             ]
         }
 

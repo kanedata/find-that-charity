@@ -201,10 +201,15 @@ class ReconciliationResultBatch(RootModel[Dict[str, Dict]], Schema):
     root: Dict[str, ReconciliationResult]
 
 
-class SuggestQuery(Schema):
+class SuggestEntityQuery(Schema):
     prefix: str
     cursor: int = 0
     type: Optional[str] = Field(None, alias="type")
+
+
+class SuggestTypeQuery(Schema):
+    prefix: str
+    cursor: int = 0
 
 
 class SuggestResult(Schema):

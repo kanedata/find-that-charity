@@ -30,7 +30,6 @@ with open(
 
 RECON_BASE_URLS: list[Tuple[str, list[str]]] = [
     ("/api/v1/reconcile/", ["0.2"]),
-    # ("/api/v1/reconcile/local-authority", ["0.2"]),
     ("/reconcile", ["0.1"]),
     ("/reconcile/local-authority", ["0.1"]),
 ]
@@ -49,7 +48,6 @@ class TestReconcileAllAPI(TestCase):
         super().setUp()
         self.registry = Registry(retrieve=retrieve_schema_from_filesystem)
 
-    # GET request to /api/v1/reconcile should return the service spec
     def test_get_service_spec(self):
         for base_url, schema_version, schema in get_test_cases("manifest.json"):
             with self.subTest((base_url, schema_version)):
@@ -71,7 +69,6 @@ class TestReconcileAllAPI(TestCase):
                 )
 
     def test_reconcile_post(self):
-        # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = RECON_RESPONSE
 
         for base_url, schema_version, schema in get_test_cases(
@@ -98,7 +95,6 @@ class TestReconcileAllAPI(TestCase):
                 )
 
     def test_reconcile_get(self):
-        # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = RECON_RESPONSE
 
         for base_url, schema_version, schema in get_test_cases(
@@ -125,7 +121,6 @@ class TestReconcileAllAPI(TestCase):
                 )
 
     def test_reconcile_with_type_post(self):
-        # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = RECON_RESPONSE
 
         for base_url, schema_version, schema in get_test_cases(
@@ -165,7 +160,6 @@ class TestReconcileAllAPI(TestCase):
                 )
 
     def test_reconcile_with_type_get(self):
-        # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = RECON_RESPONSE
 
         for base_url, schema_version, schema in get_test_cases(
@@ -205,7 +199,6 @@ class TestReconcileAllAPI(TestCase):
                 )
 
     def test_reconcile_empty(self):
-        # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = EMPTY_RESPONSE
 
         for base_url, schema_version, schema in get_test_cases(
@@ -230,7 +223,6 @@ class TestReconcileAllAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # POST request to /api/v1/reconcile/suggest/entity should return a list of candidates
     def test_reconcile_suggest_entity(self):
         self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
 
@@ -265,7 +257,6 @@ class TestReconcileAllAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # POST request to /api/v1/reconcile/suggest/entity should return a list of candidates
     def test_reconcile_suggest_entity_type(self):
         self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
 
@@ -293,6 +284,71 @@ class TestReconcileAllAPI(TestCase):
                 self.assertEqual(data["result"][0]["id"], "GB-CHC-1110225")
                 self.assertEqual(len(data["result"][0]["notable"]), 4)
                 self.assertTrue("registered-charity" in data["result"][0]["notable"])
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
+    def test_reconcile_suggest_type(self):
+        self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
+
+        for base_url, schema_version, schema in get_test_cases(
+            "suggest-types-response.json"
+        ):
+            with self.subTest((base_url, schema_version)):
+                service_spec = self.client.get(base_url).json()
+                if "type" not in service_spec["suggest"]:
+                    continue
+                suggest_url = "".join(list(service_spec["suggest"]["type"].values()))
+
+                response = self.client.get(
+                    suggest_url,
+                    {
+                        "prefix": "Charity",
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["result"])
+                self.assertEqual(len(data["result"]), 2)
+                self.assertEqual(
+                    list(data["result"][0].keys()), ["id", "name", "notable"]
+                )
+                self.assertEqual(data["result"][0]["id"], "registered-charity")
+                self.assertEqual(len(data["result"][0]["notable"]), 0)
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
+    def test_reconcile_suggest_type_empty(self):
+        self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
+
+        for base_url, schema_version, schema in get_test_cases(
+            "suggest-types-response.json"
+        ):
+            with self.subTest((base_url, schema_version)):
+                service_spec = self.client.get(base_url).json()
+                if "type" not in service_spec["suggest"]:
+                    continue
+                suggest_url = "".join(list(service_spec["suggest"]["type"].values()))
+
+                response = self.client.get(
+                    suggest_url,
+                    {
+                        "prefix": "BLAH",
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["result"])
+                self.assertEqual(len(data["result"]), 0)
 
                 jsonschema.validate(
                     instance=data,
@@ -391,7 +447,6 @@ class TestReconcileAllAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # GET request to /api/v1/reconcile/suggest/entity should return a list of candidates
     def test_reconcile_propose_properties(self):
         self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
 

@@ -27,7 +27,6 @@ class TestCompanyReconcileAPI(TestCase):
         super().setUp()
         self.registry = Registry(retrieve=retrieve_schema_from_filesystem)
 
-    # GET request to /api/v1/reconcile/company should return the service spec
     def test_get_company_service_spec(self):
         for schema_version, schema in get_schema("manifest.json").items():
             with self.subTest(schema_version):
@@ -55,9 +54,7 @@ class TestCompanyReconcileAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # POST request to /api/v1/reconcile/company should return a list of candidates
     def test_company_reconcile_post(self):
-        # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = RECON_RESPONSE
 
         for schema_version, schema in get_schema(
@@ -83,9 +80,7 @@ class TestCompanyReconcileAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # POST request to /api/v1/reconcile/company should return a list of candidates
     def test_company_reconcile_get(self):
-        # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = RECON_RESPONSE
 
         for schema_version, schema in get_schema(
@@ -111,9 +106,7 @@ class TestCompanyReconcileAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # POST request to /api/v1/reconcile should return a list of candidates
     def test_reconcile_empty_post(self):
-        # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = EMPTY_RESPONSE
 
         for schema_version, schema in get_schema(
@@ -138,9 +131,7 @@ class TestCompanyReconcileAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # POST request to /api/v1/reconcile should return a list of candidates
     def test_reconcile_empty_get(self):
-        # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = EMPTY_RESPONSE
 
         for schema_version, schema in get_schema(

@@ -15,8 +15,9 @@ from .schema import (
     ReconciliationQueryBatchForm,
     ReconciliationResult,
     ServiceSpec,
-    SuggestQuery,
+    SuggestEntityQuery,
     SuggestResponse,
+    SuggestTypeQuery,
 )
 
 api = Router(tags=["Reconciliation (nonprofits)"])
@@ -64,10 +65,15 @@ def preview(request, id: str, response: HttpResponse):
 
 
 @api.get("/suggest/entity", response={200: SuggestResponse}, exclude_none=True)
-def suggest_entity(request, query: Query[SuggestQuery]):
+def suggest_entity(request, query: Query[SuggestEntityQuery]):
     return reconcile.suggest_entity(
         request, query.prefix, query.cursor, orgtypes=query.type
     )
+
+
+@api.get("/suggest/type", response={200: SuggestResponse}, exclude_none=True)
+def suggest_type(request, query: Query[SuggestTypeQuery]):
+    return reconcile.suggest_type(request, query.prefix, query.cursor)
 
 
 @api.get(
