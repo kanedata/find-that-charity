@@ -20,8 +20,7 @@ class CompanyReconcile(Reconcile):
     name = "Find that Charity Company Reconciliation API"
     view_url = "company_detail"
     view_url_args = {"company_number": "{{id}}"}
-    suggest_entity = False
-    suggest_type = False
+    suggest = []
     extend = False
     preview = False
 

@@ -23,8 +23,7 @@ class Reconcile:
     name = "Find that Charity Reconciliation API"
     view_url = "orgid_html"
     view_url_args = {"org_id": "{{id}}"}
-    suggest_entity = True
-    suggest_type = True
+    suggest: list[str] = ["entity", "type", "property"]
     extend = True
     preview = True
 
@@ -96,18 +95,11 @@ class Reconcile:
                 },
                 "property_settings": [],
             }
-        if self.suggest_entity or self.suggest_type:
-            spec["suggest"] = {}
-            if self.suggest_entity:
-                spec["suggest"]["entity"] = {
-                    "service_url": request_path,
-                    "service_path": "/suggest/entity",
-                }
-            if self.suggest_type:
-                spec["suggest"]["type"] = {
-                    "service_url": request_path,
-                    "service_path": "/suggest/type",
-                }
+        if self.suggest:
+            spec["suggest"] = {
+                s: {"service_url": request_path, "service_path": f"/suggest/{s}"}
+                for s in self.suggest
+            }
         return spec
 
     def reconcile(
@@ -205,6 +197,29 @@ class Reconcile:
                     "notable": [],
                 }
                 for r in results
+            ]
+        }
+
+    def suggest_property(
+        self,
+        request,
+        prefix: str,
+        cursor: int = 0,
+    ):
+        if not prefix:
+            raise Http404("Prefix must be supplied")
+
+        properties = self.propose_properties(request, "Organization")["properties"]
+
+        return {
+            "result": [
+                {
+                    "id": p["id"],
+                    "name": p["name"],
+                    "notable": [],
+                }
+                for p in properties
+                if prefix.lower() in p["name"].lower() or prefix.lower() in p["id"]
             ]
         }
 

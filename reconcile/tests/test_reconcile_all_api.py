@@ -357,6 +357,75 @@ class TestReconcileAllAPI(TestCase):
                     registry=self.registry,
                 )
 
+    def test_reconcile_suggest_property(self):
+        self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
+
+        for base_url, schema_version, schema in get_test_cases(
+            "suggest-properties-response.json"
+        ):
+            with self.subTest((base_url, schema_version)):
+                service_spec = self.client.get(base_url).json()
+                if "property" not in service_spec["suggest"]:
+                    continue
+                suggest_url = "".join(
+                    list(service_spec["suggest"]["property"].values())
+                )
+
+                response = self.client.get(
+                    suggest_url,
+                    {
+                        "prefix": "name",
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["result"])
+                self.assertEqual(len(data["result"]), 2)
+                self.assertEqual(
+                    list(data["result"][0].keys()), ["id", "name", "notable"]
+                )
+                self.assertEqual(data["result"][0]["id"], "name")
+                self.assertEqual(len(data["result"][0]["notable"]), 0)
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
+    def test_reconcile_suggest_property_empty(self):
+        self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
+
+        for base_url, schema_version, schema in get_test_cases(
+            "suggest-properties-response.json"
+        ):
+            with self.subTest((base_url, schema_version)):
+                service_spec = self.client.get(base_url).json()
+                if "property" not in service_spec["suggest"]:
+                    continue
+                suggest_url = "".join(
+                    list(service_spec["suggest"]["property"].values())
+                )
+
+                response = self.client.get(
+                    suggest_url,
+                    {
+                        "prefix": "BLAH",
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["result"])
+                self.assertEqual(len(data["result"]), 0)
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
     def test_reconcile_extend_post(self):
         self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
 

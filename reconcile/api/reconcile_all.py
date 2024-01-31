@@ -76,6 +76,11 @@ def suggest_type(request, query: Query[SuggestTypeQuery]):
     return reconcile.suggest_type(request, query.prefix, query.cursor)
 
 
+@api.get("/suggest/property", response={200: SuggestResponse}, exclude_none=True)
+def suggest_property(request, query: Query[SuggestTypeQuery]):
+    return reconcile.suggest_property(request, query.prefix, query.cursor)
+
+
 @api.get(
     "/extend/propose",
     response={200: DataExtensionPropertyProposalResponse},
@@ -83,12 +88,3 @@ def suggest_type(request, query: Query[SuggestTypeQuery]):
 )
 def propose_properties(request, query: Query[DataExtensionPropertyProposalQuery]):
     return reconcile.propose_properties(request, type_=query.type, limit=query.limit)
-
-
-# @api.post(
-#     "/extend",
-#     response={200: DataExtensionQueryResponse},
-#     exclude_none=True,
-# )
-# def data_extension(request, body: DataExtensionQuery):
-#     return reconcile.data_extension(request, body)
