@@ -99,7 +99,7 @@ const fetchAutocomplete = () => {
     }
     var url = new URL(AUTOCOMPLETE_URL);
     if (orgtype) {
-        var url = new URL(AUTOCOMPLETE_ORGTYPE_URL.replace("__orgtype__", orgtype));
+        url.searchParams.append('type', orgtype);
     }
     url.searchParams.append('prefix', v);
     fetch(url)
