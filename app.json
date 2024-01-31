@@ -21,5 +21,30 @@
             "command": "sh ./update_sunday.sh",
             "schedule": "0 1 * * 0"
         }
-    ]
+    ],
+    "healthchecks": {
+        "web": [
+            {
+                "type": "startup",
+                "name": "Charity page check",
+                "content": "Hope Into Action: Coventry",
+                "path": "/charity/1177548",
+                "attempts": 3
+            },
+            {
+                "type": "startup",
+                "name": "Charity search check",
+                "content": "Search Results",
+                "path": "/charity/1177548",
+                "attempts": 3
+            },
+            {
+                "type": "startup",
+                "name": "Reconcile API check",
+                "content": "Find that Charity Reconciliation API",
+                "path": "/api/v1/reconcile/",
+                "attempts": 3
+            }
+        ]
+    }
 }
