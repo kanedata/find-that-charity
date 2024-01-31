@@ -70,8 +70,7 @@ class TestReconcileAllAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # POST request to /api/v1/reconcile should return a list of candidates
-    def test_reconcile(self):
+    def test_reconcile_post(self):
         # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = RECON_RESPONSE
 
@@ -98,8 +97,34 @@ class TestReconcileAllAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # POST request to /api/v1/reconcile should return a list of candidates
-    def test_reconcile_with_type(self):
+    def test_reconcile_get(self):
+        # attach RECON RESPONSE to the search() method of self.mock_es
+        self.mock_es.return_value.search.return_value = RECON_RESPONSE
+
+        for base_url, schema_version, schema in get_test_cases(
+            "reconciliation-result-batch.json"
+        ):
+            with self.subTest((base_url, schema_version)):
+                response = self.client.get(
+                    base_url,
+                    {
+                        "queries": json.dumps({"q0": {"query": "Test"}}),
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["q0"])
+                self.assertEqual(len(data["q0"]["result"]), 10)
+                self.assertEqual(data["q0"]["result"][0]["id"], "GB-CHC-1006706")
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
+    def test_reconcile_with_type_post(self):
         # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = RECON_RESPONSE
 
@@ -139,7 +164,46 @@ class TestReconcileAllAPI(TestCase):
                     registry=self.registry,
                 )
 
-    # POST request to /api/v1/reconcile should return a list of candidates
+    def test_reconcile_with_type_get(self):
+        # attach RECON RESPONSE to the search() method of self.mock_es
+        self.mock_es.return_value.search.return_value = RECON_RESPONSE
+
+        for base_url, schema_version, schema in get_test_cases(
+            "reconciliation-result-batch.json"
+        ):
+            with self.subTest((base_url, schema_version)):
+                response = self.client.get(
+                    base_url,
+                    {
+                        "queries": json.dumps(
+                            {
+                                "q0": {
+                                    "query": "Test",
+                                    "type": "registered-charity",
+                                    "type_strict": "should",
+                                },
+                                "q1": {
+                                    "query": "Test",
+                                    "type": "registered-charity",
+                                    "type_strict": "should",
+                                },
+                            }
+                        ),
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["q0", "q1"])
+                self.assertEqual(len(data["q0"]["result"]), 10)
+                self.assertEqual(data["q0"]["result"][0]["id"], "GB-CHC-1006706")
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
     def test_reconcile_empty(self):
         # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = EMPTY_RESPONSE
@@ -202,7 +266,42 @@ class TestReconcileAllAPI(TestCase):
                 )
 
     # POST request to /api/v1/reconcile/suggest/entity should return a list of candidates
-    def test_reconcile_extend(self):
+    def test_reconcile_suggest_entity_type(self):
+        self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
+
+        for base_url, schema_version, schema in get_test_cases(
+            "suggest-entities-response.json"
+        ):
+            with self.subTest((base_url, schema_version)):
+                service_spec = self.client.get(base_url).json()
+                suggest_url = "".join(list(service_spec["suggest"]["entity"].values()))
+
+                response = self.client.get(
+                    suggest_url,
+                    {
+                        "prefix": "Test",
+                        "type": "local-authority",
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["result"])
+                self.assertEqual(len(data["result"]), 5)
+                self.assertEqual(
+                    list(data["result"][0].keys()), ["id", "name", "notable"]
+                )
+                self.assertEqual(data["result"][0]["id"], "GB-CHC-1110225")
+                self.assertEqual(len(data["result"][0]["notable"]), 4)
+                self.assertTrue("registered-charity" in data["result"][0]["notable"])
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
+    def test_reconcile_extend_post(self):
         self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
 
         for base_url, schema_version, schema in get_test_cases(
@@ -210,6 +309,51 @@ class TestReconcileAllAPI(TestCase):
         ):
             with self.subTest((base_url, schema_version)):
                 response = self.client.post(
+                    base_url,
+                    {
+                        "extend": json.dumps(
+                            {
+                                "ids": ["GB-CHC-1234", "GB-CHC-5"],
+                                "properties": [
+                                    {
+                                        "id": "name",
+                                    },
+                                    {
+                                        "id": "vocab-test-vocab",
+                                    },
+                                ],
+                            }
+                        )
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["meta", "rows"])
+                self.assertEqual(data["meta"], [{"id": "name", "name": "Name"}])
+                self.assertEqual(list(data["rows"].keys()), ["GB-CHC-1234", "GB-CHC-5"])
+                self.assertEqual(
+                    data["rows"]["GB-CHC-1234"]["name"], [{"str": "Test organisation"}]
+                )
+                self.assertEqual(
+                    data["rows"]["GB-CHC-1234"]["vocab-test-vocab"],
+                    [{"str": "A"}, {"str": "B"}, {"str": "C"}],
+                )
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
+    def test_reconcile_extend_get(self):
+        self.mock_es.return_value.search.return_value = SUGGEST_RESPONSE
+
+        for base_url, schema_version, schema in get_test_cases(
+            "data-extension-response.json"
+        ):
+            with self.subTest((base_url, schema_version)):
+                response = self.client.get(
                     base_url,
                     {
                         "extend": json.dumps(

@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Dict, List, Literal, Optional, TypeVar, Union
 
 from ninja import Schema
-from pydantic import RootModel
+from pydantic import Field, RootModel
 
 # Reconciliation API Schema
 #
@@ -75,6 +75,11 @@ class DataExtensionPropertyProprosal(Schema):
 class DataExtensionMetadata(Schema):
     propose_properties: Optional[DataExtensionPropertyProprosal] = None
     property_settings: List[DataExtensionPropertySetting] = []
+
+
+class DataExtensionPropertyProposalQuery(Schema):
+    type: str
+    limit: int = 500
 
 
 class DataExtensionPropertyProposalResponse(Schema):
@@ -194,6 +199,12 @@ class ReconciliationResult(Schema):
 
 class ReconciliationResultBatch(RootModel[Dict[str, Dict]], Schema):
     root: Dict[str, ReconciliationResult]
+
+
+class SuggestQuery(Schema):
+    prefix: str
+    cursor: int = 0
+    type: Optional[str] = Field(None, alias="type")
 
 
 class SuggestResult(Schema):

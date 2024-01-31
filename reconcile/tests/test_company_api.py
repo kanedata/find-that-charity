@@ -56,7 +56,7 @@ class TestCompanyReconcileAPI(TestCase):
                 )
 
     # POST request to /api/v1/reconcile/company should return a list of candidates
-    def test_company_reconcile(self):
+    def test_company_reconcile_post(self):
         # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = RECON_RESPONSE
 
@@ -83,8 +83,36 @@ class TestCompanyReconcileAPI(TestCase):
                     registry=self.registry,
                 )
 
+    # POST request to /api/v1/reconcile/company should return a list of candidates
+    def test_company_reconcile_get(self):
+        # attach RECON RESPONSE to the search() method of self.mock_es
+        self.mock_es.return_value.search.return_value = RECON_RESPONSE
+
+        for schema_version, schema in get_schema(
+            "reconciliation-result-batch.json"
+        ).items():
+            with self.subTest(schema_version):
+                response = self.client.get(
+                    "/api/v1/reconcile/company",
+                    {
+                        "queries": json.dumps({"q0": {"query": "Test"}}),
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["q0"])
+                self.assertEqual(len(data["q0"]["result"]), 10)
+                self.assertEqual(data["q0"]["result"][0]["id"], "12345670")
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
     # POST request to /api/v1/reconcile should return a list of candidates
-    def test_reconcile_empty(self):
+    def test_reconcile_empty_post(self):
         # attach RECON RESPONSE to the search() method of self.mock_es
         self.mock_es.return_value.search.return_value = EMPTY_RESPONSE
 
@@ -93,6 +121,33 @@ class TestCompanyReconcileAPI(TestCase):
         ).items():
             with self.subTest(schema_version):
                 response = self.client.post(
+                    "/api/v1/reconcile/company",
+                    {
+                        "queries": json.dumps({"q0": {"query": "Test"}}),
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["q0"])
+                self.assertEqual(len(data["q0"]["result"]), 0)
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
+    # POST request to /api/v1/reconcile should return a list of candidates
+    def test_reconcile_empty_get(self):
+        # attach RECON RESPONSE to the search() method of self.mock_es
+        self.mock_es.return_value.search.return_value = EMPTY_RESPONSE
+
+        for schema_version, schema in get_schema(
+            "reconciliation-result-batch.json"
+        ).items():
+            with self.subTest(schema_version):
+                response = self.client.get(
                     "/api/v1/reconcile/company",
                     {
                         "queries": json.dumps({"q0": {"query": "Test"}}),

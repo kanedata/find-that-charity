@@ -2,11 +2,12 @@ import json
 from typing import Dict
 
 from django.http import HttpResponse
-from ninja import Form, Router
+from ninja import Form, Query, Router
 
 from reconcile.api.base import Reconcile
 
 from .schema import (
+    DataExtensionPropertyProposalQuery,
     DataExtensionPropertyProposalResponse,
     DataExtensionQuery,
     DataExtensionQueryResponse,
@@ -14,21 +15,30 @@ from .schema import (
     ReconciliationQueryBatchForm,
     ReconciliationResult,
     ServiceSpec,
+    SuggestQuery,
     SuggestResponse,
 )
 
-api = Router(tags=["Reconciliation (against all organisations)"])
+api = Router(tags=["Reconciliation (nonprofits)"])
 reconcile = Reconcile()
 
 
 @api.get(
     path="",
-    response={200: ServiceSpec},
+    response={
+        200: ServiceSpec | Dict[str, ReconciliationResult] | DataExtensionQueryResponse
+    },
     exclude_none=True,
     summary="Service specification for reconciling against any nonprofit organisation",
     description="Get the service specification for reconciling against any nonprofit organisation",
 )
-def get_service_spec(request):
+def get_service_spec(request, queries: Query[ReconciliationQueryBatchForm]):
+    if queries.queries:
+        queries_parsed = ReconciliationQueryBatch(queries=json.loads(queries.queries))
+        return reconcile.reconcile(request, queries_parsed, orgtypes="all")
+    elif queries.extend:
+        queries_parsed = DataExtensionQuery(**json.loads(queries.extend))
+        return reconcile.data_extension(request, queries_parsed)
     return reconcile.get_service_spec(request, orgtypes="all")
 
 
@@ -39,10 +49,7 @@ def get_service_spec(request):
     summary="Reconciliation endpoint for reconciling against any nonprofit organisation",
     description="Reconciling queries against any nonprofit organisation.",
 )
-def reconcile_entities(
-    request,
-    queries: Form[ReconciliationQueryBatchForm],
-):
+def reconcile_entities(request, queries: Form[ReconciliationQueryBatchForm]):
     if queries.queries:
         queries_parsed = ReconciliationQueryBatch(queries=json.loads(queries.queries))
         return reconcile.reconcile(request, queries_parsed, orgtypes="all")
@@ -57,8 +64,10 @@ def preview(request, id: str, response: HttpResponse):
 
 
 @api.get("/suggest/entity", response={200: SuggestResponse}, exclude_none=True)
-def suggest_entity(request, prefix: str, cursor: int = 0):
-    return reconcile.suggest_entity(request, prefix, cursor)
+def suggest_entity(request, query: Query[SuggestQuery]):
+    return reconcile.suggest_entity(
+        request, query.prefix, query.cursor, orgtypes=query.type
+    )
 
 
 @api.get(
@@ -66,8 +75,8 @@ def suggest_entity(request, prefix: str, cursor: int = 0):
     response={200: DataExtensionPropertyProposalResponse},
     exclude_none=True,
 )
-def propose_properties(request, type: str, limit: int = 500):
-    return reconcile.propose_properties(request, type_=type, limit=limit)
+def propose_properties(request, query: Query[DataExtensionPropertyProposalQuery]):
+    return reconcile.propose_properties(request, type_=query.type, limit=query.limit)
 
 
 # @api.post(

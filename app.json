@@ -25,17 +25,24 @@
     "healthchecks": {
         "web": [
             {
-                "type": "startup",
+                "type": "liveness",
                 "name": "Charity page check",
                 "content": "Hope Into Action: Coventry",
                 "path": "/charity/1177548",
                 "attempts": 3
             },
             {
-                "type": "startup",
+                "type": "liveness",
                 "name": "Charity search check",
                 "content": "Search Results",
                 "path": "/?q=test&orgtype=all",
+                "attempts": 3
+            },
+            {
+                "type": "liveness",
+                "name": "Frontpage",
+                "content": "Search Results",
+                "path": "/",
                 "attempts": 3
             }
         ]

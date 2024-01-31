@@ -25,14 +25,14 @@ api = NinjaAPI(
                 "name": "Companies",
             },
             {
-                "name": "Reconciliation (against all organisations)",
+                "name": "Reconciliation (nonprofits)",
                 "externalDocs": {
                     "description": "Reconciliation Service API v0.2",
                     "url": "https://reconciliation-api.github.io/specs/latest/",
                 },
             },
             {
-                "name": "Reconciliation (against registered companies)",
+                "name": "Reconciliation (registered companies)",
                 "externalDocs": {
                     "description": "Reconciliation Service API v0.2",
                     "url": "https://reconciliation-api.github.io/specs/latest/",

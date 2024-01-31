@@ -37,3 +37,7 @@ class OrganisationViewTests(TestCase):
             reverse("orgid_json", kwargs={"org_id": "XX-XXX-3456"})
         )
         self.assertEqual(response.status_code, 404)
+
+    def test_index(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
