@@ -4,10 +4,11 @@ import os
 from typing import Tuple
 
 import jsonschema
+from referencing import Registry
 
 from ftc.tests import TestCase
 
-from .conftest import get_schema
+from .conftest import get_schema, retrieve_schema_from_filesystem
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,10 @@ def get_test_cases(schema_file):
 
 
 class TestReconcileAllAPI(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.registry = Registry(retrieve=retrieve_schema_from_filesystem)
+
     # GET request to /api/v1/reconcile should return the service spec
     def test_get_service_spec(self):
         for base_url, schema_version, schema in get_test_cases("manifest.json"):
@@ -62,6 +67,7 @@ class TestReconcileAllAPI(TestCase):
                     instance=data,
                     schema=schema,
                     cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
                 )
 
     # POST request to /api/v1/reconcile should return a list of candidates
@@ -89,6 +95,7 @@ class TestReconcileAllAPI(TestCase):
                     instance=data,
                     schema=schema,
                     cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
                 )
 
     # POST request to /api/v1/reconcile should return a list of candidates
@@ -115,6 +122,7 @@ class TestReconcileAllAPI(TestCase):
                     instance=data,
                     schema=schema,
                     cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
                 )
 
     # POST request to /api/v1/reconcile/suggest/entity should return a list of candidates
@@ -149,6 +157,7 @@ class TestReconcileAllAPI(TestCase):
                     instance=data,
                     schema=schema,
                     cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
                 )
 
     # POST request to /api/v1/reconcile/suggest/entity should return a list of candidates
@@ -194,6 +203,7 @@ class TestReconcileAllAPI(TestCase):
                     instance=data,
                     schema=schema,
                     cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
                 )
 
     # GET request to /api/v1/reconcile/suggest/entity should return a list of candidates
@@ -228,4 +238,5 @@ class TestReconcileAllAPI(TestCase):
                     instance=data,
                     schema=schema,
                     cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
                 )

@@ -1,6 +1,9 @@
 import json
 import os
+import re
 import warnings
+
+from referencing.jsonschema import DRAFT7
 
 SCHEMA_DIR = os.path.join(os.path.dirname(__file__), "specs")
 SUPPORTED_API_VERSIONS = ["0.2"]
@@ -23,3 +26,21 @@ def get_schema(
             msg = f"Schema file {schema_path} not found"
             warnings.warn(msg)
     return schemas
+
+
+# set up jsonschema registry
+def retrieve_schema_from_filesystem(uri: str):
+    recon_schema = re.match(
+        r"https://reconciliation-api\.github\.io/specs/(.*)/schemas/(.*\.json)",
+        uri,
+    )
+    if recon_schema:
+        schema_version = recon_schema.group(1)
+        schema_file = recon_schema.group(2)
+        return DRAFT7.create_resource(
+            get_schema(schema_file, supported_api_versions=[schema_version])[
+                schema_version
+            ]
+        )
+
+    raise ValueError(f"Unknown URI {uri}")

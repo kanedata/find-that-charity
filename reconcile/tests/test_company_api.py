@@ -3,10 +3,11 @@ import logging
 import os
 
 import jsonschema
+from referencing import Registry
 
 from ftc.tests import TestCase
 
-from .conftest import get_schema
+from .conftest import get_schema, retrieve_schema_from_filesystem
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,10 @@ with open(
 
 
 class TestCompanyReconcileAPI(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.registry = Registry(retrieve=retrieve_schema_from_filesystem)
+
     # GET request to /api/v1/reconcile/company should return the service spec
     def test_get_company_service_spec(self):
         for schema_version, schema in get_schema("manifest.json").items():
@@ -47,6 +52,7 @@ class TestCompanyReconcileAPI(TestCase):
                     instance=data,
                     schema=schema,
                     cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
                 )
 
     # POST request to /api/v1/reconcile/company should return a list of candidates
@@ -74,6 +80,7 @@ class TestCompanyReconcileAPI(TestCase):
                     instance=data,
                     schema=schema,
                     cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
                 )
 
     # POST request to /api/v1/reconcile should return a list of candidates
@@ -100,4 +107,5 @@ class TestCompanyReconcileAPI(TestCase):
                     instance=data,
                     schema=schema,
                     cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
                 )
