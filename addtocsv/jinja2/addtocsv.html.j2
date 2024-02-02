@@ -162,8 +162,9 @@
 
 {% block bodyscripts %}
 <script type="text/javascript">
-  const PROPERTIES_URL = {{ (request.build_absolute_uri(url('api-1.0:propose_properties')) + '?type=Organization') | tojson }};
-  const EXTEND_URL = {{ request.build_absolute_uri(url('api-1.0:reconcile_entities')) | tojson }};
+  const PROPERTIES_URL = {{ properties_url | tojson }};
+  const EXTEND_URL = {{ extend_url | tojson }};
+  const ORGID_SCHEMES = {{ orgid_schemes | tojson }};
 </script>
 <script src='{{ static("js/csv.js") }}' type="text/javascript"></script>
 {% endblock %}

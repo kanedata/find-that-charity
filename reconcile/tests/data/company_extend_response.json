@@ -1,0 +1,44 @@
+{
+    "docs": [
+        {
+            "_index": "companies",
+            "_type": "_doc",
+            "_id": "BLAHBLAH",
+            "found": false
+        },
+        {
+            "_index": "companies",
+            "_type": "_doc",
+            "_id": "00445790",
+            "_version": 1,
+            "_seq_no": 16507223,
+            "_primary_term": 6,
+            "found": true,
+            "_source": {
+                "CompanyNumber": "00445790",
+                "CompanyStatus": "active",
+                "RegAddress_PostCode": "AL7 1GA",
+                "CompanyCategory": "plc",
+                "PreviousNames": null,
+                "CompanyName": "TESCO PLC"
+            }
+        },
+        {
+            "_index": "companies",
+            "_type": "_doc",
+            "_id": "14015213",
+            "_version": 1,
+            "_seq_no": 14463513,
+            "_primary_term": 6,
+            "found": true,
+            "_source": {
+                "CompanyNumber": "14015213",
+                "CompanyStatus": "active",
+                "RegAddress_PostCode": "EC2A 4NE",
+                "CompanyCategory": "ltd",
+                "PreviousNames": null,
+                "CompanyName": "KANE DATA LIMITED"
+            }
+        }
+    ]
+}

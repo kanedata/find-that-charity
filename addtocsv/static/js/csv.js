@@ -1,14 +1,6 @@
 const DEFAULT_HASH_LENGTH = 4;
 const ARRAY_CHUNK_SIZE = 100;
 const FIELD_MATCH_REGEX = /(organi[sz]ation|org_?id)/g;
-const ORGID_SCHEMES = {
-    'orgid': ["Organisation Identifier", "GB-CHC-1234567"],
-    'charity': ["Charity Number", "1234567"],
-    "GB-CHC": ["Charity Number (England and Wales only)", "1234567"],
-    "GB-SC": ["Charity Number (Scotland)", "SC012345"],
-    "GB-NIC": ["Charity Number (Northern Ireland)", "123456"],
-    "GB-COH": ["Company Number", "00123456"],
-};
 
 function chunk_array(arr, len) {
     var chunks = [],

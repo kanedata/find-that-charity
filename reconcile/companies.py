@@ -75,3 +75,27 @@ def do_reconcile_query(
             for k, o in enumerate(result)
         ],
     }
+
+
+def do_extend_query(ids, properties):
+    all_fields = [p["id"] for p in properties]
+    result = {"meta": [{"id": p, "name": p} for p in all_fields], "rows": {}}
+
+    ids_map = {id: id.replace("GB-COH-", "") for id in ids}
+
+    # get the data
+    lookup_results = {
+        doc.meta.id: doc
+        for doc in CompanyDocument.mget(ids_map.values(), _source_includes=all_fields)
+        if doc
+    }
+
+    # clean up the data
+    for id in ids:
+        lookup_result = lookup_results.get(ids_map[id])
+        if not lookup_result:
+            result["rows"][id] = {k: None for k in all_fields}
+            continue
+        result["rows"][id] = {k: lookup_result[k] for k in all_fields}
+
+    return result

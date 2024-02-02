@@ -39,6 +39,7 @@ urlpatterns = [
     path("", ftc.views.index, name="index"),
     path("about", ftc.views.about, name="about"),
     path("adddata/", addtocsv.views.index, name="csvtool"),
+    path("adddata/company/", addtocsv.views.companies, name="csvtool_company"),
     path("api/v1/", api.urls),
     path("orgid/", include(ftc.urls)),
     path("charity/", include(charity.urls)),

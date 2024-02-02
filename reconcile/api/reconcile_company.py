@@ -6,12 +6,15 @@ from django.http import Http404
 from ninja import Form, Query, Router
 
 from ftc.documents import CompanyDocument
-from reconcile.companies import COMPANY_RECON_TYPE, do_reconcile_query
+from reconcile.companies import COMPANY_RECON_TYPE, do_extend_query, do_reconcile_query
+from reconcile.utils import convert_value
 
 from .base import Reconcile
 from .schema import (
     DataExtensionPropertyProposalQuery,
     DataExtensionPropertyProposalResponse,
+    DataExtensionQuery,
+    DataExtensionQueryResponse,
     ReconciliationQueryBatch,
     ReconciliationQueryBatchForm,
     ReconciliationResult,
@@ -76,13 +79,31 @@ class CompanyReconcile(Reconcile):
             ]
         }
 
+    def data_extension(self, request, body: DataExtensionQuery) -> Dict:
+        result = do_extend_query(
+            ids=body.ids,
+            properties=[p.__dict__ for p in body.properties],
+        )
+        rows = {}
+        for row_id, row in result["rows"].items():
+            rows[row_id] = {}
+            for k, v in row.items():
+                rows[row_id][k] = convert_value(v)
+
+        return {
+            "meta": result["meta"],
+            "rows": rows,
+        }
+
 
 reconcile = CompanyReconcile()
 
 
 @api.get(
     "",
-    response={200: ServiceSpec | Dict[str, ReconciliationResult]},
+    response={
+        200: ServiceSpec | Dict[str, ReconciliationResult] | DataExtensionQueryResponse
+    },
     exclude_none=True,
 )
 def get_company_service_spec(
@@ -91,7 +112,15 @@ def get_company_service_spec(
 ):
     if queries.queries:
         queries_parsed = ReconciliationQueryBatch(queries=json.loads(queries.queries))
-        return reconcile.reconcile(request, queries_parsed)
+        return {
+            k: ReconciliationResult(**v)
+            for k, v in reconcile.reconcile(request, queries_parsed).items()
+        }
+    elif queries.extend:
+        queries_parsed = DataExtensionQuery(**json.loads(queries.extend))
+        return DataExtensionQueryResponse(
+            **reconcile.data_extension(request, queries_parsed)
+        )
     return ServiceSpec(
         **reconcile.get_service_spec(request, defaultTypes=[COMPANY_RECON_TYPE])
     )
@@ -99,7 +128,7 @@ def get_company_service_spec(
 
 @api.post(
     "",
-    response={200: Dict[str, ReconciliationResult]},
+    response={200: Dict[str, ReconciliationResult] | DataExtensionQueryResponse},
     exclude_none=True,
     summary="Reconciliation endpoint for reconciling against registered companies",
     description="Reconciling queries against registered companies.",
@@ -108,17 +137,26 @@ def company_reconcile_entities(
     request,
     queries: Form[ReconciliationQueryBatchForm],
 ):
-    queries_parsed = ReconciliationQueryBatch(queries=json.loads(queries.queries))
-    return reconcile.reconcile(request, queries_parsed)
+    if queries.queries:
+        queries_parsed = ReconciliationQueryBatch(queries=json.loads(queries.queries))
+        return {
+            k: ReconciliationResult(**v)
+            for k, v in reconcile.reconcile(request, queries_parsed).items()
+        }
+    elif queries.extend:
+        queries_parsed = DataExtensionQuery(**json.loads(queries.extend))
+        return DataExtensionQueryResponse(
+            **reconcile.data_extension(request, queries_parsed)
+        )
 
 
 @api.get("/suggest/type", response={200: SuggestResponse}, exclude_none=True)
-def suggest_type(request, query: Query[SuggestTypeQuery]):
+def company_suggest_type(request, query: Query[SuggestTypeQuery]):
     return reconcile.suggest_type(request, query.prefix, query.cursor)
 
 
 @api.get("/suggest/property", response={200: SuggestResponse}, exclude_none=True)
-def suggest_property(request, query: Query[SuggestTypeQuery]):
+def company_suggest_property(request, query: Query[SuggestTypeQuery]):
     return reconcile.suggest_property(request, query.prefix, query.cursor)
 
 
@@ -127,5 +165,7 @@ def suggest_property(request, query: Query[SuggestTypeQuery]):
     response={200: DataExtensionPropertyProposalResponse},
     exclude_none=True,
 )
-def propose_properties(request, query: Query[DataExtensionPropertyProposalQuery]):
+def company_propose_properties(
+    request, query: Query[DataExtensionPropertyProposalQuery]
+):
     return reconcile.propose_properties(request, type_=query.type, limit=query.limit)

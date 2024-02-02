@@ -27,6 +27,11 @@ with open(
 ) as f:
     SUGGEST_RESPONSE = json.load(f)
 
+with open(
+    os.path.join(os.path.dirname(__file__), "data", "company_extend_response.json")
+) as f:
+    EXTEND_RESPONSE = json.load(f)
+
 RECON_BASE_URLS: list[Tuple[str, list[str]]] = [
     ("/api/v1/reconcile/company", ["0.2"]),
 ]
@@ -40,6 +45,11 @@ class TestCompanyReconcileAPI(ReconTestCase):
         self.es_index_patcher = patch.object(CompanyDocument, "_index")
         self.addCleanup(self.es_index_patcher.stop)
         self.mock_es_index = self.es_index_patcher.start()
+
+        # setup elasticsearch patcher
+        self.es_mget_patcher = patch.object(CompanyDocument, "mget")
+        self.addCleanup(self.es_mget_patcher.stop)
+        self.mock_es_mget = self.es_mget_patcher.start()
 
     def test_get_company_service_spec(self):
         for base_url, schema_version, schema, method in self.get_test_cases(
@@ -354,3 +364,61 @@ class TestCompanyReconcileAPI(ReconTestCase):
                     cls=jsonschema.Draft7Validator,
                     registry=self.registry,
                 )
+
+    def test_reconcile_extend(self):
+        expected_tests = 2
+        self.mock_es_mget.return_value = [
+            (CompanyDocument.from_es(obj) if obj["found"] else None)
+            for obj in EXTEND_RESPONSE["docs"]
+        ]
+
+        for base_url, schema_version, schema, method in self.get_test_cases(
+            "data-extension-response.json", RECON_BASE_URLS, ["GET", "POST"]
+        ):
+            with self.subTest(
+                base_url=base_url, schema_version=schema_version, method=method
+            ):
+                response = self.do_request(
+                    method,
+                    base_url,
+                    {
+                        "extend": json.dumps(
+                            {
+                                "ids": [
+                                    "GB-COH-00445790",
+                                    "GB-COH-14015213",
+                                    "GB-COH-BLAHBLAH",
+                                ],
+                                "properties": [
+                                    {
+                                        "id": "CompanyName",
+                                    }
+                                ],
+                            }
+                        )
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["meta", "rows"])
+                self.assertEqual(
+                    data["meta"], [{"id": "CompanyName", "name": "CompanyName"}]
+                )
+                self.assertEqual(
+                    list(data["rows"].keys()),
+                    ["GB-COH-00445790", "GB-COH-14015213", "GB-COH-BLAHBLAH"],
+                )
+                self.assertEqual(
+                    data["rows"]["GB-COH-00445790"]["CompanyName"],
+                    [{"str": "TESCO PLC"}],
+                )
+                self.assertEqual(data["rows"]["GB-COH-BLAHBLAH"]["CompanyName"], [{}])
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+                expected_tests -= 1
+        self.assertEqual(expected_tests, 0)
