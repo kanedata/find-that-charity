@@ -128,6 +128,48 @@ class TestCompanyReconcileAPI(ReconTestCase):
                     registry=self.registry,
                 )
 
+    def test_company_reconcile_two(self):
+        self.mock_es.return_value.search.return_value = RECON_RESPONSE
+
+        for base_url, schema_version, schema, method in self.get_test_cases(
+            "reconciliation-result-batch.json", RECON_BASE_URLS, ["GET", "POST"]
+        ):
+            with self.subTest(
+                base_url=base_url, schema_version=schema_version, method=method
+            ):
+                response = self.do_request(
+                    method,
+                    base_url,
+                    {
+                        "queries": json.dumps(
+                            {
+                                "q0": {
+                                    "query": "Kane data",
+                                    "type": "/registered-company",
+                                    "type_strict": "should",
+                                },
+                                "q1": {
+                                    "query": "Tesco",
+                                    "type": "/registered-company",
+                                    "type_strict": "should",
+                                },
+                            }
+                        ),
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertEqual(list(data.keys()), ["q0", "q1"])
+                self.assertEqual(len(data["q0"]["result"]), 10)
+                self.assertEqual(data["q0"]["result"][0]["id"], "12345670")
+
+                jsonschema.validate(
+                    instance=data,
+                    schema=schema,
+                    cls=jsonschema.Draft7Validator,
+                    registry=self.registry,
+                )
+
     def test_reconcile_empty(self):
         self.mock_es.return_value.search.return_value = EMPTY_RESPONSE
 

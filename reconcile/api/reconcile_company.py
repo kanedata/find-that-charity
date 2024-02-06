@@ -1,5 +1,5 @@
 import json
-from typing import Dict
+from typing import Dict, List, Optional, Union
 
 from charity_django.companies.models import CompanyTypeChoices
 from django.http import Http404
@@ -78,6 +78,15 @@ class CompanyReconcile(Reconcile):
                 if prefix.lower() in id.lower() or prefix.lower() in name.lower()
             ]
         }
+
+    def _get_orgtypes_from_str(
+        self, orgtype: Optional[Union[List[str], str]] = None
+    ) -> List[str]:
+        if orgtype == "all":
+            return [t[0] for t in CompanyTypeChoices.choices]
+        if isinstance(orgtype, str):
+            return [orgtype]
+        return orgtype or []
 
     def data_extension(self, request, body: DataExtensionQuery) -> Dict:
         result = do_extend_query(
