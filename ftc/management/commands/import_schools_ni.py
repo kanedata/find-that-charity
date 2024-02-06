@@ -160,7 +160,10 @@ class Command(HTMLScraper):
                     "dateRemoved": record.get("Date Closed"),
                     "active": record.get("Status") == "Open",
                     "parent": None,
-                    "orgIDs": [self.get_org_id(record), f"GB-NIEDU-{record[self.id_field]}"],
+                    "orgIDs": [
+                        self.get_org_id(record),
+                        f"GB-NIEDU-{record[self.id_field]}",
+                    ],
                     "scrape": self.scrape,
                     "source": self.source,
                     "spider": self.name,
