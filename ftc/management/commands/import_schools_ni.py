@@ -11,7 +11,7 @@ class Command(HTMLScraper):
     allowed_domains = ["education-ni.gov.uk"]
     start_urls = ["http://apps.education-ni.gov.uk/appinstitutes/default.aspx"]
     skip_rows = 5
-    org_id_prefix = "GB-NIEDU"
+    org_id_prefix = "GB-IRN"
     id_field = "Institution Reference Number"
     date_fields = ["Date Closed"]
     source = {
@@ -160,7 +160,7 @@ class Command(HTMLScraper):
                     "dateRemoved": record.get("Date Closed"),
                     "active": record.get("Status") == "Open",
                     "parent": None,
-                    "orgIDs": [self.get_org_id(record)],
+                    "orgIDs": [self.get_org_id(record), f"GB-NIEDU-{record[self.id_field]}"],
                     "scrape": self.scrape,
                     "source": self.source,
                     "spider": self.name,
