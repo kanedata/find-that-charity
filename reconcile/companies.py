@@ -58,7 +58,7 @@ def do_reconcile_query(
                 "name": "{} ({}){}".format(
                     to_titlecase(o.CompanyName),
                     o.CompanyNumber,
-                    "" if o.CompanyStatus == "Active" else " [INACTIVE]",
+                    "" if o.CompanyStatus.lower() == "active" else " [INACTIVE]",
                 ),
                 "type": [COMPANY_RECON_TYPE]
                 + [
