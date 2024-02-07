@@ -4,13 +4,13 @@ from django.utils.text import slugify
 from findthatcharity.utils import normalise_name
 from ftc.documents import CompanyDocument
 
-COMPANY_RECON_TYPE = {"id": "/registered-company", "name": "Registered Company"}
+COMPANY_RECON_TYPE = {"id": "registered-company", "name": "Registered Company"}
 
 
 def do_reconcile_query(
     query,
     orgtypes="all",
-    type_="/Organization",
+    type_: list[str] = [],
     limit=5,
     properties=[],
     type_strict="should",
@@ -19,7 +19,7 @@ def do_reconcile_query(
     if not query:
         return {result_key: []}
 
-    properties = {p["pid"]: p["v"] for p in properties} if properties else {}
+    properties = {p.pid: p.v for p in properties} if properties else {}
 
     search_dict = {
         "query": {
@@ -31,6 +31,14 @@ def do_reconcile_query(
         "size": limit,
     }
 
+    if type_ and "registered-company" not in type_:
+        search_dict["query"] = {
+            "bool": {
+                "must": search_dict["query"],
+                "filter": {"terms": {"CompanyCategory.keyword": type_}},
+            },
+        }
+
     if properties.get("postcode"):
         # boost the score if the postcode matches
         search_dict["query"] = {
@@ -41,7 +49,7 @@ def do_reconcile_query(
                         "filter": {
                             "match": {"RegAddress_PostCode": properties["postcode"]}
                         },
-                        "weight": 1.5,
+                        "weight": 5,
                     }
                 ],
                 "boost_mode": "multiply",
@@ -63,14 +71,16 @@ def do_reconcile_query(
                 "type": [COMPANY_RECON_TYPE]
                 + [
                     {
-                        "id": "/{}".format(slugify(o.CompanyCategory)),
+                        "id": slugify(o.CompanyCategory),
                         "name": o.CompanyCategory,
                     }
                 ],
                 "score": o.meta.score,
-                "match": (normalise_name(o.CompanyName) == normalise_name(query))
-                and (o.meta.score == result.hits.max_score)
-                and (k == 0),
+                "match": (
+                    (normalise_name(o.CompanyName) == normalise_name(query))
+                    and (o.meta.score == result.hits.max_score)
+                    and (k == 0)
+                ),
             }
             for k, o in enumerate(result)
         ],

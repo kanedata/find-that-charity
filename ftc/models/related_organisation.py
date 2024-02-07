@@ -71,6 +71,19 @@ class RelatedOrganisation:
         return list(set(sources))
 
     @cached_property
+    def locations(self):
+        return OrganisationLocation.objects.filter(org_id__in=self.orgIDs)
+
+    def hq_region(self, areatype):
+        for location in self.locations:
+            if (
+                location.locationType
+                != OrganisationLocation.LocationTypes.REGISTERED_OFFICE
+            ):
+                continue
+            return getattr(location, f"geo_{areatype}", None)
+
+    @cached_property
     def geocodes(self):
         location_fields = [
             "geo_iso",
@@ -91,8 +104,7 @@ class RelatedOrganisation:
             # "geo_lep2",
         ]
         geocodes = set()
-        locations = OrganisationLocation.objects.filter(org_id__in=self.orgIDs)
-        for location in locations:
+        for location in self.locations:
             for field in location_fields:
                 value = getattr(location, field, None)
                 if value and not value.endswith("999999"):

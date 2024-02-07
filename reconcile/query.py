@@ -128,6 +128,8 @@ def do_extend_query(ids, properties):
         ("aoo", CCEWCharityAreaOfOperation, {"linked_charity_number": 0}),
     )
 
+    # add location data
+
     for table, model, default_filters in tables:
         if ccew_fields.get(table):
             for r in model.objects.filter(

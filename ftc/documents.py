@@ -104,6 +104,10 @@ class OrganisationGroup(Document):
     source = fields.KeywordField()
     locations = fields.KeywordField()
     search_scale = fields.FloatField()
+    hq_ward = fields.KeywordField()
+    hq_localauthority = fields.KeywordField()
+    hq_region = fields.KeywordField()
+    hq_country = fields.KeywordField()
 
     @classmethod
     def search(cls, using=None, index=None):
@@ -181,9 +185,11 @@ class OrganisationGroup(Document):
 
     def prepare_domain(self, instance):
         return list(
-            filter(
-                lambda item: item is not None,
-                [get_domain(link) for link in instance.get_all("url")],
+            set(
+                filter(
+                    lambda item: item is not None,
+                    [get_domain(link) for link in instance.get_all("url")],
+                )
             )
         )
 
@@ -195,6 +201,18 @@ class OrganisationGroup(Document):
 
     def prepare_locations(self, instance):
         return instance.geocodes
+
+    def prepare_hq_ward(self, instance):
+        return instance.hq_region("ward")
+
+    def prepare_hq_localauthority(self, instance):
+        return instance.hq_region("laua")
+
+    def prepare_hq_region(self, instance):
+        return instance.hq_region("rgn")
+
+    def prepare_hq_country(self, instance):
+        return instance.hq_region("ctry")
 
     def prepare_search_scale(self, instance):
         return instance.search_scale
@@ -261,6 +279,10 @@ class CompanyDocument(Document):
     RegAddress_PostCode = fields.KeywordField(attr="RegAddress_PostCode")
     CompanyCategory = fields.KeywordField(attr="CompanyCategory")
     PreviousNames = fields.TextField()
+    RegAddress_Ward = fields.KeywordField(attr="RegAddress_Ward")
+    RegAddress_LocalAuthority = fields.KeywordField(attr="RegAddress_LocalAuthority")
+    RegAddress_Region = fields.KeywordField(attr="RegAddress_Region")
+    RegAddress_Country = fields.KeywordField(attr="RegAddress_Country")
 
     @classmethod
     def search(cls, using=None, index=None):
@@ -282,22 +304,28 @@ class CompanyDocument(Document):
         """
         return self.django.model.objects.raw(
             """
-            with names as (
-                select "CompanyNumber",
-                    json_agg("CompanyName") as "names"
-                from "companies_previousname"
-                group by "CompanyNumber"
+            WITH names AS (
+                SELECT "CompanyNumber",
+                    json_agg("CompanyName") AS "names"
+                FROM "companies_previousname"
+                GROUP BY "CompanyNumber"
             )
             SELECT c."CompanyNumber",
                 c."CompanyName",
                 c."CompanyStatus",
                 c."RegAddress_PostCode",
                 c."CompanyCategory",
-                names.names as "PreviousNames"
+                names.names AS "PreviousNames",
+                p.ward AS "RegAddress_Ward",
+                p.laua AS "RegAddress_LocalAuthority",
+                p.rgn AS "RegAddress_Region",
+                p.ctry AS "RegAddress_Country"
             FROM "companies_company" c
-                left outer join names
-                    on c."CompanyNumber" = names."CompanyNumber"
-        """
+                LEFT OUTER JOIN names
+                    ON c."CompanyNumber" = names."CompanyNumber"
+                LEFT OUTER JOIN geo_postcode p
+                    ON c."RegAddress_PostCode" = p.pcds
+            """
         )
 
     def get_indexing_queryset(self):
