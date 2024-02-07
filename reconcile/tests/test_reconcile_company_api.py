@@ -69,7 +69,7 @@ class TestCompanyReconcileAPI(ReconTestCase):
                         "identifierSpace": "http://org-id.guide",
                         "schemaSpace": "https://schema.org",
                         "defaultTypes": [
-                            {"id": "/registered-company", "name": "Registered Company"}
+                            {"id": "registered-company", "name": "Registered Company"}
                         ],
                         "view": {"url": "http://testserver/company/{{id}}"},
                         "suggest": {
