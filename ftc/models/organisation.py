@@ -266,10 +266,12 @@ class Organisation(models.Model):
             prefix_order = OrgidScheme.PRIORITIES.index(self.org_id.scheme)
         else:
             prefix_order = len(OrgidScheme.PRIORITIES) + 1
+
+        org_date = self.dateRegistered if self.dateRegistered else datetime.date.max
         return (
             0 if self.active else 1,
             prefix_order,
-            self.dateRegistered if self.dateRegistered else datetime.date.min,
+            -int("{:%Y%m%d}".format(org_date)),
         )
 
     @property
