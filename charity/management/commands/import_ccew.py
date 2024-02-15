@@ -87,6 +87,7 @@ class Command(BaseScraper):
         "Charitable Incorporated Organisation - Association",
         "Charitable Incorporated Organisation - Foundation",
         "Trust",
+        "Parochial Church Council",
     ]
 
     def fetch_file(self):

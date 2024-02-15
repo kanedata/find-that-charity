@@ -424,6 +424,9 @@ select distinct on (cc.id)
         case when cc.constitution ilike 'cio - foundation %%'
             then array['charitable-incorporated-organisation-foundation']
             else array[]::text[] end ||
+        case when cc.constitution ~* 'parochial church council \(?powers'
+            then array['parochial-church-council']
+            else array[]::text[] end ||
         case when ccew.charity_type = 'Trust' then array['trust']
             else array[]::text[] end
         as "organisationType",
