@@ -50,8 +50,7 @@
                         "filter": {
                             "match_phrase": {
                                 "name": {
-                                    "query": "{{name}}",
-                                    "analyzer": "ftc_name_analyzer"
+                                    "query": "{{name}}"
                                 }
                             }
                         },
@@ -61,8 +60,7 @@
                         "filter": {
                             "match_phrase": {
                                 "alternateName": {
-                                    "query": "{{name}}",
-                                    "analyzer": "ftc_name_analyzer"
+                                    "query": "{{name}}"
                                 }
                             }
                         },
