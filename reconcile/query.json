@@ -36,27 +36,37 @@
                         }
                     }
                 },
+                "boost_mode": "sum",
                 "functions": [
                     {
-                        "filter": {
-                            "match_phrase_prefix": {
-                                "name": "{{name}}"
-                            }
+                        "field_value_factor": {
+                            "field": "search_scale",
+                            "modifier": "none",
+                            "missing": 1
                         },
-                        "weight": 200
+                        "weight": 1.5
                     },
                     {
                         "filter": {
-                            "multi_match": {
-                                "query": "{{name}}",
-                                "fields": [
-                                    "name^3",
-                                    "alternateName"
-                                ],
-                                "operator": "and"
+                            "match_phrase": {
+                                "name": {
+                                    "query": "{{name}}",
+                                    "analyzer": "ftc_name_analyzer"
+                                }
                             }
                         },
-                        "weight": 10
+                        "weight": 3
+                    },
+                    {
+                        "filter": {
+                            "match_phrase": {
+                                "alternateName": {
+                                    "query": "{{name}}",
+                                    "analyzer": "ftc_name_analyzer"
+                                }
+                            }
+                        },
+                        "weight": 1.5
                     },
                     {
                         "filter": {
@@ -77,13 +87,6 @@
                             }
                         },
                         "weight": 5
-                    },
-                    {
-                        "script_score": {
-                            "script": {
-                                "source": "doc['search_scale'].value"
-                            }
-                        }
                     }
                 ]
             }

@@ -129,6 +129,7 @@ def environment(**options):
             "get_locations": get_locations,
             "url_replace": url_replace,
             "url_remove": url_remove,
+            "debug": settings.DEBUG,
         }
     )
     env.filters.update(

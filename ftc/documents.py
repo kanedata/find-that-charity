@@ -9,6 +9,7 @@ from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 from django_elasticsearch_dsl.search import Search
 from elasticsearch.helpers import bulk
+from elasticsearch_dsl import analyzer, token_filter
 from elasticsearch_dsl.connections import get_connection
 
 from findthatcharity.utils import get_domain, normalise_name
@@ -83,6 +84,52 @@ class DSEPaginator(Paginator):
         return Page(self.result, number, self)
 
 
+name_analyzer = analyzer(
+    "ftc_name_analyzer",
+    tokenizer="standard",
+    filter=[
+        token_filter(
+            "ftc_english_possesive_stemmer", "stemmer", language="possessive_english"
+        ),
+        "lowercase",
+        token_filter(
+            "ftc_synonym",
+            "synonym",
+            synonyms=[
+                "c.i.c. => community interest company",
+                "c i c => community interest company",
+                "c.i.c => community interest company",
+                "cic => community interest company",
+                "s.c.i.o. => scottish charitable incorporated organisation",
+                "s c i o => scottish charitable incorporated organisation",
+                "s.c.i.o => scottish charitable incorporated organisation",
+                "scio => scottish charitable incorporated organisation",
+                "c.i.o. => charitable incorporated organisation",
+                "c i o => charitable incorporated organisation",
+                "c.i.o => charitable incorporated organisation",
+                "cio => charitable incorporated organisation",
+                "n.h.s. => national health service",
+                "n h s => national health service",
+                "n.h.s => national health service",
+                "nhs => national health service",
+                "ltd => limited",
+                "ltd. => limited",
+                "uk => united kingdom",
+                "pre-school => preschool",
+                "pre school => preschool",
+            ],
+        ),
+        token_filter("ftc_english_stop", "stop", stopwords="_english_"),
+        token_filter(
+            "ftc_english_keyword_marker", "keyword_marker", keywords=["limited"]
+        ),
+        "kstem",
+        # token_filter("ftc_english_stemmer", "stemmer", language="english"),
+    ],
+    char_filter=["html_strip"],
+)
+
+
 @registry.register_document
 class OrganisationGroup(Document):
     org_id = fields.KeywordField()
@@ -93,9 +140,9 @@ class OrganisationGroup(Document):
     )
     orgIDs = fields.KeywordField()
     ids = fields.KeywordField()
-    # name = fields.TextField()  # Indexed from the model
+    name = fields.TextField(analyzer=name_analyzer)  # Indexed from the model
     sortname = fields.KeywordField()
-    alternateName = fields.TextField()
+    alternateName = fields.TextField(analyzer=name_analyzer)
     # postalCode = fields.KeywordField()  # Indexed from the model
     domain = fields.KeywordField()
     # active = fields.BooleanField()  # Indexed from the model
@@ -251,7 +298,7 @@ class OrganisationGroup(Document):
 
         # The fields of the model you want to be indexed in Elasticsearch
         fields = [
-            "name",
+            # "name",
             "postalCode",
             "dateModified",
             "active",
@@ -274,11 +321,12 @@ class OrganisationGroup(Document):
 
 @registry.register_document
 class CompanyDocument(Document):
+    CompanyName = fields.TextField(analyzer=name_analyzer)
     CompanyNumber = fields.KeywordField(attr="CompanyNumber")
     CompanyStatus = fields.KeywordField(attr="CompanyStatus")
     RegAddress_PostCode = fields.KeywordField(attr="RegAddress_PostCode")
     CompanyCategory = fields.KeywordField(attr="CompanyCategory")
-    PreviousNames = fields.TextField()
+    PreviousNames = fields.TextField(analyzer=name_analyzer)
     RegAddress_Ward = fields.KeywordField(attr="RegAddress_Ward")
     RegAddress_LocalAuthority = fields.KeywordField(attr="RegAddress_LocalAuthority")
     RegAddress_Region = fields.KeywordField(attr="RegAddress_Region")
@@ -342,7 +390,7 @@ class CompanyDocument(Document):
 
         # The fields of the model you want to be indexed in Elasticsearch
         fields = [
-            "CompanyName",
+            # "CompanyName",
         ]
 
         # Ignore auto updating of Elasticsearch when a model is saved

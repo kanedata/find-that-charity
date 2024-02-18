@@ -3,14 +3,14 @@
 {% if res.paginator.count > 0 and search.term %}
 <article class="message is-success pa2 bg-washed-green mb4">
     <div class="message-body">
-    {% if res.paginator.count == 1 %}
+        {% if res.paginator.count == 1 %}
         1 result found found for "{{search.term}}"
-    {% elif res.has_other_pages() %}
+        {% elif res.has_other_pages() %}
         {{ "{:,}".format(res.paginator.count) }} results found for "{{search.term}}".
         Showing results {{ res.start_index() }} to {{ res.end_index() }}.
-    {% else %}
+        {% else %}
         {{ "{:,}".format(res.paginator.count) }} results found for "{{search.term}}"
-    {% endif %}
+        {% endif %}
     </div>
 </article>
 {% elif search.term %}
@@ -25,21 +25,28 @@
 <div class="content measure-wide mb4">
     <h3 class="title pa0 mb1 mt0 mh0">
         {% if result.active %}
-        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}" class="dark-blue link underline-hover tracked-tight lh-copy normal">{{result.name|titlecase }}</a>
+        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}"
+            class="dark-blue link underline-hover tracked-tight lh-copy normal">{{result.name|titlecase }}</a>
         {% else %}
-        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}" class="blue link underline-hover tracked-tight lh-copy normal">{{result.name|titlecase }}</a>
+        <a href="{{ url('orgid_html', kwargs=dict(org_id=result.org_id)) }}"
+            class="blue link underline-hover tracked-tight lh-copy normal">{{result.name|titlecase }}</a>
         <span class="red tracked-tight lh-copy normal ml2">(Inactive)</span>
         {% endif %}
     </h3>
+    {% if debug %}
+    <p class="ma0 f7 code">
+        <span>Score: {{ "{:,.3f}".format(result.meta.score) }}</span> |
+        <span>Search scale: {{ "{:,.3f}".format(result.search_scale) }}</span>
+    </p>
+    {% endif %}
     <h4 class="subtitle mt0 mb2 pa0 f4 mid-gray normal">
         {% if result.organisationTypePrimary is string %}
-            {% set orgTypePrimary = result.organisationTypePrimary %}
+        {% set orgTypePrimary = result.organisationTypePrimary %}
         {% else %}
-            {% set orgTypePrimary = result.organisationTypePrimary.slug %}
+        {% set orgTypePrimary = result.organisationTypePrimary.slug %}
         {% endif %}
-        <a class="link mid-gray underline-hover" 
-           href="{{ url('orgid_type', kwargs=dict(orgtype=orgTypePrimary)) }}">
-           {{ orgtypes[orgTypePrimary].title }}</a>
+        <a class="link mid-gray underline-hover" href="{{ url('orgid_type', kwargs=dict(orgtype=orgTypePrimary)) }}">
+            {{ orgtypes[orgTypePrimary].title }}</a>
     </h4>
     <div class="cf mb2">
         {{ orgid_link(result.org_id, large=True) }}
@@ -49,7 +56,7 @@
         {% endfor %}
         <details>
             <summary class="f6 pointer">
-            Additional identifiers
+                Additional identifiers
             </summary>
             {% for o in result.orgIDs[10:] if o != result.org_id %}
             {{ orgid_link(o) }}
@@ -63,7 +70,8 @@
     </div>
     <div class="cf">
         {% for k in result.organisationType if k != result.organisationTypePrimary and k in orgtypes %}
-        <a class="f6 bg-light-gray br1 pv1 ph2 link near-black dib mr2 mb2 fl" href="{{ url('orgid_type', kwargs=dict(orgtype=k)) }}">{{ orgtypes[k].title }}</a>
+        <a class="f6 bg-light-gray br1 pv1 ph2 link near-black dib mr2 mb2 fl"
+            href="{{ url('orgid_type', kwargs=dict(orgtype=k)) }}">{{ orgtypes[k].title }}</a>
         {% endfor %}
     </div>
 </div>

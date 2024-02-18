@@ -1,5 +1,8 @@
 import copy
+import json
+import os
 
+from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Func, Q
 from django.shortcuts import Http404
@@ -85,7 +88,13 @@ class OrganisationSearch:
         self.aggregation = {}
 
         self.set_criteria(**kwargs)
-        self.es_query = copy.deepcopy(RECONCILE_QUERY)
+        if settings.DEBUG:
+            with open(
+                os.path.join(os.path.dirname(__file__), "..", "reconcile", "query.json")
+            ) as a:
+                self.es_query = json.load(a)
+        else:
+            self.es_query = copy.deepcopy(RECONCILE_QUERY)
 
     def set_criteria(
         self,
