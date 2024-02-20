@@ -21,3 +21,6 @@ Disallow: /
 
 User-agent: SeznamBot
 Disallow: /
+
+User-agent: SeekportBot
+Disallow: /
