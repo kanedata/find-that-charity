@@ -1,8 +1,22 @@
 import datetime
+import re
 
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.management.commands._la_locations import LA_LOCATIONS
 from ftc.models import Organisation, OrganisationLocation
+
+name_replacements = [
+    (re.compile(r"\bThe\b"), ""),
+    (re.compile(r"\bCity of\b"), ""),
+    (re.compile(r"\band\b"), " & "),
+    (re.compile(r"\b&\b"), " and "),
+    (re.compile(r"\bof Yorkshire\b"), ""),
+    (re.compile(r"\bCouncil of the\b"), ""),
+    (re.compile(r"\bRoyal Borough of\b"), ""),
+    (re.compile(r"\bRoyal Borough of\b"), "London Borough of"),
+    (re.compile(r"\bLondon Borough of\b"), ""),
+    (re.compile(r"\bLondon Borough of\b"), "LB "),
+]
 
 
 class Command(CSVScraper):
@@ -40,6 +54,33 @@ class Command(CSVScraper):
         ],
     }
     orgtypes = ["Local Authority"]
+
+    def get_alternate_names(self, name):
+        council_suffixes = [
+            "Metropolitan Borough Council",
+            "Borough Council",
+            "City Council",
+            "County Council",
+            "District Council",
+        ]
+        alternate_names = []
+        for regex, replacement in name_replacements:
+            alternate_names.append(regex.sub(replacement, name).strip())
+
+        for name_ in alternate_names + [name]:
+            for regex, replacement in name_replacements:
+                alternate_names.append(regex.sub(replacement, name_).strip())
+
+        for suffix in council_suffixes:
+            for name_ in alternate_names + [name]:
+                if name_.endswith(suffix):
+                    alternate_names.append(name_.replace(suffix, "Council"))
+
+        for name_ in alternate_names + [name]:
+            if "council" not in name_.lower():
+                alternate_names.append(name_ + " Council")
+
+        return [n for n in set(alternate_names) if n != name]
 
     def parse_row(self, record):
         record = self.clean_fields(record)
@@ -86,7 +127,9 @@ class Command(CSVScraper):
                     "addressCountry": "England",
                     "postalCode": None,
                     "telephone": None,
-                    "alternateName": [],
+                    "alternateName": self.get_alternate_names(
+                        record.get("official-name")
+                    ),
                     "email": None,
                     "description": None,
                     "organisationType": [o.slug for o in org_types],

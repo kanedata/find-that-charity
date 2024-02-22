@@ -1,12 +1,12 @@
 import datetime
 
-from ftc.management.commands._base_scraper import CSVScraper
 from ftc.management.commands._la_locations import LA_LOCATIONS
 from ftc.management.commands.import_lae import LA_TYPES
+from ftc.management.commands.import_lae import Command as LAECommand
 from ftc.models import Organisation, OrganisationLocation
 
 
-class Command(CSVScraper):
+class Command(LAECommand):
     name = "lani"
     allowed_domains = ["register.gov.uk"]
     start_urls = [
@@ -88,7 +88,7 @@ class Command(CSVScraper):
                     "addressCountry": "Northern Ireland",
                     "postalCode": None,
                     "telephone": None,
-                    "alternateName": [],
+                    "alternateName": self.get_alternate_names(record.get("name")),
                     "email": None,
                     "description": None,
                     "organisationType": [o.slug for o in org_types],
