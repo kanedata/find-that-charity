@@ -13,6 +13,8 @@ from ftc.models.source import Source
 SCALE_DEFAULT = 1.0
 SCALE_MINIMUM = 0.1
 SCALE_INACTIVE = 0.7
+SCALE_BIG_ORGANISATION = 16
+BIG_ORGTYPES = ["local-authority", "university", "government-organisation"]
 
 
 class RelatedOrganisation:
@@ -130,6 +132,12 @@ class RelatedOrganisation:
 
         if income_vals:
             scaling = math.log(max(income_vals)) + 1
+
+        if (
+            scaling == SCALE_DEFAULT
+            and self.organisationTypePrimary.slug in BIG_ORGTYPES
+        ):
+            scaling = SCALE_BIG_ORGANISATION
 
         if not self.active:
             scaling = scaling * SCALE_INACTIVE
