@@ -212,7 +212,7 @@ class BaseScraper(BaseCommand):
         self.add_record(Organisation, record)
 
     def add_record(self, model, record):
-        if isinstance(record, dict):
+        if isinstance(record, dict) and (model not in self.upsert_models):
             record = model(**record)
         self.records[model].append(record)
         if len(self.records[model]) >= self.bulk_limit:

@@ -36,7 +36,11 @@ def bulk_upsert(model: Model, fields: List[str], values: List[List], by: List[st
         )
 
         with connections["data"].cursor() as cursor:
-            execute_values(cursor, formatted_sql, values)
+            execute_values(
+                cursor,
+                formatted_sql,
+                [tuple(row.get(f) for f in fields) for row in values],
+            )
 
 
 class BulkQuerySet(QuerySet):
