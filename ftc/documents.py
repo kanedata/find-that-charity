@@ -121,6 +121,14 @@ name_analyzer = analyzer(
                 "pre school => preschool",
             ],
         ),
+        # token_filter(
+        #     "ftc_shingles",
+        #     "shingle",
+        #     min_shingle_size=2,
+        #     max_shingle_size=2,
+        #     token_separator="",
+        #     filler_token="",
+        # ),
         token_filter("ftc_english_stop", "stop", stopwords="_english_"),
         token_filter(
             "ftc_english_keyword_marker",
@@ -128,6 +136,7 @@ name_analyzer = analyzer(
             keywords=["limited", "nhs", "cio", "scio", "cic", "uk"],
         ),
         "kstem",
+        # "remove_duplicates",
         # token_filter("ftc_english_stemmer", "stemmer", language="english"),
     ],
     char_filter=["html_strip"],
