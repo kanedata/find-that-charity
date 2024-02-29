@@ -86,6 +86,14 @@ class Command(HTMLScraper):
         if not record.get("School Name") or not record.get("School Number"):
             return
 
+        orgids = [
+            self.get_org_id(record),
+            "GB-LAESTAB-{}/{}".format(
+                str(record["School Number"])[0:3], str(record["School Number"])[3:]
+            ),
+        ]
+        print(orgids)
+
         self.add_org_record(
             Organisation(
                 **{
@@ -111,7 +119,7 @@ class Command(HTMLScraper):
                     "dateRemoved": None,
                     "active": True,
                     "parent": None,
-                    "orgIDs": [self.get_org_id(record)],
+                    "orgIDs": orgids,
                     "scrape": self.scrape,
                     "source": self.source,
                     "spider": self.name,

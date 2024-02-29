@@ -17,7 +17,7 @@ class Command(BaseCommand):
         "pla",
         "rsl",
         "schools_gias",
-        "schools_ni",
+        # "schools_ni",
         "schools_scotland",
         "schools_wales",
     ]
