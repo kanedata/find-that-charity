@@ -3,6 +3,7 @@ import json
 import os
 
 from charity_django.utils.text import to_titlecase
+from django.conf import settings
 
 from charity.models import (
     CCEWCharityAreaOfOperation,
@@ -175,7 +176,11 @@ def recon_query(
     """
     Fetch the reconciliation query and insert the query term
     """
-    json_q = copy.deepcopy(RECONCILE_QUERY)
+    if settings.DEBUG:
+        with open(os.path.join(os.path.dirname(__file__), "query.json")) as a:
+            json_q = json.load(a)
+    else:
+        json_q = copy.deepcopy(RECONCILE_QUERY)
 
     params = {}
 
