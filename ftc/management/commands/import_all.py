@@ -8,7 +8,7 @@ class Command(BaseCommand):
         "gor",
         "ror",
         "hesa",
-        "import_la_mysociety",
+        # "import_la_mysociety",
         # "lae",
         # "lani",
         # "las",
