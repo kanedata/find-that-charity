@@ -53,6 +53,12 @@ EXTERNAL_LINKS = {
             "Get information about schools",
         ],
     ],
+    "GB-WALEDU": [
+        [
+            "https://mylocalschool.gov.wales/School/{}",
+            "My Local School",
+        ],
+    ],
     "GB-UKPRN": [
         [
             "https://www.ukrlp.co.uk/ukrlp/ukrlp_provider.page_pls_provDetails?x=&pn_p_id={}&pv_status=VERIFIED&pv_vis_code=L",

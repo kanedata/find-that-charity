@@ -6,6 +6,7 @@ class OrgidScheme(models.Model):
         "GB-CHC",
         "GB-SC",
         "GB-NIC",
+        "GB-WALEDU",
         "GB-EDU",
         "GB-LAE",
         "GB-PLA",
