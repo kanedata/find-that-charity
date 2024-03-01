@@ -63,10 +63,14 @@ nano /var/lib/dokku/services/elasticsearch/ftc-es/config/jvm.options
 # restart elasticsearch
 dokku elasticsearch:restart ftc-es
 
+# Redirect
+dokku plugin:install https://github.com/dokku/dokku-redirect.git
+dokku redirect:set ftc www.findthatcharity.uk findthatcharity.uk
+
 # SSL
 sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
-dokku config:set --no-restart --global DOKKU_LETSENCRYPT_EMAIL=your@email.tld
-dokku letsencrypt ftc
+dokku letsencrypt:set ftc email your@email.tld
+dokku letsencrypt:enable ftc
 dokku letsencrypt:cron-job --add
 ```
 
@@ -76,7 +80,7 @@ On local machine:
 
 ```bash
 git remote add dokku dokku@SERVER_HOST:ftc
-git push dokku master
+git push dokku main
 ```
 
 ### 3. Setup and run import
