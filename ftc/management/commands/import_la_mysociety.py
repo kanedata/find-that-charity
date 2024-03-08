@@ -62,7 +62,7 @@ class Command(CSVScraper):
         "https://github.com/alphagov/local-links-manager/raw/main/data/local-authorities.csv",
         "https://pages.mysociety.org/uk_local_authority_names_and_codes/data/uk_la_future/latest/uk_local_authorities_future.csv",
     ]
-    org_id_prefix = "GB-ZMSLA"
+    org_id_prefix = "GB-UKLA"
     id_field = "local-authority-code"
     date_fields = ["start-date", "end-date"]
     date_format = {
