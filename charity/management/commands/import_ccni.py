@@ -1,4 +1,5 @@
 import datetime
+import re
 from collections import defaultdict
 
 from charity.management.commands._ccni_sql import UPDATE_CCNI
@@ -20,6 +21,8 @@ class Command(BaseCommand):
     date_format = {
         "Date registered": "%d/%m/%Y",
         "Date for financial year ending": "%d %B %Y",
+        "Financial period start": "%d %B %Y",
+        "Financial period end": "%d %B %Y",
     }
     source = {
         "title": "Charity Commission for Northern Ireland charity search",
@@ -62,7 +65,11 @@ class Command(BaseCommand):
         if "Charity_number" in record:
             if not hasattr(self, "extra_names"):
                 self.extra_names = defaultdict(list)
-            self.extra_names[record["Charity_number"]].append(record["Other_names"])
+            other_names = re.split(r"\bor\b", record["Other_names"])
+            for name in other_names:
+                # strip non-alphanumeric characters from the start and end of name
+                name = re.sub(r"^\W+|\W+$", "", name)
+                self.extra_names[record["Charity_number"]].append(name)
             return
 
         address, postcode = self.split_address(record.get("Public address", ""))
@@ -121,15 +128,22 @@ class Command(BaseCommand):
                         record.get(self.id_field), []
                     ),
                     "email": record.get("Email"),
-                    "description": None,
+                    "description": record.get("Charitable purposes"),
                     "organisationType": [o.slug for o in org_types],
                     "organisationTypePrimary": self.orgtype_cache["registered-charity"],
                     "url": self.parse_url(record.get("Website")),
+                    "latestIncomeDate": record.get("Date for financial year ending"),
                     "latestIncome": int(record["Total income"])
-                    if record.get("Total income")
+                    if record.get("Total income") is not None
                     else None,
                     "latestSpending": int(record["Total spending"])
-                    if record.get("Total spending")
+                    if record.get("Total spending") is not None
+                    else None,
+                    "latestEmployees": int(record["Employed staff"])
+                    if record.get("Employed staff") is not None
+                    else None,
+                    "latestVolunteers": int(record["UK and Ireland volunteers"])
+                    if record.get("Total spending") is not None
                     else None,
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": record.get("Date registered"),
