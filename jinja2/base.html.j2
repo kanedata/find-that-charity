@@ -76,8 +76,11 @@
           Supported by <a href="http://www.threesixtygiving.org/" target="_blank"
             class="link yellow underline-hover">360Giving</a> |
           <a href="https://github.com/kanedata/find-that-charity" target="_blank" class="link yellow underline-hover"
-            title="View code on Github">Code</a> [<a
-            href="https://github.com/kanedata/find-that-charity/blob/main/LICENSE" target="_blank"
+            title="View code on Github">Code</a> [{%- if GIT_REV -%}
+          <a href="https://github.com/kanedata/find-that-charity/commit/{{ GIT_REV }}"
+            class="link yellow underline-hover code">{{ GIT_REV[0:7] }}</a> -
+          {% endif %}
+          <a href="https://github.com/kanedata/find-that-charity/blob/main/LICENSE" target="_blank"
             class="link yellow underline-hover">MIT License</a>]
         </div>
         <p class="mv2 pa0">© 2017 - {{now.year}} <a href="https://dkane.net/" class="link yellow underline-hover">Kane

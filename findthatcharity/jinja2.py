@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from charity_django.utils.text import list_to_string, regex_search, to_titlecase
 from django.conf import settings
@@ -130,6 +131,7 @@ def environment(**options):
             "url_replace": url_replace,
             "url_remove": url_remove,
             "debug": settings.DEBUG,
+            "GIT_REV": os.environ.get("GIT_REV"),
         }
     )
     env.filters.update(
