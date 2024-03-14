@@ -8,7 +8,7 @@ class Command(BaseCommand):
         "gor",
         "ror",
         "hesa",
-        "import_la_mysociety",
+        "la_mysociety",
         "manual_links",
         "mutuals",
         "nhsods",
