@@ -141,3 +141,8 @@ def get_trending_organisations(examples):
         lambda: list(get_from_simple_analytics()),
         60 * 60 * 24,
     )
+
+
+def process_wikipedia_url(url):
+    end_part = url.split("/")[-1]
+    return end_part.replace("_", " ")

@@ -1,6 +1,7 @@
 <div class="mv3 measure f5">
     <p>
-        This organisation record is based on data from <a href="#data-source-{{ org.source.id }}" class="link underline-hover blue b">{{ org.source.title }}</a> published by {{ org.source.publisher }}.
+        This organisation record is based on data from <a href="#data-source-{{ org.source.id }}"
+            class="link underline-hover blue b">{{ org.source.title }}</a> published by {{ org.source.publisher }}.
     </p>
 </div>
 
@@ -14,7 +15,7 @@
             {% for link in links %}
             <li class="w-100 mb2">
                 <a class="link dark-blue underline" href="{{ link[0] }}" target="_blank">
-                {{ link[1] }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                    {{ link[1] }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
                 </a>
             </li>
             {% endfor %}
@@ -23,7 +24,7 @@
             {% if twitter %}
             <li class="w-100 mb2">
                 Twitter: <a class="link dark-blue underline" href="https://twitter.com/{{ twitter }}" target="_blank">
-                @{{ twitter }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                    @{{ twitter }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
                 </a>
             </li>
             {% endif %}
@@ -31,17 +32,21 @@
             {% for facebook in wikidata.values_list('facebook', flat=True).distinct() %}
             {% if facebook %}
             <li class="w-100 mb2">
-                Facebook: <a class="link dark-blue underline" href="https://facebook.com/{{ facebook }}" target="_blank">
-                facebook.com/{{ facebook }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                Facebook: <a class="link dark-blue underline" href="https://facebook.com/{{ facebook }}"
+                    target="_blank">
+                    facebook.com/{{ facebook }}<span class="material-icons ml1"
+                        title="Opens in a new window">launch</span>
                 </a>
             </li>
             {% endif %}
             {% endfor %}
-            {% for wiki in wikidata.values_list('wikipedia_url', flat=True).distinct() %}
+            {% set wikipedia_links = wikidata.values_list('wikipedia_url', flat=True).distinct() %}
+            {% for wiki in wikipedia_links %}
             {% if wiki %}
             <li class="w-100 mb2">
-                <a class="link dark-blue underline" href="{{ wiki }}" target="_blank">
-                Wikipedia<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                Wikipedia: <a class="link dark-blue underline" href="{{ wiki }}" target="_blank">
+                    {{ wiki|process_wikipedia_url }}<span class="material-icons ml1"
+                        title="Opens in a new window">launch</span>
                 </a>
             </li>
             {% endif %}

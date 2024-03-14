@@ -21,16 +21,19 @@ EXTERNAL_LINKS = {
             "https://register-of-charities.charitycommission.gov.uk/charity-details/?regId={}&subId=0",
             "Charity Commission England and Wales",
         ],
-        ["https://charitybase.uk/charities/{}", "CharityBase"],
+        ["https://search.charitybase.uk/chc/{}", "CharityBase"],
         # ["http://opencharities.org/charities/{}", "OpenCharities"],
         ["https://givingisgreat.org/charitydetail/?regNo={}", "Giving is Great"],
-        [
-            "http://www.charitychoice.co.uk/charities/search?t=qsearch&q={}",
-            "Charities Direct",
-        ],
+        # [
+        #     "http://www.charitychoice.co.uk/charities/search?t=qsearch&q={}",
+        #     "Charities Direct",
+        # ],
     ],
     "GB-COH": [
-        ["https://beta.companieshouse.gov.uk/company/{}", "Companies House"],
+        [
+            "https://find-and-update.company-information.service.gov.uk/company/{}",
+            "Companies House",
+        ],
         ["https://opencorporates.com/companies/gb/{}", "Opencorporates"],
     ],
     "GB-NIC": [
@@ -67,36 +70,6 @@ EXTERNAL_LINKS = {
     ],
     "GB-NHS": [
         ["https://odsportal.hscic.gov.uk/Organisation/Details/{}", "NHS Digital"],
-    ],
-    "GB-LAE": [
-        [
-            "https://www.registers.service.gov.uk/registers/local-authority-eng/records/{}",
-            "Local authorities in England",
-        ],
-    ],
-    "GB-LAN": [
-        [
-            "https://www.registers.service.gov.uk/registers/local-authority-nir/records/{}",
-            "Local authorities in Northern Ireland",
-        ],
-    ],
-    "GB-LAS": [
-        [
-            "https://www.registers.service.gov.uk/registers/local-authority-sct/records/{}",
-            "Local authorities in Scotland",
-        ],
-    ],
-    "GB-PLA": [
-        [
-            "https://www.registers.service.gov.uk/registers/principal-local-authority/records/{}",
-            "Principal Local authorities in Wales",
-        ],
-    ],
-    "GB-GOR": [
-        [
-            "https://www.registers.service.gov.uk/registers/government-organisation/records/{}",
-            "Government organisations on GOV.UK",
-        ],
     ],
     "XI-GRID": [
         ["https://www.grid.ac/institutes/{}", "Global Research Identifier Database"],

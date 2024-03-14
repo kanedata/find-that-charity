@@ -17,6 +17,7 @@ from findthatcharity.utils import (
     format_currency,
     number_format,
     pluralise,
+    process_wikipedia_url,
     str_format,
     url_remove,
     url_replace,
@@ -150,6 +151,7 @@ def environment(**options):
             "markdown": markdownify,
             "number_format": number_format,
             "orgtypes_to_dict": orgtypes_to_dict,
+            "process_wikipedia_url": process_wikipedia_url,
         }
     )
     return env
