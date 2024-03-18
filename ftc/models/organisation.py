@@ -69,7 +69,10 @@ EXTERNAL_LINKS = {
         ],
     ],
     "GB-NHS": [
-        ["https://odsportal.hscic.gov.uk/Organisation/Details/{}", "NHS Digital"],
+        [
+            "POST:https://odsportal.digital.nhs.uk/Organisation/Search?Code={}",
+            "NHS Digital",
+        ],
     ],
     "XI-GRID": [
         ["https://www.grid.ac/institutes/{}", "Global Research Identifier Database"],

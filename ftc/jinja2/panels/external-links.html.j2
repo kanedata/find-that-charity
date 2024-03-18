@@ -14,9 +14,17 @@
         <ul class="mb4 mt2 list mh0 pa0 f5">
             {% for link in links %}
             <li class="w-100 mb2">
+                {% if link[0].startswith("POST:") %}
+                <form method="POST" action="{{ link[0][5:] }}" target="_blank">
+                    <button type="submit" class="link dark-blue underline di bn pointer bg-transparent pa0 ma0">
+                        {{ link[1] }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                    </button>
+                </form>
+                {% else %}
                 <a class="link dark-blue underline" href="{{ link[0] }}" target="_blank">
                     {{ link[1] }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
                 </a>
+                {% endif %}
             </li>
             {% endfor %}
             {% if wikidata %}
