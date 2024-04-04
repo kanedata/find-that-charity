@@ -44,7 +44,7 @@ certifi==2024.2.2
     #   pyppeteer
     #   requests
     #   sentry-sdk
-charity-django @ git+https://github.com/kanedata/charity-django.git@v0.16.0
+charity-django @ git+https://github.com/kanedata/charity-django.git@v0.16.1
     # via -r requirements.in
 charset-normalizer==3.0.1
     # via requests
