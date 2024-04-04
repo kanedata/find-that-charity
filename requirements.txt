@@ -36,14 +36,15 @@ bs4==0.0.1
     # via requests-html
 cattrs==22.2.0
     # via requests-cache
-certifi==2023.7.22
+certifi==2024.2.2
     # via
     #   -r requirements.in
+    #   charity-django
     #   elasticsearch
     #   pyppeteer
     #   requests
     #   sentry-sdk
-charity-django @ git+https://github.com/kanedata/charity-django.git@v0.4.1
+charity-django @ git+https://github.com/kanedata/charity-django.git@v0.16.0
     # via -r requirements.in
 charset-normalizer==3.0.1
     # via requests
@@ -157,9 +158,12 @@ lml==0.1.0
 lxml==4.9.2
     # via
     #   -r requirements.in
+    #   lxml-html-clean
     #   pyexcel-ezodf
     #   pyexcel-ods3
     #   pyquery
+lxml-html-clean==0.1.0
+    # via charity-django
 markdown==3.4.1
     # via
     #   django-markdownx
@@ -171,7 +175,9 @@ oauthlib==3.2.2
     #   requests-oauthlib
     #   tweepy
 openpyxl==3.1.0
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   charity-django
 packaging==23.2
     # via pytest
 parse==1.19.0

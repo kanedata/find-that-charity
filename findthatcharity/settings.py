@@ -167,6 +167,9 @@ ADMIN_DB_ALIAS = "admin"
 DATA_DB_ALIAS = "data"
 DATABASES = {
     "default": {
+        **dj_database_url.config(
+            env="DATABASE_ADMIN_URL",
+        ),
         "TEST": {
             **dj_database_url.config(
                 env="DATABASE_ADMIN_URL",
