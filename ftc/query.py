@@ -173,9 +173,9 @@ class OrganisationSearch:
                 "must"
             ] = {"match_all": {}}
             # first two functions reference the {{name}} parameter
-            self.es_query["inline"]["query"]["function_score"][
-                "functions"
-            ] = self.es_query["inline"]["query"]["function_score"]["functions"][2:]
+            self.es_query["inline"]["query"]["function_score"]["functions"] = (
+                self.es_query["inline"]["query"]["function_score"]["functions"][2:]
+            )
             sort_by = "sortname"
 
         # add postcode
