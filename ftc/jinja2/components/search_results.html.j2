@@ -35,8 +35,12 @@
     </h3>
     {% if debug %}
     <p class="ma0 f7 code">
+        {% if result.meta.score %}
         <span>Score: {{ "{:,.3f}".format(result.meta.score) }}</span> |
+        {% endif %}
+        {% if result.search_scale %}
         <span>Search scale: {{ "{:,.3f}".format(result.search_scale) }}</span>
+        {% endif %}
     </p>
     {% endif %}
     <h4 class="subtitle mt0 mb2 pa0 f4 mid-gray normal">
