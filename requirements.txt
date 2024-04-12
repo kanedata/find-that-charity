@@ -54,11 +54,6 @@ click==8.1.7
     #   sqlite-utils
 click-default-group==1.2.4
     # via sqlite-utils
-colorama==0.4.6
-    # via
-    #   click
-    #   pytest
-    #   tqdm
 confusable-homoglyphs==3.3.1
     # via django-registration
 coverage==7.4.4
@@ -133,7 +128,7 @@ gunicorn==21.2.0
     # via -r requirements.in
 humanize==4.9.0
     # via -r requirements.in
-idna==3.6
+idna==3.7
     # via requests
 importlib-metadata==7.1.0
     # via pyppeteer
@@ -317,8 +312,6 @@ typing-extensions==4.10.0
     #   pydantic-core
     #   pyee
     #   typeguard
-tzdata==2024.1
-    # via django
 ua-parser==0.18.0
     # via -r requirements.in
 url-normalize==1.4.3
