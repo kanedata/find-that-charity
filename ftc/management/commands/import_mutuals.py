@@ -13,7 +13,7 @@ class Command(CSVScraper):
     org_id_prefix = "GB-MPR"
     id_field = "Full Registation Number"
     date_fields = ["Registration Date", "Deregistration Date"]
-    date_format = "%d/%m/%Y"
+    date_format = "%Y-%m-%d"
     source = {
         "title": "Mutuals Public Register",
         "description": "The Mutuals Public Register is a public record of mutual societies registered by the Financial Conduct Authority. It has information for societies currently registered, and those no longer registered. The types of mutual societies include: Registered societies, including: Co-operative societies; and Community benefit societies, Credit unions, Building societies, Friendly societies",
