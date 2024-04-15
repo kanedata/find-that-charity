@@ -269,9 +269,9 @@ class OrganisationSearch:
     def run_db(self, with_pagination=False, with_aggregation=False):
         db_filter = []
         if self.base_orgtype:
-            db_filter.append(Q(organisationType__contains=self.base_orgtype))
+            db_filter.append(Q(organisationType__overlap=self.base_orgtype))
         if self.other_orgtypes:
-            db_filter.append(Q(organisationType__contains=self.other_orgtypes))
+            db_filter.append(Q(organisationType__overlap=self.other_orgtypes))
         if self.source:
             db_filter.append(Q(source__id__in=self.source))
         if self.term:

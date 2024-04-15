@@ -6,20 +6,17 @@
     base_query.title,
 ) if base_query else 'Search Results' %}
 {% if res.has_other_pages() %}
-    {% set subtitle = "Showing organisation {:,.0f} to {:,.0f} out of {:,.0f}".format(
+{% set subtitle = "Showing organisation {:,.0f} to {:,.0f} out of {:,.0f}".format(
         res.start_index(),
         res.end_index(),
         res.paginator.count
     ) %}
 {% else %}
-    {% set subtitle = "Showing all {:,.0f} organisations".format(res.paginator.count) %}
+{% set subtitle = "Showing all {:,.0f} organisations".format(res.paginator.count) %}
 {% endif %}
 
 {% block headscripts %}
-<link
-  rel="stylesheet"
-  href="{{ static('lib/choices/choices.min.css') }}"
-/>
+<link rel="stylesheet" href="{{ static('lib/choices/choices.min.css') }}" />
 <script src="{{ static('lib/choices/choices.min.js') }}"></script>
 {{ super() }}
 {% endblock headscripts %}
@@ -31,7 +28,8 @@
 
 {% macro filter_tag(key, value) %}
 <li class="b--dark-gray bn mr2 mb2 dib f6">
-    <span class="bg-near-black yellow pv1 ph2 br-pill br--left dib b">{{ key }}</span><span class="bg-moon-gray pv1 ph2 br-pill br--right dib">{{ value }}</span>
+    <span class="bg-near-black yellow pv1 ph2 br-pill br--left dib b">{{ key }}</span><span
+        class="bg-moon-gray pv1 ph2 br-pill br--right dib">{{ value }}</span>
 </li>
 {% endmacro %}
 
@@ -60,7 +58,8 @@
                     {% endfor %}
                     {% endif %}
                 </ul>
-                <a href="{{ url_remove(request, ['orgtype', 'source', 'location']) }}" class="f6 link blue underline">Clear filters</a>
+                <a href="{{ url_remove(request, ['orgtype', 'source', 'location']) }}"
+                    class="f6 link blue underline">Clear filters</a>
             </div>
             {% endif %}
             <div class="mt4">
@@ -69,7 +68,8 @@
         </div>
         <div class="fl w-100 w-30-l pa2">
             {% if download_url %}
-            <a class="mb3 tr w-100 db b link dark-blue underline-hover" href="{{ download_url }}">Download as CSV</a>
+            <a class="mb1 tr w-100 db b link dark-blue underline-hover" href="{{ download_url }}">Download as CSV</a>
+            {% include 'components/about_this_download.html.j2' %}
             {% endif %}
             {% include 'components/search_facets.html.j2' %}
         </div>
