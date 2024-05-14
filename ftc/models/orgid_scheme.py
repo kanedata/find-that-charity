@@ -13,6 +13,7 @@ class OrgidScheme(models.Model):
         "GB-LAS",
         "GB-LANI",
         "GB-GOR",
+        "GB-MPR",
         "GB-COH",
     ]
 
