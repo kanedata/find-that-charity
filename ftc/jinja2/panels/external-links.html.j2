@@ -1,4 +1,13 @@
 <div class="mv3 measure f5">
+    {% if 'registered-charity' not in related_orgs.organisationType %}
+    <div class="f6 mt4 br2 h-100 pa2 bg-washed-red tl">
+        <p class="mt0">Find that Charity displays records of not for profit organisations that use other legal forms, as
+            well
+            as registered charities.</p>
+        <p class="mv0">According to information from the available data sources, this organisation is not
+            registered as a charity.</p>
+    </div>
+    {% endif %}
     <p>
         This organisation record is based on data from <a href="#data-source-{{ org.source.id }}"
             class="link underline-hover blue b">{{ org.source.title }}</a> published by {{ org.source.publisher }}.
