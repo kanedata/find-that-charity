@@ -1,8 +1,9 @@
-<header class="fl w-100 ph3 ph5-ns pt4 entry-content lh-copy f4 {% if not org.active %}dark-gray bg-washed-yellow{% endif %}">
+<header
+  class="fl w-100 ph3 ph5-ns pt4 entry-content lh-copy f4 {% if not org.active %}dark-gray bg-washed-yellow{% endif %}">
   <div class="w-100 w-80-ns fl">
     <span class="f5 gray">Organisation record</span>
     <h2 class="f1-ns mt0 mb0 f2 lh-title normal w-100 w-50-l">
-        {{ org.name|titlecase }}
+      {{ org.name|titlecase }}
     </h2>
     <h3 class="f3-ns mb4 mt4 f4 lh-subtitle normal">
       {% if not org.active %}
@@ -30,15 +31,22 @@
       {% endfor %}
     </div>
   </div>
-  
+
   <div class="w-100 w-20-l fl">
     <div class="cf mv3 w-100 tr">
       {% include 'starred/status.html.j2' %}
       <p class="mv3">
         <a href="{{ url('orgid_json', kwargs={'org_id': org.org_id}) }}"
-          class="link dib bg-dark-green white code underline-hover normal f6 pv0 ph1 br1">Access this data in JSON format</a>
+          class="link dib bg-dark-green white code underline-hover normal f6 pv0 ph1 br1">Access this data in JSON
+          format</a>
       </p>
       <div class="mb1">{{ orgid_link(org.org_id, true, copy=true) }}</div>
+      {% if 'GB-CASC-' in org.org_id %}
+      <div class="f6 mt4 br2 h-100 pa2 bg-washed-red tl">
+        <p class="mv0">Official registration numbers for CASCs are not published by HMRC. The number shown here is a
+          placeholder.</p>
+      </div>
+      {% endif %}
       {% if org.orgIDs and org.orgIDs|length > 1 %}
       <div class="mb1">
         {% for v in org.orgIDs if v != org.org_id %}
@@ -48,10 +56,11 @@
       {% endif %}
       {% if 'registered-charity' not in related_orgs.organisationType %}
       <div class="f6 mt4 br2 h-100 pa2 bg-washed-red tl">
-        <p class="mt0">Find that Charity displays records of not for profit organisations that use other legal forms, as well
-        as registered charities.</p>
+        <p class="mt0">Find that Charity displays records of not for profit organisations that use other legal forms, as
+          well
+          as registered charities.</p>
         <p class="mv0">According to information from the available data sources, this organisation is not
-        registered as a charity.</p>
+          registered as a charity.</p>
       </div>
       {% endif %}
     </div>

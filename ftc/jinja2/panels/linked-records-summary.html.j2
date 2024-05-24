@@ -17,4 +17,10 @@
         {% include 'components/what_is_an_identifier.html.j2' %}
     </div>
     {% endif %}
+    {% if 'GB-CASC-' in org.org_id %}
+    <div class="f6 mt4 br2 h-100 pa2 bg-washed-red tl">
+        <p class="mv0">Official registration numbers for CASCs are not published by HMRC. The number shown here is a
+            placeholder.</p>
+    </div>
+    {% endif %}
 </div>
