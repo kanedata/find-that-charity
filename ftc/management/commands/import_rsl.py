@@ -1,7 +1,4 @@
 import datetime
-import io
-
-from openpyxl import load_workbook
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation
@@ -43,31 +40,30 @@ class Command(HTMLScraper):
         ],
     }
     orgtypes = ["Registered Provider of Social Housing"]
+    date_fields = ["registration date"]
+    date_format = "%d/%m/%Y"
 
     def parse_file(self, response, source_url):
-        link = [link for link in response.html.links if link.endswith(".xlsx")][0]
+        link = [
+            link
+            for link in response.html.absolute_links
+            if "list-of-registered-providers" in link
+        ][0]
         self.set_download_url(link)
         r = self.session.get(link)
         r.raise_for_status()
 
-        wb = load_workbook(io.BytesIO(r.content), read_only=True)
-        sheets = [
-            sheetname
-            for sheetname in wb.sheetnames
-            if "listing" in sheetname.lower() or "find view" in sheetname.lower()
-        ]
-        for sheetname in sheets:
-            ws = wb[sheetname]
+        table = r.html.find("table", first=True)
+        if not table:
+            raise ValueError("No table found in {}".format(link))
 
-            # self.source["issued"] = wb.properties.modified.isoformat()[0:10]
-
-            headers = None
-            for k, row in enumerate(ws.rows):
-                if not headers:
-                    headers = [c.value.lower() for c in row]
-                else:
-                    record = dict(zip(headers, [c.value for c in row]))
-                    self.parse_row(record)
+        headers = None
+        for k, row in enumerate(table.find("tr")):
+            if not headers:
+                headers = [c.text.lower() for c in row.find("td")]
+            else:
+                record = dict(zip(headers, [c.text for c in row.find("td")]))
+                self.parse_row(record)
 
     def parse_row(self, record):
         record = self.clean_fields(record)
