@@ -44,9 +44,11 @@ class Command(CSVScraper):
             self.coynos[record["casc_orgid"]] = record["ch_orgid"]
             return
 
-        address = dict(
-            enumerate([v.strip() for v in record["address"].split(",", maxsplit=2)])
-        )
+        address = {}
+        if record.get("address", None):
+            address = dict(
+                enumerate([v.strip() for v in record["address"].split(",", maxsplit=2)])
+            )
         org_ids = [record["id"]]
         orgtypes = [
             self.orgtype_cache["community-amateur-sports-club"],
