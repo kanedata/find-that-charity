@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
     scrapers = [
         "casc",
+        "coe",
         "gor",
         "ror",
         "hesa",
