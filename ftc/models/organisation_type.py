@@ -28,6 +28,7 @@ class OrganisationType(models.Model):
         "government-organisation",
         "local-authority",
         "university",
+        "church",
     ]
 
     def is_keytype(self):
