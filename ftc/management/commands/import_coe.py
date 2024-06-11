@@ -46,9 +46,14 @@ class Command(HTMLScraper):
     date_format = "%d/%m/%Y"
 
     def parse_file(self, response, source_url):
-        link = [
-            link for link in response.html.absolute_links if "cofe_structure" in link
-        ][0]
+        for link in response.html.find("a"):
+            if link.text.strip() == "Open Church Codes":
+                link = response.html._make_absolute(link.attrs.get("href"))
+                self.logger.info("Fetching file: {}".format(link))
+                self.set_download_url(link)
+                self.fetch_link(link)
+
+    def fetch_link(self, link):
         self.set_download_url(link)
         r = self.session.get(link)
         r.raise_for_status()
