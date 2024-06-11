@@ -37,7 +37,7 @@ class Command(HTMLScraper):
             {
                 "downloadURL": "",
                 "accessURL": "https://www.churchofengland.org/resources/churchcare/churchcare-grants/open-grant-data-360-giving",
-                "title": "All open-for-worship churches ",
+                "title": "All open-for-worship churches",
             }
         ],
     }
