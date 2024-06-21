@@ -57,13 +57,10 @@ class Command(HTMLScraper):
         if not table:
             raise ValueError("No table found in {}".format(link))
 
-        headers = None
-        for k, row in enumerate(table.find("tr")):
-            if not headers:
-                headers = [c.text.lower() for c in row.find("td")]
-            else:
-                record = dict(zip(headers, [c.text for c in row.find("td")]))
-                self.parse_row(record)
+        headers = [c.text.lower() for c in table.find("thead", first=True).find("th")]
+        for k, row in enumerate(table.find("tbody", first=True).find("tr")):
+            record = dict(zip(headers, [c.text for c in row.find("td")]))
+            self.parse_row(record)
 
     def parse_row(self, record):
         record = self.clean_fields(record)
