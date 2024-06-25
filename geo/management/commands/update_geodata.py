@@ -1,3 +1,5 @@
+from django.core import management
+
 from ftc.management.commands._base_scraper import SQLRunner
 
 UPDATE_GEODATA_SQL = {
@@ -200,6 +202,10 @@ class Command(SQLRunner):
         self.post_sql = UPDATE_GEODATA_SQL
 
     def run_scraper(self, *args, **options):
+        try:
+            management.call_command("import_geolookups")
+        except Exception:
+            self.stdout.write(self.style.ERROR("Command import_geolookups failed"))
         # close the spider
         self.close_spider()
         self.logger.info("Spider finished")
