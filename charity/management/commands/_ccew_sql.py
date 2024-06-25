@@ -282,8 +282,9 @@ select CONCAT('GB-CHC-', c.registered_charity_number) as charity_id,
         else c.charity_name_type end as "name_type"
 from charity_ccewcharityothernames c
     left outer join charity_ccewcharity ccc
-        on c.registered_charity_number = ccc.registered_charity_number
-            and c.linked_charity_number = ccc.linked_charity_number
+        on c.organisation_number = ccc.organisation_number
+    inner join charity_charity cc
+        ON CONCAT('GB-CHC-', c.registered_charity_number) = cc.id
 where c.charity_name is not null
 on conflict (charity_id, name) do nothing;
 """
