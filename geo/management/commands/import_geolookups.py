@@ -7,24 +7,23 @@ import pycountry
 from ftc.management.commands._base_scraper import BaseScraper
 from geo.models import GeoLookup
 
-GeoSource = namedtuple("GeoSource", ["link", "type", "codefield", "namefield"])
+GeoSource = namedtuple(
+    "GeoSource",
+    ["link", "type", "codefield", "namefield", "typefield"],
+    defaults=[None],
+)
 
 
 class Command(BaseScraper):
     name = "geo_lookups"
     bulk_limit = 50000
     GEO_SOURCES = {
-        "utla": GeoSource(
-            "https://github.com/drkane/geo-lookups/raw/master/utla_all_codes.csv",
-            "utla",
-            "UTLACD",
-            "UTLANM",
-        ),
-        "la": GeoSource(
-            "https://github.com/drkane/geo-lookups/raw/master/la_all_codes.csv",
-            "la",
-            "LADCD",
-            "LADNM",
+        "areas": GeoSource(
+            "https://github.com/drkane/geo-lookups/raw/master/area_all_codes.csv",
+            None,
+            "areacode",
+            "areaname",
+            "areatype",
         ),
         "msoa": GeoSource(
             "https://github.com/drkane/geo-lookups/raw/master/msoa_la.csv",
@@ -168,6 +167,78 @@ class Command(BaseScraper):
             "geo_rgn": "E12000009",
             "name": "South West",
         },
+        {
+            "geoCode": "E10000006",
+            "geoCodeType": "cty",
+            "geo_iso": "GB",
+            "geo_ctry": "E9200001",
+            "geo_rgn": "E12000002",
+            "name": "Cumbria",
+        },
+        {
+            "geoCode": "E10000021",
+            "geoCodeType": "cty",
+            "geo_iso": "GB",
+            "geo_ctry": "E9200001",
+            "geo_rgn": "E12000004",
+            "name": "Northamptonshire",
+        },
+        {
+            "geoCode": "E10000023",
+            "geoCodeType": "cty",
+            "geo_iso": "GB",
+            "geo_ctry": "E9200001",
+            "geo_rgn": "E12000003",
+            "name": "North Yorkshire",
+        },
+        {
+            "geoCode": "E11000001",
+            "geoCodeType": "cty",
+            "geo_iso": "GB",
+            "geo_ctry": "E9200001",
+            "geo_rgn": "E12000002",
+            "name": "Greater Manchester",
+        },
+        {
+            "geoCode": "E11000002",
+            "geoCodeType": "cty",
+            "geo_iso": "GB",
+            "geo_ctry": "E9200001",
+            "geo_rgn": "E12000002",
+            "name": "Merseyside",
+        },
+        {
+            "geoCode": "E11000003",
+            "geoCodeType": "cty",
+            "geo_iso": "GB",
+            "geo_ctry": "E9200001",
+            "geo_rgn": "E12000003",
+            "name": "South Yorkshire",
+        },
+        {
+            "geoCode": "E11000005",
+            "geoCodeType": "cty",
+            "geo_iso": "GB",
+            "geo_ctry": "E9200001",
+            "geo_rgn": "E12000005",
+            "name": "West Midlands",
+        },
+        {
+            "geoCode": "E11000006",
+            "geoCodeType": "cty",
+            "geo_iso": "GB",
+            "geo_ctry": "E9200001",
+            "geo_rgn": "E12000003",
+            "name": "West Yorkshire",
+        },
+        {
+            "geoCode": "E11000007",
+            "geoCodeType": "cty",
+            "geo_iso": "GB",
+            "geo_ctry": "E9200001",
+            "geo_rgn": "E12000001",
+            "name": "Tyne and Wear",
+        },
     )
 
     def run_scraper(self, *args, **options):
@@ -221,9 +292,13 @@ class Command(BaseScraper):
             if not v or v == "":
                 row[k] = None
 
+        geoCodeType = (
+            row[geocodetype.typefield] if geocodetype.typefield else geocodetype.type
+        )
+
         self.add_record(
             geoCode=row[geocodetype.codefield],
-            geoCodeType=geocodetype.type,
+            geoCodeType=geoCodeType,
             geo_iso="GB",
             name=row[geocodetype.namefield],
             **{k: row[v] for k, v in self.FIELD_MATCH.items() if row.get(v)},

@@ -486,7 +486,7 @@ insert into ftc_organisationlocation (
     "scrape_id"
 )
 select CONCAT('GB-CHC-', cc.registered_charity_number) as org_id,
-    aooname as name,
+    COALESCE(gg.name, aooname) as name,
     coalesce(ca."GSS", ca."ISO3166_1") as "geoCode",
     case when ca."GSS" is not null then 'ONS'
          when ca."ISO3166_1" is not null then 'ISO'
@@ -499,6 +499,8 @@ select CONCAT('GB-CHC-', cc.registered_charity_number) as org_id,
 from charity_ccewcharityareaofoperation cc
     inner join charity_areaofoperation ca
         on cc.geographic_area_description = ca.aooname
+    LEFT OUTER JOIN geo_geolookup gg 
+        ON gg."geoCode" = coalesce(ca."GSS", ca."ISO3166_1")
 where ca."GSS" is not null or ca."ISO3166_1" is not null
 on conflict (
     "org_id",
