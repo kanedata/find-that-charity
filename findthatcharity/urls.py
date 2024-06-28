@@ -17,7 +17,9 @@ Including another URLconf
 import django_sql_dashboard
 from django.contrib import admin
 from django.urls import include, path
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
+from graphene_django.views import GraphQLView
 
 import addtocsv.views
 import charity.urls
@@ -42,6 +44,7 @@ urlpatterns = [
     path("adddata/", addtocsv.views.index, name="csvtool"),
     path("adddata/company/", addtocsv.views.companies, name="csvtool_company"),
     path("api/v1/", api.urls),
+    path("api/graphql/v1/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path("orgid/", include(ftc.urls)),
     path("charity/", include(charity.urls)),
     path(

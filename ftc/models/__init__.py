@@ -1,3 +1,4 @@
+from ftc.models.charity_data import CharityData
 from ftc.models.organisation import EXTERNAL_LINKS, Organisation
 from ftc.models.organisation_classification import OrganisationClassification
 from ftc.models.organisation_link import OrganisationLink
@@ -25,4 +26,5 @@ __all__ = [
     "Source",
     "Vocabulary",
     "VocabularyEntries",
+    "CharityData",
 ]

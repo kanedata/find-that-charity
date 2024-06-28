@@ -51,3 +51,4 @@ boto3
 jsonschema
 pytest
 pytest-django
+graphene-django

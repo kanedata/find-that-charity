@@ -107,6 +107,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_sql_dashboard",
     "widget_tweaks",
+    "graphene_django",
 ]
 
 MIDDLEWARE = [
@@ -347,3 +348,5 @@ S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")
 S3_BUCKET = os.environ.get("S3_BUCKET")
 
 SIMPLE_ANALYTICS_API_KEY = os.environ.get("SIMPLE_ANALYTICS_API_KEY")
+
+GRAPHENE = {"SCHEMA": "findthatcharity.api.graphql.schema.schema"}

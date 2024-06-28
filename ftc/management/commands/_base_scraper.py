@@ -282,11 +282,12 @@ class BaseScraper(BaseCommand):
 
     def fetch_file(self):
         self.files = {}
-        for u in self.start_urls:
-            self.set_download_url(u)
-            r = self.session.get(u, verify=self.verify_certificate)
-            r.raise_for_status()
-            self.files[u] = r
+        if hasattr(self, "start_urls"):
+            for u in self.start_urls:
+                self.set_download_url(u)
+                r = self.session.get(u, verify=self.verify_certificate)
+                r.raise_for_status()
+                self.files[u] = r
 
     def parse_file(self, response, source_url):
         self.logger.info(source_url)

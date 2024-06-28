@@ -4,6 +4,8 @@
 #
 #    pip-compile
 #
+aniso8601==9.0.1
+    # via graphene
 annotated-types==0.6.0
     # via pydantic
 appdirs==1.4.4
@@ -83,6 +85,7 @@ django==5.0.4
     #   django-prettyjson
     #   django-registration
     #   django-sql-dashboard
+    #   graphene-django
 django-better-admin-arrayfield==1.4.2
     # via -r requirements.in
 django-cors-headers==4.3.1
@@ -129,6 +132,19 @@ fake-useragent==1.5.1
     # via requests-html
 faker==24.4.0
     # via charity-django
+graphene==3.3
+    # via graphene-django
+graphene-django==3.2.2
+    # via -r requirements.in
+graphql-core==3.2.3
+    # via
+    #   graphene
+    #   graphene-django
+    #   graphql-relay
+graphql-relay==3.2.0
+    # via
+    #   graphene
+    #   graphene-django
 gunicorn==21.2.0
     # via -r requirements.in
 humanize==4.9.0
@@ -194,6 +210,8 @@ pluggy==1.4.0
     # via
     #   pytest
     #   sqlite-utils
+promise==2.3
+    # via graphene-django
 psycopg2==2.9.9
     # via -r requirements.in
 psycopg2-binary==2.9.9
@@ -276,6 +294,7 @@ six==1.16.0
     #   django-elasticsearch-dsl
     #   django-prettyjson
     #   elasticsearch-dsl
+    #   promise
     #   python-dateutil
     #   url-normalize
 soupsieve==2.5
@@ -292,6 +311,8 @@ standardjson==0.3.1
     # via django-prettyjson
 tabulate==0.9.0
     # via sqlite-utils
+text-unidecode==1.3
+    # via graphene-django
 titlecase==2.4.1
     # via
     #   -r requirements.in
