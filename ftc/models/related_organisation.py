@@ -62,11 +62,14 @@ class RelatedOrganisation:
 
     @cached_property
     def parents(self):
-        parents = self.get_all("parent")
-        for parent_id in parents:
-            parent_obj = Organisation.objects.filter(org_id=parent_id).first()
-            if parent_obj:
-                yield parent_obj
+        parents = [parent_id for parent_id in self.get_all("parent") if parent_id]
+        return Organisation.objects.filter(org_id__in=parents).exclude(
+            orgIDs__overlap=self.orgIDs
+        )
+
+    @cached_property
+    def children(self):
+        return Organisation.objects.filter(parent__in=self.orgIDs)
 
     @cached_property
     def source_ids(self):

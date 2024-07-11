@@ -1,5 +1,30 @@
-{% if related_orgs.records|length > 1 %}
+{% macro truncate_records(records, truncate_after=9) %}
+<div class="w-100 flex flex-wrap">
+  {% for record in records[:truncate_after] if record.org_id != org.org_id %}
+  <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(record, {}, request, small=true) }}
+  </div>
+  {% endfor %}
+</div>
+{% if records|length > truncate_after %}
+<details class="w-100 db">
+  <summary class="w-100 pointer">Show {{ "more record"|pluralise(records|length - truncate_after) }}</summary>
+  <div class="w-100 flex flex-wrap">
+    {% for record in records[truncate_after:] if record.org_id != org.org_id %}
+    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+      {{ org_record(record, {}, request, small=true) }}
+    </div>
+    {% endfor %}
+  </div>
+</details>
+{% endif %}
+{% endmacro %}
+
+
+{% if related_orgs.records|length > 1 or related_orgs.parents.exists() or related_orgs.children.exists() %}
 {% call org_panel("Linked records", org) %}
+
+{% if related_orgs.records|length > 1 %}
 {% include 'panels/linked-records-summary.html.j2' %}
 <div class="w-100 flex flex-wrap">
   <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
@@ -15,68 +40,20 @@
 </div>
 
 {% if related_orgs.inactiveRecords %}
-<div class="w-100 flex flex-wrap">
-  {% for record in related_orgs.inactiveRecords[:9] if record.org_id != org.org_id %}
-  <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
-    {{ org_record(record, {}, request, small=true) }}
-  </div>
-  {% endfor %}
-</div>
-{% if related_orgs.inactiveRecords|length > 9 %}
-<details class="w-100 db">
-  <summary class="w-100 pointer">Show {{ "more record"|pluralise(related_orgs.inactiveRecords|length - 9) }}</summary>
-  <div class="w-100 flex flex-wrap">
-    {% for record in related_orgs.inactiveRecords[9:] if record.org_id != org.org_id %}
-    <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
-      {{ org_record(record, {}, request, small=true) }}
-    </div>
-    {% endfor %}
-  </div>
-</details>
-{% endif %}
+{{ truncate_records(related_orgs.inactiveRecords) }}
 {% endif %}
 
-{# {% if org.parent.keys()|length %}
-  <article class="message is-info">
-    <h4 class="ma0 pa0">Parent organisations</h4>
-    <div class="message-body">
-      <ul class="mb4 mt2 list mh0 pa0 f5">
-      {% for k, v in org.parent.items() %}
-        {% if v.value in parent_orgs %}
-        <li class="w-100 mb2"><a class="link dark-blue underline-hover" href="{{ url('orgid_html', org_id=v.value) }}" target="_blank">{{ parent_org[v.value].name }}</a> {{ show_sources(v) }}</li>
-        {% else %}
-        <li class="w-100 mb2"><a class="link dark-blue underline-hover" href="{{ url('orgid_html', org_id=v.value) }}" target="_blank">{{ v.value }}</a> {{ show_sources(v) }}</li>
-        {% endif %}
-      {% endfor %}
-      </ul>
-    </div>
-  </article>
-  {% endif %}
-
-  {% if child_orgs|length %}
-  <article class="message is-info">
-    <h4 class="ma0 pa0">Child organisations</h4>
-    <div class="message-body">
-      <ul class="mb4 mt2 list mh0 pa0 f5">
-      {% for o in child_orgs %}
-        <li class="w-100 mb2"><a class="link dark-blue underline-hover" href="{{ url('orgid_html', org_id=o.id) }}" target="_blank">{{ o.name }}</a> {{ show_sources(o) }}</li>
-      {% endfor %}
-      </ul>
-    </div>
-  </article>
-  {% endif %} #}
-
-{% endcall %}
 {% endif %}
 
-{% if related_orgs.parents %}
-{% call org_panel("Parent organisation", org) %}
-<div class="w-100 flex flex-wrap">
-  {% for record in related_orgs.parents if record.org_id != org.org_id %}
-  <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
-    {{ org_record(record, {}, request, small=true) }}
-  </div>
-  {% endfor %}
-</div>
+{% if related_orgs.parents.exists() %}
+<h4>{{ 'Parent organisation'|pluralise(related_orgs.parents.count()) }}</h4>
+{{ truncate_records(related_orgs.parents.all()) }}
+{% endif %}
+
+{% if related_orgs.children.exists() %}
+<h4>{{ 'Subsidiary / Child organisation'|pluralise(related_orgs.children.count()) }}</h4>
+{{ truncate_records(related_orgs.children.all()) }}
+{% endif %}
+
 {% endcall %}
 {% endif %}

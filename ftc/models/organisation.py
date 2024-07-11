@@ -168,7 +168,11 @@ class Organisation(models.Model):
         max_length=200, null=True, blank=True, verbose_name="Status"
     )
     parent = models.CharField(
-        max_length=200, null=True, blank=True, verbose_name="Parent organisation"
+        max_length=200,
+        null=True,
+        blank=True,
+        verbose_name="Parent organisation",
+        db_index=True,
     )
     dateModified = models.DateTimeField(
         auto_now=True, verbose_name="Date record was last modified"
