@@ -68,3 +68,15 @@
 
 {% endcall %}
 {% endif %}
+
+{% if related_orgs.parents %}
+{% call org_panel("Parent organisation", org) %}
+<div class="w-100 flex flex-wrap">
+  {% for record in related_orgs.parents if record.org_id != org.org_id %}
+  <div class="w-third-l w-50-m w-100 f5 pr3 pb3">
+    {{ org_record(record, {}, request, small=true) }}
+  </div>
+  {% endfor %}
+</div>
+{% endcall %}
+{% endif %}

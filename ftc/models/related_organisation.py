@@ -61,6 +61,14 @@ class RelatedOrganisation:
         return list(Source.objects.filter(id__in=self.source_ids).all())
 
     @cached_property
+    def parents(self):
+        parents = self.get_all("parent")
+        for parent_id in parents:
+            parent_obj = Organisation.objects.filter(org_id=parent_id).first()
+            if parent_obj:
+                yield parent_obj
+
+    @cached_property
     def source_ids(self):
         sources = list(self.get_all("source_id"))
         sources.extend(

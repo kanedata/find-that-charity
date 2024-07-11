@@ -137,7 +137,7 @@ class Command(CSVScraper):
                 dateRegistered=record.get("OpenDate"),
                 dateRemoved=record.get("CloseDate"),
                 active=record.get("EstablishmentStatus (name)") != "Closed",
-                parent=record.get("PropsName"),
+                parent=None,
                 orgIDs=self.get_org_ids(record),
                 scrape=self.scrape,
                 source=self.source,

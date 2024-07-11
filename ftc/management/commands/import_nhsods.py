@@ -220,6 +220,10 @@ class Command(HTMLScraper):
             else:
                 address["addressLocality"] = record.get("Address Line 4")
 
+        parent = None
+        if record.get("Parent Organisation Code"):
+            parent = f"{self.org_id_prefix}-{record.get('Parent Organisation Code')}"
+
         self.add_org_record(
             Organisation(
                 **{
@@ -244,7 +248,7 @@ class Command(HTMLScraper):
                     "dateRegistered": record.get("Open Date"),
                     "dateRemoved": record.get("Close Date"),
                     "active": record.get("Close Date") is None,
-                    "parent": record.get("Parent Organisation Code"),
+                    "parent": parent,
                     "orgIDs": [self.get_org_id(record)],
                     "scrape": self.scrape,
                     "source": self.sources[org_type],
