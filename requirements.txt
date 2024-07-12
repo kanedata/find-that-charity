@@ -145,11 +145,11 @@ graphql-relay==3.2.0
     # via
     #   graphene
     #   graphene-django
-gunicorn==21.2.0
+gunicorn==22.0.0
     # via -r requirements.in
 humanize==4.9.0
     # via -r requirements.in
-idna==3.6
+idna==3.7
     # via requests
 importlib-metadata==7.1.0
     # via pyppeteer
@@ -303,7 +303,7 @@ sqlite-fts4==1.0.3
     # via sqlite-utils
 sqlite-utils==3.36
     # via -r requirements.in
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via
     #   django
     #   django-debug-toolbar
@@ -319,7 +319,7 @@ titlecase==2.4.1
     #   charity-django
 tomli==2.0.1
     # via pytest
-tqdm==4.66.2
+tqdm==4.66.4
     # via
     #   -r requirements.in
     #   charity-django
