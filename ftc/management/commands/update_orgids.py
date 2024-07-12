@@ -85,10 +85,77 @@ UPDATE_ORGIDS_SQL = {
         ) as a
         where a.org_id = o.org_id;
     """,
+    "Add official linked orgIDs": """
+        WITH official_sources AS (
+            SELECT distinct source_id
+            FROM ftc_organisation 
+        ),
+        official_links AS (
+            SELECT fo.*
+            FROM ftc_organisationlink fo
+            INNER JOIN official_sources s
+                ON fo.source_id = s.source_id
+        )
+        update ftc_organisation o
+        set "linked_orgs_official" = a.linked_orgs_official
+        from (
+            WITH RECURSIVE search_graph(org_id_a, org_id_b) AS (
+                    SELECT a.org_id_a, a.org_id_b
+                    FROM (
+                        SELECT official_links.org_id_a,
+                            official_links.org_id_b
+                        FROM official_links
+                        UNION
+                        SELECT official_links.org_id_b AS org_id_a,
+                            official_links.org_id_a AS org_id_b
+                        FROM official_links
+                        UNION
+                        SELECT official_links.org_id_a,
+                            official_links.org_id_a AS org_id_b
+                        FROM official_links
+                        UNION
+                        SELECT official_links.org_id_b AS org_id_a,
+                            official_links.org_id_b
+                        FROM official_links
+                    ) a
+                union
+                    SELECT sg.org_id_a, a.org_id_b
+                    FROM (
+                        SELECT official_links.org_id_a,
+                            official_links.org_id_b
+                        FROM official_links
+                        UNION
+                        SELECT official_links.org_id_b AS org_id_a,
+                            official_links.org_id_a AS org_id_b
+                        FROM official_links
+                        UNION
+                        SELECT official_links.org_id_a,
+                            official_links.org_id_a AS org_id_b
+                        FROM official_links
+                        UNION
+                        SELECT official_links.org_id_b AS org_id_a,
+                            official_links.org_id_b
+                        FROM official_links
+                    ) a
+                        inner JOIN search_graph sg
+                            ON a.org_id_a = sg.org_id_b
+            )
+            SELECT org_id_a as "org_id",
+                array_agg(org_id_b ORDER BY org_id_b ASC) as linked_orgs_official
+            FROM search_graph
+            group by org_id_a
+        ) as a
+        where a.org_id = o.org_id;
+    """,
     "Add missing orgIDs": """
         update ftc_organisation
         set linked_orgs = string_to_array(org_id, '')
         where linked_orgs is null;
+    """,
+    "Add missing orgIDs (linked orgs official)": """
+        update ftc_organisation
+        set linked_orgs_official = string_to_array(org_id, '')
+        where linked_orgs_official is null;
     """,
     "Update priorities field": """
     with priorities as (select ARRAY[{}]::varchar[] as prefixes)

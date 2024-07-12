@@ -210,6 +210,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
             "dateModified": "dateModified",
             "orgIDs": "orgIDs",
             "linked_orgs": "linked_orgs",
+            "linked_orgs_official": "linked_orgs_official",
             "organisationType": "organisationType",
             "organisationTypePrimary__title": "organisationTypePrimary",
             "source": "source",
