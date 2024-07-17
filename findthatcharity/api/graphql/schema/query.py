@@ -1,6 +1,7 @@
 import graphene
+from django.db.models import F, Q
+from django_cte import With
 
-from charity.models import CCEWCharity
 from findthatcharity.api.graphql.schema.aggregation import AggregationTypesCHC
 from findthatcharity.api.graphql.schema.chc import CharityCHC
 from findthatcharity.api.graphql.schema.enums import (
@@ -69,28 +70,46 @@ class QueryCHC(graphene.ObjectType):
     )
 
     def resolve_get_charities(root, info, filters=None):
-        charities = CharityData.objects.filter(source="ccew", active=True)
+        # get annotations
+        base_query = CharityData.objects.filter(source="ccew", active=True).values(
+            "id", "data"
+        )
+        used_filters = []
+        used_exclusions = []
 
         if filters.get("id"):
-            charities = charities.filter(id__in=filters.get("id"))
+            used_filters.append(Q(id__in=filters.get("id")))
 
         if filters.get("search"):
-            charities = charities.filter(data__name__icontains=filters.get("search"))
+            used_filters.append(
+                Q(
+                    Q(data__name__icontains=filters.get("search"))
+                    | Q(data__activities__icontains=filters.get("search"))
+                )
+            )
 
         for field in ["causes", "beneficiaries", "operations"]:
             if filters.get(field):
+                base_query = base_query.annotate(**{field: F(f"data__{field}")})
                 if filters.get(field, {}).get("some"):
-                    charities = charities.filter(
-                        **{f"data__{field}__contains": filters[field]["some"]}
+                    used_filters.append(
+                        Q(**{f"{field}__overlap": filters[field]["some"]})
                     )
                 if filters.get(field, {}).get("every"):
-                    charities = charities.filter(
-                        **{f"data__{field}__in": filters[field]["every"]}
+                    used_filters.append(
+                        Q(**{f"{field}__contains": filters[field]["every"]})
                     )
                 if filters.get(field, {}).get("notSome"):
-                    charities = charities.filter(
-                        **{f"data__{field}__not_contains": filters[field]["notSome"]}
+                    used_exclusions.append(
+                        Q(**{f"{field}__overlap": filters[field]["notSome"]})
                     )
+                if filters.get(field, {}).get("length"):
+                    for operator in ["gte", "gt", "lte", "le"]:
+                        if filters.get(field, {}).get("length", {}).get(operator):
+                            db_field = f"{field}__len__{operator}"
+                            used_filters.append(
+                                Q(**{db_field: filters[field]["length"][operator]})
+                            )
 
         for field in ["latest_income", "latest_spending"]:
             if filters.get("finances") and filters.get("finances", {}).get(field):
@@ -99,9 +118,30 @@ class QueryCHC(graphene.ObjectType):
                         db_field = f"data__finances__0__{field}__{operator}".replace(
                             "latest_", ""
                         )
-                        charities = charities.filter(
-                            **{db_field: filters["finances"][field][operator]}
+                        used_filters.append(
+                            Q(**{db_field: filters["finances"][field][operator]})
                         )
+
+        # areas = graphene.Field(ListFilterInput)
+        # causes = graphene.Field(ListFilterInput)
+        # beneficiaries = graphene.Field(ListFilterInput)
+        # operations = graphene.Field(ListFilterInput)
+        # grants = graphene.Field(GrantsFilterInput)
+        # geo = graphene.Field(GeoFilterInput)
+        # finances = graphene.Field(FinancesFilterInput)
+        # registrations = graphene.Field(RegistrationsFilterInput)
+        # trustees = graphene.Field(ListFilterInput)
+        # topics = graphene.Field(ListFilterInput)
+        # image = graphene.Field(ImageFilterInput)
+        # social = graphene.Field(SocialFilterInput)
+
+        charities_cte = With(base_query)
+        charities = (
+            charities_cte.queryset()
+            .with_cte(charities_cte)
+            .filter(*used_filters)
+            .exclude(*used_exclusions)
+        )
 
         print(charities.query)
 

@@ -52,3 +52,4 @@ jsonschema
 pytest
 pytest-django
 graphene-django
+django-cte

@@ -98,11 +98,11 @@ class Organisation(models.Model):
         null=True,
         verbose_name="Linked organisations",
     )
-    linked_orgs_official = ArrayField(
+    linked_orgs_verified = ArrayField(
         models.CharField(max_length=200, blank=True),
         blank=True,
         null=True,
-        verbose_name="Linked organisations (official sources)",
+        verbose_name="Linked organisations (verified sources)",
     )
     name = models.CharField(max_length=255, verbose_name="Name")
     alternateName = ArrayField(
@@ -227,7 +227,7 @@ class Organisation(models.Model):
         indexes = [
             GinIndex(fields=["orgIDs"]),
             GinIndex(fields=["linked_orgs"]),
-            GinIndex(fields=["linked_orgs_official"]),
+            GinIndex(fields=["linked_orgs_verified"]),
             GinIndex(fields=["alternateName"]),
             GinIndex(fields=["organisationType"]),
         ]

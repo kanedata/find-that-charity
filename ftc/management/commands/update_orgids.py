@@ -85,7 +85,7 @@ UPDATE_ORGIDS_SQL = {
         ) as a
         where a.org_id = o.org_id;
     """,
-    "Add official linked orgIDs": """
+    "Add verified linked orgIDs": """
         WITH official_sources AS (
             SELECT distinct source_id
             FROM ftc_organisation 
@@ -97,7 +97,7 @@ UPDATE_ORGIDS_SQL = {
                 ON fo.source_id = s.source_id
         )
         update ftc_organisation o
-        set "linked_orgs_official" = a.linked_orgs_official
+        set "linked_orgs_verified" = a.linked_orgs_verified
         from (
             WITH RECURSIVE search_graph(org_id_a, org_id_b) AS (
                     SELECT a.org_id_a, a.org_id_b
@@ -141,7 +141,7 @@ UPDATE_ORGIDS_SQL = {
                             ON a.org_id_a = sg.org_id_b
             )
             SELECT org_id_a as "org_id",
-                array_agg(org_id_b ORDER BY org_id_b ASC) as linked_orgs_official
+                array_agg(org_id_b ORDER BY org_id_b ASC) as linked_orgs_verified
             FROM search_graph
             group by org_id_a
         ) as a
@@ -152,10 +152,10 @@ UPDATE_ORGIDS_SQL = {
         set linked_orgs = string_to_array(org_id, '')
         where linked_orgs is null;
     """,
-    "Add missing orgIDs (linked orgs official)": """
+    "Add missing orgIDs (linked orgs verified)": """
         update ftc_organisation
-        set linked_orgs_official = string_to_array(org_id, '')
-        where linked_orgs_official is null;
+        set linked_orgs_verified = string_to_array(org_id, '')
+        where linked_orgs_verified is null;
     """,
     "Update priorities field": """
     with priorities as (select ARRAY[{}]::varchar[] as prefixes)

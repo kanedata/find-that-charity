@@ -140,6 +140,14 @@ class RegistrationCHC(graphene.ObjectType):
     removal_code = graphene.String()
     removal_reason = graphene.String()
 
+    def resolve_registration_date(root, info):
+        return date.fromisoformat(root["registration_date"])
+
+    def resolve_removal_date(root, info):
+        if root["removal_date"]:
+            return date.fromisoformat(root["removal_date"])
+        return None
+
 
 class TrusteeCharityCHC(graphene.ObjectType):
     id = graphene.ID()
@@ -180,6 +188,44 @@ class Topic(graphene.ObjectType):
     # A numerical value between `0` and `1`.
     # A high value corresponds to a high likelihood that the topic is relevant to the Charity.
     score = graphene.Float()
+
+
+CHC_CLASSIFICATION_LOOKUPS = {
+    "101": "General Charitable Purposes",
+    "102": "Education/training",
+    "103": "The Advancement Of Health Or Saving Of Lives",
+    "104": "Disability",
+    "105": "The Prevention Or Relief Of Poverty",
+    "106": "Overseas Aid/famine Relief",
+    "107": "Accommodation/housing",
+    "108": "Religious Activities",
+    "109": "Arts/culture/heritage/science",
+    "110": "Amateur Sport",
+    "111": "Animals",
+    "112": "Environment/conservation/heritage",
+    "113": "Economic/community Development/employment",
+    "114": "Armed Forces/emergency Service Efficiency",
+    "115": "Human Rights/religious Or Racial Harmony/equality Or Diversity",
+    "116": "Recreation",
+    "117": "Other Charitable Purposes",
+    "201": "Children/young People",
+    "202": "Elderly/old People",
+    "203": "People With Disabilities",
+    "204": "People Of A Particular Ethnic Or Racial Origin",
+    "205": "Other Charities Or Voluntary Bodies",
+    "206": "Other Defined Groups",
+    "207": "The General Public/mankind",
+    "301": "Makes Grants To Individuals",
+    "302": "Makes Grants To Organisations",
+    "303": "Provides Other Finance",
+    "304": "Provides Human Resources",
+    "305": "Provides Buildings/facilities/open Space",
+    "306": "Provides Services",
+    "307": "Provides Advocacy/advice/information",
+    "308": "Sponsors Or Undertakes Research",
+    "309": "Acts As An Umbrella Or Resource Body",
+    "310": "Other Charitable Activities",
+}
 
 
 # Charity registered in England & Wales
@@ -247,10 +293,19 @@ class CharityCHC(graphene.ObjectType):
         return [primary_names[0]]
 
     def resolve_causes(root, info):
-        return [{"id": value, "name": None} for value in root["causes"]]
+        return [
+            {"id": value, "name": CHC_CLASSIFICATION_LOOKUPS.get(value, value)}
+            for value in root["causes"]
+        ]
 
     def resolve_beneficiaries(root, info):
-        return [{"id": value, "name": None} for value in root["beneficiaries"]]
+        return [
+            {"id": value, "name": CHC_CLASSIFICATION_LOOKUPS.get(value, value)}
+            for value in root["beneficiaries"]
+        ]
 
     def resolve_operations(root, info):
-        return [{"id": value, "name": None} for value in root["operations"]]
+        return [
+            {"id": value, "name": CHC_CLASSIFICATION_LOOKUPS.get(value, value)}
+            for value in root["operations"]
+        ]

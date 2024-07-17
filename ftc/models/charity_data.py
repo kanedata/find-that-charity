@@ -1,4 +1,5 @@
 from django.db import models
+from django_cte import CTEManager
 
 
 class DataSources(models.TextChoices):
@@ -6,6 +7,8 @@ class DataSources(models.TextChoices):
 
 
 class CharityData(models.Model):
+    objects = CTEManager()
+
     id = models.IntegerField(primary_key=True)
     source = models.CharField(
         max_length=255, choices=DataSources.choices, default=DataSources.CCEW
