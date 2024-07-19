@@ -80,7 +80,9 @@ class GeoBoundingCircleInput(graphene.InputObjectType):
 
 class GeoFilterInput(graphene.InputObjectType):
     bounding_box = graphene.Field(GeoBoundingBoxInput)
-    bounding_circle = graphene.Field(GeoBoundingCircleInput)
+    bounding_circle = graphene.Field(
+        GeoBoundingCircleInput, deprecation_reason="Bounding circles are not supported"
+    )
     geohashes = graphene.List(graphene.String)
     region = graphene.Field(GeoRegion)
     country = graphene.Field(GeoCountry)
@@ -104,7 +106,7 @@ class ImageFilterInput(graphene.InputObjectType):
 class SocialFilterInput(graphene.InputObjectType):
     twitter_exists = graphene.Boolean()
     facebook_exists = graphene.Boolean()
-    instagram_exists = graphene.Boolean()
+    instagram_exists = graphene.Boolean(deprecation_reason="Not supported")
 
 
 class FilterCHCInput(graphene.InputObjectType):
@@ -119,6 +121,6 @@ class FilterCHCInput(graphene.InputObjectType):
     finances = graphene.Field(FinancesFilterInput)
     registrations = graphene.Field(RegistrationsFilterInput)
     trustees = graphene.Field(ListFilterInput)
-    topics = graphene.Field(ListFilterInput)
-    image = graphene.Field(ImageFilterInput)
+    topics = graphene.Field(ListFilterInput, deprecation_reason="Not supported")
+    image = graphene.Field(ImageFilterInput, deprecation_reason="Not supported")
     social = graphene.Field(SocialFilterInput)

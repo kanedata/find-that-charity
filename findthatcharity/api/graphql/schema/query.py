@@ -1,6 +1,8 @@
+from functools import reduce
+
 import graphene
-from django.db.models import F, Q
-from django_cte import With
+from django.db.models import Q
+from pygeohash import decode_exactly
 
 from findthatcharity.api.graphql.schema.aggregation import AggregationTypesCHC
 from findthatcharity.api.graphql.schema.chc import CharityCHC
@@ -71,43 +73,48 @@ class QueryCHC(graphene.ObjectType):
 
     def resolve_get_charities(root, info, filters=None):
         # get annotations
-        base_query = CharityData.objects.filter(source="ccew", active=True).values(
-            "id", "data"
-        )
-        used_filters = []
-        used_exclusions = []
+        base_query = CharityData.objects.filter(source="ccew", active=True)
 
         if filters.get("id"):
-            used_filters.append(Q(id__in=filters.get("id")))
+            base_query = base_query.filter(Q(id__in=filters.get("id")))
 
         if filters.get("search"):
-            used_filters.append(
+            base_query = base_query.filter(
                 Q(
                     Q(data__name__icontains=filters.get("search"))
                     | Q(data__activities__icontains=filters.get("search"))
                 )
             )
 
-        for field in ["causes", "beneficiaries", "operations"]:
+        if filters.get("grants") and filters.get("grants", {}).get("funders"):
+            filters["funders"] = filters["grants"]["funders"]
+
+        for field in [
+            "areas",
+            "causes",
+            "beneficiaries",
+            "operations",
+            "trustees",
+            "funders",
+        ]:
             if filters.get(field):
-                base_query = base_query.annotate(**{field: F(f"data__{field}")})
                 if filters.get(field, {}).get("some"):
-                    used_filters.append(
-                        Q(**{f"{field}__overlap": filters[field]["some"]})
+                    base_query = base_query.filter(
+                        Q(**{f"{field}_list__overlap": filters[field]["some"]})
                     )
                 if filters.get(field, {}).get("every"):
-                    used_filters.append(
-                        Q(**{f"{field}__contains": filters[field]["every"]})
+                    base_query = base_query.filter(
+                        Q(**{f"{field}_list__contains": filters[field]["every"]})
                     )
                 if filters.get(field, {}).get("notSome"):
-                    used_exclusions.append(
-                        Q(**{f"{field}__overlap": filters[field]["notSome"]})
+                    base_query = base_query.exclude(
+                        Q(**{f"{field}_list__overlap": filters[field]["notSome"]})
                     )
                 if filters.get(field, {}).get("length"):
                     for operator in ["gte", "gt", "lte", "le"]:
                         if filters.get(field, {}).get("length", {}).get(operator):
-                            db_field = f"{field}__len__{operator}"
-                            used_filters.append(
+                            db_field = f"{field}_list__len__{operator}"
+                            base_query = base_query.filter(
                                 Q(**{db_field: filters[field]["length"][operator]})
                             )
 
@@ -118,34 +125,57 @@ class QueryCHC(graphene.ObjectType):
                         db_field = f"data__finances__0__{field}__{operator}".replace(
                             "latest_", ""
                         )
-                        used_filters.append(
+                        base_query = base_query.exclude(
                             Q(**{db_field: filters["finances"][field][operator]})
                         )
 
-        # areas = graphene.Field(ListFilterInput)
-        # causes = graphene.Field(ListFilterInput)
-        # beneficiaries = graphene.Field(ListFilterInput)
-        # operations = graphene.Field(ListFilterInput)
-        # grants = graphene.Field(GrantsFilterInput)
-        # geo = graphene.Field(GeoFilterInput)
-        # finances = graphene.Field(FinancesFilterInput)
-        # registrations = graphene.Field(RegistrationsFilterInput)
-        # trustees = graphene.Field(ListFilterInput)
-        # topics = graphene.Field(ListFilterInput)
-        # image = graphene.Field(ImageFilterInput)
-        # social = graphene.Field(SocialFilterInput)
+        if filters.get("registrations") and filters.get("registrations", {}).get(
+            "latest_registration_date"
+        ):
+            reg_date_filter = filters["registrations"]["latest_registration_date"]
+            for operator in ["gte", "gt", "lte", "le"]:
+                if reg_date_filter.get(operator):
+                    db_field = "registration_date__" + operator
+                    base_query = base_query.filter(
+                        Q(**{db_field: reg_date_filter[operator]})
+                    )
 
-        charities_cte = With(base_query)
-        charities = (
-            charities_cte.queryset()
-            .with_cte(charities_cte)
-            .filter(*used_filters)
-            .exclude(*used_exclusions)
-        )
+        if filters.get("social"):
+            if filters.get("social", {}).get("twitter_exists"):
+                base_query = base_query.filter(Q(social_twitter=True))
+            if filters.get("social", {}).get("facebook_exists"):
+                base_query = base_query.filter(Q(social_facebook=True))
 
-        print(charities.query)
+        if filters.get("geo"):
+            for field in ["region", "country", "laua"]:
+                if filters.get("geo", {}).get(field):
+                    db_field = f"{field}_code"
+                    base_query = base_query.filter(
+                        Q(**{db_field: filters["geo"][field]})
+                    )
+            if filters.get("geo", {}).get("bounding_box"):
+                bounding_box = filters["geo"]["bounding_box"]
+                base_query = base_query.filter(
+                    latitude__gte=bounding_box["top"],
+                    latitude__lte=bounding_box["bottom"],
+                    longitude__gte=bounding_box["left"],
+                    longitude__lte=bounding_box["right"],
+                )
+            if filters.get("geo", {}).get("geohashes"):
+                geo_hash = []
+                for gh in filters["geo"]["geohashes"]:
+                    lat, lon, lat_err, lon_err = decode_exactly(gh)
+                    geo_hash.append(
+                        Q(
+                            latitude__gte=lat - lat_err,
+                            latitude__lte=lat + lat_err,
+                            longitude__gte=lon - lon_err,
+                            longitude__lte=lon + lon_err,
+                        )
+                    )
+                base_query = base_query.filter(reduce(Q.__or__, geo_hash))
 
-        return charities.values_list("data", flat=True)
+        return base_query.values_list("data", flat=True)
 
     def resolve_get_filters(root, info, search=None, id=None, filterType=None):
         return [
