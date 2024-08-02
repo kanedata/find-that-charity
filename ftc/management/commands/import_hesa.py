@@ -10,7 +10,7 @@ class Command(CSVScraper):
     name = "hesa"
     allowed_domains = ["hesa.ac.uk"]
     start_urls = [
-        "https://www.hesa.ac.uk/files/ProviderAllHESA.csv",
+        "https://www.hesa.ac.uk/collection/provider-tools/all_hesa_providers?ProviderAllHESAEnhanced.csv",
     ]
     org_id_prefix = "GB-HESA"
     source = {
@@ -25,7 +25,7 @@ class Command(CSVScraper):
         "distribution": [
             {
                 "downloadURL": "",
-                "accessURL": "",
+                "accessURL": "https://www.hesa.ac.uk/collection/provider-tools/all_hesa_providers",
                 "title": "HESA - Higher education providers",
             }
         ],
