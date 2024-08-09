@@ -8,7 +8,7 @@ class Command(BaseCommand):
         "coe",
         "gor",
         "ror",
-        "hesa",
+        # "hesa",
         "la_mysociety",
         "manual_links",
         "mutuals",
