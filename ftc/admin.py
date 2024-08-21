@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.db import models
+from django.forms import Textarea
 from django.urls import resolve, reverse
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
@@ -9,10 +10,16 @@ from prettyjson.widgets import PrettyJSONWidget
 from ftc import models as ftc
 
 
+class MyPrettyJSONWidget(PrettyJSONWidget):
+    def render(self, name, value, attrs=None, **kwargs):
+        html = super(MyPrettyJSONWidget, self).render(name, value, attrs)
+        return mark_safe(html)
+
+
 class JSONFieldAdmin(admin.ModelAdmin, DynamicArrayMixin):
     list_per_page = 20
     formfield_overrides = {
-        models.JSONField: {"widget": PrettyJSONWidget(attrs={"initial": "parsed"})}
+        models.JSONField: {"widget": MyPrettyJSONWidget({"initial": "parsed"})}
     }
 
 
@@ -75,6 +82,9 @@ class SourceAdmin(JSONFieldAdmin):
     )
     search_fields = ("title",)
     list_filter = ()
+    formfield_overrides = {
+        "data": {"widget": Textarea(attrs={"rows": "15", "cols": "35"})},
+    }
 
     def organisation_count(self, obj):
         return obj.organisations.count()
@@ -113,6 +123,9 @@ class ScrapeAdmin(SourceAdmin):
         "errors",
         "status",
     ]
+    formfield_overrides = {
+        models.JSONField: {"widget": MyPrettyJSONWidget({"initial": "parsed"})},
+    }
 
     class Media:
         css = {"all": ("css/admin/scrape.css",)}
