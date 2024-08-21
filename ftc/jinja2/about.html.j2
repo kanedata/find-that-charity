@@ -1,125 +1,145 @@
 {% set frontpage = false %}
 {% extends 'base.html.j2' %}
 
-{% set sources = get_sources() %}
+{% set sources = get_sources(true) %}
 {% from 'components/data_source.html.j2' import get_filetype %}
+
+{% macro show_sources(sources) %}
+<ul class="list ma0 pa0">
+  {% for publisher, pub_sources in sources.values()|groupby("publisher") %}
+  <li class="mb4">
+    {% for source in pub_sources %}
+    {% if loop.first %}
+    <strong class="f3"><a href="{{ source.data.publisher.website }}" target="_blank"
+        class="link underline-hover dark-blue">{{ source.publisher }}</a></strong>
+    <ul class="list ma0 pa0">
+      {% endif %}
+      <li class="mb3 f5 bl bw3 b--light-gray pl2">
+        {% if source.data.distribution and source.data.distribution[0].accessURL %}
+        <a href="{{ source.data.distribution.0.accessURL }}" target="_blank"
+          class="b link underline dark-blue">{{ source.title }}</a>
+        {% else %}
+        {{ source.title }}
+        {% endif %}
+        {% if source.records %}
+        - <code>{{ "record"|pluralise(source.records) }}</code>
+        {% endif %}
+        {% if source.record_links %}
+        - <code>{{ "link record"|pluralise(source.record_links) }}</code>
+        {% endif %}
+        <br>
+        <span class="f6 pv2">
+          {% if source.data.license %}
+          <a href="{{ source.data.license }}" target="_blank"
+            class="link underline-hover dark-blue">{{ source.data.license_name }}</a>
+          {% if source.data.distribution and source.data.distribution[0].downloadURL %} | {% endif %}
+          {% endif %}
+          {% if source.data.distribution and source.data.distribution[0].downloadURL %}
+          <a class="link underline-hover dark-blue" href="{{ source.data.distribution[0].downloadURL }}"
+            title="Download links may be large files">
+            Download source {{ get_filetype(source.data.distribution[0].downloadURL) }}
+            <span class="material-icons">get_app</span>
+          </a>
+          {% endif %}
+          {% if source.data.modified %}
+          | Last updated <code>{{ source.data.modified[0:10] }}</code>
+          {% endif %}
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+  </li>
+  {% endfor %}
+</ul>
+{% endmacro %}
 
 {% block content %}
 <div class="w-60-l w-100 center" id="content">
-    <p>
-        The site is a tool for finding non profit organisations by name, from <a href="https://dkane.net/">Kane Data Ltd</a>. It brings together data from 
-        <a href="#data-sources">a number of sources</a> to include a record for a large number of
-        non profit organisations in the UK, including every registered charity.
-      </p>
-      <p>
-        The site was initially put together by <a href="https://twitter.com/kanedr">David Kane</a>.
-        Huge thanks to other contributors, particularly <a href="">Bob Harper</a> who implemented
-        the Northern Ireland charity data and Katherine and others at <a href="https://threesixtygiving.org/">360Giving</a>
-        for their help and feedback.
-      </p>
-      <p>
-        The data is used directly from regulatory sources. Any corrections needed to the
-        data should be directed to the regulators themselves, using the <a href="#data-sources">links below</a>.
-      </p>
-      <h2>Support</h2>
-      <p>
-        The site is supported by <a href="http://www.threesixtygiving.org/" target="_blank">360Giving</a>.
-      </p>
-      <p>
-        You can support the site through <a href="https://github.com/sponsors/drkane" target="_blank">GitHub Sponsors</a>.
-      </p>
-      <p>
-        If you have any questions, please contact <a href="mailto:info@findthatcharity.uk" target="_blank">info@findthatcharity.uk</a>.
-      </p>
-      <h2>Using the data</h2>
-      <p>
-        As well as a search engine, you can also as an
-        <a href="https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation">OpenRefine reconciliation service</a>.
-        Access this using <a href="/reconcile"><code>/reconcile</code></a> endpoint.
-      </p>
-      <p>
-        You can access data about any charity in json format by adding <code>.json</code> to the end of the URL.
-      </p>
-      <p>
-        Find a <a href="/random">random charity record</a>. Or add <a href="/random?active=true"><code>?active=true</code></a>
-        to the end to restrict the random search to only active charities. This powers the 
-        <a href="https://twitter.com/CharityRandom">@CharityRandom</a> twitter feed.
-      </p>
-      <h2 id="data-sources">Data sources</h2>
-      <p>
-        The data is used directly from regulatory sources. Any corrections needed to the
-        data should be directed to the regulators themselves, using the links below.
-      </p>
-      <p>Uses data from the following sources:</p>
-
-      <ul class="list ma0 pa0">
-        {% for publisher, pub_sources in sources.values()|groupby("publisher") %}
-        <li class="mb4">
-            {% for source in pub_sources %}
-            {% if loop.first %}
-            <strong class="f3"><a href="{{ source.data.publisher.website }}" target="_blank" class="link underline-hover dark-blue">{{ source.publisher }}</a></strong>
-            <ul class="list ma0 pa0">
-            {% endif %}
-                <li class="mb3 f5 bl bw3 b--light-gray pl2">
-                {% if source.data.distribution and source.data.distribution[0].accessURL %}
-                <a href="{{ source.data.distribution.0.accessURL }}" target="_blank" class="b link underline dark-blue">{{ source.title }}</a>
-                {% else %}
-                {{ source.title }}
-                {% endif %}
-                {% if source.records %}
-                  - <code>{{ "record"|pluralise(source.records) }}</code>
-                {% endif %}
-                {% if source.record_links %}
-                  - <code>{{ "link record"|pluralise(source.record_links) }}</code>
-                {% endif %}
-                <br>
-                <span class="f6 pv2">
-                {% if source.data.license %}
-                <a href="{{ source.data.license }}" target="_blank" class="link underline-hover dark-blue">{{ source.data.license_name }}</a>
-                {% if source.data.distribution and source.data.distribution[0].downloadURL %} | {% endif %} 
-                {% endif %}
-                {% if source.data.distribution and source.data.distribution[0].downloadURL %}
-                <a class="link underline-hover dark-blue" href="{{ source.data.distribution[0].downloadURL }}" title="Download links may be large files">
-                  Download source {{ get_filetype(source.data.distribution[0].downloadURL) }}
-                  <span class="material-icons">get_app</span>
-                </a>
-                {% endif %}
-                {% if source.data.modified %}
-                | Last updated <code>{{ source.data.modified[0:10] }}</code>
-                {% endif %}
-                </span>
-                </li>
-            {% endfor %}
-            </ul>
-        </li>
-        {% endfor %}
-      </ul>
-      <p>
-        A list of <a href="https://gist.github.com/BobHarper1/2687545c562b47bc755aef2e9e0de537" target="_blank">additional names for 
-        Northern Irish charities</a> is also maintained on Github.
-      </p>
-      <h2>Other acknowledgements</h2>
-      <ul>
-        <li>Styles from <a href="http://tachyons.io/" target="_blank">Tachyons</a></li>
-        <li>Powered by
-          <a href="https://www.python.org/" target="_blank">Python</a>, 
-          <a href="https://www.djangoproject.com/" target="_blank">Django</a>,
-          <a href="https://www.postgresql.org/" target="_blank">PostgreSQL</a> and 
-          <a href="https://www.elastic.co/products/elasticsearch" target="_blank">Elasticsearch</a>.
-        </li>
-      </ul>
-      <h2 id="privacy">Privacy</h2>
-      <p>
-        To get critical information about the behavior of our visitors, we use
-        <a href="https://simpleanalytics.com" target="_blank">Simple Analytics</a>. This
-        analytics software gives us insight about our visitors only in general, but not
-        about individuals, as it does not track visitors and does not store any
-        personal identifiable information.
-      </p>
-      <p>
-        <a href="https://docs.simpleanalytics.com/what-we-collect" target="_blank">Go
-        to their documentation</a> to find out what Simple Analytics collects (and most
-        importantly what they don't).
-      </p>
+  <p>
+    The site is a tool for finding non profit organisations by name, from <a href="https://dkane.net/">Kane Data
+      Ltd</a>. It brings together data from
+    <a href="#data-sources">a number of sources</a> to include a record for a large number of
+    non profit organisations in the UK, including every registered charity.
+  </p>
+  <p>
+    The site was initially put together by <a href="https://twitter.com/kanedr">David Kane</a>.
+    Huge thanks to other contributors, particularly <a href="">Bob Harper</a> who implemented
+    the Northern Ireland charity data and Katherine and others at <a href="https://threesixtygiving.org/">360Giving</a>
+    for their help and feedback.
+  </p>
+  <p>
+    The data is used directly from regulatory sources. Any corrections needed to the
+    data should be directed to the regulators themselves, using the <a href="#data-sources">links below</a>.
+  </p>
+  <h2>Support</h2>
+  <p>
+    The site is supported by <a href="http://www.threesixtygiving.org/" target="_blank">360Giving</a>.
+  </p>
+  <p>
+    You can support the site through <a href="https://github.com/sponsors/drkane" target="_blank">GitHub Sponsors</a>.
+  </p>
+  <p>
+    If you have any questions, please contact <a href="mailto:info@findthatcharity.uk"
+      target="_blank">info@findthatcharity.uk</a>.
+  </p>
+  <h2>Using the data</h2>
+  <p>
+    As well as a search engine, you can also as an
+    <a href="https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation">OpenRefine reconciliation service</a>.
+    Access this using <a href="/reconcile"><code>/reconcile</code></a> endpoint.
+  </p>
+  <p>
+    You can access data about any charity in json format by adding <code>.json</code> to the end of the URL.
+  </p>
+  <p>
+    Find a <a href="/random">random charity record</a>. Or add <a
+      href="/random?active=true"><code>?active=true</code></a>
+    to the end to restrict the random search to only active charities. This powers the
+    <a href="https://twitter.com/CharityRandom">@CharityRandom</a> twitter feed.
+  </p>
+  <h2 id="data-sources">Data sources</h2>
+  <p>
+    The data is used directly from regulatory sources. Any corrections needed to the
+    data should be directed to the regulators themselves, using the links below.
+  </p>
+  <p>Uses data from the following sources:</p>
+  {% if sources["current"] and sources["archive"] %}
+  {{ show_sources(sources["current"]) }}
+  {% if sources["archive"] %}
+  <h3>Archived data sources</h3>
+  <p>The following sources have not been updated in over a month. Some data from these sources may remain in the
+    database.</p>
+  <details>
+    <summary class="pointer f4 b">{{ "archived data source"|pluralise(sources["archive"]|length) }}</summary>
+    {{ show_sources(sources["archive"]) }}
+  </details>
+  {% endif %}
+  {% else %}
+  {% set sources = get_sources(false) %}
+  {{ show_sources(sources) }}
+  {% endif %}
+  <h2>Other acknowledgements</h2>
+  <ul>
+    <li>Styles from <a href="http://tachyons.io/" target="_blank">Tachyons</a></li>
+    <li>Powered by
+      <a href="https://www.python.org/" target="_blank">Python</a>,
+      <a href="https://www.djangoproject.com/" target="_blank">Django</a>,
+      <a href="https://www.postgresql.org/" target="_blank">PostgreSQL</a> and
+      <a href="https://www.elastic.co/products/elasticsearch" target="_blank">Elasticsearch</a>.
+    </li>
+  </ul>
+  <h2 id="privacy">Privacy</h2>
+  <p>
+    To get critical information about the behavior of our visitors, we use
+    <a href="https://simpleanalytics.com" target="_blank">Simple Analytics</a>. This
+    analytics software gives us insight about our visitors only in general, but not
+    about individuals, as it does not track visitors and does not store any
+    personal identifiable information.
+  </p>
+  <p>
+    <a href="https://docs.simpleanalytics.com/what-we-collect" target="_blank">Go
+      to their documentation</a> to find out what Simple Analytics collects (and most
+    importantly what they don't).
+  </p>
 </div>
 {% endblock %}

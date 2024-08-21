@@ -62,21 +62,28 @@ def orgtypes_to_dict(orgtypes):
     return {o.slug: o.title for o in orgtypes.values()}
 
 
-def get_sources():
+def get_sources(split=False):
     cache_key = "sources"
     value = cache.get(cache_key)
-    if value:
-        return value
-    if Source._meta.db_table in connections["data"].introspection.table_names():
-        value = {
-            s.id: s
-            for s in Source.objects.all()
-            .annotate(records=Count("organisations"))
-            .order_by("-records")
+    if not value:
+        if Source._meta.db_table in connections["data"].introspection.table_names():
+            value = {
+                s.id: s
+                for s in Source.objects.all()
+                .annotate(records=Count("organisations"))
+                .order_by("-records")
+            }
+            cache.set(cache_key, value, 60 * 60)
+        else:
+            value = {}
+
+    if split:
+        MONTH_AGO = datetime.datetime.now() - datetime.timedelta(days=30)
+        return {
+            "current": {k: v for k, v in value.items() if v.modified > MONTH_AGO},
+            "archive": {k: v for k, v in value.items() if v.modified <= MONTH_AGO},
         }
-        cache.set(cache_key, value, 60 * 60)
-    else:
-        value = {}
+
     return value
 
 
