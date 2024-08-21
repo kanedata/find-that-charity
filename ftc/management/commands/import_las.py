@@ -21,8 +21,8 @@ class Command(LAECommand):
         "end-date": "%Y-%m-%d",
     }
     source = {
-        "title": "Local authorites in Scotland register",
-        "description": "Local authorities in Scotland",
+        "title": "[Archived] Local authorites in Scotland register",
+        "description": "Local authorities in Scotland This register was part of GOV.UK registers which was retired in 2021. [More information is available on gov.uk](https://www.data.gov.uk/dataset/a8f488fd-eaea-4176-92b0-6d0437b4d121/historical-gov-uk-registers).",
         "identifier": "las",
         "license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
         "license_name": "Open Government Licence v3.0",

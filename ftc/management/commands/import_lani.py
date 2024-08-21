@@ -21,8 +21,8 @@ class Command(LAECommand):
         "end-date": "%Y-%m-%d",
     }
     source = {
-        "title": "Local authorites in Northern Ireland register",
-        "description": "Local authorities in Northern Ireland",
+        "title": "[Archived] Local authorites in Northern Ireland register",
+        "description": "Local authorities in Northern Ireland This register was part of GOV.UK registers which was retired in 2021. [More information is available on gov.uk](https://www.data.gov.uk/dataset/a8f488fd-eaea-4176-92b0-6d0437b4d121/historical-gov-uk-registers).",
         "identifier": "lani",
         "license": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
         "license_name": "Open Government Licence v3.0",
