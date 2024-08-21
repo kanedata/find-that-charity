@@ -1,5 +1,6 @@
 import io
 
+from openpyxl.utils.datetime import from_excel
 from pyexcel_ods3 import get_data
 from tqdm import tqdm
 
@@ -135,8 +136,18 @@ class Command(HTMLScraper):
                     continue
                 self.parse_row(dict(zip(headers, row)))
 
+    def clean_fields(self, row):
+        record = super().clean_fields(row)
+
+        for f in self.date_fields:
+            if record.get(f) and isinstance(record.get(f), int):
+                record[f] = from_excel(record[f])
+
+        return record
+
     def parse_row(self, row):
         row = self.clean_fields(row)
+
         this_model = {m.__name__: {} for m in self.models}
 
         for k in row:
