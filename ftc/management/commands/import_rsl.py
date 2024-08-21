@@ -44,23 +44,25 @@ class Command(HTMLScraper):
     date_format = "%d/%m/%Y"
 
     def parse_file(self, response, source_url):
-        link = [
-            link
-            for link in response.html.absolute_links
-            if "list-of-registered-providers" in link
-        ][0]
-        self.set_download_url(link)
-        r = self.session.get(link)
-        r.raise_for_status()
+        for link in response.html.absolute_links:
+            if "registered-providers-of-social-housing" not in link:
+                continue
+            r = self.session.get(link)
+            r.raise_for_status()
 
-        table = r.html.find("table", first=True)
-        if not table:
-            raise ValueError("No table found in {}".format(link))
+            table = r.html.find("table", first=True)
+            if not table:
+                self.logger.error("No table found in {}".format(link))
+                continue
 
-        headers = [c.text.lower() for c in table.find("thead", first=True).find("th")]
-        for k, row in enumerate(table.find("tbody", first=True).find("tr")):
-            record = dict(zip(headers, [c.text for c in row.find("td")]))
-            self.parse_row(record)
+            self.set_download_url(link)
+
+            headers = [
+                c.text.lower() for c in table.find("thead", first=True).find("th")
+            ]
+            for k, row in enumerate(table.find("tbody", first=True).find("tr")):
+                record = dict(zip(headers, [c.text for c in row.find("td")]))
+                self.parse_row(record)
 
     def parse_row(self, record):
         record = self.clean_fields(record)
