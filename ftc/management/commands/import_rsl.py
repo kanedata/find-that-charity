@@ -52,7 +52,7 @@ class Command(HTMLScraper):
 
             table = r.html.find("table", first=True)
             if not table:
-                self.logger.error("No table found in {}".format(link))
+                self.logger.warning("No table found in {}".format(link))
                 continue
 
             self.set_download_url(link)
