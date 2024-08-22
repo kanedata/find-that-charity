@@ -1,6 +1,6 @@
-import csv
 import datetime
-import io
+
+from django.conf import settings
 
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation
@@ -10,7 +10,7 @@ class Command(CSVScraper):
     name = "hesa"
     allowed_domains = ["hesa.ac.uk"]
     start_urls = [
-        "https://www.hesa.ac.uk/collection/provider-tools/all_hesa_providers?ProviderAllHESAEnhanced.csv",
+        "https://www.hesa.ac.uk/collection/sharedfiles/providerallhesa.csv",
     ]
     org_id_prefix = "GB-HESA"
     source = {
@@ -30,29 +30,19 @@ class Command(CSVScraper):
             }
         ],
     }
+    bool_fields = ["Rescinded"]
     orgtypes = ["Higher Education Institution", "University"]
 
-    def parse_file(self, response, source_url):
-        try:
-            csv_text = response.text
-        except AttributeError:
-            csv_text = response.body.decode(self.encoding)
-
-        with io.StringIO(csv_text) as a:
-            csvreader = csv.DictReader(
-                a,
-                fieldnames=[
-                    "INSTID",
-                    "UKPRN",
-                    "ProviderName",
-                    "CountryCode",
-                    "CategoryName",
-                    "FE_Provider",
-                    "Rescinded",
-                ],
+    def set_session(self, install_cache=False):
+        super().set_session(install_cache=install_cache)
+        if getattr(settings, "HESA_SUPPLIER_ID", None) and getattr(
+            settings, "HESA_SUPPLIER_HEADER", None
+        ):
+            self.session.headers.update(
+                {
+                    settings.HESA_SUPPLIER_HEADER: settings.HESA_SUPPLIER_ID,
+                }
             )
-            for k, row in enumerate(csvreader):
-                self.parse_row(row)
 
     def parse_row(self, record):
         record = self.clean_fields(record)
@@ -94,7 +84,7 @@ class Command(CSVScraper):
                     "dateModified": datetime.datetime.now(),
                     "dateRegistered": None,
                     "dateRemoved": None,
-                    "active": True,
+                    "active": not record.get("Rescinded"),
                     "parent": None,
                     "orgIDs": orgids,
                     "scrape": self.scrape,

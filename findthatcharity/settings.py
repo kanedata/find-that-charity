@@ -348,5 +348,7 @@ S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")
 S3_BUCKET = os.environ.get("S3_BUCKET")
 
 SIMPLE_ANALYTICS_API_KEY = os.environ.get("SIMPLE_ANALYTICS_API_KEY")
+HESA_SUPPLIER_HEADER = os.environ.get("HESA_SUPPLIER_HEADER")
+HESA_SUPPLIER_ID = os.environ.get("HESA_SUPPLIER_ID")
 
 GRAPHENE = {"SCHEMA": "findthatcharity.api.graphql.schema.schema"}
