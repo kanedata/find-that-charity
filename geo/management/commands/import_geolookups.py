@@ -57,7 +57,7 @@ class Command(BaseScraper):
         "geo_msoa11": "MSOA11CD",  # Middle Super Output Area (2011) code
         "geo_lsoa21": "LSOA21CD",  # Lower Super Output Area (2021) code
         "geo_msoa21": "MSOA21CD",  # Middle Super Output Area (2021) code
-        "geo_laua": "LAD20CD",  # Local Authority (2020) code
+        "geo_laua": "LADCD_ACTIVE",  # Local Authority (2020) code
         "geo_cty": "UTLACD",  # Upper tier local authority code
         # "geo_": "CAUTHCD",  # Combined authority code
         "geo_rgn": "RGNCD",  # Region code
