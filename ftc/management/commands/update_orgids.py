@@ -3,9 +3,9 @@ from ftc.models import OrgidScheme
 
 UPDATE_ORGIDS_SQL = {
     "update domains": """
-    update ftc_organisation
-    set domain = lower(substring(email from '@(.*)$'))
-    where lower(substring(email from '@(.*)$')) not in (
+    UPDATE ftc_organisation
+    SET domain = lower(substring(email from '@(.*)$'))
+    WHERE lower(substring(email from '@(.*)$')) not in (
         'gmail.com', 'hotmail.com', 'btinternet.com',
         'hotmail.co.uk', 'yahoo.co.uk', 'outlook.com',
         'aol.com', 'btconnect.com', 'yahoo.com',
@@ -33,150 +33,124 @@ UPDATE_ORGIDS_SQL = {
         'gmail.co.uk'
     )
     """,
-    "Add linked orgIDs": """
-        update ftc_organisation o
-        set "linked_orgs" = a.linked_orgs
-        from (
-            WITH RECURSIVE search_graph(org_id_a, org_id_b) AS (
-                    SELECT a.org_id_a, a.org_id_b
-                    FROM (
-                        SELECT ftc_organisationlink.org_id_a,
-                            ftc_organisationlink.org_id_b
-                        FROM ftc_organisationlink
-                        UNION
-                        SELECT ftc_organisationlink.org_id_b AS org_id_a,
-                            ftc_organisationlink.org_id_a AS org_id_b
-                        FROM ftc_organisationlink
-                        UNION
-                        SELECT ftc_organisationlink.org_id_a,
-                            ftc_organisationlink.org_id_a AS org_id_b
-                        FROM ftc_organisationlink
-                        UNION
-                        SELECT ftc_organisationlink.org_id_b AS org_id_a,
-                            ftc_organisationlink.org_id_b
-                        FROM ftc_organisationlink
-                    ) a
-                union
-                    SELECT sg.org_id_a, a.org_id_b
-                    FROM (
-                        SELECT ftc_organisationlink.org_id_a,
-                            ftc_organisationlink.org_id_b
-                        FROM ftc_organisationlink
-                        UNION
-                        SELECT ftc_organisationlink.org_id_b AS org_id_a,
-                            ftc_organisationlink.org_id_a AS org_id_b
-                        FROM ftc_organisationlink
-                        UNION
-                        SELECT ftc_organisationlink.org_id_a,
-                            ftc_organisationlink.org_id_a AS org_id_b
-                        FROM ftc_organisationlink
-                        UNION
-                        SELECT ftc_organisationlink.org_id_b AS org_id_a,
-                            ftc_organisationlink.org_id_b
-                        FROM ftc_organisationlink
-                    ) a
-                        inner JOIN search_graph sg
-                            ON a.org_id_a = sg.org_id_b
-            )
-            SELECT org_id_a as "org_id",
-                array_agg(org_id_b ORDER BY org_id_b ASC) as linked_orgs
-            FROM search_graph
-            group by org_id_a
-        ) as a
-        where a.org_id = o.org_id;
-    """,
-    "Add verified linked orgIDs": """
-        WITH official_sources AS (
-            SELECT distinct source_id
-            FROM ftc_organisation 
-        ),
-        official_links AS (
-            SELECT fo.*
-            FROM ftc_organisationlink fo
-            INNER JOIN official_sources s
-                ON fo.source_id = s.source_id
-        )
-        update ftc_organisation o
-        set "linked_orgs_verified" = a.linked_orgs_verified
-        from (
-            WITH RECURSIVE search_graph(org_id_a, org_id_b) AS (
-                    SELECT a.org_id_a, a.org_id_b
-                    FROM (
-                        SELECT official_links.org_id_a,
-                            official_links.org_id_b
-                        FROM official_links
-                        UNION
-                        SELECT official_links.org_id_b AS org_id_a,
-                            official_links.org_id_a AS org_id_b
-                        FROM official_links
-                        UNION
-                        SELECT official_links.org_id_a,
-                            official_links.org_id_a AS org_id_b
-                        FROM official_links
-                        UNION
-                        SELECT official_links.org_id_b AS org_id_a,
-                            official_links.org_id_b
-                        FROM official_links
-                    ) a
-                union
-                    SELECT sg.org_id_a, a.org_id_b
-                    FROM (
-                        SELECT official_links.org_id_a,
-                            official_links.org_id_b
-                        FROM official_links
-                        UNION
-                        SELECT official_links.org_id_b AS org_id_a,
-                            official_links.org_id_a AS org_id_b
-                        FROM official_links
-                        UNION
-                        SELECT official_links.org_id_a,
-                            official_links.org_id_a AS org_id_b
-                        FROM official_links
-                        UNION
-                        SELECT official_links.org_id_b AS org_id_a,
-                            official_links.org_id_b
-                        FROM official_links
-                    ) a
-                        inner JOIN search_graph sg
-                            ON a.org_id_a = sg.org_id_b
-            )
-            SELECT org_id_a as "org_id",
-                array_agg(org_id_b ORDER BY org_id_b ASC) as linked_orgs_verified
-            FROM search_graph
-            group by org_id_a
-        ) as a
-        where a.org_id = o.org_id;
-    """,
-    "Add missing orgIDs": """
-        update ftc_organisation
-        set linked_orgs = string_to_array(org_id, '')
-        where linked_orgs is null;
-    """,
-    "Add missing orgIDs (linked orgs verified)": """
-        update ftc_organisation
-        set linked_orgs_verified = string_to_array(org_id, '')
-        where linked_orgs_verified is null;
-    """,
     "Update priorities field": """
-    with priorities as (select ARRAY[{}]::varchar[] as prefixes)
-    update ftc_organisation o
-    set priority = array[
+    WITH priorities AS (SELECT ARRAY[{}]::varchar[] AS prefixes)
+    UPDATE ftc_organisation o
+    SET priority = array[
         case when active then 0 else 1 end,
         coalesce(array_position(priorities.prefixes, org_id_scheme_id), 99),
         coalesce(extract(epoch from o."dateRegistered"), 0)
     ]
-    from priorities;
+    from priorities
     """.format(",".join([f"'{p}'" for p in OrgidScheme.PRIORITIES])),
+    "Add linked orgIDs": """
+        UPDATE ftc_organisation o
+        SET "linked_orgs" = a.linked_orgs
+        FROM (
+            WITH RECURSIVE a AS (
+                SELECT ftc_organisationlink.org_id_a,
+                    ftc_organisationlink.org_id_b
+                FROM ftc_organisationlink
+                UNION
+                SELECT ftc_organisationlink.org_id_b AS org_id_a,
+                    ftc_organisationlink.org_id_a AS org_id_b
+                FROM ftc_organisationlink
+                UNION
+                SELECT ftc_organisationlink.org_id_a,
+                    ftc_organisationlink.org_id_a AS org_id_b
+                FROM ftc_organisationlink
+                UNION
+                SELECT ftc_organisationlink.org_id_b AS org_id_a,
+                    ftc_organisationlink.org_id_b
+                FROM ftc_organisationlink
+            ),
+            search_graph(org_id_a, org_id_b) AS (
+                SELECT a.org_id_a, a.org_id_b
+                FROM a
+                UNION
+                SELECT sg.org_id_a, a.org_id_b
+                FROM a
+                    INNER JOIN search_graph sg
+                        ON a.org_id_a = sg.org_id_b
+            )
+            SELECT org_id_a AS "org_id",
+                array_agg(org_id_b ORDER BY o.priority ASC NULLS LAST) AS linked_orgs
+            FROM search_graph
+                LEFT OUTER JOIN ftc_organisation o
+                    ON search_graph.org_id_b = o.org_id
+            GROUP BY org_id_a
+        ) AS a
+        WHERE a.org_id = o.org_id;
+    """,
+    "Add verified linked orgIDs": """
+        UPDATE ftc_organisation o
+        SET "linked_orgs_verified" = a.linked_orgs_verified
+        FROM (
+            WITH RECURSIVE official_sources AS (
+                SELECT distinct source_id
+                FROM ftc_organisation 
+            ),
+            official_links AS (
+                SELECT fo.*
+                FROM ftc_organisationlink fo
+                INNER JOIN official_sources s
+                    ON fo.source_id = s.source_id
+            ),
+            a AS (
+                SELECT official_links.org_id_a,
+                    official_links.org_id_b
+                FROM official_links
+                UNION
+                SELECT official_links.org_id_b AS org_id_a,
+                    official_links.org_id_a AS org_id_b
+                FROM official_links
+                UNION
+                SELECT official_links.org_id_a,
+                    official_links.org_id_a AS org_id_b
+                FROM official_links
+                UNION
+                SELECT official_links.org_id_b AS org_id_a,
+                    official_links.org_id_b
+                FROM official_links
+            ),
+            search_graph(org_id_a, org_id_b) AS (
+                SELECT a.org_id_a, a.org_id_b
+                FROM a
+                UNION
+                SELECT sg.org_id_a, a.org_id_b
+                FROM a
+                    INNER JOIN search_graph sg
+                        ON a.org_id_a = sg.org_id_b
+            )
+            SELECT org_id_a AS "org_id",
+                array_agg(org_id_b ORDER BY o.priority ASC NULLS LAST) AS linked_orgs_verified
+            FROM search_graph
+                LEFT OUTER JOIN ftc_organisation o
+                    ON search_graph.org_id_b = o.org_id
+            GROUP BY org_id_a
+        ) AS a
+        WHERE a.org_id = o.org_id
+    """,
+    "Add missing orgIDs": """
+        UPDATE ftc_organisation
+        SET linked_orgs = string_to_array(org_id, '')
+        WHERE linked_orgs IS NULL
+    """,
+    "Add missing orgIDs (linked orgs verified)": """
+        UPDATE ftc_organisation
+        SET linked_orgs_verified = string_to_array(org_id, '')
+        WHERE linked_orgs_verified IS NULL
+    """,
     "Add names from grant data": """
-        insert into charity_charityname ("charity_id", "name", "name_type")
-        select "recipientOrganization_id" as "charity_id",
-            "recipientOrganization_name" as "name",
-            'Grant' as "name_type"
-        from other_data_grant g 
-            inner join charity_charity c
-                on g."recipientOrganization_id" = c.id
-        group by 1, 2
-        on conflict (charity_id, name) do nothing
+        INSERT INTO charity_charityname ("charity_id", "name", "name_type")
+        SELECT "recipientOrganization_id" AS "charity_id",
+            "recipientOrganization_name" AS "name",
+            'Grant' AS "name_type"
+        FROM other_data_grant g 
+            INNER JOIN charity_charity c
+                ON g."recipientOrganization_id" = c.id
+        GROUP BY 1, 2
+        ON CONFLICT (charity_id, name) DO NOTHING
     """,
 }
 
