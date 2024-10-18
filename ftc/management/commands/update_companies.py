@@ -14,6 +14,7 @@ with pn as (
 c as (
     select *,
         'GB-COH-' || c."CompanyNumber" as "org_id",
+        'GB-COH-' || TRIM(LEADING '0' FROM c."CompanyNumber") as "org_id_alt",
         case
             when "CompanyCategory" like 'private-limited-guarant-nsc%%' then 'company-limited-by-guarantee'
             when "CompanyCategory" = 'private-unlimited-nsc' then 'private-unlimited'
@@ -57,21 +58,21 @@ insert into ftc_organisation (
     "org_id_scheme_id"
 )
 select c."org_id" as "org_id",
-    array [c."org_id"] as "orgIDs",
+    CASE WHEN c."org_id" = c."org_id_alt" THEN array [c."org_id"] ELSE array [c."org_id", c."org_id_alt"] END as "orgIDs",
     c."CompanyName" as name,
     pn."alternateName" as "alternateName",
     c."CompanyNumber" as "companyNumber",
-    concat_ws(
+    NULLIF(concat_ws(
         ', ',
-        c."RegAddress_CareOf",
-        c."RegAddress_POBox",
-        c."RegAddress_AddressLine1",
-        c."RegAddress_AddressLine2"
-    ) as "streetAddress",
-    c."RegAddress_PostTown" as "addressLocality",
-    c."RegAddress_County" as "addressRegion",
-    c."RegAddress_Country" as "addressCountry",
-    c."RegAddress_PostCode" as "postalCode",
+        NULLIF(c."RegAddress_CareOf", 'None'),
+        NULLIF(c."RegAddress_POBox", 'None'),
+        NULLIF(c."RegAddress_AddressLine1", 'None'),
+        NULLIF(c."RegAddress_AddressLine2", 'None')
+    ), '') as "streetAddress",
+    NULLIF(c."RegAddress_PostTown", 'None') as "addressLocality",
+    NULLIF(c."RegAddress_County", 'None') as "addressRegion",
+    NULLIF(c."RegAddress_Country", 'None') as "addressCountry",
+    NULLIF(c."RegAddress_PostCode", 'None') as "postalCode",
     c."IncorporationDate" as "dateRegistered",
     c."DissolutionDate" as "dateRemoved",
     case
