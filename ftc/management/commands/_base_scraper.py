@@ -326,12 +326,12 @@ class BaseScraper(BaseCommand):
     def get_org_id(self, record):
         return "-".join([self.org_id_prefix, str(record.get(self.id_field))])
 
-    def clean_fields(self, record):
+    def clean_fields(self, record, blank_values=[""]):
         record = {k.strip(): v for k, v in record.items()}
 
         for f in record.keys():
             # clean blank values
-            if record[f] == "":
+            if record[f] in blank_values:
                 record[f] = None
 
             # clean date fields

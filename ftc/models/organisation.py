@@ -68,6 +68,12 @@ EXTERNAL_LINKS = {
             "UK Register of Learning Providers",
         ],
     ],
+    "GB-UKPRN-officeforstudents": [
+        [
+            "https://www.officeforstudents.org.uk/for-providers/regulatory-resources/the-ofs-register/#/provider/{}",
+            "Office for Students",
+        ],
+    ],
     "GB-NHS": [
         [
             "POST:https://odsportal.digital.nhs.uk/Organisation/Search?Code={}",
@@ -319,7 +325,9 @@ class Organisation(models.Model):
         if not self.orgIDs:
             return
         for o in self.orgIDs:
-            links = EXTERNAL_LINKS.get(o.scheme, [])
+            links = EXTERNAL_LINKS.get(o.scheme, []) + EXTERNAL_LINKS.get(
+                f"{o.scheme}-{self.spider}", []
+            )
             for link in links:
                 yield (link[0].format(o.id), link[1], o)
 
