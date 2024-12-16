@@ -126,6 +126,8 @@ class Command(HTMLScraper):
         for ws_name in wb:
             if ws_name == "README":
                 continue
+            if ws_name == "Dual_Registration_Locations":
+                continue
             self.logger.info("Loading from sheet '{}'".format(ws_name))
             ws = wb[ws_name]
             headers = None
@@ -161,7 +163,9 @@ class Command(HTMLScraper):
 
         # add IDs
         this_model["CQCLocation"]["provider_id"] = this_model["CQCProvider"]["id"]
-        if this_model["CQCBrand"]["id"] == "-":
+        if not this_model["CQCBrand"].get("id"):
+            this_model["CQCBrand"]["id"] = None
+        elif this_model["CQCBrand"]["id"] == "-":
             this_model["CQCBrand"]["id"] = None
         if this_model["CQCBrand"].get("name", "").startswith("BRAND "):
             this_model["CQCBrand"]["name"] = this_model["CQCBrand"]["name"][6:]
