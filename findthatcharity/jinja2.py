@@ -80,8 +80,16 @@ def get_sources(split=False):
     if split:
         MONTH_AGO = datetime.datetime.now() - datetime.timedelta(days=30)
         return {
-            "current": {k: v for k, v in value.items() if v.modified > MONTH_AGO},
-            "archive": {k: v for k, v in value.items() if v.modified <= MONTH_AGO},
+            "current": {
+                k: v
+                for k, v in value.items()
+                if v.modified is None or (v.modified > MONTH_AGO)
+            },
+            "archive": {
+                k: v
+                for k, v in value.items()
+                if v.modified is not None and (v.modified <= MONTH_AGO)
+            },
         }
 
     return value

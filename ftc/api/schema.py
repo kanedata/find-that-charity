@@ -1,6 +1,7 @@
 import datetime
 from typing import List, Optional
 
+from django.urls import reverse
 from ninja import Field, Schema
 
 
@@ -31,12 +32,7 @@ class Address(Schema):
 
 
 class OrganisationLink(Schema):
-    orgid: Optional[str] = None
-    url: Optional[str] = None
-
-
-class OrganisationWebsiteLink(Schema):
-    site: Optional[str] = None
+    site: Optional[str] = "Find that Charity"
     orgid: Optional[str] = None
     url: Optional[str] = None
 
@@ -79,11 +75,85 @@ class Organisation(Schema):
     address: Optional[Address] = None
 
     sources: Optional[List[str]] = None
-    links: List[OrganisationWebsiteLink] = None
+    links: List[OrganisationLink] = None
     orgIDs: Optional[List[str]] = None
     linked_records: List[OrganisationLink] = None
 
     dateModified: Optional[datetime.datetime] = None
+
+    @staticmethod
+    def resolve_latestFinancialYearEnd(obj):
+        return obj.latestIncomeDate
+
+    @staticmethod
+    def resolve_address(obj):
+        address_fields = [
+            "streetAddress",
+            "addressLocality",
+            "addressRegion",
+            "addressCountry",
+            "postalCode",
+        ]
+        address = {}
+        for field in address_fields:
+            value = getattr(obj, field, None)
+            if value:
+                address[field] = value
+        return address
+
+    @staticmethod
+    def resolve_sources(obj):
+        return [obj.source_id]
+
+    @staticmethod
+    def resolve_links(obj):
+        def build_url(url):
+            if hasattr(obj, "_request"):
+                return obj._request.build_absolute_uri(url)
+            return url
+
+        return [
+            {
+                "site": "Find that Charity",
+                "url": build_url(
+                    reverse(
+                        "api-1.0:get_organisation",
+                        kwargs={"organisation_id": obj.org_id},
+                    )
+                ),
+                "orgid": obj.org_id,
+            }
+        ] + [
+            {
+                "site": site,
+                "url": url,
+                "orgid": orgid,
+            }
+            for url, site, orgid in obj._get_links()
+        ]
+
+    @staticmethod
+    def resolve_linked_records(obj):
+        if not obj.linked_orgs:
+            return []
+
+        def build_url(url):
+            if hasattr(obj, "_request"):
+                return obj._request.build_absolute_uri(url)
+            return url
+
+        return [
+            {
+                "orgid": orgid,
+                "url": build_url(
+                    reverse(
+                        "api-1.0:get_organisation",
+                        kwargs={"organisation_id": orgid},
+                    )
+                ),
+            }
+            for orgid in obj.linked_orgs
+        ]
 
     # domain: Optional[str] = None
     # status: Optional[str] = None

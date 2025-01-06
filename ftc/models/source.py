@@ -21,7 +21,10 @@ class Source(models.Model):
 
     @property
     def modified(self):
-        return datetime.datetime.fromisoformat(self.data.get("modified"))
+        date_modified = self.data.get("modified")
+        if date_modified:
+            return datetime.datetime.fromisoformat(date_modified)
+        return None
 
     def __str__(self):
         return self.publisher + " (" + self.title + ")"

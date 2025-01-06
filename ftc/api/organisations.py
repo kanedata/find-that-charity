@@ -38,6 +38,14 @@ class OrganisationResultList(Schema):
     previous: Optional[str] = None
     result: List[OrganisationOut]
 
+    @staticmethod
+    def resolve_result(obj):
+        results = []
+        for r in obj.get("result", {}).get("results", []):
+            r._request = obj.get("result", {}).get("request")
+            results.append(r)
+        return results
+
 
 class SourceResult(Schema):
     success: bool = True
@@ -67,7 +75,7 @@ def get_organisation_list(request, filters: OrganisationIn = Query({})):
         "error": None,
         "params": filters,
         "count": paginator.count,
-        "result": list(response.object_list),
+        "result": {"results": list(response.object_list), "request": request},
         "next": (
             url_replace(request, page=response.next_page_number())
             if response.has_next()
@@ -96,12 +104,14 @@ def get_random_organisation(
     )[0]
     result = q.execute()
     for r in result:
+        organisation = query_organisation(r.org_id)
+        organisation._request = request
         return {
             "error": None,
             "params": {
                 "active_only": active_only,
             },
-            "result": query_organisation(r.org_id),
+            "result": organisation,
         }
 
 
@@ -111,12 +121,14 @@ def get_random_organisation(
 )
 def get_organisation(request, organisation_id: str):
     try:
+        organisation = query_organisation(organisation_id)
+        organisation._request = request
         return {
             "error": None,
             "params": {
                 "org_id": organisation_id,
             },
-            "result": query_organisation(organisation_id),
+            "result": organisation,
         }
     except Http404 as e:
         return 404, {
@@ -132,12 +144,14 @@ def get_organisation(request, organisation_id: str):
 def get_canonical_organisation(request, organisation_id: str):
     orgs = query_linked_organisations(organisation_id)
     try:
+        organisation = orgs.records[0]
+        organisation._request = request
         return {
             "error": None,
             "params": {
                 "org_id": organisation_id,
             },
-            "result": orgs.records[0],
+            "result": organisation,
         }
     except Http404 as e:
         return 404, {
@@ -159,7 +173,7 @@ def get_linked_organisations(request, organisation_id: str):
                 "org_id": organisation_id,
             },
             "count": len(orgs.records),
-            "result": orgs.records,
+            "result": {"results": orgs.records, "request": request},
             "next": None,
             "previous": None,
         }
@@ -177,6 +191,7 @@ def get_linked_organisations(request, organisation_id: str):
 def get_organisation_source(request, organisation_id: str):
     try:
         organisation = get_object_or_404(Organisation, org_id=organisation_id)
+        organisation._request = request
         return {
             "error": None,
             "params": {
