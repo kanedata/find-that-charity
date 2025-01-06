@@ -155,6 +155,10 @@ class Organisation(Schema):
             for orgid in obj.linked_orgs
         ]
 
+    @staticmethod
+    def resolve_url(obj):
+        return obj.cleanUrl
+
     # domain: Optional[str] = None
     # status: Optional[str] = None
     # source_id: str
