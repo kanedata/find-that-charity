@@ -116,7 +116,7 @@ def get_random_organisation(
 
 
 @api.get(
-    "/{organisation_id}",
+    "/{path:organisation_id}",
     response={200: OrganisationResult, 404: ResultError},
 )
 def get_organisation(request, organisation_id: str):
@@ -138,7 +138,7 @@ def get_organisation(request, organisation_id: str):
 
 
 @api.get(
-    "/{organisation_id}/canonical",
+    "/{path:organisation_id}/canonical",
     response={200: OrganisationResult, 404: ResultError},
 )
 def get_canonical_organisation(request, organisation_id: str):
@@ -161,7 +161,7 @@ def get_canonical_organisation(request, organisation_id: str):
 
 
 @api.get(
-    "/{organisation_id}/linked",
+    "/{path:organisation_id}/linked",
     response={200: OrganisationResultList, 404: ResultError},
 )
 def get_linked_organisations(request, organisation_id: str):
@@ -185,7 +185,7 @@ def get_linked_organisations(request, organisation_id: str):
 
 
 @api.get(
-    "/{organisation_id}/source",
+    "/{path:organisation_id}/source",
     response={200: SourceResult, 404: ResultError},
 )
 def get_organisation_source(request, organisation_id: str):
