@@ -23,6 +23,15 @@ class TestOrganisationAPI(TestCase):
         )
         self.assertEqual(data["result"]["description"], "Test description")
 
+    def test_get_organisation_slash(self):
+        response = self.client.get("/api/v1/organisations/GB-EDU-123/ABC")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(
+            data["result"]["organisationTypePrimary"]["title"], "Registered Charity"
+        )
+        self.assertEqual(data["result"]["description"], "Test description")
+
     def test_get_organisationmissing(self):
         response = self.client.get("/api/v1/organisations/GB-CHC-BLAHBLAH")
         self.assertEqual(response.status_code, 404)
@@ -58,6 +67,15 @@ class TestOrganisationAPI(TestCase):
         )
         self.assertEqual(data["result"]["id"], "GB-CHC-5")
 
+    def test_get_canonical_organisation_with_slash(self):
+        response = self.client.get("/api/v1/organisations/GB-EDU-123/ABC/canonical")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(
+            data["result"]["organisationTypePrimary"]["title"], "Registered Charity"
+        )
+        self.assertEqual(data["result"]["id"], "GB-CHC-5")
+
     def test_get_canonical_organisation_single(self):
         response = self.client.get("/api/v1/organisations/GB-CHC-1234/canonical")
         self.assertEqual(response.status_code, 200)
@@ -71,7 +89,7 @@ class TestOrganisationAPI(TestCase):
         response = self.client.get("/api/v1/organisations/GB-CHC-5/linked")
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(data["count"], 2)
+        self.assertEqual(data["count"], 3)
         self.assertEqual(data["count"], len(data["result"]))
         self.assertEqual(data["result"][0]["name"], "Test organisation 2")
 
@@ -85,6 +103,6 @@ class TestOrganisationAPI(TestCase):
         response = self.client.get("/api/v1/organisations?active=true")
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(len(data["result"]), 3)
+        self.assertEqual(len(data["result"]), 4)
         ids = sorted([x["id"] for x in data["result"]])
-        self.assertEqual(ids, ["GB-CHC-1234", "GB-CHC-5", "GB-CHC-6"])
+        self.assertEqual(ids, ["GB-CHC-1234", "GB-CHC-5", "GB-CHC-6", "GB-EDU-123/ABC"])

@@ -25,7 +25,7 @@ class QueryTests(TestCase):
     def test_get_linked_organisations(self):
         org = get_linked_organisations("GB-CHC-5")
         self.assertEqual(org.name, "Test organisation 2")
-        self.assertEqual(len(org.records), 2)
+        self.assertEqual(len(org.records), 3)
 
     def test_get_linked_organisations_404(self):
         with self.assertRaises(Http404):

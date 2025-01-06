@@ -116,28 +116,6 @@ def get_random_organisation(
 
 
 @api.get(
-    "/{path:organisation_id}",
-    response={200: OrganisationResult, 404: ResultError},
-)
-def get_organisation(request, organisation_id: str):
-    try:
-        organisation = query_organisation(organisation_id)
-        organisation._request = request
-        return {
-            "error": None,
-            "params": {
-                "org_id": organisation_id,
-            },
-            "result": organisation,
-        }
-    except Http404 as e:
-        return 404, {
-            "error": str(e),
-            "params": {"organisation_id": organisation_id},
-        }
-
-
-@api.get(
     "/{path:organisation_id}/canonical",
     response={200: OrganisationResult, 404: ResultError},
 )
@@ -198,6 +176,28 @@ def get_organisation_source(request, organisation_id: str):
                 "org_id": organisation_id,
             },
             "result": organisation.source,
+        }
+    except Http404 as e:
+        return 404, {
+            "error": str(e),
+            "params": {"organisation_id": organisation_id},
+        }
+
+
+@api.get(
+    "/{path:organisation_id}",
+    response={200: OrganisationResult, 404: ResultError},
+)
+def get_organisation(request, organisation_id: str):
+    try:
+        organisation = query_organisation(organisation_id)
+        organisation._request = request
+        return {
+            "error": None,
+            "params": {
+                "org_id": organisation_id,
+            },
+            "result": organisation,
         }
     except Http404 as e:
         return 404, {

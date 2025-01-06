@@ -62,7 +62,7 @@ class TestCase(django.test.TestCase):
         Organisation.objects.create(
             org_id="GB-CHC-5",
             orgIDs=["GB-CHC-5", "GB-CHC-6"],
-            linked_orgs=["GB-CHC-5", "GB-CHC-6"],
+            linked_orgs=["GB-CHC-5", "GB-CHC-6", "GB-EDU-123/ABC"],
             linked_orgs_verified=["GB-CHC-5", "GB-CHC-6"],
             description="Test description",
             name="Test organisation 2",
@@ -75,7 +75,19 @@ class TestCase(django.test.TestCase):
         Organisation.objects.create(
             org_id="GB-CHC-6",
             orgIDs=["GB-CHC-5", "GB-CHC-6"],
-            linked_orgs=["GB-CHC-5", "GB-CHC-6"],
+            linked_orgs=["GB-CHC-5", "GB-CHC-6", "GB-EDU-123/ABC"],
+            description="Test description",
+            name="Test organisation 3",
+            active=True,
+            organisationTypePrimary=ot,
+            source=self.source,
+            scrape=self.scrape,
+            organisationType=[ot.slug, ot2.slug],
+        )
+        Organisation.objects.create(
+            org_id="GB-EDU-123/ABC",
+            orgIDs=["GB-EDU-123/ABC"],
+            linked_orgs=["GB-CHC-5", "GB-CHC-6", "GB-EDU-123/ABC"],
             description="Test description",
             name="Test organisation 3",
             active=True,

@@ -73,7 +73,7 @@ class IndexViewTests(ftc.tests.TestCase):
         self.assertContains(response, "Find that Charity", html=True)
         self.assertContains(
             response,
-            "<p>Find that Charity contains information about 3 UK charities.</p>",
+            "<p>Find that Charity contains information about 4 UK charities.</p>",
             html=True,
         )
         self.assertContains(
