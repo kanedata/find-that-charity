@@ -352,3 +352,7 @@ HESA_SUPPLIER_HEADER = os.environ.get("HESA_SUPPLIER_HEADER")
 HESA_SUPPLIER_ID = os.environ.get("HESA_SUPPLIER_ID")
 
 GRAPHENE = {"SCHEMA": "findthatcharity.api.graphql.schema.schema"}
+DEFAULT_USER_AGENT = os.environ.get(
+    "DEFAULT_USER_AGENT",
+    "Mozilla/5.0 (compatible; Find that Charity; +https://findthatcharity.uk)",
+)

@@ -8,6 +8,7 @@ from collections import defaultdict
 import requests
 import requests_cache
 import validators
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connections, transaction
 from django.utils.text import slugify
@@ -44,6 +45,7 @@ class BaseScraper(BaseCommand):
     upsert_models = {}
     expected_records = 1
     verify_certificate = True
+    user_agent = settings.DEFAULT_USER_AGENT
 
     postcode_regex = re.compile(
         r"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"
@@ -93,6 +95,7 @@ class BaseScraper(BaseCommand):
             self.logger.info("Using requests_cache")
             requests_cache.install_cache("http_cache")
         self.session = requests.Session()
+        self.session.headers.update({"User-Agent": self.user_agent})
 
     def handle(self, *args, **options):
         self.debug = options.get("debug")
@@ -565,6 +568,7 @@ class HTMLScraper(BaseScraper):
         from requests_html import HTMLSession
 
         self.session = HTMLSession()
+        self.session.headers.update({"User-Agent": self.user_agent})
 
     def fetch_file(self):
         self.files = {}

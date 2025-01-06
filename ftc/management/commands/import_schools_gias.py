@@ -63,6 +63,7 @@ class Command(CSVScraper):
             self.logger.info("Using requests_cache")
             requests_cache.install_cache("http_cache")
         self.session = HTMLSession()
+        self.session.headers.update({"User-Agent": self.user_agent})
 
     def fetch_file(self):
         self.files = {}

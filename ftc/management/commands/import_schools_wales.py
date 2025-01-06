@@ -92,7 +92,6 @@ class Command(HTMLScraper):
                 str(record["School Number"])[0:3], str(record["School Number"])[3:]
             ),
         ]
-        print(orgids)
 
         self.add_org_record(
             Organisation(
