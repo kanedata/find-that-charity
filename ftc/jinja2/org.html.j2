@@ -33,7 +33,10 @@
 <script src="{{ static('lib/htmx/htmx.min.js') }}"></script>
 {% if org.locations or org.postalCode %}
 <link rel="stylesheet" href="{{ static('lib/leaflet/leaflet.css' )}}" />
+<link rel="stylesheet" href="{{ static('lib/maplibre/maplibre-gl.css' )}}" />
 <script src="{{ static('lib/leaflet/leaflet.js' )}}"></script>
+<script src="{{ static('lib/maplibre/maplibre-gl.js' )}}"></script>
+<script src="{{ static('lib/maplibre/leaflet-maplibre-gl.js' )}}"></script>
 {% endif %}
 <script type="application/ld+json">
 {{ org.schema_dot_org(request)|tojson(indent=4) }}

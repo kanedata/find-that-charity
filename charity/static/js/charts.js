@@ -105,7 +105,6 @@ if (FINANCES.filter(f => f['fyend']).length > 1) {
         });
     }
     if (FINANCES.filter(f => f['employees']).length > 0) {
-        console.log(FINANCES.filter(f => f['employees']))
         document.querySelector('#employeesChartFigure').classList.remove('dn');
         var employeesChart = new Chart('employeesChart', {
             type: 'line',

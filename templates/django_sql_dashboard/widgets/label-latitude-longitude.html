@@ -41,7 +41,6 @@
         L.marker(latlng).bindPopup(value.label).addTo(markers);
         bounds.extend(latlng);
     })
-    console.log(bounds);
     vis_map.fitBounds(bounds);
     markers.addTo(vis_map);
 </script>

@@ -3,7 +3,6 @@ function setupCopyText() {
         if (el.dataset.target) {
             el.onclick = (ev) => {
                 ev.preventDefault();
-                console.log(el.dataset.target);
                 navigator.clipboard.writeText(el.dataset.target).then(() => {
                     const toast = document.createElement("span");
                     toast.classList = ['ml2 pa1 bg-dark-gray white f7 br2 absolute']

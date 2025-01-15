@@ -17,9 +17,12 @@ if (MARKER_ICON_OPTIONS) {
 if (GEOCODES || ORG_LAT_LONGS) {
     var map = L.map('locationmap');
     map.scrollWheelZoom.disable();
-    L.tileLayer(TILES, {
-        style: 'toner_lite',
-        attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://www.stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
+    var layer = L.maplibreGL({
+        style: 'https://tiles.openfreemap.org/styles/positron',
+        attribution: `
+    <a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> 
+    <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> 
+    Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>`,
     }).addTo(map);
     map.fitBounds(DEFAULT_BOUNDS);
     var bounds = L.latLngBounds();
