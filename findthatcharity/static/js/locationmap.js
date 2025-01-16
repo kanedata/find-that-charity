@@ -1,6 +1,5 @@
 const GEOJSON_URL = 'https://findthatpostcode.uk/areas/{}.geojson';
 const GEOPOINT_URL = 'https://findthatpostcode.uk/postcodes/{}.json';
-const TILES = 'https://tiles.stadiamaps.com/tiles/stamen_{style}/{z}/{x}/{y}{r}.png';
 const DEFAULT_BOUNDS = L.latLngBounds(
     L.latLng(49.8647440573549, -8.649995833304311),
     L.latLng(60.86078239016185, 1.763705609663519),
