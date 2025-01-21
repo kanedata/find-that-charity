@@ -74,7 +74,7 @@ UPDATE_ORGIDS_SQL = {
                         ON a.org_id_a = sg.org_id_b
             )
             SELECT org_id_a AS "org_id",
-                array_agg(org_id_b ORDER BY o.priority ASC NULLS LAST) AS linked_orgs
+                array_agg(org_id_b ORDER BY o.priority, org_id_b ASC NULLS LAST) AS linked_orgs
             FROM search_graph
                 LEFT OUTER JOIN ftc_organisation o
                     ON search_graph.org_id_b = o.org_id
@@ -123,7 +123,7 @@ UPDATE_ORGIDS_SQL = {
                         ON a.org_id_a = sg.org_id_b
             )
             SELECT org_id_a AS "org_id",
-                array_agg(org_id_b ORDER BY o.priority ASC NULLS LAST) AS linked_orgs_verified
+                array_agg(org_id_b ORDER BY o.priority, org_id_b ASC NULLS LAST) AS linked_orgs_verified
             FROM search_graph
                 LEFT OUTER JOIN ftc_organisation o
                     ON search_graph.org_id_b = o.org_id
