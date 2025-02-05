@@ -33,8 +33,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Parse Python version
-        run: sed  s/python-// runtime.txt | head > .python-version
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -46,6 +44,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: ruff
+        run: |
+          ruff check .
+          ruff format . --check
       - name: Run migrations
         run: |
           python manage.py migrate --database=data --noinput
