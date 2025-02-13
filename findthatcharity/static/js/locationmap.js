@@ -85,5 +85,4 @@ if (GEOCODES || ORG_LAT_LONGS) {
     L.control.layers(null, layer_groups, {
         collapsed: false,
     }).addTo(map);
-    map.fitBounds(bounds);
 }
