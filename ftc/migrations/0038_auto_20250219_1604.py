@@ -51,7 +51,9 @@ WITH n_charity AS (
     SELECT o.org_id AS organisation_id,
         NULL AS charity_number,
         o.name AS organisation_name,
-        o."organisationTypePrimary_id"  AS organisation_type,
+        CASE WHEN o."organisationTypePrimary_id" = 'community-interest-company' THEN 'Community Interest Company'
+            WHEN o."organisationTypePrimary_id" = 'community-amateur-sports-club' THEN 'Community Amateur Sports Club'
+            ELSE o."organisationTypePrimary_id" END AS organisation_type,
         c."CompanyNumber" AS company_number,
         o."alternateName" AS also_known_as,
         o."postalCode" AS postcode,
@@ -103,7 +105,7 @@ WITH n_charity AS (
 SELECT main.organisation_id,
     main.charity_number,
     main.organisation_name,
-    main.organisation_type,
+    main.organisation_type::text,
     main.company_number,
     main.also_known_as,
     main.postcode,
