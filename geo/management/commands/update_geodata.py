@@ -3,6 +3,58 @@ from django.core import management
 from ftc.management.commands._base_scraper import SQLRunner
 
 UPDATE_GEODATA_SQL = {
+    "Remove personal data in Organisations": """
+        UPDATE ftc_organisation
+        SET "streetAddress" = NULL,
+            "addressLocality" = NULL,
+            "addressRegion" = NULL,
+            "addressCountry" = NULL,
+            "postalCode" = NULL,
+            "telephone" = NULL,
+            "email" = NULL,
+            "url" = NULL
+        FROM ftc_personaldata pd
+        WHERE pd.org_id = ANY(ftc_organisation.linked_orgs)
+    """,
+    "Remove personal data in Companies": """
+        UPDATE companies_company
+        SET "RegAddress_CareOf" = NULL,
+            "RegAddress_POBox" = NULL,
+            "RegAddress_AddressLine1" = NULL,
+            "RegAddress_AddressLine2" = NULL,
+            "RegAddress_PostTown" = NULL,
+            "RegAddress_County" = NULL,
+            "RegAddress_Country" = NULL,
+            "RegAddress_PostCode" = NULL
+        FROM ftc_personaldata pd
+        WHERE pd.org_id ILIKE 'GB-COH-%%'
+            AND pd.org_id = CONCAT('GB-COH-', "CompanyNumber")
+    """,
+    "Remove personal data in Charities": """
+        UPDATE charity_charity
+        SET address = NULL,
+            postcode = NULL,
+            phone = NULL,
+            web = NULL,
+            email = NULL
+        FROM ftc_personaldata pd
+        WHERE (
+                pd.org_id ILIKE 'GB-CHC-%%' OR 
+                pd.org_id ILIKE 'GB-NIC-%%' OR 
+                pd.org_id ILIKE 'GB-SC-%%'
+            )
+            AND pd.org_id = id;
+    """,
+    "Remove personal data in Organisation Location": """
+        DELETE
+        FROM ftc_organisationlocation 
+        WHERE org_id IN (
+            SELECT o.org_id
+            FROM ftc_organisation o
+                INNER JOIN ftc_personaldata pd
+                    ON pd.org_id = ANY(o.linked_orgs)
+)
+    """,
     "Remove blank postcodes": """
         update ftc_organisation
         set "postalCode" = null

@@ -178,6 +178,10 @@ class VocabularyEntriesAdmin(JSONFieldAdmin):
         return obj.code
 
 
+class PersonalDataAdmin(admin.ModelAdmin):
+    list_display = ("org_id", "notes")
+
+
 admin.site.site_header = "Find that Charity admin"
 admin.site_site_title = admin.site.site_header
 
@@ -189,3 +193,4 @@ admin.site.register(ftc.Scrape, ScrapeAdmin)
 admin.site.register(ftc.OrgidScheme, JSONFieldAdmin)
 admin.site.register(ftc.Vocabulary, VocabularyAdmin)
 admin.site.register(ftc.VocabularyEntries, VocabularyEntriesAdmin)
+admin.site.register(ftc.PersonalData, PersonalDataAdmin)

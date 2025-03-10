@@ -6,6 +6,7 @@ from ftc.models.organisation_location import OrganisationLocation
 from ftc.models.organisation_type import OrganisationType
 from ftc.models.orgid import Orgid, OrgidField
 from ftc.models.orgid_scheme import OrgidScheme
+from ftc.models.personal_data import PersonalData
 from ftc.models.related_organisation import RelatedOrganisation
 from ftc.models.scrape import Scrape
 from ftc.models.source import Source
@@ -21,6 +22,7 @@ __all__ = [
     "OrgidField",
     "Orgid",
     "OrgidScheme",
+    "PersonalData",
     "RelatedOrganisation",
     "Scrape",
     "Source",
