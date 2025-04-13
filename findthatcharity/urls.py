@@ -35,6 +35,13 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
+    path(
+        "opensearch.xml",
+        TemplateView.as_view(
+            template_name="opensearch.xml.j2", content_type="application/xml"
+        ),
+        name="opensearch",
+    ),
     path("accounts/", include("ftcprofile.urls")),
     path("accounts/", include("django_registration.backends.activation.urls")),
     path("accounts/", include("django.contrib.auth.urls")),

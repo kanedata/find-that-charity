@@ -1,0 +1,10 @@
+<OpenSearchDescription
+  xmlns="http://a9.com/-/spec/opensearch/1.1/"
+  xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>Find that Charity</ShortName>
+  <Description>Find that Charity - a search engine for UK registered charities and nonprofits</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="16" height="16" type="image/x-icon">{{ request.build_absolute_uri(static('images/favicon-16.ico')) }}</Image>
+  <Image width="64" height="64" type="image/png">{{ request.build_absolute_uri(static('images/favicon-64.png')) }}</Image>
+  <Url type="text/html" template="{{ request.build_absolute_uri(url('index') + '?q={searchTerms}') }}"/>
+</OpenSearchDescription>

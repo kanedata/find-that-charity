@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="{{ static('css/fonts.css') }}" />
   <link rel="stylesheet" href="{{ static('css/style.css') }}" />
   <link rel="shortcut icon" href="{{ static('images/favicon.png') }}" />
+  <link rel="search" type="application/opensearchdescription+xml" title="Find that Charity"
+    href="{{ request.build_absolute_uri(url('opensearch')) }}" />
+
   {% block headscripts %}
   {% endblock %}
   <title>{{ (title or default_title)|striptags }}{% block title %}{% endblock %}</title>
