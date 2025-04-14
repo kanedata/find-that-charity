@@ -7,6 +7,7 @@ class Command(BaseCommand):
         "casc",
         "coe",
         "gor",
+        "govuk",
         "ror",
         "hesa",
         "officeforstudents",
