@@ -183,6 +183,10 @@ class Command(HTMLScraper):
             this_model["CQCProvider"]["org_id"] = "GB-COH-{}".format(
                 this_model["CQCProvider"]["company_number"]
             )
+        elif len(this_model["CQCProvider"]["id"]) == 3:
+            this_model["CQCProvider"]["org_id"] = "GB-NHS-{}".format(
+                this_model["CQCProvider"]["id"]
+            )
 
         # add scrape id
         this_model["CQCLocation"]["scrape_id"] = self.scrape.id
