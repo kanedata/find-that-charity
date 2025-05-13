@@ -78,11 +78,11 @@ class Command(BaseScraper):
             "GB-GOVUK-the-scottish-government",
         )
         linked_orgs = [
-            self.get_org_id(linked_id)
-            for linked_id in (
-                record.get("superseded_organisations", [])
-                + record.get("superseding_organisations", [])
-            )
+            # self.get_org_id(linked_id)
+            # for linked_id in (
+            #     record.get("superseded_organisations", [])
+            #     + record.get("superseding_organisations", [])
+            # )
         ]
         if len(linked_orgs) == 1:
             if linked_orgs[0] not in devolved_ids:
