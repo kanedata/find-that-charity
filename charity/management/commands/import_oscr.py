@@ -62,9 +62,9 @@ class Command(CSVScraper):
     name = "oscr"
     allowed_domains = ["oscr.org.uk", "githubusercontent.com"]
     start_urls = [
-        "https://www.oscr.org.uk/umbraco/Surface/FormsSurface/Charity5YearsRegDownload",
-        "https://www.oscr.org.uk/umbraco/Surface/FormsSurface/CharityRegDownload",
-        "https://www.oscr.org.uk/umbraco/Surface/FormsSurface/CharityFormerRegDownload",
+        "https://www.oscr.org.uk/download/charity-register",
+        "https://www.oscr.org.uk/download/5-years-charity-register",
+        "https://www.oscr.org.uk/download/charity-former-register",
     ]
     org_id_prefix = "GB-SC"
     id_field = "Charity Number"
