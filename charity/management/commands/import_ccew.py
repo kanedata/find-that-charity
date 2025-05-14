@@ -128,8 +128,11 @@ class Command(BaseScraper):
                     )
                 yield [k] + list(row.values())
 
+        csvtext = io.StringIO(
+            csvfile.read().replace(b"\r\n\t", b"\t").decode(self.encoding)
+        )
         reader = csv.DictReader(
-            io.TextIOWrapper(csvfile, encoding=self.encoding),
+            csvtext,
             delimiter="\t",
             escapechar="\\",
             quoting=csv.QUOTE_NONE,
