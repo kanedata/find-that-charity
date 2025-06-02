@@ -17,8 +17,12 @@ class Command(CSVScraper):
     float_fields = [
         "Amount Awarded",
     ]
-    encoding = "utf8"
+    encoding = "utf-8-sig"
     date_fields = ["Award Date", "Last Modified"]
+    date_format = {
+        "Award Date": "%Y-%m-%d",
+        "Last Modified": "%Y-%m-%d %H:%M:%S",
+    }
     source = {
         "title": "National Lottery grants",
         "description": "The National Lottery grant database brings together National Lottery grant data from the launch of the National Lottery in 1994 to the present. The data is uploaded periodically onto this database by the 12 National Lottery Distributing Bodies. Data on this website is not considered official statistics.",
