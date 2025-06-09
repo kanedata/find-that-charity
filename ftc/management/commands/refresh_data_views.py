@@ -9,6 +9,6 @@ class Command(SQLRunner):
         super().__init__(*args, **kwargs)
         self.post_sql = {
             "Refresh charity data view": """
-            REFRESH MATERIALIZED VIEW ftc_charitydata;
+            REFRESH MATERIALIZED VIEW superhighways_london_organisations_view;
             """
         }
