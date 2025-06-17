@@ -1,0 +1,10 @@
+<div class="flex-l f4 pr4-ns">
+    <div class="ba br1 b--white inline-flex flex-grow">
+        <input name="q" id="search-autocomplete-q"
+            class="h-100 input-reset bn pa1 near-black bg-white flex-grow header-font" type="text"
+            placeholder="Search for a name or number" value="{{ search.term if search and search.term }}"
+            autocomplete='off'>
+    </div>
+    <input type="submit" value="Search"
+        class="button-reset header-font fl pv1 ph2 tc bg-animate bg-yellow dim near-black pointer br2-ns br--right-ns  bw2 b--yellow ba">
+</div>

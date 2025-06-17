@@ -20,6 +20,11 @@
 <body class="home w-100 sans-serif near-black base-font bg-wavy">
   <header class="body header-font normal ph3 ph5-ns pt4 {% if frontpage %}pt5-ns pb5{% else %}pb4{% endif %} moon-gray">
     <div class="fr f3-ns mt1 mr2 w-100 w-auto-ns tr pb3">
+      {% if not frontpage and not search %}
+      <form class="dib" action="{{ url('index') }}">
+        {% include 'components/search_form_mini.html.j2' %}
+      </form>
+      {% endif %}
       <a href="{{ url('about') }}" class="white logo underline double underline-yellow">About</a> |
       {% if request.user.is_authenticated %}
       <a href="{{ url('account_profile') }}" class="white logo underline double underline-yellow">Profile</a>
