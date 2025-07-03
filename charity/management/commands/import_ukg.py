@@ -13,7 +13,7 @@ class Command(BaseScraper):
     name = "ukgrantmaking"
     allowed_domains = ["ukgrantmaking.org"]
     start_urls = [
-        "https://www.ukgrantmaking.org/wp-content/uploads/2024/06/uk-grantmaking-all-grantmakers-2022-23.xlsx",
+        "https://www.ukgrantmaking.org/wp-content/uploads/2025/06/UKGrantmaking-2025-All-Grantmakers-1.xlsx",
     ]
     source = {
         "title": "UK Grantmaking Segments",
@@ -53,7 +53,7 @@ Find out more at [ukgrantmaking.org](https://www.ukgrantmaking.org/).
         self.intialise_vocabulary()
 
     def intialise_vocabulary(self):
-        self.logger.info("Fetching ICNPTSO")
+        self.logger.info("Fetching UK Grantmaking")
         vocab, _ = Vocabulary.objects.update_or_create(
             slug=UKG,
             defaults=dict(
