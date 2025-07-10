@@ -1,6 +1,7 @@
 import datetime
 
 import requests_cache
+from requests.exceptions import HTTPError
 from requests_html import HTMLSession
 
 from ftc.management.commands._base_scraper import CSVScraper
@@ -23,7 +24,8 @@ class Command(CSVScraper):
     name = "schools_gias"
     allowed_domains = ["service.gov.uk", "ea-edubase-api-prod.azurewebsites.net"]
     start_urls = [
-        "https://get-information-schools.service.gov.uk/Downloads",
+        # "https://ea-edubase-api-prod.azurewebsites.net/edubase/downloads/public/edubasealldata20210324.csv",
+        "https://ea-edubase-api-prod.azurewebsites.net/edubase/downloads/public/edubasealldata{}.csv",
     ]
     org_id_prefix = "GB-EDU"
     id_field = "URN"
@@ -40,7 +42,11 @@ class Command(CSVScraper):
             "website": "https://www.gov.uk/government/organisations/department-for-education",
         },
         "distribution": [
-            {"downloadURL": "", "accessURL": "", "title": "Establishment fields CSV"}
+            {
+                "downloadURL": "",
+                "accessURL": "https://get-information-schools.service.gov.uk/Downloads",
+                "title": "Establishment fields CSV",
+            }
         ],
     }
 
@@ -67,23 +73,23 @@ class Command(CSVScraper):
 
     def fetch_file(self):
         self.files = {}
+        days_to_test = 30
+        today = datetime.datetime.today().date()
+        date_range = [today - datetime.timedelta(days=x) for x in range(days_to_test)]
         for u in self.start_urls:
-            self.set_access_url(u)
-            response = self.session.get(u)
-            response.raise_for_status()
-            for item in response.html.find(".govuk-checkboxes__item"):
-                item_data = {
-                    field.attrs["name"].split(".")[1]: field.attrs["value"]
-                    for field in item.find("input")
-                }
-                if item_data.get("Tag") == "all.edubase.data":
-                    last_updated = datetime.datetime.strptime(
-                        item_data.get("FileGeneratedDate").split(" ")[0], "%m/%d/%Y"
-                    )
-                    link = self.gias_url_format.format(last_updated)
-                    self.set_download_url(link)
-                    self.files[link] = self.session.get(link)
-                    self.files[link].raise_for_status()
+            for day in date_range:
+                link = u.format(day.strftime("%Y%m%d"))
+                self.logger.info(f"Attempting to fetch {link}")
+                response = self.session.get(link)
+                try:
+                    response.raise_for_status()
+                except HTTPError as e:
+                    self.logger.error(f"Error fetching {link}: {e}")
+                    continue
+                self.logger.info(f"Successfully fetched {link}")
+                self.set_download_url(link)
+                self.files[link] = response
+                break  # Stop after the first successful fetch
 
     def depluralise(self, s):
         if not isinstance(s, str):
