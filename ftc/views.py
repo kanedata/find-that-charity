@@ -2,6 +2,7 @@ import csv
 from collections import defaultdict
 
 from charity_django.companies.models import Company
+from django.db.models import CharField, Value
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -200,7 +201,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
             "name": "name",
             "charityNumber": "charityNumber",
             "companyNumber": "companyNumber",
-            "postalCode": "postalCode",
+            "dummyPostalCode": "postalCode",
             "url": "url",
             "latestIncome": "latestIncome",
             "latestIncomeDate": "latestIncomeDate",
@@ -221,7 +222,11 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
             writer = csv.writer(buffer_)
             yield writer.writerow(columns.values())
             s.run_db()
-            res = s.query.values_list(*columns.keys()).order_by("org_id")
+            res = (
+                s.query.annotate(dummyPostalCode=Value(None, output_field=CharField()))
+                .values_list(*columns.keys())
+                .order_by("org_id")
+            )
             prev_id = None
             for r in res:
                 if r[0] != prev_id:

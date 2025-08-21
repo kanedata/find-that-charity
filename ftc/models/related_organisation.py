@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 
+from findthatcharity.utils import can_view_postcode
 from ftc.models.organisation import EXTERNAL_LINKS, Organisation
 from ftc.models.organisation_link import OrganisationLink
 from ftc.models.organisation_location import OrganisationLocation
@@ -261,6 +262,8 @@ class RelatedOrganisation:
         orgtypes = [y for y in self.get_all("organisationType")]
         orgtypes = [o.title for o in OrganisationType.objects.filter(slug__in=orgtypes)]
 
+        show_postcode = can_view_postcode(request)
+
         def build_url(url):
             if request:
                 return request.build_absolute_uri(url)
@@ -324,10 +327,10 @@ class RelatedOrganisation:
                 "known_as": self.name,
                 "geo": {
                     "areas": [],
-                    "postcode": self.postalCode,
+                    "postcode": self.postalCode if show_postcode else None,
                     "location": self.location,
                     "address": {
-                        k: getattr(self, k)
+                        k: getattr(self, k) if show_postcode else None
                         for k in address_fields
                         if getattr(self, k, None)
                     },
@@ -367,11 +370,13 @@ class RelatedOrganisation:
             "organisationType": orgtypes,
             "organisationTypePrimary": self.organisationTypePrimary.title,
             "alternateName": self.alternateName,
-            "telephone": self.telephone,
-            "email": self.email,
+            "telephone": None,
+            "email": None,
             "location": self.location,
             "address": {
-                k: getattr(self, k) for k in address_fields if getattr(self, k, None)
+                k: (getattr(self, k) if show_postcode else None)
+                for k in address_fields
+                if getattr(self, k, None)
             },
             "sources": [s.id for s in self.sources],
             "links": [

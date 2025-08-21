@@ -60,7 +60,7 @@ var app = new Vue({
         fields_to_add: [
             "org_id",
             "name",
-            "postalCode",
+            // "postalCode",
             "url",
             "latestIncome",
             "latestIncomeDate",

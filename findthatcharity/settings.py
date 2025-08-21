@@ -356,3 +356,4 @@ DEFAULT_USER_AGENT = os.environ.get(
     "DEFAULT_USER_AGENT",
     "Mozilla/5.0 (compatible; Find that Charity; +https://findthatcharity.uk)",
 )
+FTC_SHOW_POSTCODE = os.environ.get("FTC_SHOW_POSTCODE")

@@ -283,11 +283,23 @@ class Organisation(models.Model):
 
     @classmethod
     def get_fields_as_properties(cls):
-        internal_fields = ["scrape", "spider", "id", "priority"]
+        excluded_fields = [
+            "scrape",
+            "spider",
+            "id",
+            "priority",
+            "streetAddress",
+            "addressLocality",
+            "addressRegion",
+            "addressCountry",
+            "postalCode",
+            "telephone",
+            "email",
+        ]
         return [
             {"id": f.name, "name": f.verbose_name}
             for f in cls._meta.get_fields()
-            if f.name not in internal_fields
+            if f.name not in excluded_fields
         ]
 
     def schema_dot_org(self, request=None):

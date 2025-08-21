@@ -49,8 +49,8 @@
 {% if org.locations or org.postalCode %}
 <script>
   const GEOCODES = {{ org.geoCodes() | list | tojson }};
-  const POSTCODE = {{ org.postalCode| tojson }};
-  const ORG_LAT_LONGS = {{ org.lat_lngs| tojson }};
+  const POSTCODE = null;
+  const ORG_LAT_LONGS = null;
   const MARKER_ICON_OPTIONS = {{ {
     "iconUrl": static('lib/leaflet/images/marker-icon.png'),
       "iconRetinaUrl": static('lib/leaflet/images/marker-icon-2x.png'),

@@ -126,6 +126,13 @@ class Command(BaseScraper):
                             len(row) + 1,
                         )
                     )
+
+                if (
+                    filename == "charity_trustee"
+                    and row["individual_or_organisation"] != "O"
+                ):
+                    row["trustee_name"] = ""
+
                 yield [k] + list(row.values())
 
         csvtext = io.StringIO(

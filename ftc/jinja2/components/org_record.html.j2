@@ -100,12 +100,6 @@
       {{ "{:%d %B %Y}".format(record.dateRemoved) }}
     </p>
     {% endif %}
-    {% if record.postalCode %}
-    <p>
-      <strong class="is-size-7">Postcode</strong><br>
-      <span>{{ record.postalCode }}</span>
-    </p>
-    {% endif %}
     {% if record.url %}
     <p>
       <strong class="is-size-7">Website</strong><br>

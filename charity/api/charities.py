@@ -38,12 +38,14 @@ api = Router(tags=["Charities"])
 def get_charity(request, charity_id: str):
     charity_id = regno_to_orgid(charity_id)
     try:
+        charity = get_object_or_404(Charity, id=charity_id)
+        charity._request = request  # Attach request for address resolution
         return {
             "error": None,
             "params": {
                 "charity_id": charity_id,
             },
-            "result": get_object_or_404(Charity, id=charity_id),
+            "result": charity,
         }
     except Http404 as e:
         return 404, {

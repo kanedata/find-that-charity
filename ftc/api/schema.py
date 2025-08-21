@@ -4,6 +4,8 @@ from typing import List, Optional
 from django.urls import reverse
 from ninja import Field, Schema
 
+from findthatcharity.utils import can_view_postcode
+
 
 class OrganisationType(Schema):
     slug: str
@@ -87,6 +89,10 @@ class Organisation(Schema):
 
     @staticmethod
     def resolve_address(obj):
+        show_postcode = False
+        if hasattr(obj, "_request"):
+            show_postcode = can_view_postcode(obj._request)
+
         address_fields = [
             "streetAddress",
             "addressLocality",
@@ -98,8 +104,19 @@ class Organisation(Schema):
         for field in address_fields:
             value = getattr(obj, field, None)
             if value:
-                address[field] = value
+                if show_postcode:
+                    address[field] = value
+                else:
+                    address[field] = None
         return address
+
+    @staticmethod
+    def resolve_telephone(obj):
+        return None
+
+    @staticmethod
+    def resolve_email(obj):
+        return None
 
     @staticmethod
     def resolve_sources(obj):
@@ -215,3 +232,45 @@ class Company(Schema):
     ConfStmtNextDueDate: Optional[datetime.date] = None
     ConfStmtLastMadeUpDate: Optional[datetime.date] = None
     org_id: Optional[str] = None
+
+    @staticmethod
+    def _resolve_address_field(obj, field_name):
+        show_postcode = False
+        if hasattr(obj, "_request"):
+            show_postcode = can_view_postcode(obj._request)
+
+        if show_postcode:
+            return getattr(obj, field_name, None)
+        return None
+
+    @staticmethod
+    def resolve_RegAddress_CareOf(obj):
+        return Schema._resolve_address_field(obj, "RegAddress_CareOf")
+
+    @staticmethod
+    def resolve_RegAddress_POBox(obj):
+        return Schema._resolve_address_field(obj, "RegAddress_POBox")
+
+    @staticmethod
+    def resolve_RegAddress_AddressLine1(obj):
+        return Schema._resolve_address_field(obj, "RegAddress_AddressLine1")
+
+    @staticmethod
+    def resolve_RegAddress_AddressLine2(obj):
+        return Schema._resolve_address_field(obj, "RegAddress_AddressLine2")
+
+    @staticmethod
+    def resolve_RegAddress_PostTown(obj):
+        return Schema._resolve_address_field(obj, "RegAddress_PostTown")
+
+    @staticmethod
+    def resolve_RegAddress_County(obj):
+        return Schema._resolve_address_field(obj, "RegAddress_County")
+
+    @staticmethod
+    def resolve_RegAddress_Country(obj):
+        return Schema._resolve_address_field(obj, "RegAddress_Country")
+
+    @staticmethod
+    def resolve_RegAddress_PostCode(obj):
+        return Schema._resolve_address_field(obj, "RegAddress_PostCode")

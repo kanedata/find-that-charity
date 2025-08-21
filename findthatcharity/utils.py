@@ -146,3 +146,13 @@ def get_trending_organisations(examples):
 def process_wikipedia_url(url):
     end_part = url.split("/")[-1]
     return end_part.replace("_", " ")
+
+
+def can_view_postcode(request):
+    if (
+        request
+        and settings.FTC_SHOW_POSTCODE
+        and (request.headers.get("FTC-SHOW-POSTCODE") == settings.FTC_SHOW_POSTCODE)
+    ):
+        return True
+    return False

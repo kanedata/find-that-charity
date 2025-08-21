@@ -1,65 +1,62 @@
 {% from 'components/date_format.html.j2' import format_date %}
 
 <div class="measure-wide">
-{% if company.previous_names.exists() %}
-<h4>Also known as</h4>
-<ul>
-    {% set previous_names = company.previous_names.all() %}
-    {% for n in previous_names[0:10] %}
-    <li>{{ n.CompanyName|titlecase }}</li>
-    {% endfor %}
-    {% if previous_names|length > 10 %}
-    <details>
-    <summary class="blue link underline-hover pointer">...and {{ "{:,.0f}".format(previous_names|length - 10) }} other names</summary>
-    {% for n in previous_names[10:] %}
-    <li>{{ n.CompanyName|titlecase }}</li>
-    {% endfor %}
-    </details>
+    {% if company.previous_names.exists() %}
+    <h4>Also known as</h4>
+    <ul>
+        {% set previous_names = company.previous_names.all() %}
+        {% for n in previous_names[0:10] %}
+        <li>{{ n.CompanyName|titlecase }}</li>
+        {% endfor %}
+        {% if previous_names|length > 10 %}
+        <details>
+            <summary class="blue link underline-hover pointer">...and {{ "{:,.0f}".format(previous_names|length - 10) }}
+                other names</summary>
+            {% for n in previous_names[10:] %}
+            <li>{{ n.CompanyName|titlecase }}</li>
+            {% endfor %}
+        </details>
+        {% endif %}
+    </ul>
     {% endif %}
-</ul>
-{% endif %}
-<h4>Company number</h4>
-<p>
-    <a class="link dark-blue underline-hover f4" href="https://beta.companieshouse.gov.uk/company/{{ company.CompanyNumber }}" target="_blank">{{ company.CompanyNumber }}</a>
-</p>
-{% if company.IncorporationDate %}
-<h4>Registered</h4>
-<p>
-    {{ format_date(company.IncorporationDate) }}
-</p>
-{% endif %}
-{% if company.DissolutionDate %}
-<h4>Removed</h4>
-<p>
-    {{ format_date(company.DissolutionDate) }}
-</p>
-{% endif %}
-{% if company.RegAddress_PostCode %}
-<h4>Postcode</h4>
-<p>
-    <span>{{ company.RegAddress_PostCode }}</span>
-</p>
-{% endif %}
-{% if company.sic_codes.exists() %}
-<h4><abbr title="Standard Industrial Code">SIC</abbr> Codes</h4>
-<ul>
-    {% for s in company.sic_codes.all() %}
-    <li>
-        <code>{{ s.sic_code.code }}</code>
-        - {{ s.sic_code.title }}
-    </li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% if company.accounts.exists() %}
-<h4>Company accounts</h4>
-<ul>
-    {% for account in company.accounts.order_by("-financial_year_end") %}
-    <li>
-        <strong>{{ account.financial_year_end }}</strong> - 
-        {{ account.category|titlecase }}
-    </li>
-    {% endfor %}
-</ul>
-{% endif %}
+    <h4>Company number</h4>
+    <p>
+        <a class="link dark-blue underline-hover f4"
+            href="https://beta.companieshouse.gov.uk/company/{{ company.CompanyNumber }}"
+            target="_blank">{{ company.CompanyNumber }}</a>
+    </p>
+    {% if company.IncorporationDate %}
+    <h4>Registered</h4>
+    <p>
+        {{ format_date(company.IncorporationDate) }}
+    </p>
+    {% endif %}
+    {% if company.DissolutionDate %}
+    <h4>Removed</h4>
+    <p>
+        {{ format_date(company.DissolutionDate) }}
+    </p>
+    {% endif %}
+    {% if company.sic_codes.exists() %}
+    <h4><abbr title="Standard Industrial Code">SIC</abbr> Codes</h4>
+    <ul>
+        {% for s in company.sic_codes.all() %}
+        <li>
+            <code>{{ s.sic_code.code }}</code>
+            - {{ s.sic_code.title }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if company.accounts.exists() %}
+    <h4>Company accounts</h4>
+    <ul>
+        {% for account in company.accounts.order_by("-financial_year_end") %}
+        <li>
+            <strong>{{ account.financial_year_end }}</strong> -
+            {{ account.category|titlecase }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 </div>
