@@ -11,7 +11,7 @@ from django_sql_dashboard.models import Dashboard
 from elasticsearch.exceptions import RequestError
 
 from charity.models import Charity
-from findthatcharity.utils import get_trending_organisations
+from findthatcharity.utils import can_view_postcode, get_trending_organisations
 from ftc.documents import OrganisationGroup
 from ftc.models import Organisation, OrganisationType, RelatedOrganisation, Source
 from ftc.query import (
@@ -194,14 +194,16 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
 
     # add additional criteria from the get params
     s.set_criteria_from_request(request)
+    show_postcode = can_view_postcode(request)
 
     if filetype == "csv":
+        postcodefield = "postalCode" if show_postcode else "dummyPostalCode"
         columns = {
             "org_id": "id",
             "name": "name",
             "charityNumber": "charityNumber",
             "companyNumber": "companyNumber",
-            "dummyPostalCode": "postalCode",
+            postcodefield: "postalCode",
             "url": "url",
             "latestIncome": "latestIncome",
             "latestIncomeDate": "latestIncomeDate",

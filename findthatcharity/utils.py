@@ -149,10 +149,9 @@ def process_wikipedia_url(url):
 
 
 def can_view_postcode(request):
-    if (
-        request
-        and settings.FTC_SHOW_POSTCODE
-        and (request.headers.get("FTC-SHOW-POSTCODE") == settings.FTC_SHOW_POSTCODE)
-    ):
-        return True
+    if request and settings.FTC_SHOW_POSTCODE:
+        if request.headers.get("FTC-SHOW-POSTCODE") == settings.FTC_SHOW_POSTCODE:
+            return True
+        if request.GET.get("FTC-SHOW-POSTCODE") == settings.FTC_SHOW_POSTCODE:
+            return True
     return False
