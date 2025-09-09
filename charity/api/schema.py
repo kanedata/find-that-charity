@@ -3,8 +3,6 @@ from typing import Optional
 
 from ninja import Schema
 
-from findthatcharity.utils import can_view_postcode
-
 
 class Charity(Schema):
     id: Optional[str] = None
@@ -39,26 +37,6 @@ class Charity(Schema):
 
     @staticmethod
     def resolve_phone(obj):
-        return None
-
-    @staticmethod
-    def resolve_address(obj):
-        show_postcode = False
-        if hasattr(obj, "_request"):
-            show_postcode = can_view_postcode(obj._request)
-
-        if show_postcode:
-            return obj.address
-        return None
-
-    @staticmethod
-    def resolve_postcode(obj):
-        show_postcode = False
-        if hasattr(obj, "_request"):
-            show_postcode = can_view_postcode(obj._request)
-
-        if show_postcode:
-            return obj.postcode
         return None
 
 

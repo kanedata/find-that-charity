@@ -35,11 +35,6 @@
   <div class="w-100 w-20-l fl">
     <div class="cf mv3 w-100 tr">
       {% include 'starred/status.html.j2' %}
-      <p class="mv3">
-        <a href="{{ url('orgid_json', kwargs={'org_id': org.org_id}) }}"
-          class="link dib bg-dark-green white code underline-hover normal f6 pv0 ph1 br1">Access this data in JSON
-          format</a>
-      </p>
       <div class="mb1">{{ orgid_link(org.org_id, true, copy=true) }}</div>
       {% if 'GB-CASC-' in org.org_id %}
       <div class="f6 mt4 br2 h-100 pa2 bg-washed-red tl">

@@ -4,8 +4,6 @@ from typing import List, Optional
 from django.urls import reverse
 from ninja import Field, Schema
 
-from findthatcharity.utils import can_view_postcode
-
 
 class OrganisationType(Schema):
     slug: str
@@ -89,10 +87,6 @@ class Organisation(Schema):
 
     @staticmethod
     def resolve_address(obj):
-        show_postcode = False
-        if hasattr(obj, "_request"):
-            show_postcode = can_view_postcode(obj._request)
-
         address_fields = [
             "streetAddress",
             "addressLocality",
@@ -104,10 +98,7 @@ class Organisation(Schema):
         for field in address_fields:
             value = getattr(obj, field, None)
             if value:
-                if show_postcode:
-                    address[field] = value
-                else:
-                    address[field] = None
+                address[field] = value
         return address
 
     @staticmethod
@@ -235,13 +226,7 @@ class Company(Schema):
 
     @staticmethod
     def _resolve_address_field(obj, field_name):
-        show_postcode = False
-        if hasattr(obj, "_request"):
-            show_postcode = can_view_postcode(obj._request)
-
-        if show_postcode:
-            return getattr(obj, field_name, None)
-        return None
+        return getattr(obj, field_name, None)
 
     @staticmethod
     def resolve_RegAddress_CareOf(obj):
