@@ -9,17 +9,18 @@
     </blockquote>
     {% endif %}
     {% if org.sortedAlternateName %}
+    {% set org_names = org.sortedAlternateName|map('titlecase')|unique|list %}
     <h4>Also known as</h4>
     <ul>
-        {% for n in org.sortedAlternateName[0:10] %}
-        <li>{{ n|titlecase }}</li>
+        {% for n in org_names[0:10] %}
+        <li>{{ n }}</li>
         {% endfor %}
-        {% if org.sortedAlternateName|length > 10 %}
+        {% if org_names|length > 10 %}
         <details>
             <summary class="blue link underline-hover pointer">...and
-                {{ "{:,.0f}".format(org.alternateName|length - 10) }} other names</summary>
-            {% for n in org.sortedAlternateName[10:] %}
-            <li>{{ n|titlecase }}</li>
+                {{ "{:,.0f}".format(org_names|length - 10) }} other names</summary>
+            {% for n in org_names[10:] %}
+            <li>{{ n }}</li>
             {% endfor %}
         </details>
         {% endif %}
