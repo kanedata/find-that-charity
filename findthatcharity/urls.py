@@ -38,7 +38,8 @@ urlpatterns = [
     path(
         "opensearch.xml",
         TemplateView.as_view(
-            template_name="opensearch.xml.j2", content_type="application/xml"
+            template_name="opensearch.xml.j2",
+            content_type="application/opensearchdescription+xml",
         ),
         name="opensearch",
     ),
