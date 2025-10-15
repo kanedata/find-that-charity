@@ -487,6 +487,11 @@ class Organisation(models.Model):
         }
 
         for location in self.locations:
+            if location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE:
+                # return local authority codes for PostCode locations
+                yield [location.locationType, location.geo_msoa21]
+                continue
+
             if re.match("[ENWSK][0-9]{8}", location.geoCode):
                 location_type = OrganisationLocation.LocationTypes(
                     location.locationType
@@ -578,11 +583,11 @@ class Organisation(models.Model):
             location_type = OrganisationLocation.LocationTypes(
                 location.locationType
             ).label
-            if (
-                location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE
-                and location.geo_laua
-            ):
-                locations[location_type][location.geo_iso].add(location.geo_laua)
+            if location.geoCodeType == OrganisationLocation.GeoCodeTypes.POSTCODE:
+                if location.geo_msoa21:
+                    locations[location_type][location.geo_iso].add(location.geo_msoa21)
+                elif location.geo_laua:
+                    locations[location_type][location.geo_iso].add(location.geo_laua)
             elif location.geoCode:
                 locations[location_type][location.geo_iso].add(location.geoCode)
         return locations
