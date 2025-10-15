@@ -75,11 +75,11 @@ django==5.2.7
     #   django-filter
     #   django-markdownx
     #   django-ninja
-    #   django-ninja-apikey
     #   django-prettyjson
     #   django-registration
     #   django-sql-dashboard
     #   graphene-django
+    #   ninja-api-key
 django-better-admin-arrayfield==1.4.2
     # via -r requirements.in
 django-cors-headers==4.9.0
@@ -99,9 +99,7 @@ django-markdownx==4.0.9
 django-ninja==1.4.3
     # via
     #   -r requirements.in
-    #   django-ninja-apikey
-django-ninja-apikey==0.2.1
-    # via -r requirements.in
+    #   ninja-api-key
 django-prettyjson==0.4.1
     # via -r requirements.in
 django-registration==5.2.1
@@ -118,10 +116,6 @@ elasticsearch-dsl==7.4.1
     #   django-elasticsearch-dsl
 et-xmlfile==2.0.0
     # via openpyxl
-exceptiongroup==1.3.0
-    # via
-    #   cattrs
-    #   pytest
 fake-useragent==2.2.0
     # via requests-html
 faker==37.11.0
@@ -184,6 +178,8 @@ markupsafe==3.0.3
     # via jinja2
 more-itertools==10.8.0
     # via inflect
+ninja-api-key==1.0.3
+    # via -r requirements.in
 oauthlib==3.3.1
     # via
     #   requests-oauthlib
@@ -315,8 +311,6 @@ titlecase==2.4.1
     # via
     #   -r requirements.in
     #   charity-django
-tomli==2.3.0
-    # via pytest
 tqdm==4.67.1
     # via
     #   -r requirements.in
@@ -328,15 +322,12 @@ typeguard==4.4.4
     # via inflect
 typing-extensions==4.15.0
     # via
-    #   asgiref
     #   beautifulsoup4
     #   cattrs
-    #   exceptiongroup
     #   graphene
     #   pydantic
     #   pydantic-core
     #   pyee
-    #   referencing
     #   typeguard
     #   typing-inspection
 typing-inspection==0.4.2

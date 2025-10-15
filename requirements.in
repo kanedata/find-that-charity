@@ -10,7 +10,7 @@ django-markdownx>=4.0.0b1
 django-widget-tweaks
 dj-database-url
 django-ninja>=1.0.0
-django-ninja-apikey
+ninja-api-key
 django-registration
 git+https://github.com/drkane/django-sql-dashboard.git@dk/issue-141
 whitenoise
