@@ -44,7 +44,7 @@ django-debug-toolbar
 django-enforce-host
 ua-parser
 sqlite-utils
-git+https://github.com/kanedata/charity-django.git@v0.16.1
+git+https://github.com/kanedata/charity-django.git@v0.27.0
 certifi
 xlsxwriter
 boto3

@@ -95,8 +95,8 @@ def get_organisation_list(request, filters: OrganisationIn = Query({})):
 )
 def get_random_organisation(
     request,
-    active_only: bool = Query(False),
-    organisation_type: str = Query("registered-charity"),
+    active_only: bool = False,
+    organisation_type: str = "registered-charity",
 ):
     """Get a random charity record"""
     q = OrganisationGroup.search().update_from_dict(
@@ -110,6 +110,7 @@ def get_random_organisation(
             "error": None,
             "params": {
                 "active_only": active_only,
+                "organisation_type": organisation_type,
             },
             "result": organisation,
         }

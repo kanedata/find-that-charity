@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     "geo",
     "other_data",
     "ftcbot",
+    "charity_django.utils",
     "charity_django.companies",
     "markdownx",
     "prettyjson",
