@@ -10,6 +10,10 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
+            "DROP MATERIALIZED VIEW IF EXISTS superhighways_london_organisations_view CASCADE;",
+            "",
+        ),
+        migrations.RunSQL(
             """
             CREATE MATERIALIZED VIEW superhighways_london_organisations_view AS
             WITH n_charity AS (
