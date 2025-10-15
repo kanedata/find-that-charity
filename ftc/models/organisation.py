@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django_better_admin_arrayfield.models.fields import ArrayField
 
+from findthatcharity.utils import process_wikipedia_url
 from ftc.models.organisation_classification import OrganisationClassification
 from ftc.models.organisation_link import OrganisationLink
 from ftc.models.organisation_location import OrganisationLocation
@@ -351,6 +352,90 @@ class Organisation(models.Model):
                 yield (link[0], f"{link[1]} ({link[2].id})", link[2])
             else:
                 yield link
+
+    def wikidata_links(self):
+        from other_data.models.wikidata import WikiDataItem
+
+        links_seen = set()
+        for item in WikiDataItem.objects.filter(org_id__in=self.orgIDs).all():
+            item_links = []
+            if item.twitter:
+                handle = item.twitter.lstrip("@")
+                link = (
+                    "https://twitter.com/{}".format(handle),
+                    f"Twitter: @{handle}",
+                    item.org_id,
+                )
+                item_links.append(link)
+            if item.facebook:
+                handle = item.facebook.lstrip("/")
+                link = (
+                    "https://facebook.com/{}".format(handle),
+                    f"Facebook: {handle}",
+                    item.org_id,
+                )
+                item_links.append(link)
+            if item.instagram:
+                handle = item.instagram.lstrip("@")
+                link = (
+                    "https://www.instagram.com/{}".format(handle),
+                    f"Instagram: {handle}",
+                    item.org_id,
+                )
+                item_links.append(link)
+            if item.linkedin:
+                handle = item.linkedin.lstrip("/")
+                link = (
+                    "https://www.linkedin.com/company/{}".format(handle),
+                    f"LinkedIn: {handle}",
+                    item.org_id,
+                )
+                item_links.append(link)
+            if item.youtube:
+                handle = item.youtube.lstrip("/")
+                link = (
+                    "https://www.youtube.com/channel/{}".format(handle),
+                    "YouTube",
+                    item.org_id,
+                )
+                item_links.append(link)
+            if item.bluesky:
+                handle = item.bluesky.lstrip("@")
+                link = (
+                    "https://bsky.app/profile/{}".format(handle),
+                    f"Bluesky: @{handle}",
+                    item.org_id,
+                )
+                item_links.append(link)
+            if item.wikipedia_url:
+                link = (
+                    item.wikipedia_url,
+                    f"Wikipedia: {process_wikipedia_url(item.wikipedia_url)}",
+                    item.org_id,
+                )
+                item_links.append(link)
+            if item.wikidata_id:
+                link = (
+                    item.wikidata_id,
+                    "Wikidata: {}".format(item.wikidata_id.split("/")[-1]),
+                    item.org_id,
+                )
+                item_links.append(link)
+            for link in item_links:
+                if link not in links_seen:
+                    yield link
+                    links_seen.add(link)
+
+    @cached_property
+    def wikidata_id(self):
+        from other_data.models.wikidata import WikiDataItem
+
+        item = WikiDataItem.objects.filter(
+            org_id__in=self.orgIDs, wikidata_id__isnull=False
+        ).first()
+        if item and item.wikidata_id:
+            return item.wikidata_id
+        return None
 
     @cached_property
     def sameAs(self):

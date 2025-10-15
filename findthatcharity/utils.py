@@ -3,11 +3,7 @@ from urllib.parse import urlparse
 
 import babel.numbers
 import inflect
-import requests
 from django.conf import settings
-from django.core.cache import cache
-
-from ftc.models.organisation import Organisation
 
 WORD_BOUNDARY_REGEX = re.compile(r"\b\w+\b")
 
@@ -97,50 +93,6 @@ def get_domain(url):
     if domain in settings.IGNORE_DOMAINS:
         return None
     return domain
-
-
-def get_trending_organisations(examples):
-    def get_from_simple_analytics():
-        if settings.SIMPLE_ANALYTICS_API_KEY:
-            try:
-                r = requests.get(
-                    "https://simpleanalytics.com/findthatcharity.uk.json?fields=pages&version=5&pages=%2Forgid%2FGB-*",
-                    headers={
-                        "Api-Key": settings.SIMPLE_ANALYTICS_API_KEY,
-                    },
-                )
-                r.raise_for_status()
-                organisations = [
-                    {
-                        **page,
-                        "org_id": page["value"].split("/")[-1],
-                    }
-                    for page in r.json()["pages"]
-                ]
-                for org in organisations:
-                    if org["org_id"] in examples:
-                        continue
-                    organisation = Organisation.objects.filter(
-                        org_id=org["org_id"]
-                    ).first()
-                    if not organisation:
-                        continue
-                    if org["pageviews"] < 10:
-                        continue
-                    yield {
-                        **org,
-                        "organisation": organisation,
-                    }
-            except Exception as e:
-                print(e.msg)
-                pass
-        return []
-
-    return cache.get_or_set(
-        "trending_organisations",
-        lambda: list(get_from_simple_analytics()),
-        60 * 60 * 24,
-    )
 
 
 def process_wikipedia_url(url):

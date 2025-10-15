@@ -2,13 +2,17 @@ from ftc.management.commands._base_scraper import HTMLScraper
 from other_data.models import WikiDataItem
 
 SPARQL_QUERY = """
-SELECT ?item ?itemLabel ?charity ?article ?articlename ?twitter ?facebook ?grid WHERE {
+SELECT ?item ?itemLabel ?charity ?article ?articlename ?twitter ?facebook ?instagram ?linkedin ?youtube ?bluesky ?grid WHERE {
   ?item wdt:P3057 ?charity.
   OPTIONAL {?article schema:about ?item ;
               schema:name ?articlename .
   ?article schema:isPartOf <https://en.wikipedia.org/>.}
   OPTIONAL { ?item wdt:P2002 ?twitter. }
   OPTIONAL { ?item wdt:P2013 ?facebook. }
+  OPTIONAL { ?item wdt:P2003 ?instagram. }
+  OPTIONAL { ?item wdt:P4264 ?linkedin. }
+  OPTIONAL { ?item wdt:P2397 ?youtube. }
+  OPTIONAL { ?item wdt:P12361 ?bluesky. }
   OPTIONAL { ?item wdt:P2427 ?grid. }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }  ORDER BY ?itemLabel
@@ -82,6 +86,10 @@ class Command(HTMLScraper):
             "wikipedia_url": row.get("article"),
             "twitter": row.get("twitter"),
             "facebook": row.get("facebook"),
+            "instagram": row.get("instagram"),
+            "linkedin": row.get("linkedin"),
+            "youtube": row.get("youtube"),
+            "bluesky": row.get("bluesky"),
             "grid_id": "XI-GRID-{}".format(row.get("grid"))
             if row.get("grid")
             else None,
@@ -134,6 +142,10 @@ class Command(HTMLScraper):
                     .get("url"),
                     "twitter": get_property(entity, "P2002"),
                     "facebook": get_property(entity, "P2013"),
+                    "instagram": get_property(entity, "P2003"),
+                    "linkedin": get_property(entity, "P4264"),
+                    "youtube": get_property(entity, "P2397"),
+                    "bluesky": get_property(entity, "P12361"),
                     "grid_id": "XI-GRID-{}".format(grid_id) if grid_id else None,
                     "spider": self.name,
                     "scrape": self.scrape,

@@ -11,6 +11,10 @@ class WikiDataItem(models.Model):
     wikipedia_url = models.URLField(null=True, blank=True, max_length=1000)
     twitter = models.CharField(max_length=255, null=True, blank=True)
     facebook = models.CharField(max_length=255, null=True, blank=True)
+    instagram = models.CharField(max_length=255, null=True, blank=True)
+    linkedin = models.CharField(max_length=255, null=True, blank=True)
+    youtube = models.CharField(max_length=255, null=True, blank=True)
+    bluesky = models.CharField(max_length=255, null=True, blank=True)
     grid_id = models.CharField(max_length=255, null=True, blank=True)
     scrape = models.ForeignKey(
         "ftc.Scrape",

@@ -15,7 +15,9 @@
 </div>
 
 {% set links = org.get_links()|list %}
-{% if links or wikidata %}
+{% set wikidata_links = org.wikidata_links()|list %}
+{% set wikidata_id = org.wikidata_id %}
+{% if links or wikidata_links %}
 <article class="message is-info">
     <h4 class="ma0 pa0">More about this organisation</h4>
     <p class="f6 gray">Find that Charity is not responsible for the content of external websites</p>
@@ -36,49 +38,19 @@
                 {% endif %}
             </li>
             {% endfor %}
-            {% if wikidata %}
-            {% for twitter in wikidata.values_list('twitter', flat=True).distinct() %}
-            {% if twitter %}
+            {% for link in wikidata_links %}
             <li class="w-100 mb2">
-                Twitter: <a class="link dark-blue underline" href="https://twitter.com/{{ twitter }}" target="_blank">
-                    @{{ twitter }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                <a class="link dark-blue underline" href="{{ link[0] }}" target="_blank">
+                    {{ link[1] }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
                 </a>
             </li>
-            {% endif %}
             {% endfor %}
-            {% for facebook in wikidata.values_list('facebook', flat=True).distinct() %}
-            {% if facebook %}
-            <li class="w-100 mb2">
-                Facebook: <a class="link dark-blue underline" href="https://facebook.com/{{ facebook }}"
-                    target="_blank">
-                    facebook.com/{{ facebook }}<span class="material-icons ml1"
-                        title="Opens in a new window">launch</span>
-                </a>
-            </li>
-            {% endif %}
-            {% endfor %}
-            {% set wikipedia_links = wikidata.values_list('wikipedia_url', flat=True).distinct() %}
-            {% for wiki in wikipedia_links %}
-            {% if wiki %}
-            <li class="w-100 mb2">
-                Wikipedia: <a class="link dark-blue underline" href="{{ wiki }}" target="_blank">
-                    {{ wiki|process_wikipedia_url }}<span class="material-icons ml1"
-                        title="Opens in a new window">launch</span>
-                </a>
-            </li>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
         </ul>
-        {% if wikidata %}
-        {% for wikidata_id in wikidata.values_list('wikidata_id', flat=True).distinct() %}
-        {% if loop.first %}
-        <p class="f6 gray">Twitter, Facebook and Wikipedia links from Wikidata</p>
+        {% if wikidata_id %}
+        <p class="f6 gray">Social media and Wikipedia links from Wikidata</p>
         <a class="link dark-blue underline db" href="{{ wikidata_id }}" target="_blank">
             <img src="{{ static('images/Wikidata_Stamp_Rec_Light.svg') }}" alt="Wikidata logo" class="db mb2 mw4" />
         </a>
-        {% endif %}
-        {% endfor %}
         {% endif %}
     </div>
 </article>
