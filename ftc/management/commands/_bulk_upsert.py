@@ -91,8 +91,7 @@ class BulkQuerySet(QuerySet):
                 )
             if any(f.primary_key for f in update_fields):
                 raise ValueError(
-                    "bulk_create() cannot be used with primary keys in "
-                    "update_fields."
+                    "bulk_create() cannot be used with primary keys in update_fields."
                 )
             if unique_fields:
                 available_fields = {

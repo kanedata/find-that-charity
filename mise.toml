@@ -7,23 +7,23 @@ test = ['pytest . {{arg(name="pytest_args", var=true, default="")}}']
 lint = ["ruff check .", "ruff format . --check"]
 fmt = ["ruff format .", "ruff check . --fix"]
 pip = [
-    "uv pip compile -o requirements.txt requirements.in",
-    "uv pip sync requirements.txt",
+  "uv pip compile -o requirements.txt requirements.in",
+  "uv pip sync requirements.txt",
 ]
 loc = 'uvx pygount --format=summary --folders-to-skip="[...],node_modules,staticfiles,static" .'
 
 [tasks.mm]
 depends_post = ["fmt"]
 run = [
-    'python manage.py makemigrations {{arg(name="makemigrations_args", var=true, default="")}}',
+  'python manage.py makemigrations {{arg(name="makemigrations_args", var=true, default="")}}',
 ]
 
 [tasks.m]
 depends = ["collectstatic"]
 run = [
-    'python manage.py migrate --database admin --noinput {{arg(name="migration_args", var=true, default="")}}',
-    'python manage.py migrate --database data --noinput {{arg(name="migration_args", var=true, default="")}}',
-    "python manage.py createcachetable",
+  'python manage.py migrate --database admin --noinput {{arg(name="migration_args", var=true, default="")}}',
+  'python manage.py migrate --database data --noinput {{arg(name="migration_args", var=true, default="")}}',
+  "python manage.py createcachetable",
 ]
 
 [tasks.full_test]
