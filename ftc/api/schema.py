@@ -133,11 +133,11 @@ class Organisation(Schema):
             }
         ] + [
             {
-                "site": site,
-                "url": url,
-                "orgid": orgid,
+                "site": link.title,
+                "url": link.url,
+                "orgid": link.entity,
             }
-            for url, site, orgid in obj._get_links()
+            for link in obj._get_links()
         ]
 
     @staticmethod

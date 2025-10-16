@@ -195,17 +195,9 @@ class RelatedOrganisation:
         links_seen = set()
         for r in self.records:
             for link in r.get_links():
-                if link[1] not in links_seen:
+                if link.title not in links_seen:
                     yield link
-                links_seen.add(link[1])
-
-    def wikidata_links(self):
-        links_seen = set()
-        for r in self.records:
-            for link in r.wikidata_links():
-                if link[1] not in links_seen:
-                    yield link
-                links_seen.add(link[1])
+                links_seen.add(link.title)
 
     def recordsBySource(self, source_id):
         return [r for r in self.records if r.source_id == source_id]
@@ -398,7 +390,7 @@ class RelatedOrganisation:
                 },
             ]
             + [
-                {"site": link[1], "url": link[0], "orgid": link[2]}
+                {"site": link.title, "url": link.url, "orgid": link.entity}
                 for link in self.get_links()
             ],
             "orgIDs": self.orgIDs,
