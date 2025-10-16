@@ -15,34 +15,34 @@
 </div>
 
 {% set links = org.get_links()|list %}
-{% set wikidata_links = org.wikidata_links()|list %}
 {% set wikidata_id = org.wikidata_id %}
-{% if links or wikidata_links %}
+{% if links or wikidata_id %}
 <article class="message is-info">
     <h4 class="ma0 pa0">More about this organisation</h4>
     <p class="f6 gray">Find that Charity is not responsible for the content of external websites</p>
     <div class="message-body">
         <ul class="mb4 mt2 list mh0 pa0 f5">
             {% for link in links %}
-            <li class="w-100 mb2">
-                {% if link[0].startswith("POST:") %}
-                <form method="POST" action="{{ link[0][5:] }}" target="_blank">
-                    <button type="submit" class="link dark-blue underline di bn pointer bg-transparent pa0 ma0">
-                        {{ link[1] }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
-                    </button>
-                </form>
-                {% else %}
-                <a class="link dark-blue underline" href="{{ link[0] }}" target="_blank">
-                    {{ link[1] }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+            <li class="w-100 mv2 flex items-center">
+                {% if link.logo %}
+                <a class="w2 db mr2" href="{{ link.url }}" target="_blank" title="{{ link.prefix }}: {{ link.title }}">
+                    <img src="{{ static(link.logo) }}" alt="{{ link.title }}" class="w2 h2 br-100 v-mid" />
                 </a>
                 {% endif %}
-            </li>
-            {% endfor %}
-            {% for link in wikidata_links %}
-            <li class="w-100 mb2">
-                <a class="link dark-blue underline" href="{{ link[0] }}" target="_blank">
-                    {{ link[1] }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
-                </a>
+                <div class="flex-grow">
+                    {% if link.prefix and link.prefix != link.title and not link.logo %}{{ link.prefix }}: {% endif %}
+                    {% if link.url.startswith("POST:") %}
+                    <form method="POST" action="{{ link.url[5:] }}" target="_blank">
+                        <button type="submit" class="link dark-blue underline di bn pointer bg-transparent pa0 ma0">
+                            {{ link.title }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                        </button>
+                    </form>
+                    {% else %}
+                    <a class="link dark-blue underline" href="{{ link.url }}" target="_blank">
+                        {{ link.title }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+                    </a>
+                    {% endif %}
+                </div>
             </li>
             {% endfor %}
         </ul>

@@ -1,7 +1,7 @@
 import datetime
 import re
 from collections import defaultdict
-from typing import Counter
+from typing import Counter, Generator
 
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django_better_admin_arrayfield.models.fields import ArrayField
 
-from findthatcharity.utils import process_wikipedia_url
+from findthatcharity.utils import Link, process_wikipedia_url
 from ftc.models.organisation_classification import OrganisationClassification
 from ftc.models.organisation_link import OrganisationLink
 from ftc.models.organisation_location import OrganisationLocation
@@ -332,9 +332,9 @@ class Organisation(models.Model):
                 obj["sameAs"] = obj["sameAs"][0]
         return obj
 
-    def _get_links(self):
+    def _get_links(self) -> Generator[Link, None, None]:
         if self.url:
-            yield (self.cleanUrl, self.displayUrl, self.org_id)
+            yield Link(self.cleanUrl, self.displayUrl, self.org_id)
         if not self.orgIDs:
             return
         for o in self.orgIDs:
@@ -342,16 +342,16 @@ class Organisation(models.Model):
                 f"{o.scheme}-{self.spider}", []
             )
             for link in links:
-                yield (link[0].format(o.id), link[1], o)
+                yield Link(link[0].format(o.id), link[1], o)
 
     def get_links(self):
         links = list(self._get_links())
-        link_counts = Counter(elem[1] for elem in links)
+        links.extend(sorted(self.wikidata_links(), key=lambda x: x.prefix))
+        link_counts = Counter(elem.title for elem in links)
         for link in links:
-            if link_counts[link[1]] > 1:
-                yield (link[0], f"{link[1]} ({link[2].id})", link[2])
-            else:
-                yield link
+            if link_counts[link.title] > 1:
+                link.title = f"{link.title} ({link.entity.id})"
+            yield link
 
     def wikidata_links(self):
         from other_data.models.wikidata import WikiDataItem
@@ -361,70 +361,86 @@ class Organisation(models.Model):
             item_links = []
             if item.twitter:
                 handle = item.twitter.lstrip("@")
-                link = (
+                link = Link(
                     "https://twitter.com/{}".format(handle),
-                    f"Twitter: @{handle}",
-                    item.org_id,
+                    f"@{handle}",
+                    handle,
+                    prefix="Twitter / X",
+                    logo="images/links/x.svg",
                 )
                 item_links.append(link)
             if item.facebook:
                 handle = item.facebook.lstrip("/")
-                link = (
+                link = Link(
                     "https://facebook.com/{}".format(handle),
-                    f"Facebook: {handle}",
-                    item.org_id,
+                    handle,
+                    handle,
+                    prefix="Facebook",
+                    logo="images/links/facebook.svg",
                 )
                 item_links.append(link)
             if item.instagram:
                 handle = item.instagram.lstrip("@")
-                link = (
+                link = Link(
                     "https://www.instagram.com/{}".format(handle),
-                    f"Instagram: {handle}",
-                    item.org_id,
+                    handle,
+                    handle,
+                    prefix="Instagram",
+                    logo="images/links/instagram.svg",
                 )
                 item_links.append(link)
             if item.linkedin:
                 handle = item.linkedin.lstrip("/")
-                link = (
+                link = Link(
                     "https://www.linkedin.com/company/{}".format(handle),
-                    f"LinkedIn: {handle}",
-                    item.org_id,
+                    handle,
+                    handle,
+                    prefix="LinkedIn",
+                    logo="images/links/linkedin.svg",
                 )
                 item_links.append(link)
             if item.youtube:
                 handle = item.youtube.lstrip("/")
-                link = (
+                link = Link(
                     "https://www.youtube.com/channel/{}".format(handle),
                     "YouTube",
-                    item.org_id,
+                    handle,
+                    prefix="YouTube",
+                    logo="images/links/youtube.svg",
                 )
                 item_links.append(link)
             if item.bluesky:
                 handle = item.bluesky.lstrip("@")
-                link = (
+                link = Link(
                     "https://bsky.app/profile/{}".format(handle),
-                    f"Bluesky: @{handle}",
-                    item.org_id,
+                    f"@{handle}",
+                    handle,
+                    prefix="Bluesky",
+                    logo="images/links/bluesky.svg",
                 )
                 item_links.append(link)
             if item.wikipedia_url:
-                link = (
+                link = Link(
                     item.wikipedia_url,
-                    f"Wikipedia: {process_wikipedia_url(item.wikipedia_url)}",
-                    item.org_id,
+                    process_wikipedia_url(item.wikipedia_url),
+                    process_wikipedia_url(item.wikipedia_url),
+                    prefix="Wikipedia",
+                    logo="images/links/wikipedia.svg",
                 )
                 item_links.append(link)
-            if item.wikidata_id:
-                link = (
-                    item.wikidata_id,
-                    "Wikidata: {}".format(item.wikidata_id.split("/")[-1]),
-                    item.org_id,
-                )
-                item_links.append(link)
+            # if item.wikidata_id:
+            #     id = item.wikidata_id.split("/")[-1]
+            #     link = Link(
+            #         item.wikidata_id,
+            #         id,
+            #         id,
+            #         prefix="Wikidata",
+            #     )
+            #     item_links.append(link)
             for link in item_links:
-                if link not in links_seen:
+                if link.title not in links_seen:
                     yield link
-                    links_seen.add(link)
+                    links_seen.add(link.title)
 
     @cached_property
     def wikidata_id(self):

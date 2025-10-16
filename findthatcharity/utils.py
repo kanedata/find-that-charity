@@ -1,4 +1,5 @@
 import re
+from dataclasses import dataclass
 from urllib.parse import urlparse
 
 import babel.numbers
@@ -8,6 +9,16 @@ from django.conf import settings
 WORD_BOUNDARY_REGEX = re.compile(r"\b\w+\b")
 
 p = inflect.engine()
+
+
+@dataclass
+class Link:
+    url: str
+    title: str
+    entity: str
+    prefix: str = ""
+    logo: str = ""
+    count: int = 0
 
 
 def url_replace(request, **kwargs):

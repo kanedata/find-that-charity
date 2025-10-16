@@ -325,7 +325,7 @@ body {
     font-weight: 400;
 }
 
-@media screen and (min-width: 60em){
+@media screen and (min-width: 60em) {
     .sql-dashboard .results-grid {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
