@@ -350,7 +350,7 @@ class Organisation(models.Model):
         link_counts = Counter(elem.title for elem in links)
         for link in links:
             if link_counts[link.title] > 1:
-                link.title = f"{link.title} ({link.entity.id})"
+                link.title = f"{link.title} ({link.entity})"
             yield link
 
     def wikidata_links(self):
