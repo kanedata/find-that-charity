@@ -347,9 +347,9 @@ class Organisation(models.Model):
     def get_links(self):
         links = list(self._get_links())
         links.extend(sorted(self.wikidata_links(), key=lambda x: x.prefix))
-        link_counts = Counter(elem.title for elem in links)
+        link_counts = Counter(f"{elem.prefix} {elem.title}" for elem in links)
         for link in links:
-            if link_counts[link.title] > 1:
+            if link_counts[f"{link.prefix} {link.title}"] > 1:
                 link.title = f"{link.title} ({link.entity})"
             yield link
 
