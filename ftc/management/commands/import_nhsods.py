@@ -2,17 +2,190 @@ import copy
 import csv
 import datetime
 import io
-import zipfile
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation, Source
+
+"""
+Import NHS Organisation Data Service (NHS ODS) data.
+
+As of November 2025, the ODS has a new API endpoint for downloading reports, which replaces the previous static ZIP files.
+
+Automate/Schedule the Download of Report Packages
+
+An API endpoint has been created for DSE that enables users to automate / schedule downloads of predefined reports programmatically.
+
+The DSE API endpoint can be queried via an internet browser, API querying tools (i.e. Postman) or via command scripts.
+
+Users can query specific predefined reports or report bundles and optionally filter results to show only records created/amended/closed since a given date or within a specified period of time (i.e. last 7 days).
+
+The response will contain the requested report(s) in an object format or provide error messages when invalid parameters are used.
+
+The report data will be in csv format with no headers, consistent with legacy ODS .csv files previously published on the ODS website or via TRUD. Multiple reports or a report bundle will be output as multiple .csv in a .zip file.
+
+Report specifications are not included in the download, these can be accessed via the ODS Reference Data Catalogue.
+
+Request
+
+Method: GET 
+Endpoint: /getReport
+
+Query Parameters
+Parameter	Type	Description
+report	String	The report name or a comma-separated list of report names for multiple reports. You cannot use this parameter with reportBundle.
+reportBundle	String	Use “prescribingDataPack” to get the following reports: 'ebranchs', 'edispensary', 'egmcmem', 'egpcur', 'epcmem', 'epharmacyhq', 'epraccur', 'epracmem'. You cannot use this parameter with report.
+lastChangeStart	String 	The start date for filtering reports based on the last changed date. Must be in yyyy-mm-dd format.Used only when querying a single report using the report parameter.
+lastChangePeriod	String	A period for filtering reports to include only records added/updated/closed in the period. Must be one of the following: 7, 30, or 90 (e.g., changes in the last 7, 30, or 90 days). Used only when querying multiple reports using the report parameter or querying using reportBundle.
+
+Note:
+
+    When specifying/including report parameters they are case sensitive.
+    lastChangeStart only applies when requesting single reports, lastChangePeriod applies only to report bundles/packs.
+
+
+Response
+
+Success Response (200)
+
+The response body contains an object where each report name is a key, and its corresponding data (in CSV format) is the value.
+
+Example:
+{ 
+"eauth ": (csvData)
+"educate ": (csvData)
+}
+
+Error Responses
+
+    400 Bad Request: If any required parameter is missing or invalid, or if conflicting parameters are provided.
+    405 Method Not Allowed: If the HTTP method is not GET.
+
+Example:
+{ 
+"error": "Missing report query parameter"
+}
+
+Error Handling
+
+    Missing report or reportBundle query parameter: You must provide either  report or  reportBundle. You cannot use both.
+    Invalid date format:  lastChangeStart  must be in yyyy-mm-dd format.
+    Invalid use of lastChangeStart: These parameters cannot be used with  reportBundle.
+    lastChangePeriod invalid: The value of  lastChangePeriod must be one of 7, 30, or 90.
+    Invalid combination of report and lastChangePeriod: If you query a single report, you cannot use lastChangePeriod.
+    Future Date Error: Dates cannot be in the future. The API will reject any future dates with a 400 error.
+
+
+Examples
+
+Get a single report
+
+Request: GET 
+https://www.odsdatasearchandexport.nhs.uk/api/getReport?report=eauth
+
+Get report with only changes since a given date
+
+Request: GET 
+https://www.odsdatasearchandexport.nhs.uk/api/getReport?report=eauth&lastChangeStart=2025-01-01
+
+Get a premade report bundle (prescribingDataPack) with only changes within a specific period
+
+Request: GET 
+https://www.odsdatasearchandexport.nhs.uk/api/getReport?reportBundle=prescribingDataPack&lastChangePeriod=7
+
+Get multiple reports with only changes within a specific period (7, 30 or 90 days)
+
+Request: GET 
+https://www.odsdatasearchandexport.nhs.uk/api/getReport?report=eauth,educate&lastChangePeriod=30
+
+Get multiple reports with only changes within a specific period that replicates the amendment files previously provided in the TRUD Weekly Prescribing Data pack
+
+Request: GET 
+https://www.odsdatasearchandexport.nhs.uk/api/getReport?report=ebranchs,edispensary,epharmacyhq&lastChangePeriod=7
+
+List of Available Reports
+
+Below is a full list of permitted report names, queries must specify report names in this EXACT format.
+
+Due to their nature (i.e. they may be snapshot files), not all reports are available to run as ‘amendments only’ – these are indicated below.
+Permitted Reports (Full Files)	Not available as Amendment Files / 'Changes Since'
+eabeydispgp	
+eauth	
+ebranchs	
+ecarehomehq	
+ecarehomesite	
+eccg	
+eccgsite	
+econcur	*
+ecsu	
+ecsusite	
+ect	
+ectsite	
+edconcur	*
+edispensary	
+educate	
+egdpprac	
+egmcmem	*
+egpcur	
+ehospice	
+eiom	
+ejustice	
+enonnhs	
+ensa	
+enurse	*
+eopthq	
+eoptsite	
+eother	
+epcdp	
+epcmem	*
+epcn	
+epcncorepartnerdetails	*
+epharmacyhq	
+ephp	
+ephpsite	
+eplab	
+epraccur	
+epracmem	*
+eschools	
+espha	
+etr	
+etreat	
+etrust	
+ets	
+lauth	
+lauthsite	
+ngpcur	
+niorg	
+nlhscgpr	*
+npraccur	
+succ	*
+wlhb	
+wlhbsite	
+
+Download File Naming Conventions
+
+Zip file naming convention for FULL report bundles/packs
+
+22_04_2025_ prescribingDataPack.zip
+22_04_2025_userDefinedPack.zip
+Where the date is the date the pack was run/downloaded.
+
+Csv and Zip file naming conventions for AMENDMENTS ONLY report bundles/packs
+
+The first date is the user defined ‘Last Change Date and the ‘to’ date is the date the file was run. i.e.: 
+
+    edispensary_changes_20250301_to_20250424.csv 
+
+or for a bundle, :
+
+    prescribingDataPack_changes_90_days_to_20250424.zip
+"""
 
 
 class Command(HTMLScraper):
     name = "nhsods"
     allowed_domains = ["nhs.uk"]
     start_urls = [
-        "https://digital.nhs.uk/services/organisation-data-service/data-downloads"
+        "https://digital.nhs.uk/services/organisation-data-service/data-search-and-export"
     ]
     org_id_prefix = "GB-NHS"
     id_field = "Code"
@@ -30,96 +203,24 @@ class Command(HTMLScraper):
         "distribution": [{"downloadURL": "", "accessURL": "", "title": ""}],
     }
     zipfiles = [
-        # {
-        #   "org_type": "NHS England Commissioning and Government Office Regions",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/eauth.zip",
-        #   "id": "eauth",
-        # },
-        {
-            "org_type": "Special Health Authority",
-            "url": "https://files.digital.nhs.uk/assets/ods/current/espha.zip",
-            "id": "espha",
-        },
-        {
-            "org_type": "Commissioning Support Unit",
-            "url": "https://files.digital.nhs.uk/assets/ods/current/ecsu.zip",
-            "id": "ecsu",
-        },
-        # {
-        #   "org_type": "Commissioning Support Units sites",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/ecsusite.zip",
-        #   "id": "ecsusite",
-        # },
-        # {
-        #   "org_type": "Executive Agency Programme",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/eother.zip",
-        #   "id": "eother",
-        # },
-        {
-            "org_type": "NHS Support Agency or Shared Service",
-            "url": "https://files.digital.nhs.uk/assets/ods/current/ensa.zip",
-            "id": "ensa",
-        },
-        {
-            "org_type": "GP practice",
-            "url": "https://files.digital.nhs.uk/assets/ods/current/epraccur.zip",
-            "id": "epraccur",
-        },
-        {
-            "org_type": "Clinical Commissioning Group",
-            "url": "https://files.digital.nhs.uk/assets/ods/current/eccg.zip",
-            "id": "eccg",
-        },
-        # {
-        #   "org_type": "Clinical Commissioning Group sites",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/eccgsite.zip"
-        #   "id": "eccgsite",
-        # },
-        {
-            "org_type": "NHS Trust",
-            "url": "https://files.digital.nhs.uk/assets/ods/current/etr.zip",
-            "id": "etr",
-        },
-        # {
-        #   "org_type": "NHS Trust sites",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/ets.zip"
-        #   "id": "ets",
-        # },
-        # {
-        #   "org_type": "NHS Trusts and sites",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/etrust.zip"
-        #   "id": "etrust",
-        # },
-        {
-            "org_type": "Care Trust",
-            "url": "https://files.digital.nhs.uk/assets/ods/current/ect.zip",
-            "id": "ect",
-        },
-        # {
-        #   "org_type": "Care Trust sites",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/ectsite.zip"
-        #   "id": "ectsite",
-        # },
-        # {
-        #   "org_type": "Care Trusts and sites",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/ecare.zip"
-        #   "id": "ecare",
-        # },
-        {
-            "org_type": "Welsh Local Health Board",
-            "url": "https://files.digital.nhs.uk/assets/ods/current/wlhb.zip",
-            "id": "wlhb",
-        },
-        # {
-        #   "org_type": "Welsh Local Health Board sites",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/wlhbsite.zip"
-        #   "id": "wlhbsite",
-        # },
-        # {
-        #   "org_type": "Welsh Local Health Boards and sites",
-        #   "url": "https://files.digital.nhs.uk/assets/ods/current/whbs.zip"
-        #   "id": "whbs",
-        # },
+        # {"org_type": "NHS England Commissioning and Government Office Regions", "id": "eauth"},
+        {"org_type": "Special Health Authority", "id": "espha"},
+        {"org_type": "Commissioning Support Unit", "id": "ecsu"},
+        # {"org_type": "Commissioning Support Units sites", "id": "ecsusite"},
+        # {"org_type": "Executive Agency Programme", "id": "eother"},
+        {"org_type": "NHS Support Agency or Shared Service", "id": "ensa"},
+        {"org_type": "GP practice", "id": "epraccur"},
+        {"org_type": "Clinical Commissioning Group", "id": "eccg"},
+        # {"org_type": "Clinical Commissioning Group sites", "id": "eccgsite"},
+        {"org_type": "NHS Trust", "id": "etr"},
+        # {"org_type": "NHS Trust sites", "id": "ets"},
+        # {"org_type": "NHS Trusts and sites", "id": "etrust"},
+        {"org_type": "Care Trust", "id": "ect"},
+        # {"org_type": "Care Trust sites", "id": "ectsite"},
+        # {"org_type": "Care Trusts and sites", "id": "ecare"},
+        {"org_type": "Welsh Local Health Board", "id": "wlhb"},
+        # {"org_type": "Welsh Local Health Board sites", "id": "wlhbsite"},
+        # {"org_type": "Welsh Local Health Boards and sites", "id": "whbs"},
     ]
     fields = [
         "Code",
@@ -156,14 +257,17 @@ class Command(HTMLScraper):
         self.files = {}
         self.sources = {}
         for u in self.zipfiles:
-            r = self.session.get(u["url"])
+            url = "https://www.odsdatasearchandexport.nhs.uk/api/getReport?report={}".format(
+                u["id"]
+            )
+            r = self.session.get(url)
             r.raise_for_status()
             self.files[u["org_type"]] = r
 
             source = copy.deepcopy(self.source_template)
             source["distribution"] = [
                 {
-                    "downloadURL": u["url"],
+                    "downloadURL": url,
                     "accessURL": self.start_urls[0],
                     "title": u["org_type"],
                 }
@@ -175,20 +279,12 @@ class Command(HTMLScraper):
             )
 
     def parse_file(self, response, org_type):
-        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
-            for f in z.infolist():
-                if not f.filename.endswith(".csv"):
-                    continue
-                self.logger.info("Opening: {}".format(f.filename))
-                with z.open(f) as csvfile:
-                    reader = csv.DictReader(
-                        io.TextIOWrapper(csvfile), fieldnames=self.fields
-                    )
-                    rowcount = 0
-                    for row in reader:
-                        rowcount += 1
-
-                        self.parse_row(row, org_type)
+        content = io.StringIO(response.text)
+        reader = csv.DictReader(content, fieldnames=self.fields)
+        rowcount = 0
+        for row in reader:
+            rowcount += 1
+            self.parse_row(row, org_type)
 
     def parse_row(self, record, org_type=None):
         record = self.clean_fields(record)
