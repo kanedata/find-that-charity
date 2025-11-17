@@ -37,7 +37,6 @@ certifi==2025.10.5
     #   -r requirements.in
     #   charity-django
     #   elasticsearch
-    #   pyppeteer
     #   requests
     #   sentry-sdk
 charity-django @ git+https://github.com/kanedata/charity-django.git@2f283e9cd840a4029a78411ad60bfeedd4762492
@@ -65,7 +64,7 @@ dj-database-url==3.0.1
     # via
     #   -r requirements.in
     #   charity-django
-django==5.2.7
+django==5.2.8
     # via
     #   -r requirements.in
     #   charity-django
@@ -108,7 +107,7 @@ django-sql-dashboard @ git+https://github.com/drkane/django-sql-dashboard.git@af
     # via -r requirements.in
 django-widget-tweaks==1.5.0
     # via -r requirements.in
-elasticsearch==7.17.12
+elasticsearch==7.9.1
     # via elasticsearch-dsl
 elasticsearch-dsl==7.4.1
     # via
@@ -141,8 +140,6 @@ idna==3.11
     # via
     #   requests
     #   url-normalize
-importlib-metadata==8.7.0
-    # via pyppeteer
 inflect==7.5.0
     # via
     #   -r requirements.in
@@ -228,7 +225,7 @@ pygeohash==3.2.0
     # via -r requirements.in
 pygments==2.19.2
     # via pytest
-pyppeteer==2.0.0
+pyppeteer==0.0.25
     # via requests-html
 pyquery==2.0.1
     # via requests-html
@@ -342,7 +339,7 @@ ua-parser-builtins==0.18.0.post1
     # via ua-parser
 url-normalize==2.2.1
     # via requests-cache
-urllib3==1.26.20
+urllib3==2.5.0
     # via
     #   -r requirements.in
     #   botocore
@@ -363,5 +360,3 @@ whitenoise==6.11.0
     # via -r requirements.in
 xlsxwriter==3.2.9
     # via -r requirements.in
-zipp==3.23.0
-    # via importlib-metadata

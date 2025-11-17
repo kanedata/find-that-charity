@@ -33,7 +33,7 @@ PyYAML
 lxml
 pycountry
 sentry-sdk
-urllib3
+urllib3>=2.5.0
 pydantic
 babel
 tweepy
