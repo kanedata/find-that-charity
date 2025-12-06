@@ -39,7 +39,7 @@ certifi==2025.10.5
     #   elasticsearch
     #   requests
     #   sentry-sdk
-charity-django @ git+https://github.com/kanedata/charity-django.git@2f283e9cd840a4029a78411ad60bfeedd4762492
+charity-django @ git+https://github.com/kanedata/charity-django.git@v0.27.0
     # via -r requirements.in
 charset-normalizer==3.4.4
     # via requests
@@ -49,11 +49,6 @@ click==8.3.0
     #   sqlite-utils
 click-default-group==1.2.4
     # via sqlite-utils
-colorama==0.4.6
-    # via
-    #   click
-    #   pytest
-    #   tqdm
 confusable-homoglyphs==3.3.1
     # via django-registration
 coverage==7.11.0
@@ -103,7 +98,7 @@ django-prettyjson==0.4.1
     # via -r requirements.in
 django-registration==5.2.1
     # via -r requirements.in
-django-sql-dashboard @ git+https://github.com/drkane/django-sql-dashboard.git@af90367555984a7af0ef7fdb4ff61555300f1dae
+django-sql-dashboard @ git+https://github.com/drkane/django-sql-dashboard.git@dk/issue-141
     # via -r requirements.in
 django-widget-tweaks==1.5.0
     # via -r requirements.in
@@ -330,16 +325,14 @@ typing-extensions==4.15.0
 typing-inspection==0.4.2
     # via pydantic
 tzdata==2025.2
-    # via
-    #   django
-    #   faker
+    # via faker
 ua-parser==1.0.1
     # via -r requirements.in
 ua-parser-builtins==0.18.0.post1
     # via ua-parser
 url-normalize==2.2.1
     # via requests-cache
-urllib3==2.5.0
+urllib3==2.6.0
     # via
     #   -r requirements.in
     #   botocore
