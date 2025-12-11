@@ -33,24 +33,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.7.19"
+          enable-cache: true
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version-file: ".python-version"
           cache: "pip"
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: uv sync --locked --all-extras --dev
       - name: ruff
         run: |
-          ruff check .
-          ruff format . --check
+          uv run ruff check .
+          uv run ruff format . --check
       - name: Run migrations
         run: |
-          python manage.py migrate --database=data --noinput
-          python manage.py migrate --database=admin --noinput
-          python manage.py collectstatic
+          uv run python manage.py migrate --database=data --noinput
+          uv run python manage.py migrate --database=admin --noinput
+          uv run python manage.py collectstatic
       - name: Test with django test
         run: |
-          pytest
+          uv run pytest
