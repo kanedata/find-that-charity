@@ -1,50 +1,50 @@
 {
-    "formation": {
-        "web": {
-            "quantity": 4
-        }
-    },
-    "cron": [
-        {
-            "command": "python ./manage.py import_oscr",
-            "schedule": "0 20 * * 4"
-        },
-        {
-            "command": "sh ./update_daily.sh",
-            "schedule": "0 1 * * 1-5"
-        },
-        {
-            "command": "sh ./update_saturday.sh",
-            "schedule": "0 1 * * 6"
-        },
-        {
-            "command": "sh ./update_sunday.sh",
-            "schedule": "0 1 * * 0"
-        }
-    ],
-    "healthchecks": {
-        "web": [
-            {
-                "type": "liveness",
-                "name": "Charity page check",
-                "content": "Hope Into Action: Coventry",
-                "path": "/charity/1177548",
-                "attempts": 3
-            },
-            {
-                "type": "liveness",
-                "name": "Charity search check",
-                "content": "Search Results",
-                "path": "/?q=test&orgtype=all",
-                "attempts": 3
-            },
-            {
-                "type": "liveness",
-                "name": "Frontpage",
-                "content": "Search Results",
-                "path": "/",
-                "attempts": 3
-            }
-        ]
+  "formation": {
+    "web": {
+      "quantity": 8
     }
+  },
+  "cron": [
+    {
+      "command": "python ./manage.py import_oscr",
+      "schedule": "0 20 * * 4"
+    },
+    {
+      "command": "sh ./update_daily.sh",
+      "schedule": "0 1 * * 1-5"
+    },
+    {
+      "command": "sh ./update_saturday.sh",
+      "schedule": "0 1 * * 6"
+    },
+    {
+      "command": "sh ./update_sunday.sh",
+      "schedule": "0 1 * * 0"
+    }
+  ],
+  "healthchecks": {
+    "web": [
+      {
+        "type": "liveness",
+        "name": "Charity page check",
+        "content": "Hope Into Action: Coventry",
+        "path": "/charity/1177548",
+        "attempts": 3
+      },
+      {
+        "type": "liveness",
+        "name": "Charity search check",
+        "content": "Search Results",
+        "path": "/?q=test&orgtype=all",
+        "attempts": 3
+      },
+      {
+        "type": "liveness",
+        "name": "Frontpage",
+        "content": "Search Results",
+        "path": "/",
+        "attempts": 3
+      }
+    ]
+  }
 }
