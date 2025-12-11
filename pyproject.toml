@@ -1,3 +1,72 @@
+[project]
+name = "find-that-charity"
+version = "2.0.0"
+description = "A database and search engine for UK charities."
+readme = "readme.md"
+authors = [{ name = "David Kane", email = "david@dkane.net" }]
+requires-python = ">=3.13"
+dependencies = [
+    "babel",
+    "bcp-reader",
+    "boto3",
+    "certifi",
+    "charity-django@git+https://github.com/kanedata/charity-django.git@v0.28.1",
+    "coverage",
+    "dj-database-url",
+    "django-better-admin-arrayfield",
+    "django-cors-headers",
+    "django-debug-toolbar",
+    "django-elasticsearch-dsl>=7.0.0,<8.0.0",
+    "django-enforce-host",
+    "django-environ",
+    "django-filter",
+    "django-markdownx>=4.0.0b1",
+    "django-ninja>=1.0.0",
+    "django-prettyjson",
+    "django-registration",
+    "django-sql-dashboard@git+https://github.com/drkane/django-sql-dashboard.git@dk/issue-141",
+    "django-widget-tweaks",
+    "django",
+    "elasticsearch-dsl>=7.0.0,<8.0.0",
+    "graphene-django",
+    "gunicorn",
+    "humanize",
+    "inflect",
+    "jinja2",
+    "jsonschema",
+    "lxml",
+    "ninja-api-key",
+    "openpyxl",
+    "psycopg2",
+    "pycountry",
+    "pydantic",
+    "pyexcel_ods3",
+    "pygeohash",
+    "pytest-django",
+    "pytest",
+    "python-dotenv",
+    "PyYAML",
+    "requests_cache",
+    "requests_html",
+    "requests-mock",
+    "requests",
+    "ruff",
+    "sentry-sdk",
+    "sqlite-utils",
+    "titlecase",
+    "tqdm",
+    "tweepy",
+    "ua-parser",
+    "urllib3>=2.5.0",
+    "validators",
+    "whitenoise",
+    "xlsxwriter",
+]
+
+
 [tool.ruff]
 lint.select = ["E", "F", "I"]
 lint.ignore = ['E501']
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "findthatcharity.settings"
