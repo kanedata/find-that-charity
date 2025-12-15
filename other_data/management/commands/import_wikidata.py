@@ -36,7 +36,7 @@ class Command(HTMLScraper):
         "description": "",
         "identifier": "gpg",
         "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-        "license_name": " CC0 1.0 Universal (CC0 1.0) Public Domain Dedication ",
+        "license_name": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
         "issued": "",
         "modified": "",
         "publisher": {
@@ -52,6 +52,9 @@ class Command(HTMLScraper):
         ],
     }
     models_to_delete = [WikiDataItem]
+    user_agent = (
+        "FindThatCharityBot/1.0 (https://findthatcharity.uk; info@findthatcharity.uk)"
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
