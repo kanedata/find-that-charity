@@ -70,14 +70,19 @@ ROR includes identifiers and metadata for more than 100,000 organizations. ROR i
                     rowcount = 0
                     for k, i in enumerate(data):
                         # We only want data from certain countries
-                        if (
-                            i.get("country", {}).get("country_code")
-                            not in self.included_countries
-                        ):
+                        include_entry = False
+                        for location in i.get("locations", []):
+                            country_code = location.get("geonames_details", {}).get(
+                                "country_code"
+                            )
+                            if country_code in self.included_countries:
+                                include_entry = True
+                                break
+                        if not include_entry:
                             continue
 
                         # And we only want certain types of organisation (eg exclude private companies)
-                        if "Company" in i.get("types", []):
+                        if "company" in i.get("types", []):
                             continue
 
                         rowcount += 1
@@ -97,12 +102,30 @@ ROR includes identifiers and metadata for more than 100,000 organizations. ROR i
         if not postcode or postcode == "":
             postcode = None
 
-        url = record.get("links")[0] if record.get("links") else None
+        url = None
+        for link in record.get("links", []):
+            if link.get("type") == "website":
+                url = link.get("value")
+                break
+
+        if url and len(url) > 200:
+            url = None
 
         parent = None
         for r in record.get("relationships", [{}]):
             if r.get("type") == "Parent":
                 parent = self.org_id_prefix + "-" + r.get("id").replace(ROR_PREFIX, "")
+
+        org_ids = self.get_org_ids(record.get("external_ids", []))
+
+        name = None
+        alt_names = []
+        for name_record in record.get("names", []):
+            alt_names.append(name_record.get("value"))
+            if "label" in name_record.get("types") and name_record.get("lang") == "en":
+                name = name_record.get("name")
+        if not name and len(alt_names) > 0:
+            name = alt_names[0]
 
         orgtype = record.get("types", [])[0] if record.get("types", []) else "Education"
         orgtypes = []
@@ -112,63 +135,63 @@ ROR includes identifiers and metadata for more than 100,000 organizations. ROR i
             orgtypes.append(self.add_org_type("Research Facility"))
         elif orgtype.lower() == "government":
             orgtypes.append(self.add_org_type("Government Organisation"))
-        elif orgtype.lower() == "university" or record.get("external_ids", {}).get(
-            "HESA"
-        ):
+        elif orgtype.lower() == "university":
             orgtypes.append(self.add_org_type("higher-education-institution"))
         else:
             orgtypes.append(self.add_org_type(orgtype + " Institution"))
 
-        self.add_org_record(
-            Organisation(
-                **{
-                    "org_id": self.get_org_id(record),
-                    "name": record.get("name"),
-                    "charityNumber": None,
-                    "companyNumber": None,
-                    "streetAddress": ", ".join(address),
-                    "addressLocality": record.get("addresses", [{}])[0].get("city"),
-                    "addressRegion": record.get("addresses", [{}])[0].get("state"),
-                    "addressCountry": record.get("addresses", [{}])[0].get("country"),
-                    "postalCode": postcode,
-                    "telephone": None,
-                    "alternateName": record.get("aliases", [])
-                    + record.get("acronyms", []),
-                    "email": record.get("email_address"),
-                    "description": None,
-                    "organisationType": [o.slug for o in orgtypes],
-                    "organisationTypePrimary": orgtypes[0],
-                    "url": url,
-                    "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
-                    "dateRegistered": None,
-                    "dateRemoved": None,
-                    "active": record.get("status") == "active",
-                    "parent": parent,
-                    "orgIDs": [self.get_org_id(record)]
-                    + self.get_org_ids(record.get("external_ids", {})),
-                    "scrape": self.scrape,
-                    "source": self.source,
-                    "spider": self.name,
-                    "org_id_scheme": self.orgid_scheme,
-                }
-            )
+        org = Organisation(
+            **{
+                "org_id": self.get_org_id(record),
+                "name": name,
+                "charityNumber": None,
+                "companyNumber": None,
+                "streetAddress": ", ".join(address),
+                "addressLocality": record.get("addresses", [{}])[0].get("city"),
+                "addressRegion": record.get("addresses", [{}])[0].get("state"),
+                "addressCountry": record.get("addresses", [{}])[0].get("country"),
+                "postalCode": postcode,
+                "telephone": None,
+                "alternateName": record.get("aliases", []) + record.get("acronyms", []),
+                "email": record.get("email_address"),
+                "description": None,
+                "organisationType": [o.slug for o in orgtypes],
+                "organisationTypePrimary": orgtypes[0],
+                "url": url,
+                "latestIncome": None,
+                "dateModified": datetime.datetime.now(),
+                "dateRegistered": None,
+                "dateRemoved": None,
+                "active": record.get("status") == "active",
+                "parent": parent,
+                "orgIDs": [self.get_org_id(record)] + org_ids,
+                "scrape": self.scrape,
+                "source": self.source,
+                "spider": self.name,
+                "org_id_scheme": self.orgid_scheme,
+            }
         )
+        self.add_record(Organisation, org)
 
-    def get_org_ids(self, record):
+    def get_org_ids(self, record: list) -> list:
         orgids = []
 
-        for scheme, value in record.items():
-            names = value["all"] if isinstance(value["all"], list) else [value["all"]]
-            if scheme == "UKPRN":
+        for external_id in record:
+            scheme = external_id.get("type").lower()
+            names = (
+                external_id["all"]
+                if isinstance(external_id["all"], list)
+                else [external_id["all"]]
+            )
+            if scheme == "ukprn":
                 orgids.extend(["GB-UKPRN-{}".format(v) for v in names])
-            elif scheme == "HESA":
+            elif scheme == "hesa":
                 orgids.extend(["GB-HESA-{}".format(v) for v in names])
-            elif scheme == "UCAS":
+            elif scheme == "ucas":
                 orgids.extend(["GB-UCAS-{}".format(v) for v in names])
-            elif scheme == "GRID":
+            elif scheme == "grid":
                 orgids.extend(["XI-GRID-{}".format(v) for v in names])
-            elif scheme == "Wikidata":
+            elif scheme == "wikidata":
                 orgids.extend(["XI-WIKIDATA-{}".format(v) for v in names])
 
         return orgids
