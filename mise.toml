@@ -1,6 +1,6 @@
 [tasks]
 dj = "python manage.py"
-serve = "python manage.py runserver"
+serve = "python manage.py runserver 8001"
 es = "elasticsearch"
 collectstatic = "python manage.py collectstatic --noinput"
 test = ['pytest . {{arg(name="pytest_args", var=true, default="")}}']
