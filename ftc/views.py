@@ -6,12 +6,13 @@ from charity_django.companies.models import Company
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import CharField, Value
-from django.http import JsonResponse, StreamingHttpResponse
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django_sql_dashboard.models import Dashboard
 from elasticsearch.exceptions import RequestError
+from markdownify import markdownify as md_to_html
 
 from charity.models import Charity
 from findthatcharity.utils import can_view_postcode
@@ -131,7 +132,7 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
     if preview:
         template = "org_preview.html.j2"
 
-    return render(
+    result = render(
         request,
         template,
         {
@@ -142,6 +143,18 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
             **additional_data,
         },
     )
+
+    if filetype == "txt":
+        # convert HTML to plain text
+        result = HttpResponse(
+            md_to_html(result.content.decode("utf-8"), wrap=True)
+            .replace("![](https://queue.simpleanalyticscdn.com/noscript.gif)", "")
+            .strip(),
+            "text/plain; charset=utf-8",
+            result.status_code,
+        )
+
+    return result
 
 
 @xframe_options_exempt

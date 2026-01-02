@@ -51,6 +51,7 @@ urlpatterns = [
         {"filetype": "json"},
         name="orgid_json",
     ),
+    path("<path:org_id>.txt", views.get_org_by_id, {"filetype": "txt"}),
     path("<path:org_id>.html", views.get_org_by_id, {"filetype": "html"}),
     path(
         "<path:org_id>/preview",
