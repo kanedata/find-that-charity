@@ -1,7 +1,7 @@
 {
   "formation": {
     "web": {
-      "quantity": 8
+      "quantity": 16
     }
   },
   "cron": [
