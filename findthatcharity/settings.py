@@ -355,6 +355,6 @@ HESA_SUPPLIER_ID = os.environ.get("HESA_SUPPLIER_ID")
 GRAPHENE = {"SCHEMA": "findthatcharity.api.graphql.schema.schema"}
 DEFAULT_USER_AGENT = os.environ.get(
     "DEFAULT_USER_AGENT",
-    "Mozilla/5.0 (compatible; Find that Charity; +https://findthatcharity.uk)",
+    "FindThatCharityBot/1.0 (https://findthatcharity.uk; info@findthatcharity.uk)",
 )
 FTC_SHOW_POSTCODE = os.environ.get("FTC_SHOW_POSTCODE")
