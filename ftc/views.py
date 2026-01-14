@@ -255,6 +255,7 @@ def orgid_type(request, orgtype=None, source=None, filetype="html"):
         response["Content-Disposition"] = 'attachment; filename="{}.csv"'.format(
             base_query.slug if base_query else "findthatcharity-search-results"
         )
+        response["X-Robots-Tag"] = "noindex"
         return response
 
     s.run_es(with_pagination=True, with_aggregation=True)
