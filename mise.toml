@@ -21,8 +21,8 @@ run = [
 [tasks.m]
 depends = ["collectstatic"]
 run = [
-  'python manage.py migrate --database admin --noinput {{arg(name="migration_args", var=true, default="")}}',
-  'python manage.py migrate --database data --noinput {{arg(name="migration_args", var=true, default="")}}',
+  'python manage.py migrate --database admin --noinput',
+  'python manage.py migrate --database data --noinput',
   "python manage.py createcachetable",
 ]
 
