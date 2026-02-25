@@ -13,7 +13,7 @@ class Command(BaseCommand):
     allowed_domains = ["charitycommissionni.org.uk", "gist.githubusercontent.com"]
     start_urls = [
         "https://gist.githubusercontent.com/BobHarper1/2687545c562b47bc755aef2e9e0de537/raw/ac052c33fd14a08dd4c2a0604b54c50bc1ecc0db/ccni_extra",
-        "https://www.charitycommissionni.org.uk/umbraco/api/charityApi/ExportSearchResultsToCsv/?include=Linked&include=Removed",
+        "https://www.charitycommissionni.org.uk/api/charity-search/exportSearchResultsToCsv/?homePageId=c0884e5e-b621-4563-a378-2b313e15c74a&pageNumber=1&sortOption=Rank%3Basc&searchText=",
     ]
     org_id_prefix = "GB-NIC"
     id_field = "Reg charity number"
@@ -54,7 +54,7 @@ class Command(BaseCommand):
         "Who the charity helps",
         "How the charity works",
     ]
-    verify_certificate = False
+    verify_certificate = True
 
     def parse_file(self, response, source_url):
         CSVScraper.parse_file(self, response, source_url)

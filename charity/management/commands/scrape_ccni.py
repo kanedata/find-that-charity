@@ -7,9 +7,7 @@ from ftc.management.commands._base_scraper import HTMLScraper
 
 class Command(HTMLScraper):
     name = "ccni_scrape"
-    base_url = (
-        "https://www.charitycommissionni.org.uk/charity-details/?regid={}&subid=0"
-    )
+    base_url = "https://www.charitycommissionni.org.uk/charity-search/charity-details-page/?regId={}&subId=0"
 
     def run_scraper(self, *args, **options):
         # set up cache if we're caching

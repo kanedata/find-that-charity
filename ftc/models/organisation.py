@@ -39,7 +39,7 @@ EXTERNAL_LINKS = {
     ],
     "GB-NIC": [
         [
-            "http://www.charitycommissionni.org.uk/charity-details/?regid={}&subid=0",
+            "https://www.charitycommissionni.org.uk/charity-search/charity-details-page/?regId={}&subId=0",
             "Charity Commission Northern Ireland",
         ],
         ["https://givingisgreat.org/charitydetail/?regNo={}", "Giving is Great"],
