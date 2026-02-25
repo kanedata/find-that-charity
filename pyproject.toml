@@ -10,7 +10,7 @@ dependencies = [
     "bcp-reader",
     "boto3",
     "certifi",
-    "charity-django@git+https://github.com/kanedata/charity-django.git@v0.28.1",
+    "charity-django@git+https://github.com/kanedata/charity-django.git@v0.29.0",
     "coverage",
     "dj-database-url",
     "django-better-admin-arrayfield",

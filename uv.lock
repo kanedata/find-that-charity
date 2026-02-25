@@ -145,8 +145,8 @@ wheels = [
 
 [[package]]
 name = "charity-django"
-version = "0.28.1"
-source = { git = "https://github.com/kanedata/charity-django.git?rev=v0.28.1#1542660b98dc2c87bfd17bd45576da1a70bd730f" }
+version = "0.29.0"
+source = { git = "https://github.com/kanedata/charity-django.git?rev=v0.29.0#7fcf39ed62adc82fce397e60bad220bcd79142ff" }
 dependencies = [
     { name = "certifi" },
     { name = "dj-database-url" },
@@ -620,7 +620,7 @@ requires-dist = [
     { name = "bcp-reader" },
     { name = "boto3" },
     { name = "certifi" },
-    { name = "charity-django", git = "https://github.com/kanedata/charity-django.git?rev=v0.28.1" },
+    { name = "charity-django", git = "https://github.com/kanedata/charity-django.git?rev=v0.29.0" },
     { name = "coverage" },
     { name = "dj-database-url" },
     { name = "django" },
