@@ -170,7 +170,9 @@ insert into charity_charityfinancial as cf (
     income,
     spending,
     volunteers,
-    account_type
+    account_type,
+    inc_govt_contracts,
+    inc_govt_grants
 )
 select DISTINCT ON ("org_id", "fyend") a.*
 from (
@@ -180,7 +182,9 @@ from (
         c.total_gross_income as "income",
         c.total_gross_expenditure as "spending",
         c.count_volunteers as "volunteers",
-        'basic' as "account_type"
+        'basic' as "account_type",
+        c.income_from_government_contracts as "inc_govt_contracts",
+        c.income_from_government_grants as "inc_govt_grants"
     from charity_ccewcharityarparta c
     where "total_gross_income" is not null
 ) as a
@@ -189,7 +193,9 @@ set fystart = EXCLUDED.fystart,
     income = EXCLUDED.income,
     spending = EXCLUDED.spending,
     volunteers = EXCLUDED.volunteers,
-    account_type = cf.account_type;
+    account_type = cf.account_type,
+    inc_govt_contracts = EXCLUDED.inc_govt_contracts,
+    inc_govt_grants = EXCLUDED.inc_govt_grants;
 """
 
 UPDATE_CCEW["Insert partb into charity financial"] = """

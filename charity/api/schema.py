@@ -85,3 +85,5 @@ class CharityFinancial(Schema):
     employees: Optional[int] = None
     volunteers: Optional[int] = None
     account_type: Optional[str] = None
+    inc_govt_contracts: Optional[int] = None
+    inc_govt_grants: Optional[int] = None

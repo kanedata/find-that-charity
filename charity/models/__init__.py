@@ -249,6 +249,9 @@ class CharityFinancial(models.Model):
         max_length=50, default=AccountType.BASIC, choices=AccountType.choices
     )
 
+    inc_govt_contracts = models.BigIntegerField(null=True, blank=True)
+    inc_govt_grants = models.BigIntegerField(null=True, blank=True)
+
     class Meta:
         unique_together = (
             "charity",
