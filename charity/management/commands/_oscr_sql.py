@@ -133,3 +133,46 @@ where id in (
 )
 and source = %(spider_name)s;
 """
+
+UPDATE_OSCR["Add scale classification"] = """
+WITH scales AS (
+    SELECT ve.*
+    FROM ftc_vocabularyentries ve
+        INNER JOIN ftc_vocabulary v
+            ON ve.vocabulary_id = v.id
+    WHERE ve."current" 
+        AND v.slug = 'scale'
+),
+sc AS (
+    SELECT id,
+        geographical_spread,
+        CASE WHEN geographical_spread = 'UK and overseas' THEN 'National and Overseas'
+            WHEN geographical_spread = 'Overseas only' THEN 'Overseas'
+            WHEN geographical_spread = 'A specific local point, community or neighbourhood' THEN 'Local'
+            WHEN geographical_spread = 'More than one local authority area in Scotland' THEN 'Regional'
+            WHEN geographical_spread = 'Wider, but within one local authority area' THEN 'Local'
+            WHEN geographical_spread = 'Scotland and other parts of the UK' THEN 'National'
+            WHEN geographical_spread = 'Operations cover all or most of Scotland' THEN 'National'
+            WHEN geographical_spread = 'One or a few bases or facilities serving people who come from a broad area' THEN 'National'
+            ELSE NULL END AS "geo_scale",
+        spider,
+        "source",
+        scrape_id
+    FROM charity_charity
+    WHERE "source" = %(spider_name)s
+        AND geographical_spread IS NOT NULL
+)
+insert into ftc_organisationclassification as ca (
+    org_id,
+    spider,
+    scrape_id,
+    source_id,
+    vocabulary_id
+)
+SELECT sc.id AS org_id,
+    sc.spider,
+    sc.scrape_id,
+    sc."source" AS source_id,
+    scales.id AS vocabulary_id
+FROM sc INNER JOIN scales ON sc.geo_scale = scales.title
+"""
