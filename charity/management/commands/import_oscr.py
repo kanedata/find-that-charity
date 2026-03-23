@@ -18,45 +18,6 @@ from ftc.models import (
 )
 from ftc.models.vocabulary import VocabularyEntries
 
-STANDARD_FIELD_NAMES = [
-    "Charity Number",
-    "Charity Name",
-    "Registered Date",
-    "Known As",
-    "Charity Status",
-    "Notes",
-    "Postcode",
-    "Constitutional Form",
-    "Previous Constitutional Form 1",
-    "Geographical Spread",
-    "Main Operating Location",
-    "Purposes",
-    "Beneficiaries",
-    "Activities",
-    "Objectives",
-    "Principal Office/Trustees Address",
-    "Website",
-    "Most recent year income",
-    "Most recent year expenditure",
-    "Mailing cycle",
-    "Year End",
-    "Date annual return received",
-    "Next year end date",
-    "Donations and legacies income",
-    "Charitable activities income",
-    "Other trading activities income",
-    "Investments income",
-    "Other income",
-    "Raising funds spending",
-    "Charitable activities spending",
-    "Other spending",
-    "Parent charity name",
-    "Parent charity number",
-    "Parent charity country of registration",
-    "Designated religious body",
-    "Regulatory Type",
-]
-
 
 class Command(CSVScraper):
     name = "oscr"
@@ -167,10 +128,7 @@ class Command(CSVScraper):
             self.logger.info("Opening: {}".format(f.filename))
             with z.open(f) as csvfile:
                 if "5Years" in f.filename:
-                    reader = csv.DictReader(
-                        io.TextIOWrapper(csvfile, encoding="utf8"),
-                        fieldnames=STANDARD_FIELD_NAMES,
-                    )
+                    reader = csv.DictReader(io.TextIOWrapper(csvfile, encoding="utf8"))
                     records = {}
                     for row in tqdm.tqdm(reader):
                         record = self.parse_row_fiveyear(row)
@@ -194,6 +152,7 @@ class Command(CSVScraper):
                             "exp_vol",
                             "exp_charble",
                             "exp_other",
+                            "employees",
                         ],
                     )
                 else:
@@ -203,7 +162,7 @@ class Command(CSVScraper):
         z.close()
 
     def clean_fields(self, record):
-        record = {k.strip(): v for k, v in record.items()}
+        record = {k.strip(): v for k, v in record.items() if k is not None}
         return super().clean_fields(record)
 
     def parse_row_fiveyear(self, record):
@@ -215,6 +174,8 @@ class Command(CSVScraper):
             + int(record.get("Raising funds spending", 0))
             + int(record.get("Other spending", 0))
         )
+
+        employee_numbers = record.get("Number of Staff")
 
         financial_record = CharityFinancial(
             charity_id=self.get_org_id(record),
@@ -229,6 +190,9 @@ class Command(CSVScraper):
                 if record.get("Most recent year expenditure") is None
                 else int(record.get("Most recent year expenditure"))
             ),
+            employees=int(employee_numbers)
+            if isinstance(employee_numbers, str) and employee_numbers.isdigit()
+            else None,
             account_type=("basic_oscr" if not total_spending else "detailed_oscr"),
         )
         if financial_record.account_type == "detailed_oscr":
