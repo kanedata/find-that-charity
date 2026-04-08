@@ -32,14 +32,14 @@ jobs:
       SECRET_KEY: 1234567890
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
           version: "0.7.19"
           enable-cache: true
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version-file: ".python-version"
       - name: Install dependencies
