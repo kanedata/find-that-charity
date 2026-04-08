@@ -6,10 +6,6 @@ collectstatic = "python manage.py collectstatic --noinput"
 test = ['pytest . {{arg(name="pytest_args", var=true, default="")}}']
 lint = ["ruff check .", "ruff format . --check"]
 fmt = ["ruff format .", "ruff check . --fix"]
-pip = [
-  "uv pip compile -o requirements.txt requirements.in",
-  "uv pip sync requirements.txt",
-]
 loc = 'uvx pygount --format=summary --folders-to-skip="[...],node_modules,staticfiles,static" .'
 
 [tasks.mm]

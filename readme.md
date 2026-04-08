@@ -16,7 +16,7 @@ Elasticsearch-powered search engine for looking for charities and other non-prof
 1. [Clone repository](https://github.com/kanedata/find-that-charity)
 2. Create virtual environment (`python -m venv env`)
 3. Activate virtual environment (`env/bin/activate` or `env/Scripts\activate`)
-4. Install requirements (`pip install -r requirements.txt`)
+4. Install requirements (`pip install .`)
 5. [Install postgres](https://www.postgresql.org/download/)
 6. Start postgres
 7. Create 2 postgres databases - one for admin (eg `ftc_admin` and one for data eg `ftc_data`)
