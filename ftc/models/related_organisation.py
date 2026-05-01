@@ -20,6 +20,7 @@ BIG_ORGTYPES = ["local-authority", "university", "government-organisation"]
 class RelatedOrganisation:
     def __init__(self, orgs):
         self.records = self.prioritise_orgs(orgs)
+        self.other_sources = set()
 
     @classmethod
     def from_orgid(cls, org_id):
@@ -81,7 +82,7 @@ class RelatedOrganisation:
                 ).values_list("source_id", flat=True)
             )
         )
-        return list(set(sources))
+        return list(set(sources) | self.other_sources)
 
     @cached_property
     def locations(self):

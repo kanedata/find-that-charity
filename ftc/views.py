@@ -26,6 +26,7 @@ from ftc.query import (
 )
 from ftcprofile.controller import user_get_org_tags
 from other_data.models import CQCProvider, Grant, WikiDataItem
+from other_data.models.tscc import CIC
 
 
 # site homepage
@@ -110,7 +111,21 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
             .all()
         ),
         wikidata=WikiDataItem.objects.filter(org_id__in=related_orgs.orgIDs).all(),
+        cic=CIC.objects.filter(uid__in=related_orgs.orgIDs).all(),
     )
+
+    if additional_data["grants_received"]:
+        related_orgs.other_sources.update(
+            g.spider for g in additional_data["grants_received"]
+        )
+    if additional_data["cqc"]:
+        related_orgs.other_sources.update(["cqc"])
+    if additional_data["wikidata"]:
+        related_orgs.other_sources.update(["wikidata"])
+    if additional_data["cic"]:
+        related_orgs.other_sources.update(
+            additional_data["cic"].values_list("source_id", flat=True)
+        )
 
     additional_data["grants_given_by_year"] = defaultdict(
         lambda: defaultdict(
@@ -121,6 +136,7 @@ def get_org_by_id(request, org_id, filetype="html", preview=False, as_charity=Fa
         )
     )
     for g in additional_data["grants_given"]:
+        related_orgs.other_sources.add(g.spider)
         additional_data["grants_given_by_year"][g.awardDate.year][g.currency][
             "grants"
         ] += 1

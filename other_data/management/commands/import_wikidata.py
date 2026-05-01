@@ -34,7 +34,7 @@ class Command(HTMLScraper):
     source = {
         "title": "Wikidata",
         "description": "",
-        "identifier": "gpg",
+        "identifier": "wikidata",
         "license": "https://creativecommons.org/publicdomain/zero/1.0/",
         "license_name": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
         "issued": "",

@@ -9,6 +9,7 @@ from .cqc import (
 )
 from .gender_pay_gap import GenderPayGap
 from .threesixtygiving import Grant
+from .tscc import CIC
 from .wikidata import WikiDataItem
 
 __all__ = (
@@ -22,4 +23,5 @@ __all__ = (
     GenderPayGap,
     Grant,
     WikiDataItem,
+    CIC,
 )

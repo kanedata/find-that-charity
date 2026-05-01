@@ -7,6 +7,14 @@
     <blockquote class="bl bw3 b--light-blue pl3 ml0 i">
         {{ org.description|titlecase(sentence=true)|e|markdown|safe }}
     </blockquote>
+    {% if cic %}
+    <p class="i f6 gray">
+        Description from
+        <a href="https://uk-third-sector-database.github.io/data/" class="link underline blue">The UK Third
+            and Civil Society Sector Database<span class="material-icons ml1"
+                title="Opens in a new window">launch</span></a>
+    </p>
+    {% endif %}
     {% endif %}
     {% if org.sortedAlternateName %}
     {% set org_names = org.sortedAlternateName|map('titlecase')|unique|list %}

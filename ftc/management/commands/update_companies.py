@@ -1,7 +1,9 @@
+from charity_django.companies.ch_api import COMPANY_CATEGORY_LOOKUP
 from charity_django.companies.models import SICCode
 
 from ftc.management.commands._base_scraper import SQLRunner
 from ftc.models import Vocabulary, VocabularyEntries
+from ftc.models.organisation_type import OrganisationType
 
 UPDATE_ORGIDS_SQL = {
     "Add companies": """
@@ -117,6 +119,12 @@ from c
         and spider = %(spider_name)s
         and scrape_id != %(scrape_id)s;
     """,
+    "Add descriptions from CIC data": """
+    UPDATE ftc_organisation
+    SET description = NULLIF(concat_ws(E'\n\n', cic.beneficiaries, cic.surplus_use), '')
+    FROM other_data_cic cic
+    WHERE org_id = cic.uid
+    """,
 }
 
 
@@ -156,6 +164,25 @@ class Command(SQLRunner):
         self.logger.info("saving sources")
         self.save_sources()
         self.logger.info("sources saved")
+
+        # Create organisation types
+        self.logger.info("Creating or updating organisation types")
+        company_categories = {
+            **{
+                category: orgtype.value
+                for category, orgtype in COMPANY_CATEGORY_LOOKUP.items()
+            },
+            "Company Limited by Guarantee": "company-limited-by-guarantee",
+        }
+
+        for category, orgtype in company_categories.items():
+            orgtype_obj = OrganisationType.objects.filter(slug=orgtype).first()
+            if orgtype_obj:
+                continue
+            self.logger.info("Creating or updating organisation type: %s", orgtype)
+            orgtype_obj = OrganisationType(slug=orgtype, title=category)
+            orgtype_obj.slug = orgtype
+            orgtype_obj.save()
 
         # create the classification vocabulary
         self.logger.info("Creating or updating vocabulary 'Companies House SIC Codes'")
