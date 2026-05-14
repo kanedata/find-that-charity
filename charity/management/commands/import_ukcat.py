@@ -16,8 +16,10 @@ class Command(CSVScraper):
     start_urls = [
         "https://raw.githubusercontent.com/charity-classification/ukcat/main/data/charities_active-ukcat.csv",
         "https://raw.githubusercontent.com/charity-classification/ukcat/main/data/charities_inactive-ukcat.csv",
+        "https://raw.githubusercontent.com/charity-classification/ukcat/main/data/cics-ukcat.csv",
         "https://raw.githubusercontent.com/charity-classification/ukcat/main/data/charities_active-icnptso.csv",
         "https://raw.githubusercontent.com/charity-classification/ukcat/main/data/charities_inactive-icnptso.csv",
+        "https://raw.githubusercontent.com/charity-classification/ukcat/main/data/cics-icnptso.csv",
     ]
     source = {
         "title": "UK Charity Activity Tags",
