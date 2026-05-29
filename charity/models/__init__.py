@@ -34,7 +34,7 @@ class Charity(models.Model):
     date_registered = models.DateField(null=True, blank=True, db_index=True)
     date_removed = models.DateField(null=True, blank=True, db_index=True)
     removal_reason = models.CharField(max_length=255, null=True, blank=True)
-    web = models.URLField(null=True, blank=True)
+    web = models.URLField(null=True, blank=True, max_length=1000)
     email = models.CharField(max_length=255, null=True, blank=True)
     company_number = models.CharField(max_length=255, null=True, blank=True)
     activities = models.TextField(null=True, blank=True)

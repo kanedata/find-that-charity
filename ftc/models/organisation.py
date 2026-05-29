@@ -146,7 +146,9 @@ class Organisation(models.Model):
         max_length=255, null=True, blank=True, verbose_name="Email address"
     )
     description = models.TextField(null=True, blank=True, verbose_name="Description")
-    url = models.URLField(null=True, blank=True, verbose_name="Website address")
+    url = models.URLField(
+        null=True, blank=True, verbose_name="Website address", max_length=1000
+    )
     domain = models.CharField(
         max_length=255,
         null=True,
