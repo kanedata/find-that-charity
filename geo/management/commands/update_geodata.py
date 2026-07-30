@@ -12,7 +12,8 @@ UPDATE_GEODATA_SQL = {
             "postalCode" = NULL,
             "telephone" = NULL,
             "email" = NULL,
-            "url" = NULL
+            "url" = NULL,
+            "description" = NULL
         FROM ftc_personaldata pd
         WHERE pd.org_id = ANY(ftc_organisation.linked_orgs)
     """,
@@ -32,11 +33,12 @@ UPDATE_GEODATA_SQL = {
     """,
     "Remove personal data in Charities": """
         UPDATE charity_charity
-        SET address = NULL,
-            postcode = NULL,
-            phone = NULL,
-            web = NULL,
-            email = NULL
+        SET "address" = NULL,
+            "postcode" = NULL,
+            "phone" = NULL,
+            "web" = NULL,
+            "email" = NULL,
+            "activities" = NULL
         FROM ftc_personaldata pd
         WHERE (
                 pd.org_id ILIKE 'GB-CHC-%%' OR 
