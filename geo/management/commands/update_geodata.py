@@ -13,7 +13,9 @@ UPDATE_GEODATA_SQL = {
             "telephone" = NULL,
             "email" = NULL,
             "url" = NULL,
-            "description" = NULL
+            "description" = NULL,
+            "name" = CASE WHEN pd.remove_organisation_name THEN '[Name Removed]' ELSE "name" END,
+            "alternateName" = CASE WHEN pd.remove_organisation_name THEN '[]'::varchar[] ELSE "alternateName" END
         FROM ftc_personaldata pd
         WHERE pd.org_id = ANY(ftc_organisation.linked_orgs)
     """,
@@ -26,10 +28,19 @@ UPDATE_GEODATA_SQL = {
             "RegAddress_PostTown" = NULL,
             "RegAddress_County" = NULL,
             "RegAddress_Country" = NULL,
-            "RegAddress_PostCode" = NULL
+            "RegAddress_PostCode" = NULL,
+            "CompanyName" = CASE WHEN pd.remove_organisation_name THEN '[Name Removed]' ELSE "CompanyName" END
         FROM ftc_personaldata pd
         WHERE pd.org_id ILIKE 'GB-COH-%%'
             AND pd.org_id = CONCAT('GB-COH-', "CompanyNumber")
+    """,
+    "Remove personal data in Company names": """
+        UPDATE companies_previousname
+        SET "CompanyName" = '[Name Removed]'
+        FROM ftc_personaldata pd
+        WHERE pd.org_id ILIKE 'GB-COH-%%'
+            AND pd.org_id = CONCAT('GB-COH-', "CompanyNumber")
+            AND pd.remove_organisation_name = TRUE
     """,
     "Remove personal data in Charities": """
         UPDATE charity_charity
@@ -38,7 +49,8 @@ UPDATE_GEODATA_SQL = {
             "phone" = NULL,
             "web" = NULL,
             "email" = NULL,
-            "activities" = NULL
+            "activities" = NULL,
+            "name" = CASE WHEN pd.remove_organisation_name THEN '[Name Removed]' ELSE "name" END
         FROM ftc_personaldata pd
         WHERE (
                 pd.org_id ILIKE 'GB-CHC-%%' OR 

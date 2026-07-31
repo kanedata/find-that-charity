@@ -179,11 +179,11 @@ class VocabularyEntriesAdmin(JSONFieldAdmin):
 
 
 class PersonalDataAdmin(admin.ModelAdmin):
-    list_display = ("org_id", "notes")
+    list_display = ("org_id", "notes", "remove_organisation_name")
 
 
 admin.site.site_header = "Find that Charity admin"
-admin.site_site_title = admin.site.site_header
+admin.site.site_title = admin.site.site_header
 
 admin.site.register(ftc.Organisation, OrganisationAdmin)
 admin.site.register(ftc.OrganisationType, JSONFieldAdmin)

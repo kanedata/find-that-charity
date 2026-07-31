@@ -17,6 +17,10 @@ class PersonalData(models.Model):
         blank=True,
         null=True,
     )
+    remove_organisation_name = models.BooleanField(
+        default=False,
+        help_text="Remove the organisation name from the database",
+    )
 
     class Meta:
         verbose_name = "Personal Data"
