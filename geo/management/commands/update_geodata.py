@@ -15,7 +15,7 @@ UPDATE_GEODATA_SQL = {
             "url" = NULL,
             "description" = NULL,
             "name" = CASE WHEN pd.remove_organisation_name THEN '[Name Removed]' ELSE "name" END,
-            "alternateName" = CASE WHEN pd.remove_organisation_name THEN '[]'::varchar[] ELSE "alternateName" END
+            "alternateName" = CASE WHEN pd.remove_organisation_name THEN '{}'::varchar[] ELSE "alternateName" END
         FROM ftc_personaldata pd
         WHERE pd.org_id = ANY(ftc_organisation.linked_orgs)
     """,
@@ -32,7 +32,7 @@ UPDATE_GEODATA_SQL = {
             "CompanyName" = CASE WHEN pd.remove_organisation_name THEN '[Name Removed]' ELSE "CompanyName" END
         FROM ftc_personaldata pd
         WHERE pd.org_id ILIKE 'GB-COH-%%'
-            AND pd.org_id = CONCAT('GB-COH-', "CompanyNumber")
+            AND "CompanyNumber" = REPLACE(pd.org_id, 'GB-COH-', '')
     """,
     "Remove personal data in Company names": """
         UPDATE companies_previousname
@@ -67,7 +67,7 @@ UPDATE_GEODATA_SQL = {
             FROM ftc_organisation o
                 INNER JOIN ftc_personaldata pd
                     ON pd.org_id = ANY(o.linked_orgs)
-)
+        )
     """,
     "Remove blank postcodes": """
         update ftc_organisation
