@@ -3,8 +3,8 @@
 {# {% call org_panel("Organisation details", org) %} #}
 <div class="measure-wide">
     {% if org.description %}
-    <h4>Description</h4>
-    <blockquote class="bl bw3 b--light-blue pl3 ml0 i">
+    <h4 class="mb0">Description</h4>
+    <blockquote class="bl bw3 b--light-blue pl3 ml0 i mt2">
         {{ org.description|titlecase(sentence=true)|e|markdown|safe }}
     </blockquote>
     {% if cic %}
@@ -18,8 +18,8 @@
     {% endif %}
     {% if org.sortedAlternateName %}
     {% set org_names = org.sortedAlternateName|map('titlecase')|unique|list %}
-    <h4>Also known as</h4>
-    <ul>
+    <h4 class="mb0">Also known as</h4>
+    <ul class="mt2">
         {% for n in org_names[0:10] %}
         <li>{{ n }}</li>
         {% endfor %}
@@ -36,32 +36,32 @@
     {% endif %}
     {% for v in org.orgIDs %}
     {% if v.startswith("GB-COH-") %}
-    <h4>Company number</h4>
-    <p>
+    <h4 class="mb0">Company number</h4>
+    <p class="mt2">
         <a class="link dark-blue underline-hover f4"
             href="https://beta.companieshouse.gov.uk/company/{{ v.replace('GB-COH-', '') }}"
             target="_blank">{{ v.replace('GB-COH-', '') }}</a>
     </p>
     {% endif %}
     {% if v.startswith("GB-CHC-") %}
-    <h4><abbr title="Charity Commission for England and Wales">CCEW</abbr> Charity number</h4>
-    <p>
+    <h4 class="mb0"><abbr title="Charity Commission for England and Wales">CCEW</abbr> Charity number</h4>
+    <p class="mt2">
         <a class="link dark-blue underline-hover f4"
             href="https://register-of-charities.charitycommission.gov.uk/charity-details/?regId={{ v.replace('GB-CHC-', '') }}&subId=0"
             target="_blank">{{ v.replace('GB-CHC-', '') }}</a>
     </p>
     {% endif %}
     {% if v.startswith("GB-NIC-") %}
-    <h4><abbr title="Charity Commission for Northern Ireland">CCNI</abbr> Charity number</h4>
-    <p>
+    <h4 class="mb0"><abbr title="Charity Commission for Northern Ireland">CCNI</abbr> Charity number</h4>
+    <p class="mt2">
         <a class="link dark-blue underline-hover f4"
             href="https://www.charitycommissionni.org.uk/charity-search/charity-details-page/?regId={{ v.replace('GB-NIC-', '').replace('NIC', '')}}&subId=0"
             target="_blank">{{ v.replace('GB-NIC-', '') }}</a>
     </p>
     {% endif %}
     {% if v.startswith("GB-SC-") %}
-    <h4><abbr title="Scottish Charity Regulator">OSCR</abbr> Charity number</h4>
-    <p>
+    <h4 class="mb0"><abbr title="Scottish Charity Regulator">OSCR</abbr> Charity number</h4>
+    <p class="mt2">
         <a class="link dark-blue underline-hover f4"
             href="https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number={{ v.replace('GB-SC-', '') }}"
             target="_blank">{{ v.replace('GB-SC-', '') }}</a>
@@ -69,32 +69,35 @@
     {% endif %}
     {% endfor %}
     {% if org.dateRegistered %}
-    <h4>Registered</h4>
-    <p>
+    <h4 class="mb0">Registered</h4>
+    <p class="mt2">
         {{ format_date(org.dateRegistered) }}
     </p>
     {% endif %}
     {% if org.dateRemoved %}
-    <h4>Removed</h4>
-    <p>
+    <h4 class="mb0">Removed</h4>
+    <p class="mt2">
         {{ format_date(org.dateRemoved) }}
     </p>
     {% endif %}
     {% if org.url %}
-    <h4>Website</h4>
-    <p>
-        <a href="{{ org.cleanUrl }}" class="link underline-hover blue">{{ org.displayUrl }}</a>
+    <h4 class="mb0">Website</h4>
+    <p class="mt2">
+        <span class="f6 gray">Find that Charity is not responsible for the content of external websites</span><br>
+        <a href="{{ org.cleanUrl }}" class="link underline-hover blue" rel="external" target="_blank">
+            {{ org.displayUrl }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
+        </a>
     </p>
     {% endif %}
     {% if org.domain %}
-    <h4>Domain</h4>
-    <p>
+    <h4 class="mb0">Domain</h4>
+    <p class="mt2">
         <code>{{ org.domain }}</code>
     </p>
     {% endif %}
     {% if org.latestIncome %}
-    <h4>Latest income</h4>
-    <p>
+    <h4 class="mb0">Latest income</h4>
+    <p class="mt2">
         &pound;{{ "{:,.0f}".format( org.latestIncome )}}
         {% if org.latestIncomeDate %}
         <span class="grey">(on {{ format_date(org.latestIncomeDate) }})</span>

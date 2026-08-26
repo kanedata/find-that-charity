@@ -10,13 +10,13 @@
   <li class="mb4">
     {% for source in pub_sources %}
     {% if loop.first %}
-    <strong class="f3"><a href="{{ source.data.publisher.website }}" target="_blank"
+    <strong class="f3"><a href="{{ source.data.publisher.website }}" target="_blank" rel="external"
         class="link underline-hover dark-blue">{{ source.publisher }}</a></strong>
     <ul class="list ma0 pa0">
       {% endif %}
       <li class="mb3 f5 bl bw3 b--light-gray pl2">
         {% if source.data.distribution and source.data.distribution[0].accessURL %}
-        <a href="{{ source.data.distribution.0.accessURL }}" target="_blank"
+        <a href="{{ source.data.distribution.0.accessURL }}" target="_blank" rel="external"
           class="b link underline dark-blue">{{ source.title }}</a>
         {% else %}
         {{ source.title }}
@@ -30,7 +30,7 @@
         <br>
         <span class="f6 pv2">
           {% if source.data.license %}
-          <a href="{{ source.data.license }}" target="_blank"
+          <a href="{{ source.data.license }}" target="_blank" rel="external"
             class="link underline-hover dark-blue">{{ source.data.license_name }}</a>
           {% if source.data.distribution and source.data.distribution[0].downloadURL %} | {% endif %}
           {% endif %}

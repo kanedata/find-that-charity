@@ -38,7 +38,7 @@
                         </button>
                     </form>
                     {% else %}
-                    <a class="link dark-blue underline" href="{{ link.url }}" target="_blank">
+                    <a class="link dark-blue underline" href="{{ link.url }}" target="_blank" rel="external">
                         {{ link.title }}<span class="material-icons ml1" title="Opens in a new window">launch</span>
                     </a>
                     {% endif %}
@@ -48,7 +48,7 @@
         </ul>
         {% if wikidata_id %}
         <p class="f6 gray">Social media and Wikipedia links from Wikidata</p>
-        <a class="link dark-blue underline db" href="{{ wikidata_id }}" target="_blank">
+        <a class="link dark-blue underline db" href="{{ wikidata_id }}" target="_blank" rel="external">
             <img src="{{ static('images/Wikidata_Stamp_Rec_Light.svg') }}" alt="Wikidata logo" class="db mb2 mw4" />
         </a>
         {% endif %}
