@@ -118,4 +118,8 @@ class Command(BaseScraper):
                     original_row[f] = original_row[f].replace("-31", "-30")
         row = self.clean_fields(original_row)
         row["scrape"] = self.scrape
+
+        if not row["title"]:
+            row["title"] = row["grant_id"]
+
         self.add_record(Grant, row)
