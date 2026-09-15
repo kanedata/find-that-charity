@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import io
 
 from django.utils.text import slugify
@@ -139,7 +139,7 @@ It is a single, authoritative reference about a provider’s regulatory status."
             "organisationTypePrimary": orgtypes[0],
             "url": record.get("providers-website"),
             "latestIncome": None,
-            "dateModified": datetime.datetime.now(),
+            "dateModified": dt.datetime.now(),
             "dateRegistered": None,
             "dateRemoved": None,
             "active": True,

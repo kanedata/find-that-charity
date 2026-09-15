@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import re
 from collections import defaultdict
 
@@ -145,7 +145,7 @@ class Command(BaseCommand):
                     "latestVolunteers": int(record["UK and Ireland volunteers"])
                     if record.get("Total spending") is not None
                     else None,
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": record.get("Date registered"),
                     "dateRemoved": None,
                     "active": record.get("Status") != "Removed",

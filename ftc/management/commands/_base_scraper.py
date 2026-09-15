@@ -1,5 +1,5 @@
 import csv
-import datetime
+import datetime as dt
 import io
 import logging
 import re
@@ -269,7 +269,7 @@ class BaseScraper(BaseCommand):
             # fix datetimes
             for f in ["issued", "modified"]:
                 if not s.get(f):
-                    s[f] = datetime.datetime.now().strftime("%Y-%m-%d")
+                    s[f] = dt.datetime.now().strftime("%Y-%m-%d")
             self.source, _ = Source.objects.update_or_create(
                 id=s["identifier"], defaults={"data": s}
             )
@@ -346,7 +346,7 @@ class BaseScraper(BaseCommand):
 
                 try:
                     if record.get(f):
-                        record[f] = datetime.datetime.strptime(
+                        record[f] = dt.datetime.strptime(
                             record.get(f).strip(), date_format
                         )
                 except ValueError:

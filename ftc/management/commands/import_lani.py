@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from ftc.management.commands._la_locations import LA_LOCATIONS
 from ftc.management.commands.import_lae import LA_TYPES
@@ -96,7 +96,7 @@ class Command(LAECommand):
                     "url": record.get("website"),
                     # "location": locations,
                     "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": record.get("start-date"),
                     "dateRemoved": record.get("end-date"),
                     "active": record.get("end-date") is None,

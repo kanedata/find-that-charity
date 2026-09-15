@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 from unittest.mock import patch
 
 import django.test
@@ -43,8 +43,8 @@ class TestCase(django.test.TestCase):
             errors=0,
             items=1,
             log="",
-            start_time=timezone.now() - datetime.timedelta(minutes=10),
-            finish_time=timezone.now() - datetime.timedelta(minutes=5),
+            start_time=timezone.now() - dt.timedelta(minutes=10),
+            finish_time=timezone.now() - dt.timedelta(minutes=5),
         )
         organisation = Organisation.objects.create(
             org_id="GB-CHC-1234",

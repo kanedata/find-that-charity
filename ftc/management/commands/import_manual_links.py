@@ -1,5 +1,5 @@
 import csv
-import datetime
+import datetime as dt
 import io
 
 from ftc.management.commands._base_scraper import CSVScraper
@@ -44,7 +44,7 @@ class Command(CSVScraper):
                 defaults={
                     "data": {
                         **{k: v for k, v in s.items() if not k.startswith("_")},
-                        "modified": datetime.datetime.now().isoformat(),
+                        "modified": dt.datetime.now().isoformat(),
                     }
                 },
             )

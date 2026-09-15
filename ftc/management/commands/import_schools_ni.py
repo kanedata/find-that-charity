@@ -1,5 +1,5 @@
 import csv
-import datetime
+import datetime as dt
 import io
 
 from ftc.management.commands._base_scraper import HTMLScraper
@@ -155,7 +155,7 @@ class Command(HTMLScraper):
                     "organisationTypePrimary": org_types[2],
                     "url": None,
                     "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": None,
                     "dateRemoved": record.get("Date Closed"),
                     "active": record.get("Status") == "Open",

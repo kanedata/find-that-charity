@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+import datetime as dt
 import io
 
 from openpyxl import load_workbook
@@ -123,7 +123,7 @@ class Command(HTMLScraper):
                     organisationTypePrimary=org_types[0],
                     url=record.get("website_address"),
                     latestIncome=None,
-                    dateModified=datetime.datetime.now(),
+                    dateModified=dt.datetime.now(),
                     dateRegistered=None,
                     dateRemoved=None,
                     active=True,

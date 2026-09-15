@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from django.conf import settings
 
@@ -81,7 +81,7 @@ class Command(CSVScraper):
                     "organisationTypePrimary": org_types[0],
                     "url": None,
                     "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": None,
                     "dateRemoved": None,
                     "active": not record.get("Rescinded"),

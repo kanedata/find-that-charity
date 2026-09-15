@@ -1,6 +1,6 @@
 import copy
 import csv
-import datetime
+import datetime as dt
 import io
 
 from ftc.management.commands._base_scraper import HTMLScraper
@@ -273,7 +273,7 @@ class Command(HTMLScraper):
                 }
             ]
             source["title"] = u["org_type"]
-            source["modified"] = datetime.datetime.now().isoformat()
+            source["modified"] = dt.datetime.now().isoformat()
             self.sources[u["org_type"]], _ = Source.objects.update_or_create(
                 id=f"{source['identifier']}-{u['id']}", defaults={"data": source}
             )
@@ -340,7 +340,7 @@ class Command(HTMLScraper):
                     "organisationTypePrimary": org_types[0],
                     "url": None,
                     "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": record.get("Open Date"),
                     "dateRemoved": record.get("Close Date"),
                     "active": record.get("Close Date") is None,

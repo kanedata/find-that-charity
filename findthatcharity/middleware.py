@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from django.conf import settings
 from django.urls import Resolver404, resolve
@@ -22,9 +22,9 @@ class FTCLoggingMiddleware:
         if settings.LOGGING_DB:
             self.db_args = dict(
                 filename_or_conn=settings.LOGGING_DB.format(
-                    year=datetime.datetime.now().year,
-                    month=datetime.datetime.now().month,
-                    day=datetime.datetime.now().day,
+                    year=dt.datetime.now().year,
+                    month=dt.datetime.now().month,
+                    day=dt.datetime.now().day,
                 )
             )
         else:
@@ -46,7 +46,7 @@ class FTCLoggingMiddleware:
         self._get_db()["logs"].insert(
             {
                 "app": "findthatcharity",
-                "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": dt.datetime.now().isoformat(),
                 "url": request.build_absolute_uri(),
                 "path": request.path,
                 "method": request.method,

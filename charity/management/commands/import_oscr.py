@@ -1,5 +1,5 @@
 import csv
-import datetime
+import datetime as dt
 import io
 import zipfile
 
@@ -313,7 +313,7 @@ class Command(CSVScraper):
                     if record.get("Most recent year expenditure")
                     else None,
                     "latestIncomeDate": record.get("Year End"),
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": record.get("Registered Date"),
                     "dateRemoved": record.get("Ceased Date"),
                     "active": record.get("Charity Status") != "Removed",

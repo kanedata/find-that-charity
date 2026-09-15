@@ -1,5 +1,5 @@
 import csv
-import datetime
+import datetime as dt
 import io
 from urllib.parse import urlencode
 
@@ -79,7 +79,7 @@ class Command(CSVScraper):
         u = self.start_urls[0]
         self.set_download_url(u)
         initial_year = 1994
-        current_year = datetime.datetime.now().year
+        current_year = dt.datetime.now().year
         for year in range(initial_year, current_year + 1):
             url = (
                 u

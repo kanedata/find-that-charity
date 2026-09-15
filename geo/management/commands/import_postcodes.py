@@ -1,5 +1,5 @@
 import csv
-import datetime
+import datetime as dt
 import io
 import zipfile
 
@@ -63,7 +63,7 @@ class Command(BaseScraper):
         def parse_date(value):
             if not value or value == "":
                 return None
-            return datetime.date(
+            return dt.date(
                 int(value[0:4]),
                 int(value[4:6]),
                 1,

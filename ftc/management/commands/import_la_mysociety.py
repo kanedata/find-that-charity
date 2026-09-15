@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import re
 from collections import defaultdict
 
@@ -213,7 +213,7 @@ class Command(CSVScraper):
                     "url": website,
                     # "locations": locations,
                     "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": record.get("start-date"),
                     "dateRemoved": record.get("end-date"),
                     "active": record.get("end-date") is None,

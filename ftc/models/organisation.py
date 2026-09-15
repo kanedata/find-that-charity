@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import re
 from collections import defaultdict
 from typing import Counter, Generator
@@ -269,7 +269,7 @@ class Organisation(models.Model):
         else:
             prefix_order = len(OrgidScheme.PRIORITIES) + 1
 
-        org_date = self.dateRegistered if self.dateRegistered else datetime.date.max
+        org_date = self.dateRegistered if self.dateRegistered else dt.date.max
         return (
             0 if self.active else 1,
             prefix_order,

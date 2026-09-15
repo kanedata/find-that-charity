@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+import datetime as dt
 import io
 
 from pyexcel_ods3 import get_data
@@ -113,7 +113,7 @@ class Command(HTMLScraper):
                     "organisationTypePrimary": org_types[0],
                     "url": None,
                     "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": None,
                     "dateRemoved": None,
                     "active": True,

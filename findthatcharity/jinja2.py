@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import os
 
 from charity_django.utils.text import list_to_string, regex_search, to_titlecase
@@ -78,7 +78,7 @@ def get_sources(split=False):
             value = {}
 
     if split:
-        MONTH_AGO = datetime.datetime.now() - datetime.timedelta(days=30)
+        MONTH_AGO = dt.datetime.now() - dt.timedelta(days=30)
         return {
             "current": {
                 k: v
@@ -139,7 +139,7 @@ def environment(**options):
         {
             "static": static,
             "url": reverse,
-            "now": datetime.datetime.now(),
+            "now": dt.datetime.now(),
             "get_orgtypes": get_orgtypes,
             "get_sources": get_sources,
             "get_orgidschemes": get_orgidschemes,

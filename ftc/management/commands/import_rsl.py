@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from ftc.management.commands._base_scraper import HTMLScraper
 from ftc.models import Organisation
@@ -136,7 +136,7 @@ class Command(HTMLScraper):
                     "url": None,
                     # "location": locations,
                     "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": record.get("registration date"),
                     "dateRemoved": None,
                     "active": True,

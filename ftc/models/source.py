@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from django.db import models
 
@@ -23,7 +23,7 @@ class Source(models.Model):
     def modified(self):
         date_modified = self.data.get("modified")
         if date_modified:
-            return datetime.datetime.fromisoformat(date_modified)
+            return dt.datetime.fromisoformat(date_modified)
         return None
 
     def __str__(self):

@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 import requests_cache
 from requests.exceptions import HTTPError
@@ -74,8 +74,8 @@ class Command(CSVScraper):
     def fetch_file(self):
         self.files = {}
         days_to_test = 30
-        today = datetime.datetime.today().date()
-        date_range = [today - datetime.timedelta(days=x) for x in range(days_to_test)]
+        today = dt.datetime.today().date()
+        date_range = [today - dt.timedelta(days=x) for x in range(days_to_test)]
         for u in self.start_urls:
             for day in date_range:
                 link = u.format(day.strftime("%Y%m%d"))
@@ -140,7 +140,7 @@ class Command(CSVScraper):
                 organisationTypePrimary=org_types[1],
                 url=self.parse_url(record.get("SchoolWebsite")),
                 latestIncome=None,
-                dateModified=datetime.datetime.now(),
+                dateModified=dt.datetime.now(),
                 dateRegistered=record.get("OpenDate"),
                 dateRemoved=record.get("CloseDate"),
                 active=record.get("EstablishmentStatus (name)") != "Closed",

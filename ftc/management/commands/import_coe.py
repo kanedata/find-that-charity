@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import io
 
 from openpyxl import load_workbook
@@ -115,7 +115,7 @@ class Command(HTMLScraper):
                     "url": None,
                     # "location": locations,
                     "latestIncome": None,
-                    "dateModified": datetime.datetime.now(),
+                    "dateModified": dt.datetime.now(),
                     "dateRegistered": None,
                     "dateRemoved": None,
                     "active": True,

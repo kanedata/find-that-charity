@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from ftc.management.commands._base_scraper import CSVScraper
 from ftc.models import Organisation
@@ -97,7 +97,7 @@ class Command(CSVScraper):
             "organisationTypePrimary": orgtypes[1],
             "url": None,
             "latestIncome": None,
-            "dateModified": datetime.datetime.now(),
+            "dateModified": dt.datetime.now(),
             "dateRegistered": record.get("Registration Date"),
             "dateRemoved": record.get("Deregistration Date"),
             "active": record.get("Society Status", "") != "Deregistered",

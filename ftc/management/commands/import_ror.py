@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import io
 import json
 import zipfile
@@ -159,7 +159,7 @@ ROR includes identifiers and metadata for more than 100,000 organizations. ROR i
                 "organisationTypePrimary": orgtypes[0],
                 "url": url,
                 "latestIncome": None,
-                "dateModified": datetime.datetime.now(),
+                "dateModified": dt.datetime.now(),
                 "dateRegistered": None,
                 "dateRemoved": None,
                 "active": record.get("status") == "active",

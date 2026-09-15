@@ -62,12 +62,16 @@ dependencies = [
     "whitenoise",
     "xlsxwriter",
     "markdownify>=1.2.2",
+    "flake8-import-conventions>=0.1.0",
 ]
 
 
 [tool.ruff]
-lint.select = ["E", "F", "I"]
+lint.select = ["E", "F", "I", "ICN001", "ICN002", "ICN003"]
 lint.ignore = ['E501']
+
+[tool.ruff.lint.flake8-import-conventions.extend-aliases]
+"datetime" = "dt"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "findthatcharity.settings"

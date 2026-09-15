@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 from typing import List, Optional
 
 from django.urls import reverse
@@ -53,15 +53,15 @@ class Organisation(Schema):
     url: Optional[str] = None
 
     # finances
-    latestFinancialYearEnd: Optional[datetime.date] = None
+    latestFinancialYearEnd: Optional[dt.date] = None
     latestIncome: Optional[int] = None
     latestSpending: Optional[int] = None
     latestEmployees: Optional[int] = None
     latestVolunteers: Optional[int] = None
     trusteeCount: Optional[int] = None
 
-    dateRegistered: Optional[datetime.date] = None
-    dateRemoved: Optional[datetime.date] = None
+    dateRegistered: Optional[dt.date] = None
+    dateRemoved: Optional[dt.date] = None
     active: Optional[bool] = None
 
     parent: Optional[str] = None
@@ -79,7 +79,7 @@ class Organisation(Schema):
     orgIDs: Optional[List[str]] = None
     linked_records: List[OrganisationLink] = None
 
-    dateModified: Optional[datetime.datetime] = None
+    dateModified: Optional[dt.datetime] = None
 
     @staticmethod
     def resolve_latestFinancialYearEnd(obj):
@@ -205,23 +205,23 @@ class Company(Schema):
     CompanyCategory: Optional[str] = None
     CompanyStatus: Optional[str] = None
     CountryOfOrigin: Optional[str] = None
-    DissolutionDate: Optional[datetime.date] = None
-    IncorporationDate: Optional[datetime.date] = None
+    DissolutionDate: Optional[dt.date] = None
+    IncorporationDate: Optional[dt.date] = None
     Accounts_AccountRefDay: Optional[int] = None
     Accounts_AccountRefMonth: Optional[int] = None
-    Accounts_NextDueDate: Optional[datetime.date] = None
-    Accounts_LastMadeUpDate: Optional[datetime.date] = None
+    Accounts_NextDueDate: Optional[dt.date] = None
+    Accounts_LastMadeUpDate: Optional[dt.date] = None
     Accounts_AccountCategory: Optional[str] = None
-    Returns_NextDueDate: Optional[datetime.date] = None
-    Returns_LastMadeUpDate: Optional[datetime.date] = None
+    Returns_NextDueDate: Optional[dt.date] = None
+    Returns_LastMadeUpDate: Optional[dt.date] = None
     Mortgages_NumMortCharges: Optional[int] = None
     Mortgages_NumMortOutstanding: Optional[int] = None
     Mortgages_NumMortPartSatisfied: Optional[int] = None
     Mortgages_NumMortSatisfied: Optional[int] = None
     LimitedPartnerships_NumGenPartners: Optional[int] = None
     LimitedPartnerships_NumLimPartners: Optional[int] = None
-    ConfStmtNextDueDate: Optional[datetime.date] = None
-    ConfStmtLastMadeUpDate: Optional[datetime.date] = None
+    ConfStmtNextDueDate: Optional[dt.date] = None
+    ConfStmtLastMadeUpDate: Optional[dt.date] = None
     org_id: Optional[str] = None
 
     @staticmethod
