@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db import connections
 from django_db_views.autodetector import ViewMigrationAutoDetector
 from django_db_views.db_view import DBMaterializedView
+from psycopg2 import sql
 
 from ftc.management.commands._base_scraper import BaseScraper
 
@@ -82,4 +83,9 @@ class Command(BaseScraper):
                     self.logger.info(
                         f"Ensuring readonly permissions for user {user} on model {model._meta.label}"
                     )
-                    cursor.execute(f"GRANT SELECT ON {model._meta.db_table} TO {user}")
+                    cursor.execute(
+                        sql.SQL("GRANT SELECT ON {} TO {}").format(
+                            sql.Identifier(model._meta.db_table),
+                            sql.Identifier(user),
+                        )
+                    )
