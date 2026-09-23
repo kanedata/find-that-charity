@@ -80,6 +80,17 @@ class Command(BaseScraper):
                         )
 
                 for user, model in user_model_list:
+                    # check if the table/view actually exists
+                    cursor.execute(
+                        sql.SQL("SELECT to_regclass(%s)"), [model._meta.db_table]
+                    )
+                    result = cursor.fetchone()
+                    if result is None or result[0] is None:
+                        self.logger.warning(
+                            f"Table/view {model._meta.db_table} does not exist"
+                        )
+                        continue
+
                     self.logger.info(
                         f"Ensuring readonly permissions for user {user} on model {model._meta.label}"
                     )
