@@ -63,6 +63,7 @@ dependencies = [
     "xlsxwriter",
     "markdownify>=1.2.2",
     "flake8-import-conventions>=0.1.0",
+    "django-db-views>=0.1.14",
 ]
 
 
