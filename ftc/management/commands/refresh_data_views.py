@@ -23,11 +23,46 @@ class Command(BaseScraper):
         self._refresh_views()
         self._ensure_readonly_users()
 
+    def _check_view_exists(self, view, cursor=None):
+        if cursor is None:
+            with connections[settings.DATA_DB_ALIAS].cursor() as cursor:
+                cursor.execute(sql.SQL("SELECT to_regclass(%s)"), [view._meta.db_table])
+                result = cursor.fetchone()
+                return result is not None and result[0] is not None
+        else:
+            cursor.execute(sql.SQL("SELECT to_regclass(%s)"), [view._meta.db_table])
+            result = cursor.fetchone()
+            return result is not None and result[0] is not None
+
+    def _check_user_exists(self, user, cursor=None):
+        if cursor is None:
+            with connections[settings.DATA_DB_ALIAS].cursor() as cursor:
+                cursor.execute(
+                    "SELECT 1 FROM pg_roles WHERE rolname = %(username)s",
+                    {
+                        "username": user,
+                    },
+                )
+                result = cursor.fetchone()
+                return result is not None
+        else:
+            cursor.execute(
+                "SELECT 1 FROM pg_roles WHERE rolname = %(username)s",
+                {
+                    "username": user,
+                },
+            )
+            result = cursor.fetchone()
+            return result is not None
+
     def _refresh_views(self):
         views = ViewMigrationAutoDetector.get_current_view_models()
         for app_label, view_name in views:
             view = apps.get_model(app_label, view_name)
             if issubclass(view, DBMaterializedView):
+                if not self._check_view_exists(view):
+                    self.logger.warning(f"View {view._meta.label} does not exist")
+                    continue
                 self.logger.info(f"Refreshing view {view._meta.label}")
                 view.refresh(using=settings.DATA_DB_ALIAS)
                 self.logger.info(f"Refreshed view {view._meta.label}")
@@ -56,14 +91,7 @@ class Command(BaseScraper):
         with connections[settings.DATA_DB_ALIAS].cursor() as cursor:
             for username, models in user_models.items():
                 """Check if user already exists"""
-                cursor.execute(
-                    "SELECT 1 FROM pg_roles WHERE rolname = %(username)s",
-                    {
-                        "username": username,
-                    },
-                )
-                users = cursor.fetchall()
-                if len(users) == 0:
+                if not self._check_user_exists(username, cursor):
                     self.logger.warning(f"User {username} does not exist")
                     continue
 
@@ -81,11 +109,7 @@ class Command(BaseScraper):
 
                 for user, model in user_model_list:
                     # check if the table/view actually exists
-                    cursor.execute(
-                        sql.SQL("SELECT to_regclass(%s)"), [model._meta.db_table]
-                    )
-                    result = cursor.fetchone()
-                    if result is None or result[0] is None:
+                    if not self._check_view_exists(model, cursor):
                         self.logger.warning(
                             f"Table/view {model._meta.db_table} does not exist"
                         )
