@@ -17,9 +17,9 @@ class Migration(migrations.Migration):
                 DROP VIEW IF EXISTS superhighways_classification;
                 DROP VIEW IF EXISTS superhighways_area_of_operation;
                 DROP VIEW IF EXISTS superhighways_london_organisations;
-                DROP VIEW IF EXISTS superhighways_london_organisations_view;
+                DROP MATERIALIZED VIEW IF EXISTS superhighways_london_organisations_view;
                 DROP VIEW IF EXISTS ftc_charitydata;
-                DROP VIEW IF EXISTS tsg_organisation;
+                DROP MATERIALIZED VIEW IF EXISTS tsg_organisation;
             """,
             reverse_sql="",
         ),
