@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "django_db_views",
     "ftc",
     "ftcprofile",
     "charity",

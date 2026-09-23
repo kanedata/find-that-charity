@@ -1,14 +1,85 @@
-from ftc.management.commands._base_scraper import SQLRunner
+from django.apps import apps
+from django.conf import settings
+from django.db import connections
+from django_db_views.autodetector import ViewMigrationAutoDetector
+from django_db_views.db_view import DBMaterializedView
+
+from ftc.management.commands._base_scraper import BaseScraper
+
+DEFAULT_SHARED_MODELS = [
+    "ftc.*",
+    "charity.*",
+    "geo.*",
+    "other_data.*",
+]
 
 
-class Command(SQLRunner):
-    help = "Refresh charity data view"
-    name = "refresh_charity_data"
+class Command(BaseScraper):
+    help = "Refresh materialized data views"
+    name = "refresh_data_views"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.post_sql = {
-            "Refresh charity data view": """
-            REFRESH MATERIALIZED VIEW superhighways_london_organisations_view;
-            """
+    def run_scraper(self, *args, **kwargs):
+        self._refresh_views()
+        self._ensure_readonly_users()
+
+    def _refresh_views(self):
+        views = ViewMigrationAutoDetector.get_current_view_models()
+        for app_label, view_name in views:
+            view = apps.get_model(app_label, view_name)
+            if issubclass(view, DBMaterializedView):
+                self.logger.info(f"Refreshing view {view._meta.label}")
+                view.refresh(using=settings.DATA_DB_ALIAS)
+                self.logger.info(f"Refreshed view {view._meta.label}")
+
+    def _ensure_readonly_users(self):
+        # Implement logic to ensure readonly users have appropriate permissions
+        user_models = {
+            "alexa": [*DEFAULT_SHARED_MODELS],
+            "chrisd": [*DEFAULT_SHARED_MODELS],
+            "diarmuid": [*DEFAULT_SHARED_MODELS],
+            "karl": [*DEFAULT_SHARED_MODELS],
+            "kva": [*DEFAULT_SHARED_MODELS],
+            "priscilla": [*DEFAULT_SHARED_MODELS],
+            "rcvda": [*DEFAULT_SHARED_MODELS],
+            "read_only_user": [*DEFAULT_SHARED_MODELS],
+            "superhighways": [
+                "ftc.superhighwaysareaofoperation",
+                "ftc.superhighwaysclassification",
+                "ftc.superhighwayslondonorganisations",
+                "ftc.superhighwaystrustees",
+                "ftc.superhighwayslondonorganisationsview",
+            ],
+            "threesixtygiving": [*DEFAULT_SHARED_MODELS],
         }
+
+        with connections[settings.DATA_DB_ALIAS].cursor() as cursor:
+            for username, models in user_models.items():
+                """Check if user already exists"""
+                cursor.execute(
+                    "SELECT 1 FROM pg_roles WHERE rolname = %(username)s",
+                    {
+                        "username": username,
+                    },
+                )
+                users = cursor.fetchall()
+                if len(users) == 0:
+                    self.logger.warning(f"User {username} does not exist")
+                    continue
+
+                user_model_list = []
+                for model in models:
+                    app, model_name = model.split(".")
+                    if model_name == "*":
+                        app_models = apps.get_app_config(app).get_models()
+                        for app_model in app_models:
+                            user_model_list.append((username, app_model))
+                    else:
+                        user_model_list.append(
+                            (username, apps.get_model(app, model_name))
+                        )
+
+                for user, model in user_model_list:
+                    self.logger.info(
+                        f"Ensuring readonly permissions for user {user} on model {model._meta.label}"
+                    )
+                    cursor.execute(f"GRANT SELECT ON {model._meta.db_table} TO {user}")

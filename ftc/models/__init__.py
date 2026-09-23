@@ -1,4 +1,3 @@
-from ftc.models.charity_data import CharityData
 from ftc.models.organisation import EXTERNAL_LINKS, Organisation
 from ftc.models.organisation_classification import OrganisationClassification
 from ftc.models.organisation_link import OrganisationLink
@@ -10,6 +9,18 @@ from ftc.models.personal_data import PersonalData
 from ftc.models.related_organisation import RelatedOrganisation
 from ftc.models.scrape import Scrape
 from ftc.models.source import Source
+from ftc.models.views.superhighways.area_of_operation import (
+    SuperhighwaysAreaOfOperation,
+)
+from ftc.models.views.superhighways.classification import SuperhighwaysClassification
+from ftc.models.views.superhighways.london_organisations import (
+    SuperhighwaysLondonOrganisations,
+)
+from ftc.models.views.superhighways.london_organisations_view import (
+    SuperhighwaysLondonOrganisationsView,
+)
+from ftc.models.views.superhighways.trustees import SuperhighwaysTrustees
+from ftc.models.views.tsg import TsgOrganisations
 from ftc.models.vocabulary import Vocabulary, VocabularyEntries
 
 __all__ = [
@@ -28,5 +39,10 @@ __all__ = [
     "Source",
     "Vocabulary",
     "VocabularyEntries",
-    "CharityData",
+    "SuperhighwaysLondonOrganisationsView",
+    "SuperhighwaysLondonOrganisations",
+    "SuperhighwaysAreaOfOperation",
+    "SuperhighwaysClassification",
+    "SuperhighwaysTrustees",
+    "TsgOrganisations",
 ]

@@ -10,7 +10,7 @@ loc = 'uvx pygount --format=summary --folders-to-skip="[...],node_modules,static
 
 [tasks.mm]
 depends_post = ["fmt"]
-run = ['python manage.py makemigrations']
+run = ['python manage.py makeviewmigrations', 'python manage.py makemigrations']
 
 [tasks.m]
 depends = ["collectstatic"]
