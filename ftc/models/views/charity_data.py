@@ -1,13 +1,13 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django_db_views.db_view import DBMaterializedView
+from django_db_views.db_view import DBView
 
 
 class DataSources(models.TextChoices):
     CCEW = "ccew", "Charity Commission for England and Wales"
 
 
-class CharityData(DBMaterializedView):
+class CharityData(DBView):
     id = models.IntegerField(primary_key=True, db_index=True)
     source = models.CharField(
         max_length=255,

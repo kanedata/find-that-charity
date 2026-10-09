@@ -9,6 +9,7 @@ from ftc.models.personal_data import PersonalData
 from ftc.models.related_organisation import RelatedOrganisation
 from ftc.models.scrape import Scrape
 from ftc.models.source import Source
+from ftc.models.views.charity_data import CharityData
 from ftc.models.views.superhighways.area_of_operation import (
     SuperhighwaysAreaOfOperation,
 )
@@ -45,4 +46,5 @@ __all__ = [
     "SuperhighwaysClassification",
     "SuperhighwaysTrustees",
     "TsgOrganisations",
+    "CharityData",
 ]
