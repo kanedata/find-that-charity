@@ -285,6 +285,7 @@ select CONCAT('GB-CHC-', c.registered_charity_number) as charity_id,
     c.charity_name as "normalisedName",
     case when c.linked_charity_number != '0' then 'Subsidiary'
         when c.charity_name = ccc."charity_name" then 'Primary'
+        when c.charity_name_type = 'Working name' then 'Known as'
         else c.charity_name_type end as "name_type"
 from charity_ccewcharityothernames c
     left outer join charity_ccewcharity ccc
