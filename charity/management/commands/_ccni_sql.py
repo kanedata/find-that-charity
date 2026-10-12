@@ -71,6 +71,17 @@ where spider = %(spider_name)s
     and scrape_id != %(scrape_id)s
 """
 
+UPDATE_CCNI["Insert into charity names"] = """
+insert into charity_charityname as cn (charity_id, name, "normalisedName", name_type)
+select cc.org_id as org_id,
+    cc.data->>'Charity name' as "name",
+    cc.data->>'Charity name' as "normalisedName",
+    'Primary' as "name_type"
+from charity_charityraw cc
+where cc.spider = %(spider_name)s
+on conflict (charity_id, name) do nothing;
+"""
+
 UPDATE_CCNI["Insert into charity financial"] = """
 insert into charity_charityfinancial as cf (
     charity_id, fystart, fyend, income, inc_total, inc_vol, inc_char, inc_fr, inc_invest,

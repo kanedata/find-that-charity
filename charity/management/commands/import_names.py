@@ -39,6 +39,6 @@ class Command(CSVScraper):
                     "charity_id": record["org_id"],
                     "name": record["alternative_name"],
                     "normalisedName": record["alternative_name"],
-                    "name_type": "Alternative Name",
+                    "name_type": "Alternative",
                 },
             )

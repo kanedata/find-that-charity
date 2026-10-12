@@ -110,7 +110,7 @@ insert into charity_charityname as cn (charity_id, name, "normalisedName", name_
 select cc.org_id as org_id,
     cc.data->>'Charity Name' as "name",
     cc.data->>'Charity Name' as "normalisedName",
-    'Registered name' as "name_type"
+    'Primary' as "name_type"
 from charity_charityraw cc
 where cc.spider = %(spider_name)s
 union
