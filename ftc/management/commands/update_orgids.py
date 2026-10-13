@@ -141,6 +141,10 @@ UPDATE_ORGIDS_SQL = {
         SET linked_orgs_verified = string_to_array(org_id, '')
         WHERE linked_orgs_verified IS NULL
     """,
+    "Remove existing names from grant data": """
+        DELETE FROM charity_charityname
+        WHERE name_type = 'Grant'
+    """,
     "Add names from grant data": """
         INSERT INTO charity_charityname ("charity_id", "name", "name_type")
         SELECT "recipientOrganization_id" AS "charity_id",
