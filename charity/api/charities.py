@@ -4,7 +4,7 @@ from typing import Optional
 
 from django.http import Http404
 from django.shortcuts import get_list_or_404, get_object_or_404
-from ninja import Router, Schema
+from ninja import Router, Schema, Status
 
 from charity.models import Charity, CharityFinancial
 from charity.utils import regno_to_orgid
@@ -48,10 +48,13 @@ def get_charity(request, charity_id: str):
             "result": charity,
         }
     except Http404 as e:
-        return 404, {
-            "error": str(e),
-            "params": {"charity_id": charity_id},
-        }
+        return Status(
+            404,
+            {
+                "error": str(e),
+                "params": {"charity_id": charity_id},
+            },
+        )
 
 
 @api.get(
@@ -72,10 +75,13 @@ def get_charity_finance_latest(request, charity_id: str):
             "result": financial_years[0],
         }
     except Http404 as e:
-        return 404, {
-            "error": str(e),
-            "params": {"charity_id": charity_id},
-        }
+        return Status(
+            404,
+            {
+                "error": str(e),
+                "params": {"charity_id": charity_id},
+            },
+        )
 
 
 @api.get(
@@ -122,7 +128,10 @@ def get_charity_finance_by_date(request, charity_id: str, date: Date):
             "result": financial_year,
         }
     except Http404 as e:
-        return 404, {
-            "error": str(e),
-            "params": {"charity_id": charity_id, "date": date},
-        }
+        return Status(
+            404,
+            {
+                "error": str(e),
+                "params": {"charity_id": charity_id, "date": date},
+            },
+        )

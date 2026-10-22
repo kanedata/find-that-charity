@@ -1,4 +1,4 @@
-from django.shortcuts import Http404
+from django.http import Http404
 
 from ftc.query import OrganisationSearch, get_linked_organisations, get_organisation
 from ftc.tests import TestCase

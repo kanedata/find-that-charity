@@ -1,8 +1,9 @@
 from typing import List, Optional
 
 from django.core.paginator import Paginator
-from django.shortcuts import Http404, get_object_or_404
-from ninja import Query, Router, Schema
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+from ninja import Query, Router, Schema, Status
 
 from findthatcharity.utils import url_replace
 from ftc.api.filters import OrganisationFilter, OrganisationIn
@@ -133,10 +134,13 @@ def get_canonical_organisation(request, organisation_id: str):
             "result": organisation,
         }
     except Http404 as e:
-        return 404, {
-            "error": str(e),
-            "params": {"organisation_id": organisation_id},
-        }
+        return Status(
+            404,
+            {
+                "error": str(e),
+                "params": {"organisation_id": organisation_id},
+            },
+        )
 
 
 @api.get(
@@ -157,10 +161,13 @@ def get_linked_organisations(request, organisation_id: str):
             "previous": None,
         }
     except Http404 as e:
-        return 404, {
-            "error": str(e),
-            "params": {"organisation_id": organisation_id},
-        }
+        return Status(
+            404,
+            {
+                "error": str(e),
+                "params": {"organisation_id": organisation_id},
+            },
+        )
 
 
 @api.get(
@@ -179,10 +186,13 @@ def get_organisation_source(request, organisation_id: str):
             "result": organisation.source,
         }
     except Http404 as e:
-        return 404, {
-            "error": str(e),
-            "params": {"organisation_id": organisation_id},
-        }
+        return Status(
+            404,
+            {
+                "error": str(e),
+                "params": {"organisation_id": organisation_id},
+            },
+        )
 
 
 @api.get(
@@ -201,7 +211,10 @@ def get_organisation(request, organisation_id: str):
             "result": organisation,
         }
     except Http404 as e:
-        return 404, {
-            "error": str(e),
-            "params": {"organisation_id": organisation_id},
-        }
+        return Status(
+            404,
+            {
+                "error": str(e),
+                "params": {"organisation_id": organisation_id},
+            },
+        )

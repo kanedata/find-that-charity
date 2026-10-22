@@ -5,7 +5,7 @@ import os
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Func, Q
-from django.shortcuts import Http404
+from django.http import Http404
 from elasticsearch_dsl import A
 
 from ftc.documents import DSEPaginator, OrganisationGroup
