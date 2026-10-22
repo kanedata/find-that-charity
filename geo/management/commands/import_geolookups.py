@@ -19,32 +19,32 @@ class Command(BaseScraper):
     bulk_limit = 50000
     GEO_SOURCES = {
         "areas": GeoSource(
-            "https://github.com/drkane/geo-lookups/raw/master/area_all_codes.csv",
+            "https://github.com/drkane/geo-lookups/raw/main/area_all_codes.csv",
             None,
             "areacode",
             "areaname",
             "areatype",
         ),
         "msoa": GeoSource(
-            "https://github.com/drkane/geo-lookups/raw/master/msoa_la.csv",
+            "https://github.com/drkane/geo-lookups/raw/main/msoa_la.csv",
             "msoa",
             "MSOACD",
             "MSOAHCLNM",
         ),
         "lsoa": GeoSource(
-            "https://github.com/drkane/geo-lookups/raw/master/lsoa_la.csv",
+            "https://github.com/drkane/geo-lookups/raw/main/lsoa_la.csv",
             "lsoa",
             "LSOACD",
             "LSOANM",
         ),
         "ward": GeoSource(
-            "https://github.com/drkane/geo-lookups/raw/master/ward_all_codes.csv",
+            "https://github.com/drkane/geo-lookups/raw/main/ward_all_codes.csv",
             "ward",
             "WDCD",
             "WDNM",
         ),
         "pcon": GeoSource(
-            "https://github.com/drkane/geo-lookups/raw/master/pcon.csv",
+            "https://github.com/drkane/geo-lookups/raw/main/pcon.csv",
             "pcon",
             "PCON22CD",
             "PCON22NM",

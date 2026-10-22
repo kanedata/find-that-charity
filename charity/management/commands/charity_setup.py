@@ -17,7 +17,9 @@ class Command(BaseCommand):
 
     def fetch_cc_classifications(self):
         print("Fetching CC classifications")
-        ccew = "https://github.com/drkane/charity-lookups/raw/master/classification/ccew.csv"
+        ccew = (
+            "https://github.com/drkane/charity-lookups/raw/main/classification/ccew.csv"
+        )
 
         for f in ("theme", "beneficiaries", "activities"):
             v, _ = Vocabulary.objects.get_or_create(
@@ -37,7 +39,7 @@ class Command(BaseCommand):
 
     def fetch_icnpo(self):
         print("Fetching ICNPO")
-        icnpo = "https://github.com/drkane/charity-lookups/raw/master/classification/icnpo.csv"
+        icnpo = "https://github.com/drkane/charity-lookups/raw/main/classification/icnpo.csv"
         v, _ = Vocabulary.objects.update_or_create(
             slug="icnpo",
             title="International Classification of Non Profit Organisations (ICNPO)",
@@ -69,11 +71,13 @@ class Command(BaseCommand):
             )
 
     # def fetch_ntee(self):
-    #     ntee = 'https://github.com/drkane/charity-lookups/raw/master/classification/ntee.csv'
+    #     ntee = 'https://github.com/drkane/charity-lookups/raw/main/classification/ntee.csv'
 
     def fetch_aoo(self):
         print("Fetching AOO lookups")
-        aoo = "https://github.com/drkane/charity-lookups/raw/master/cc-aoo-gss-iso-new.csv"
+        aoo = (
+            "https://github.com/drkane/charity-lookups/raw/main/cc-aoo-gss-iso-new.csv"
+        )
         for r in self.get_csv(aoo):
             for k, v in r.items():
                 if v == "":

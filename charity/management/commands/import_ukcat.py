@@ -54,7 +54,7 @@ class Command(CSVScraper):
                 "International Classification of Non-profit "
                 "and Third Sector Organizations (ICNP/TSO)"
             ),
-            "code_url": "https://github.com/drkane/charity-lookups/raw/master/classification/icnptso.csv",
+            "code_url": "https://github.com/drkane/charity-lookups/raw/main/classification/icnptso.csv",
             "vocab": None,
             "entries": {},
             "field": "icnptso_code",

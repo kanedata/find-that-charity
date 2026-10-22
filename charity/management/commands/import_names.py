@@ -6,7 +6,7 @@ class Command(CSVScraper):
     name = "charity_names"
     allowed_domains = ["gist.githubusercontent.com"]
     start_urls = [
-        "https://raw.githubusercontent.com/drkane/charity-lookups/master/charity-names.csv",
+        "https://raw.githubusercontent.com/drkane/charity-lookups/main/charity-names.csv",
     ]
     source = {
         "title": "Charity Alternative Names",
@@ -22,8 +22,8 @@ class Command(CSVScraper):
         },
         "distribution": [
             {
-                "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/master/charity-names.csv",
-                "accessURL": "https://github.com/drkane/charity-lookups/blob/master/charity-names.csv",
+                "downloadURL": "https://raw.githubusercontent.com/drkane/charity-lookups/main/charity-names.csv",
+                "accessURL": "https://github.com/drkane/charity-lookups/blob/main/charity-names.csv",
                 "title": "Find that Charity alternative names",
             }
         ],

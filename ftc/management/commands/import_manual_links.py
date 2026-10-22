@@ -26,8 +26,8 @@ class Command(CSVScraper):
             },
             "distribution": [
                 {
-                    "downloadURL": "https://github.com/drkane/charity-lookups/raw/master/relationships/_sameas.csv",
-                    "accessURL": "https://github.com/drkane/charity-lookups/tree/master/relationships",
+                    "downloadURL": "https://github.com/drkane/charity-lookups/raw/main/relationships/_sameas.csv",
+                    "accessURL": "https://github.com/drkane/charity-lookups/tree/main/relationships",
                     "title": "Find that Charity Relationship Lookups",
                 }
             ],
