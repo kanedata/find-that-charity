@@ -4,7 +4,7 @@ from django.db import NotSupportedError, connections
 from django.db.models import Manager, Model
 from django.db.models.constants import OnConflict
 from django.db.models.query import QuerySet
-from psycopg2.extras import execute_values
+from psycopg import sql
 
 
 # from https://gist.github.com/aisayko/dcacd546bcb17a740dec703de6b2377e
@@ -13,31 +13,34 @@ def bulk_upsert(model: Model, fields: List[str], values: List[List], by: List[st
     Return the tuple of (inserted, updated) ids
     """
 
-    def comma_separated(items):
-        return ", ".join([f'"{i}"' for i in items])
+    def comma_separated(items) -> sql.Composed:
+        return sql.SQL(",").join([sql.Identifier(i) for i in items])
 
     if values:
-        stmt = """
-            INSERT INTO "{table}" ({fields_str})
-            VALUES %s
+        stmt = sql.SQL("""
+            INSERT INTO {table} ({fields_str})
+            VALUES ({values})
             ON CONFLICT ({by})
-            DO
-            UPDATE SET ({set_fields})=({set_values})
-        """
-        set_fields = comma_separated([f for f in fields if f not in by])
-        set_values = ", ".join([f'EXCLUDED."{f}"' for f in fields if f not in by])
+            DO UPDATE SET {set_values}
+        """)
+        set_values = sql.SQL(",").join(
+            [
+                sql.SQL("{} = EXCLUDED.{}").format(sql.Identifier(f), sql.Identifier(f))
+                for f in fields
+                if f not in by
+            ]
+        )
 
         formatted_sql = stmt.format(
-            table=model._meta.db_table,
+            table=sql.Identifier(model._meta.db_table),
             fields_str=comma_separated(fields),
+            values=sql.SQL(", ").join(sql.Placeholder() * len(fields)),
             by=comma_separated(by),
-            set_fields=set_fields,
             set_values=set_values,
         )
 
         with connections["data"].cursor() as cursor:
-            execute_values(
-                cursor,
+            cursor.executemany(
                 formatted_sql,
                 [tuple(row.get(f) for f in fields) for row in values],
             )

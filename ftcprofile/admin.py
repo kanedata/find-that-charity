@@ -3,7 +3,7 @@ from django.contrib import admin, messages
 from django.db import ProgrammingError, connections
 from django.template.loader import render_to_string
 from django.utils.html import format_html_join, mark_safe
-from psycopg2 import sql
+from psycopg import sql
 
 from findthatcharity.db_router import DBRouter
 from ftcprofile.models import DatabaseUser

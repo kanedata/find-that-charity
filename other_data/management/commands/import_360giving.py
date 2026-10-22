@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg
 from django.conf import settings
 from tqdm import tqdm
 
@@ -82,7 +82,7 @@ class Command(BaseScraper):
 
         # setup database connection
         self.logger.info("Connecting to database")
-        self.tsg_connection = psycopg2.connect(options["db_con"])
+        self.tsg_connection = psycopg.connect(options["db_con"])
         self.tsg_cursor = self.tsg_connection.cursor()
 
         # run the query

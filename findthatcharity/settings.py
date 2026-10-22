@@ -336,12 +336,21 @@ TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
 
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
-EMAIL_HOST = os.environ.get("EMAIL_HOST")
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
-EMAIL_PORT = os.environ.get("EMAIL_PORT")
-EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"
-EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"
+_email_host = os.environ.get("EMAIL_HOST")
+if _email_host:
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": _email_host,
+                "user": os.environ.get("EMAIL_HOST_USER"),
+                "password": os.environ.get("EMAIL_HOST_PASSWORD"),
+                "port": os.environ.get("EMAIL_PORT"),
+                "use_ssl": os.environ.get("EMAIL_USE_SSL") == "True",
+                "use_tls": os.environ.get("EMAIL_USE_TLS") == "True",
+            },
+        }
+    }
 
 S3_REGION = os.environ.get("S3_REGION")
 S3_ENDPOINT = os.environ.get("S3_ENDPOINT")

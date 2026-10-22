@@ -3,9 +3,10 @@ import csv
 import io
 import re
 import zipfile
+from itertools import batched
 
-import psycopg2
 import tqdm
+from psycopg import sql
 
 from charity.management.commands._ccew_sql import UPDATE_CCEW
 from charity.models import (
@@ -146,16 +147,20 @@ class Command(BaseScraper):
         )
         self.logger.info("Starting table insert [{}]".format(db_table._meta.db_table))
         db_table.objects.all().delete()
-        statement = """INSERT INTO "{table}" ("{fields}") VALUES %s;""".format(
-            table=db_table._meta.db_table,
-            fields='", "'.join(["id"] + list(reader.fieldnames)),
+        statement = sql.SQL(
+            """INSERT INTO {table} ({fields}) VALUES ({values});"""
+        ).format(
+            table=sql.Identifier(db_table._meta.db_table),
+            fields=sql.SQL(", ").join(
+                [sql.Identifier("id")] + [sql.Identifier(f) for f in reader.fieldnames]
+            ),
+            values=sql.SQL(", ").join(sql.Placeholder() * (len(reader.fieldnames) + 1)),
         )
-        psycopg2.extras.execute_values(
-            self.cursor,
-            statement,
-            get_data(reader, len(reader.fieldnames) + 1),
-            page_size=page_size,
-        )
+        for batch in batched(get_data(reader, len(reader.fieldnames) + 1), page_size):
+            self.cursor.executemany(
+                statement,
+                batch,
+            )
         self.logger.info("Finished table insert [{}]".format(db_table._meta.db_table))
 
     def close_spider(self):

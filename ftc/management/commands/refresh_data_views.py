@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db import connections
 from django_db_views.autodetector import ViewMigrationAutoDetector
 from django_db_views.db_view import DBMaterializedView
-from psycopg2 import sql
+from psycopg import sql
 
 from ftc.management.commands._base_scraper import BaseScraper
 
