@@ -69,6 +69,15 @@
           versions of the data and should be contacted in
           the event of any issues with the data on this site.
         </p>
+        <a href="https://status.kanedata.co.uk?utm_source=status_badge&utm_medium=referral" target="_blank"
+          rel="noopener" class="fr-l">
+          <picture>
+            <source media="(prefers-color-scheme: dark)"
+              srcset="https://badge.uptimerobot.com/psp/4a4fa58a3aac1b82b0ad4a89bf93a0d3.svg?style=text&theme=dark">
+            <img src="https://badge.uptimerobot.com/psp/4a4fa58a3aac1b82b0ad4a89bf93a0d3.svg?style=text&theme=light"
+              alt="Kane Data status">
+          </picture>
+        </a>
       </div>
       <div class="w-100 w-two-thirds-l">
         <p class="mv2 pa0">
@@ -87,7 +96,7 @@
             title="View code on Github">Code</a> [{%- if GIT_REV -%}
           <a href="https://github.com/kanedata/find-that-charity/commit/{{ GIT_REV }}"
             class="link yellow underline-hover code">{{ GIT_REV[0:7] }}</a> -
-          {% endif %}
+          {%- endif -%}
           <a href="https://github.com/kanedata/find-that-charity/blob/main/LICENSE" target="_blank"
             class="link yellow underline-hover">MIT License</a>]
         </div>
