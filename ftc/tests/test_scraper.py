@@ -17,11 +17,11 @@ MOCK_FILES = (
         "ror-data.zip",
     ),
     (
-        "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/master/cascs.csv",
+        "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/main/cascs.csv",
         "cascs.csv",
     ),
     (
-        "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/master/casc_company_house.csv",
+        "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/main/casc_company_house.csv",
         "casc_company_house.csv",
     ),
 )

@@ -8,8 +8,8 @@ class Command(CSVScraper):
     name = "casc"
     allowed_domains = ["raw.githubusercontent.com"]
     start_urls = [
-        "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/master/casc_company_house.csv",
-        "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/master/cascs.csv",
+        "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/main/casc_company_house.csv",
+        "https://raw.githubusercontent.com/ThreeSixtyGiving/cascs/main/cascs.csv",
     ]
     org_id_prefix = "GB-CASC"
     id_field = "id"
