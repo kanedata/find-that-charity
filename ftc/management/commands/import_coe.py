@@ -15,7 +15,7 @@ class Command(HTMLScraper):
     name = "coe"
     allowed_domains = ["churchofengland.org"]
     start_urls = [
-        "https://www.churchofengland.org/resources/churchcare/churchcare-grants/open-grant-data-360-giving",
+        "https://www.churchofengland.org/national-bodies/church-commissioners-england/what-we-do/cathedrals-and-church-buildings-4/open",
     ]
     org_id_prefix = "GB-COE"
     id_field = "church code"
@@ -36,7 +36,7 @@ class Command(HTMLScraper):
         "distribution": [
             {
                 "downloadURL": "",
-                "accessURL": "https://www.churchofengland.org/resources/churchcare/churchcare-grants/open-grant-data-360-giving",
+                "accessURL": "https://www.churchofengland.org/national-bodies/church-commissioners-england/what-we-do/cathedrals-and-church-buildings-4/open",
                 "title": "All open-for-worship churches",
             }
         ],
